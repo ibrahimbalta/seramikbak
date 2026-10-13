@@ -1761,70 +1761,70 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {viewMode === 'editor' && (
         <div className="space-y-4 pb-16">
           {/* Editor Top Header with Mode Switcher (Kolay Mod / Gelişmiş Studio) */}
-          <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-2xs p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
             {/* Left: Back + Title & Badge */}
-            <div className="flex items-center gap-3.5 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className="p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition flex-shrink-0 cursor-pointer"
+                className="p-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition flex-shrink-0 cursor-pointer"
                 title="Katalog Listesine Dön"
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={15} />
               </button>
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-[#b4823c] bg-amber-50 px-2 py-0.5 rounded border border-amber-200 uppercase tracking-wide">
-                    {activeCatalogId ? 'Katalog Düzenleme' : 'Yeni Katalog Stüdyosu'}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60 uppercase tracking-wide">
+                    {activeCatalogId ? 'Düzenleme' : 'Yeni Katalog'}
                   </span>
-                  <span className="text-[10px] font-mono text-neutral-400">
-                    {formData.dataMode === 'live' ? '• Canlı Ürün Verisi' : '• Sabit Sürüm'}
+                  <span className="text-[10px] text-neutral-400">
+                    {formData.dataMode === 'live' ? '• Canlı Stok' : '• Sabit Sürüm'}
                   </span>
                 </div>
-                <h2 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5 truncate">
+                <h2 className="text-sm sm:text-base font-bold text-neutral-900 mt-0.5 truncate">
                   {formData.title || 'Başlıksız Katalog'}
                 </h2>
               </div>
             </div>
 
             {/* Center: Mode Switcher (Kolay Mod vs Gelişmiş Studio) */}
-            <div className="flex items-center bg-neutral-100 p-1.5 rounded-2xl border border-neutral-200 flex-shrink-0 self-start md:self-center">
+            <div className="flex items-center bg-neutral-100/90 p-1 rounded-xl border border-neutral-200/80 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-start">
               <button
                 type="button"
                 onClick={() => setStudioMode('easy')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   studioMode === 'easy'
                     ? 'bg-white text-neutral-900 shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-900'
+                    : 'text-neutral-500 hover:text-neutral-800'
                 }`}
               >
-                <Sparkles size={14} className="text-[#b4823c]" />
-                <span>Kolay Mod (Adım Adım)</span>
+                <Sparkles size={13} className="text-amber-500" />
+                <span>Kolay Mod</span>
               </button>
               <button
                 type="button"
                 onClick={() => setStudioMode('advanced')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${
+                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   studioMode === 'advanced'
                     ? 'bg-neutral-900 text-white shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-900'
+                    : 'text-neutral-500 hover:text-neutral-800'
                 }`}
               >
-                <Wand2 size={14} className="text-amber-400" />
-                <span>Gelişmiş Studio (Tuval)</span>
+                <Wand2 size={13} className="text-amber-400" />
+                <span>Gelişmiş Tuval</span>
               </button>
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
               {activeCatalogId && (
                 <button
                   type="button"
                   onClick={(e) => handleDelete({ id: activeCatalogId, title: formData.title }, e)}
-                  className="px-3 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-medium transition flex items-center gap-1 cursor-pointer"
                   title="Kataloğu Sil"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={13} />
                   <span className="hidden sm:inline">Sil</span>
                 </button>
               )}
@@ -1832,19 +1832,19 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 type="button"
                 onClick={() => handleSaveCatalog(false)}
                 disabled={saving}
-                className="px-4 py-2.5 rounded-xl border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                className="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
               >
-                {saving ? <Loader2 size={13} className="animate-spin" /> : null}
-                <span>Taslak Kaydet</span>
+                {saving ? <Loader2 size={12} className="animate-spin" /> : null}
+                <span>Taslak</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSaveCatalog(true)}
                 disabled={saving}
-                className="px-4 py-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <Sparkles size={14} />
-                <span>Kataloğu Yayınla</span>
+                <Sparkles size={13} />
+                <span>Yayınla</span>
               </button>
             </div>
           </div>
@@ -1883,30 +1883,30 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             /* ==================== MODE B: KOLAY MOD (6 ADIMLI SİHİRBAZ) ==================== */
             <>
               {/* High-End Stepper Navigation */}
-              <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-3.5 sm:p-4.5">
+              <div className="bg-white rounded-xl border border-neutral-200 shadow-2xs p-3 sm:p-4">
                 {/* Stepper Progress Bar Header */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-100 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                    <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-neutral-500">
+                <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-neutral-100 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="text-[11px] font-semibold text-neutral-600">
                       Adım {activeStep} / 6 • {STEPS[activeStep - 1]?.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-semibold text-neutral-400">İlerleme:</span>
-                    <div className="w-28 h-2 rounded-full bg-neutral-100 overflow-hidden">
+                    <span className="text-[10px] text-neutral-400">İlerleme:</span>
+                    <div className="w-20 sm:w-28 h-1.5 rounded-full bg-neutral-100 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-amber-500 to-[#b4823c] transition-all duration-300"
+                        className="h-full bg-amber-500 transition-all duration-300"
                         style={{ width: `${Math.round((activeStep / 6) * 100)}%` }}
                       />
                     </div>
-                    <span className="text-[11px] font-mono font-bold text-neutral-700">
+                    <span className="text-[10px] font-mono font-semibold text-neutral-600">
                       %{Math.round((activeStep / 6) * 100)}
                     </span>
                   </div>
                 </div>
 
-                <div className="hidden lg:grid grid-cols-6 gap-2.5">
+                <div className="hidden lg:grid grid-cols-6 gap-2">
                   {STEPS.map((step) => {
                     const isActive = activeStep === step.num;
                     const isPassed = activeStep > step.num;
@@ -1917,28 +1917,28 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         key={step.num}
                         type="button"
                         onClick={() => setActiveStep(step.num)}
-                        className={`group relative p-3 rounded-xl text-left border transition-all duration-200 flex items-center gap-3 cursor-pointer ${
+                        className={`group relative p-2.5 rounded-lg text-left border transition-all duration-200 flex items-center gap-2.5 cursor-pointer ${
                           isActive
-                            ? 'border-amber-500/80 bg-gradient-to-br from-amber-50/70 to-orange-50/40 shadow-sm ring-2 ring-amber-500/20'
+                            ? 'border-amber-400 bg-amber-50/50 shadow-2xs'
                             : isPassed
-                            ? 'border-emerald-200 bg-emerald-50/30 text-emerald-950 hover:bg-emerald-50/60'
-                            : 'border-neutral-200/80 bg-neutral-50/40 text-neutral-500 hover:bg-neutral-100 hover:border-neutral-300'
+                            ? 'border-emerald-200 bg-emerald-50/30 text-emerald-900 hover:bg-emerald-50/60'
+                            : 'border-neutral-200/70 bg-neutral-50/50 text-neutral-500 hover:bg-neutral-100'
                         }`}
                       >
                         <div
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 transition-transform group-hover:scale-105 shadow-2xs ${
+                          className={`w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 transition-transform ${
                             isActive
-                              ? 'bg-gradient-to-br from-[#b4823c] to-amber-600 text-white shadow-amber-500/20'
+                              ? 'bg-amber-600 text-white'
                               : isPassed
                               ? 'bg-emerald-600 text-white'
                               : 'bg-white border border-neutral-200 text-neutral-400'
                           }`}
                         >
-                          {isPassed ? <Check size={14} strokeWidth={2.5} /> : <StepIcon size={14} />}
+                          {isPassed ? <Check size={12} strokeWidth={2.5} /> : <StepIcon size={12} />}
                         </div>
                         <div className="overflow-hidden min-w-0">
                           <p
-                            className={`text-xs font-extrabold truncate ${
+                            className={`text-xs font-semibold truncate ${
                               isActive ? 'text-neutral-900' : isPassed ? 'text-emerald-900' : 'text-neutral-700'
                             }`}
                           >
@@ -1951,27 +1951,34 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   })}
                 </div>
 
-                {/* Mobile Stepper */}
-                <div className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  {STEPS.map((step) => {
+                {/* Mobile Stepper - Clean, modern CRM pill layout with compact buttons and subtle colors */}
+                <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {[
+                    { num: 1, label: 'Bilgiler', icon: FileText },
+                    { num: 2, label: `Ürünler (${formData.selectedItems.length})`, icon: Layers },
+                    { num: 3, label: 'Şablon', icon: LayoutTemplate },
+                    { num: 4, label: 'Marka', icon: Palette },
+                    { num: 5, label: 'Tasarım', icon: Sliders },
+                    { num: 6, label: 'Önizleme', icon: Sparkles }
+                  ].map((step) => {
                     const isActive = activeStep === step.num;
                     const isPassed = activeStep > step.num;
-                    const StepIcon = step.icon || FileText;
+                    const StepIcon = step.icon;
 
                     return (
                       <button
                         key={step.num}
                         type="button"
                         onClick={() => setActiveStep(step.num)}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer border ${
                           isActive
-                            ? 'bg-neutral-900 text-amber-400 shadow-sm'
+                            ? 'bg-amber-500 text-white border-amber-600 shadow-2xs font-semibold'
                             : isPassed
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-neutral-100 text-neutral-600'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100'
                         }`}
                       >
-                        <StepIcon size={12} />
+                        <StepIcon size={11} className={isActive ? 'text-white' : isPassed ? 'text-emerald-600' : 'text-neutral-400'} />
                         <span>{step.num}. {step.label}</span>
                       </button>
                     );
@@ -1980,148 +1987,147 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               </div>
 
               {/* Step Content Area */}
-              <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-5 sm:p-8">
+              <div className="bg-white rounded-xl border border-neutral-200 shadow-2xs p-3.5 sm:p-6">
                 {/* STEP 1: KATALOG BİLGİLERİ & ÇOK DİLLİ AYARLAR */}
                 {activeStep === 1 && (
-                  <div className="space-y-6">
-                    {/* Header Banner */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-stone-50 via-amber-50/20 to-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-4 sm:space-y-5">
+                    {/* Header Banner - Compact & Clean CRM style */}
+                    <div className="p-3 sm:p-4 rounded-lg bg-neutral-50/80 border border-neutral-200/80 flex items-center justify-between gap-3">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/10 text-[#b4823c] font-mono text-[10px] font-bold uppercase tracking-wider">
-                            ADIM 1 / 6
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-semibold tracking-wide">
+                            ADIM 1
                           </span>
-                          <span className="text-xs font-mono text-neutral-400">• Mimari Standart</span>
+                          <h3 className="text-xs sm:text-sm font-bold text-neutral-800 flex items-center gap-1.5">
+                            <FileText size={14} className="text-amber-600" />
+                            <span>Katalog Temel Bilgileri & Dil</span>
+                          </h3>
                         </div>
-                        <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-1 flex items-center gap-2">
-                          <FileText size={18} className="text-[#b4823c]" />
-                          <span>Katalog Temel Bilgileri & Yayın Dili</span>
-                        </h3>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          Kataloğunuzun başlığı, kapak metinleri, ölçü oryantasyonu ve hedef pazar dilini belirleyin.
+                        <p className="text-[11px] text-neutral-500 mt-0.5 hidden sm:block">
+                          Kataloğunuzun başlığı, kapak metinleri, sayfa yönü ve dilini belirleyin.
                         </p>
                       </div>
-                      <div className="hidden md:flex items-center gap-2 text-xs font-bold text-neutral-600 bg-white px-3 py-2 rounded-xl border border-neutral-200 shadow-2xs">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span>Canlı Önizleme Aktif</span>
+                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200/60 flex-shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span>Canlı Önizleme</span>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
                       {/* Left: Input Form (7 cols) */}
-                      <div className="lg:col-span-7 space-y-4.5">
+                      <div className="lg:col-span-7 space-y-3 sm:space-y-4">
                         {/* Title Input */}
-                        <div className="space-y-1.5 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
-                          <label className="text-xs font-extrabold text-neutral-800 flex items-center justify-between">
-                            <span>Katalog Resmi Adı *</span>
-                            <span className="text-[10px] font-normal text-neutral-400">Marka panelinde görünür</span>
+                        <div className="space-y-1 bg-white p-3 sm:p-3.5 rounded-lg border border-neutral-200/90 shadow-2xs">
+                          <label className="text-[11px] font-semibold text-neutral-700 flex items-center justify-between">
+                            <span>Katalog Adı *</span>
+                            <span className="text-[10px] text-neutral-400 font-normal">Panelde görünür</span>
                           </label>
                           <input
                             type="text"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            placeholder="Örn: Bien Seramik 2026 Genel Katalog"
-                            className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs sm:text-sm font-semibold text-neutral-900 transition-all outline-none"
+                            placeholder="Örn: 2026 Genel Katalog"
+                            className="w-full px-3 py-2 bg-neutral-50/60 hover:bg-white focus:bg-white border border-neutral-200 focus:border-amber-500 rounded-lg text-xs font-medium text-neutral-900 transition-all outline-none"
                           />
                         </div>
 
                         {/* Cover Titles */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-extrabold text-neutral-800 block">Kapak Ana Başlığı</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 bg-white p-3 sm:p-3.5 rounded-lg border border-neutral-200/90 shadow-2xs">
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-semibold text-neutral-700 block">Kapak Ana Başlığı</label>
                             <input
                               type="text"
                               value={formData.coverTitle}
                               onChange={(e) => setFormData({ ...formData, coverTitle: e.target.value })}
                               placeholder="SERAMİK KOLEKSİYONU 2026"
-                              className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-semibold text-neutral-900 transition-all outline-none"
+                              className="w-full px-3 py-2 bg-neutral-50/60 hover:bg-white focus:bg-white border border-neutral-200 focus:border-amber-500 rounded-lg text-xs font-medium text-neutral-900 transition-all outline-none"
                             />
                           </div>
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-extrabold text-neutral-800 block">Kapak Alt Başlığı</label>
+                          <div className="space-y-1">
+                            <label className="text-[11px] font-semibold text-neutral-700 block">Kapak Alt Başlığı</label>
                             <input
                               type="text"
                               value={formData.coverSubtitle}
                               onChange={(e) => setFormData({ ...formData, coverSubtitle: e.target.value })}
-                              placeholder="TECHNICAL & ARCHITECTURAL CATALOG"
-                              className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-semibold text-neutral-900 transition-all outline-none"
+                              placeholder="ARCHITECTURAL CATALOG"
+                              className="w-full px-3 py-2 bg-neutral-50/60 hover:bg-white focus:bg-white border border-neutral-200 focus:border-amber-500 rounded-lg text-xs font-medium text-neutral-900 transition-all outline-none"
                             />
                           </div>
-                          <div className="sm:col-span-2 space-y-1.5 pt-1">
-                            <label className="text-xs font-extrabold text-neutral-800 block">Koleksiyon Önsöz / Manifesto Metni</label>
+                          <div className="sm:col-span-2 space-y-1 pt-0.5">
+                            <label className="text-[11px] font-semibold text-neutral-700 block">Önsöz / Tanıtım Metni</label>
                             <textarea
-                              rows={3}
+                              rows={2}
                               value={formData.introText}
                               onChange={(e) => setFormData({ ...formData, introText: e.target.value })}
-                              placeholder="Yenilikçi yüzey teknolojileri, yüksek dayanımlı porselen gövde ve çağdaş tasarım estetiği..."
-                              className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-800 transition-all outline-none leading-relaxed"
+                              placeholder="Katalog tanıtım yazısı..."
+                              className="w-full px-3 py-2 bg-neutral-50/60 hover:bg-white focus:bg-white border border-neutral-200 focus:border-amber-500 rounded-lg text-xs text-neutral-800 transition-all outline-none leading-relaxed"
                             />
                           </div>
                         </div>
 
                         {/* Orientation Selection */}
-                        <div className="space-y-2 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
-                          <label className="text-xs font-extrabold text-neutral-800 block">Sayfa Yönlendirmesi & Ölçü Standartı</label>
-                          <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5 bg-white p-3 sm:p-3.5 rounded-lg border border-neutral-200/90 shadow-2xs">
+                          <label className="text-[11px] font-semibold text-neutral-700 block">Sayfa Yönü</label>
+                          <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
                             <button
                               type="button"
                               onClick={() => setFormData({ ...formData, orientation: 'portrait' })}
-                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 cursor-pointer ${
+                              className={`p-2.5 rounded-lg border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
                                 formData.orientation === 'portrait'
-                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
-                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                                  ? 'border-amber-500 bg-amber-50/40 shadow-2xs'
+                                  : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300'
                               }`}
                             >
                               <div
-                                className={`w-7 h-9 rounded border-2 flex items-center justify-center text-[9px] font-mono font-bold flex-shrink-0 ${
+                                className={`w-6 h-8 rounded border flex items-center justify-center text-[8px] font-mono font-bold flex-shrink-0 ${
                                   formData.orientation === 'portrait'
-                                    ? 'border-[#b4823c] bg-[#b4823c]/10 text-[#b4823c]'
+                                    ? 'border-amber-600 bg-amber-100 text-amber-800'
                                     : 'border-neutral-300 text-neutral-400'
                                 }`}
                               >
                                 A4
                               </div>
                               <div>
-                                <p className="text-xs font-extrabold text-neutral-900">A4 Dikey (Portrait)</p>
-                                <p className="text-[10px] text-neutral-400 font-mono">210 × 297 mm • Standart</p>
+                                <p className="text-xs font-semibold text-neutral-900">A4 Dikey</p>
+                                <p className="text-[10px] text-neutral-400 font-mono">210 × 297 mm</p>
                               </div>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setFormData({ ...formData, orientation: 'landscape' })}
-                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 cursor-pointer ${
+                              className={`p-2.5 rounded-lg border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
                                 formData.orientation === 'landscape'
-                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
-                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                                  ? 'border-amber-500 bg-amber-50/40 shadow-2xs'
+                                  : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300'
                               }`}
                             >
                               <div
-                                className={`w-9 h-7 rounded border-2 flex items-center justify-center text-[9px] font-mono font-bold flex-shrink-0 ${
+                                className={`w-8 h-6 rounded border flex items-center justify-center text-[8px] font-mono font-bold flex-shrink-0 ${
                                   formData.orientation === 'landscape'
-                                    ? 'border-[#b4823c] bg-[#b4823c]/10 text-[#b4823c]'
+                                    ? 'border-amber-600 bg-amber-100 text-amber-800'
                                     : 'border-neutral-300 text-neutral-400'
                                 }`}
                               >
                                 A4
                               </div>
                               <div>
-                                <p className="text-xs font-extrabold text-neutral-900">A4 Yatay (Landscape)</p>
-                                <p className="text-[10px] text-neutral-400 font-mono">297 × 210 mm • Lookbook</p>
+                                <p className="text-xs font-semibold text-neutral-900">A4 Yatay</p>
+                                <p className="text-[10px] text-neutral-400 font-mono">297 × 210 mm</p>
                               </div>
                             </button>
                           </div>
                         </div>
 
                         {/* Multi-Language Selection */}
-                        <div className="space-y-2 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
-                          <label className="text-xs font-extrabold text-neutral-800 block">Katalog Yayın Dili</label>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div className="space-y-1.5 bg-white p-3 sm:p-3.5 rounded-lg border border-neutral-200/90 shadow-2xs">
+                          <label className="text-[11px] font-semibold text-neutral-700 block">Katalog Dili</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
                             {[
                               { code: 'tr', flag: '🇹🇷', label: 'Türkçe', sub: 'İç Pazar' },
-                              { code: 'en', flag: '🇬🇧', label: 'English', sub: 'Global Export' },
-                              { code: 'de', flag: '🇩🇪', label: 'Deutsch', sub: 'DACH Bölgesi' },
-                              { code: 'ar', flag: '🇸🇦', label: 'العربية', sub: 'MENA Pazarı' }
+                              { code: 'en', flag: '🇬🇧', label: 'English', sub: 'Global' },
+                              { code: 'de', flag: '🇩🇪', label: 'Deutsch', sub: 'Avrupa' },
+                              { code: 'ar', flag: '🇸🇦', label: 'العربية', sub: 'Orta Doğu' }
                             ].map((lang) => {
                               const isSelected = formData.language === lang.code;
                               return (
@@ -2129,17 +2135,17 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                   key={lang.code}
                                   type="button"
                                   onClick={() => setFormData({ ...formData, language: lang.code })}
-                                  className={`p-2.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${
+                                  className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
                                     isSelected
-                                      ? 'border-[#b4823c] bg-amber-50/50 shadow-2xs'
-                                      : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                                      ? 'border-amber-500 bg-amber-50/50 shadow-2xs'
+                                      : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300'
                                   }`}
                                 >
-                                  <div className="flex items-center gap-1.5 mb-1">
-                                    <span className="text-base">{lang.flag}</span>
-                                    <span className="text-xs font-extrabold text-neutral-900">{lang.label}</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-sm">{lang.flag}</span>
+                                    <span className="text-xs font-semibold text-neutral-900">{lang.label}</span>
                                   </div>
-                                  <p className="text-[10px] text-neutral-400 truncate">{lang.sub}</p>
+                                  <p className="text-[9px] text-neutral-400 truncate mt-0.5">{lang.sub}</p>
                                 </button>
                               );
                             })}
@@ -2147,44 +2153,44 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         </div>
 
                         {/* Data Sync Mode: Live vs Snapshot */}
-                        <div className="space-y-2 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
-                          <label className="text-xs font-extrabold text-neutral-800 block">
-                            Akıllı Ürün Güncelleme ve Sürümleme Davranışı
+                        <div className="space-y-1.5 bg-white p-3 sm:p-3.5 rounded-lg border border-neutral-200/90 shadow-2xs">
+                          <label className="text-[11px] font-semibold text-neutral-700 block">
+                            Ürün Veri Senkronizasyonu
                           </label>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <button
                               type="button"
                               onClick={() => setFormData({ ...formData, dataMode: 'live' })}
-                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${
+                              className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                                 formData.dataMode === 'live'
-                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
-                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                                  ? 'border-amber-500 bg-amber-50/40 shadow-2xs'
+                                  : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300'
                               }`}
                             >
-                              <div className="flex items-center gap-2 mb-1">
-                                <RefreshCw size={13} className="text-[#b4823c]" />
-                                <span className="text-xs font-extrabold text-neutral-900">Canlı Veri Modu (Önerilen)</span>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <RefreshCw size={12} className="text-amber-600" />
+                                <span className="text-xs font-semibold text-neutral-900">Canlı Stok Senkronu</span>
                               </div>
-                              <p className="text-[11px] text-neutral-500 leading-relaxed">
-                                Fabrika veritabanındaki ürün resmi veya ebat değiştikçe tasarımı bozmadan senkronize eder.
+                              <p className="text-[10px] text-neutral-500 leading-tight">
+                                Ürün değiştikçe katalog otomatik güncellenir.
                               </p>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => setFormData({ ...formData, dataMode: 'snapshot' })}
-                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${
+                              className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                                 formData.dataMode === 'snapshot'
-                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
-                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                                  ? 'border-amber-500 bg-amber-50/40 shadow-2xs'
+                                  : 'border-neutral-200 bg-neutral-50/50 hover:border-neutral-300'
                               }`}
                             >
-                              <div className="flex items-center gap-2 mb-1">
-                                <Archive size={13} className="text-neutral-600" />
-                                <span className="text-xs font-extrabold text-neutral-900">Sabit Sürüm (Arşiv)</span>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <Archive size={12} className="text-neutral-500" />
+                                <span className="text-xs font-semibold text-neutral-900">Sabit Sürüm (Arşiv)</span>
                               </div>
-                              <p className="text-[11px] text-neutral-500 leading-relaxed">
-                                Tasarım o anki verilerle dondurulur; sonraki ürün değişikliklerinden asla etkilenmez.
+                              <p className="text-[10px] text-neutral-500 leading-tight">
+                                Tasarım o anki verilerle dondurulur.
                               </p>
                             </button>
                           </div>
@@ -2204,45 +2210,45 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         </div>
 
                         {/* Interactive Simulated Book Cover */}
-                        <div className="bg-neutral-950 rounded-2xl p-5 border border-neutral-800 shadow-xl overflow-hidden relative group text-white">
+                        <div className="bg-neutral-900 rounded-xl p-4 sm:p-5 border border-neutral-800 shadow-md overflow-hidden relative group text-white">
                           <div
                             className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700"
                             style={{
                               backgroundImage: `url(${CARD_COVERS[0]})`
                             }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-transparent" />
 
-                          <div className="relative z-10 flex flex-col justify-between h-[360px]">
+                          <div className="relative z-10 flex flex-col justify-between h-[280px] sm:h-[320px]">
                             {/* Top Brand Header */}
-                            <div className="flex items-center justify-between text-[10px] font-mono tracking-widest text-neutral-400 uppercase pb-2 border-b border-white/10">
+                            <div className="flex items-center justify-between text-[10px] font-mono tracking-wider text-neutral-400 uppercase pb-1.5 border-b border-white/10">
                               <span>{brandInfo?.name || 'SERAMİKBAK'}</span>
                               <span className="text-amber-400 font-bold">{formData.language?.toUpperCase() || 'TR'}</span>
                             </div>
 
                             {/* Middle Title Display */}
-                            <div className="my-auto text-center px-4 space-y-2">
-                              <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[9px] font-mono tracking-widest uppercase border border-amber-400/30">
+                            <div className="my-auto text-center px-2 space-y-1.5">
+                              <span className="inline-block px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 text-[8px] font-mono tracking-wider uppercase border border-amber-400/30">
                                 2026 ARCHITECTURAL CATALOG
                               </span>
-                              <h4 className="text-xl sm:text-2xl font-serif font-black tracking-tight text-white uppercase drop-shadow-md">
+                              <h4 className="text-lg sm:text-xl font-serif font-bold tracking-tight text-white uppercase drop-shadow-sm">
                                 {formData.coverTitle || formData.title || 'SERAMİK KOLEKSİYONU'}
                               </h4>
-                              <p className="text-xs text-neutral-300 font-sans tracking-wide">
+                              <p className="text-[11px] text-neutral-300 font-sans tracking-wide">
                                 {formData.coverSubtitle || 'TECHNICAL & ARCHITECTURAL CATALOG'}
                               </p>
                             </div>
 
                             {/* Bottom Card Footer */}
-                            <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-neutral-400 font-mono">
+                            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-neutral-400 font-mono">
                               <span>{formData.orientation === 'landscape' ? 'A4 YATAY' : 'A4 DİKEY'}</span>
                               <span className="text-amber-400/90">• {formData.dataMode === 'live' ? 'CANLI SENKRON' : 'SABİT ARŞİV'}</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-[11px] text-neutral-500 flex items-center gap-2">
-                          <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0" />
+                        <div className="p-2.5 bg-neutral-50 rounded-lg border border-neutral-200 text-[11px] text-neutral-600 flex items-center gap-2">
+                          <CheckCircle2 size={13} className="text-emerald-600 flex-shrink-0" />
                           <span>Bu bilgiler katalog kapağında ve içindekiler sayfasında otomatik biçimlendirilecektir.</span>
                         </div>
                       </div>
@@ -2795,15 +2801,15 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   </div>
                 )}
 
-                {/* Bottom Step Navigation Bar */}
-                <div className="mt-8 pt-5 border-t border-neutral-100 flex items-center justify-between">
+                {/* Bottom Step Navigation Bar - Compact CRM buttons */}
+                <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between gap-3">
                   <button
                     type="button"
                     disabled={activeStep === 1}
                     onClick={() => setActiveStep((prev) => Math.max(1, prev - 1))}
-                    className="px-4 py-2.5 rounded-xl border border-neutral-300 hover:bg-neutral-50 disabled:opacity-40 text-xs font-bold text-neutral-700 flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-40 text-xs font-semibold text-neutral-600 flex items-center gap-1.5 cursor-pointer shadow-2xs"
                   >
-                    <ArrowLeft size={14} />
+                    <ArrowLeft size={13} />
                     <span>Önceki Adım</span>
                   </button>
 
@@ -2811,20 +2817,20 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     <button
                       type="button"
                       onClick={() => setActiveStep((prev) => Math.min(6, prev + 1))}
-                      className="px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                      className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                     >
                       <span>Sonraki Adım</span>
-                      <ArrowRight size={14} />
+                      <ArrowRight size={13} />
                     </button>
                   ) : (
                     <button
                       type="button"
                       onClick={() => handleSaveCatalog(true)}
                       disabled={saving}
-                      className="px-6 py-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer"
+                      className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
                     >
-                      <CheckCircle2 size={15} />
-                      <span>Kataloğu Kaydet ve Yayınla</span>
+                      <CheckCircle2 size={14} />
+                      <span>Kaydet ve Yayınla</span>
                     </button>
                   )}
                 </div>
