@@ -1770,6 +1770,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 setFormData((prev) => ({ ...prev, customCanvasPages: updatedPages }))
               }
               onSaveDraft={() => handleSaveCatalog(false)}
+              onPublish={() => handleSaveCatalog(true)}
             />
           ) : (
             /* ==================== MODE B: KOLAY MOD (6 ADIMLI SİHİRBAZ) ==================== */

@@ -22,6 +22,7 @@ import {
   Grid,
   Save,
   Eye,
+  EyeOff,
   Layers,
   Sparkles,
   Check,
@@ -40,7 +41,14 @@ import {
   CheckCircle2,
   Move,
   RotateCcw,
-  BookOpen
+  BookOpen,
+  Upload,
+  Table,
+  FileText,
+  Compass,
+  X,
+  ExternalLink,
+  ChevronDown
 } from 'lucide-react';
 
 // ============================================================================
@@ -159,746 +167,14 @@ export const CATALOG_MASTER_TEMPLATES = [
   }
 ];
 
-export const generateTemplateElementsForPage = (templateId, pageType, brandInfo = {}, product = null) => {
-  const brandName = (brandInfo.name || 'SERAMİK').toUpperCase();
-  const prodName = product?.name || 'CALACATTA GOLD';
-  const prodImg = product?.imageUrl || product?.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
-  const prodDim = product?.width && product?.height ? `${product.width}×${product.height} cm` : '120×280 cm';
-  const prodFinish = product?.finish || 'Full Lappato';
-  const prodCode = product?.code || product?.sku || 'SER-2026';
-
-  switch (templateId) {
-    case 'deco':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 30,
-          content: `${brandName} EXCLUSIVE • 2026 COLLECTION`,
-          fontSize: 11,
-          fontWeight: '800',
-          letterSpacing: '0.3em',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 85,
-          width: 495,
-          height: 50,
-          content: prodName,
-          fontSize: 28,
-          fontWeight: '900',
-          letterSpacing: '0.08em',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 145,
-          width: 495,
-          height: 420,
-          src: prodImg,
-          borderRadius: 4,
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'box',
-          x: 50,
-          y: 580,
-          width: 495,
-          height: 180,
-          color: '#f8fafc',
-          borderColor: '#e2e8f0',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 75,
-          y: 600,
-          width: 445,
-          height: 140,
-          content: `EBAT & DETAYLAR: ${prodDim} • ${prodFinish} • Kod: ${prodCode}\n\nDEKOFON VE YÜZEY SEÇENEKLERİ:\n• Kare Monografik Yüzey (REC / M)\n• Uyumlu Bordür ve Mozaik Seçenekleri\n• Banyo, Mutfak ve Otel Projeleri İçin Lüks Doku`,
-          fontSize: 12,
-          fontWeight: '600',
-          color: '#334155',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'lidya':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 30,
-          content: `${brandName} PRO TECHNIC • MODULAR ARCHITECTURE`,
-          fontSize: 11,
-          fontWeight: '800',
-          letterSpacing: '0.2em',
-          color: '#059669',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 85,
-          width: 495,
-          height: 45,
-          content: `${prodName} — COLOUR ENGINEERING`,
-          fontSize: 24,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 140,
-          width: 320,
-          height: 400,
-          src: prodImg,
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'box',
-          x: 385,
-          y: 140,
-          width: 160,
-          height: 400,
-          color: '#ecfdf5',
-          borderColor: '#a7f3d0',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 395,
-          y: 155,
-          width: 140,
-          height: 370,
-          content: `TEKNİK PARAMETRELER:\n\n• Ebat: ${prodDim}\n• RAL Kodu: RAL 7016\n• Kaymazlık: R10 / R11\n• Yüzey: ${prodFinish}\n• Su Emme: ≤ %0.1\n• Kırılma: ≥ 2500 N\n• PEI Değeri: Sınıf 4\n• Tel Kafes Modüler\n• BIM / Revit Uyumlu`,
-          fontSize: 11,
-          fontWeight: '600',
-          color: '#065f46',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-6`,
-          type: 'box',
-          x: 50,
-          y: 560,
-          width: 495,
-          height: 190,
-          color: '#f8fafc',
-          borderColor: '#e2e8f0',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-7`,
-          type: 'text',
-          x: 75,
-          y: 580,
-          width: 445,
-          height: 150,
-          content: 'ŞARTNAME NOTU:\nKamusal projeler, metro istasyonları, havalimanları ve yoğun yaya trafiğine sahip ticari alanlar için TS EN 14411 Ek G standartlarına tam uygun mimari porselen karo şartnamesi.',
-          fontSize: 12,
-          fontWeight: '500',
-          color: '#1e293b',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'verona':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 25,
-          content: `${brandName} • VERONA NATURAL MARBLE LOOKBOOK`,
-          fontSize: 10,
-          fontWeight: '800',
-          letterSpacing: '0.25em',
-          color: '#c59b27',
-          align: 'center',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 80,
-          width: 495,
-          height: 45,
-          content: `${prodName} BOOKMATCH A / B`,
-          fontSize: 26,
-          fontWeight: '800',
-          color: '#ffffff',
-          align: 'center',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 135,
-          width: 240,
-          height: 460,
-          src: prodImg,
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'image',
-          x: 305,
-          y: 135,
-          width: 240,
-          height: 460,
-          src: '/renders/luxury_bathroom_calacatta_gold.jpg',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'box',
-          x: 50,
-          y: 610,
-          width: 495,
-          height: 160,
-          color: '#27272a',
-          borderColor: '#3f3f46',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-6`,
-          type: 'text',
-          x: 75,
-          y: 630,
-          width: 445,
-          height: 120,
-          content: `DAMAR EŞLEŞTİRME & HEVESKÂR DETAY:\n• Ebat: ${prodDim} Dev Plaka Porselen\n• Yüzey: Full Lappato Parlak Ayna Cilası\n• Kitap Açılımı (Bookmatch) Simetrisi ile Kesintisiz Damar Takibi\n• Lüks Rezidans, Lobi, Şömine ve Banyo Zemin/Duvar Uygulamaları`,
-          fontSize: 12,
-          fontWeight: '500',
-          color: '#e4e4e7',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'nordic':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 25,
-          content: `${brandName} • NORDIC ARCHITECTURAL CONCRETE`,
-          fontSize: 11,
-          fontWeight: '800',
-          letterSpacing: '0.2em',
-          color: '#475569',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 80,
-          width: 495,
-          height: 45,
-          content: `${prodName} — BRÜT BETON & LOFT`,
-          fontSize: 24,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 135,
-          width: 495,
-          height: 390,
-          src: '/renders/luxury_bathroom_loft_beton.jpg',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'box',
-          x: 50,
-          y: 545,
-          width: 495,
-          height: 210,
-          color: '#f8fafc',
-          borderColor: '#e2e8f0',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 75,
-          y: 565,
-          width: 445,
-          height: 170,
-          content: `İSKANDİNAV MİMARİ SERİSİ:\n• Ebat Seçenekleri: 60×120 cm / 80×80 cm / 120×120 cm\n• Yüzey: Mat Rölyefli / Doğal Çimento Dokusu\n• Kaymazlık: R10 A+B\n• Akustik ve Dayanıklılık: Yüksek Aşınma Mukavemeti PEI 4\n• Kullanım: Loft Daireler, Ofisler, Kafeler ve Modern Konutlar`,
-          fontSize: 12,
-          fontWeight: '500',
-          color: '#1e293b',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'artisan':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 25,
-          content: `${brandName} • ARTISAN MEDITERRANEAN ZELLIGE`,
-          fontSize: 11,
-          fontWeight: '800',
-          letterSpacing: '0.2em',
-          color: '#0d9488',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 80,
-          width: 495,
-          height: 45,
-          content: `${prodName} — BUTİK SIRLI KARO`,
-          fontSize: 24,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 135,
-          width: 495,
-          height: 400,
-          src: '/renders/modern_living_natural_oak.jpg',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'box',
-          x: 50,
-          y: 550,
-          width: 495,
-          height: 200,
-          color: '#f0fdfa',
-          borderColor: '#99f6e4',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 75,
-          y: 570,
-          width: 445,
-          height: 160,
-          content: `GELENEKSEL EL İŞÇİLİĞİ VE PARLAK SIR:\n• Modüler Formlar: 7.5×30 cm Balıksırtı / 15×15 cm Zellige\n• Yüzey Parlaklığı: Dalgalı Parlak El İşi Sır (Artisanal Glaze)\n• Renk Varyasyonu: V3 - Zengin Ton Geçişleri\n• Kullanım Alanı: Butik Oteller, Mutfak Tezgah Arası, Banyo Nişleri`,
-          fontSize: 12,
-          fontWeight: '600',
-          color: '#134e4a',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'outdoor':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 25,
-          content: `${brandName} • 20MM OUTDOOR & LANDSCAPE`,
-          fontSize: 11,
-          fontWeight: '800',
-          letterSpacing: '0.2em',
-          color: '#15803d',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 80,
-          width: 495,
-          height: 45,
-          content: `${prodName} — 2 CM DIŞ MEKAN`,
-          fontSize: 24,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 135,
-          width: 495,
-          height: 380,
-          src: '/renders/luxury_bathroom_natural_oak.jpg',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'box',
-          x: 50,
-          y: 535,
-          width: 495,
-          height: 220,
-          color: '#f0fdf4',
-          borderColor: '#bbf7d0',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 75,
-          y: 555,
-          width: 445,
-          height: 180,
-          content: `20 MM EKSTRA MUKAVEMETLİ DIŞ MEKAN STANDARDI:\n• Kalınlık: 20 mm (Kırılma Yükü: > 10.000 N)\n• Montaj Türü: Çim / Çakıl Üzeri Kuru Montaj & Yükseltilmiş Döşeme\n• Kaymazlık Sınıfı: R11 A+B+C (Islak Zemin & Havuz Kenarı)\n• Dayanım: %100 Donmaya, Tuza, Klora ve Ağır Yüke Dirençli\n• Ebat: 60×60×2 cm / 60×120×2 cm`,
-          fontSize: 12,
-          fontWeight: '600',
-          color: '#14532d',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'spec-sheet':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 35,
-          content: `${brandName} ARCHITECTURAL SPECIFICATION`,
-          fontSize: 20,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 85,
-          width: 495,
-          height: 25,
-          content: 'TS EN 14411 EK G — GRUP BIa PORSELEN TEKNİK ŞARTNAME MATRİSİ',
-          fontSize: 10,
-          fontWeight: '700',
-          color: '#0284c7',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'box',
-          x: 50,
-          y: 120,
-          width: 495,
-          height: 640,
-          color: '#f8fafc',
-          borderColor: '#cbd5e1',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'text',
-          x: 75,
-          y: 145,
-          width: 445,
-          height: 590,
-          content: `ÜRÜN GRUBU: ${prodName} (${prodDim})\n\n1. FİZİKSEL & MEKANİK PERFORMANS:\n• Su Emme Oranı: ≤ %0.08\n• Kırılma Dayanımı: ≥ 2400 N\n• Eğilme Mukavemeti: ≥ 48 N/mm²\n• Yüzey Sertliği (Mohs): 7 - 8\n\n2. GÜVENLİK VE STANDARTLAR:\n• Kaymazlık Değeri: R10 / R11 seçenekleri\n• PEI Aşınma Dayanımı: Sınıf 4 (Yoğun Trafik)\n• Kimyasal ve Asit Direnci: A Sınıfı\n• Yanmazlık Standardı: A1FL (Hiç Yanmaz)\n\n3. LOJİSTİK VE KUTU BİLGİSİ:\n• Koli Metrajı: 2.88 m²\n• Koli İçi Adet: 2 Adet\n• Palet Ağırlığı: 1140 kg / 24 Kutu`,
-          fontSize: 12,
-          fontWeight: '500',
-          color: '#1e293b',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'showroom':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 35,
-          content: `${brandName} SHOWROOM & MAĞAZA KATALOĞU`,
-          fontSize: 22,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'center',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'image',
-          x: 50,
-          y: 105,
-          width: 235,
-          height: 420,
-          src: prodImg,
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 310,
-          y: 105,
-          width: 235,
-          height: 420,
-          src: '/renders/luxury_bathroom_albatros_antrasit.jpg',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'text',
-          x: 50,
-          y: 545,
-          width: 235,
-          height: 100,
-          content: `${prodName}\n${prodDim} • ${prodFinish}\nÖneri: Banyo / Mutfak`,
-          fontSize: 13,
-          fontWeight: '700',
-          color: '#0f172a',
-          align: 'center',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 310,
-          y: 545,
-          width: 235,
-          height: 100,
-          content: `ALBATROS ANTRASİT\n120×280 cm • Mat\nÖneri: Salon / Lobi`,
-          fontSize: 13,
-          fontWeight: '700',
-          color: '#0f172a',
-          align: 'center',
-          locked: false
-        }
-      ];
-
-    case 'global-export':
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 50,
-          width: 495,
-          height: 30,
-          content: `${brandName} • GLOBAL EXPORT SPECIFICATION`,
-          fontSize: 11,
-          fontWeight: '800',
-          letterSpacing: '0.2em',
-          color: '#2563eb',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 50,
-          y: 85,
-          width: 495,
-          height: 45,
-          content: `${prodName} (HS CODE: 6907.21)`,
-          fontSize: 22,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'image',
-          x: 50,
-          y: 140,
-          width: 495,
-          height: 350,
-          src: prodImg,
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'box',
-          x: 50,
-          y: 505,
-          width: 495,
-          height: 250,
-          color: '#eff6ff',
-          borderColor: '#bfdbfe',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'text',
-          x: 75,
-          y: 525,
-          width: 445,
-          height: 210,
-          content: `INTERNATIONAL CONTAINER LOADING (20ft / 40ft):\n• Slab Dimensions: ${prodDim} / Thickness: 9 mm\n• Surface Finish: ${prodFinish} / Rectified\n• 20ft Container Capacity: 22 Pallets (~1,850 m²)\n• 40ft HC Container Capacity: 26 Pallets (~2,180 m²)\n• Compliance: CE Certificate, ISO 9001, TS EN 14411 Group BIa\n• Export Packaging: Euro Wooden Crates with Protective Film`,
-          fontSize: 12,
-          fontWeight: '600',
-          color: '#1e3a8a',
-          align: 'left',
-          locked: false
-        }
-      ];
-
-    case 'milano':
-    default:
-      return [
-        {
-          id: `el-${Date.now()}-1`,
-          type: 'text',
-          x: 50,
-          y: 45,
-          width: 400,
-          height: 40,
-          content: prodName,
-          fontSize: 26,
-          fontWeight: '800',
-          color: '#0f172a',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-2`,
-          type: 'text',
-          x: 455,
-          y: 50,
-          width: 90,
-          height: 26,
-          content: 'MILANO SLAB',
-          fontSize: 10,
-          fontWeight: '800',
-          color: '#ffffff',
-          bgColor: '#b4823c',
-          align: 'center',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-3`,
-          type: 'text',
-          x: 50,
-          y: 85,
-          width: 495,
-          height: 25,
-          content: `${brandName} İtalyan mimari serisi • ${prodDim} • ${prodFinish}`,
-          fontSize: 12,
-          fontWeight: '600',
-          color: '#64748b',
-          align: 'left',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-4`,
-          type: 'image',
-          x: 50,
-          y: 120,
-          width: 495,
-          height: 380,
-          src: prodImg,
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-5`,
-          type: 'box',
-          x: 50,
-          y: 525,
-          width: 495,
-          height: 240,
-          color: '#f8fafc',
-          borderColor: '#e2e8f0',
-          locked: false
-        },
-        {
-          id: `el-${Date.now()}-6`,
-          type: 'text',
-          x: 75,
-          y: 545,
-          width: 445,
-          height: 195,
-          content: `TEKNİK STANDARTLAR:\n• Ebat: ${prodDim}\n• Kalınlık: 6 mm / 9 mm İnce Porselen\n• Yüzey: ${prodFinish} / Rektifiyeli\n• Kaymazlık: R9 / PEI 4\n• Kullanım: Lobi, Banyo, Mutfak Tezgahı, Dış Cephe\n• Sertifikasyon: TS EN 14411 Grup BIa`,
-          fontSize: 13,
-          fontWeight: '500',
-          color: '#1e293b',
-          align: 'left',
-          locked: false
-        }
-      ];
-  }
-};
-
-// ============================================================================
-// MATBAA DÜZEYİNDE HAZIR MİZANPAJ ŞABLONLARI (PRESET LAYOUT TEMPLATES)
-// ============================================================================
-const PRESET_TEMPLATES = [
+// 8 CERAMIC SPECIFIC PRESET LAYOUTS
+export const PRESET_TEMPLATES = [
   {
     id: 'cover-milano',
-    name: 'Milano Minimalist Kapak',
+    name: '1. Premium Koleksiyon Kapağı',
     badge: 'Kapak',
     category: 'cover',
-    desc: 'Lüks koyu slate zemin, altın tipografi ve büyük mimari mekan fotoğrafı.',
+    desc: 'Koyu slate zemin, altın tipografi, büyük mekan fotoğrafı ve mimari monograf başlığı.',
     bgColor: '#18181b',
     elements: [
       {
@@ -908,7 +184,7 @@ const PRESET_TEMPLATES = [
         y: 60,
         width: 495,
         height: 25,
-        content: 'BİEN SERAMİK • ARCHITECTURAL MONOGRAPH',
+        content: 'SERAMİKBAK • ARCHITECTURAL MONOGRAPH',
         fontSize: 11,
         fontWeight: '700',
         letterSpacing: '0.25em',
@@ -922,10 +198,10 @@ const PRESET_TEMPLATES = [
         x: 50,
         y: 95,
         width: 495,
-        height: 80,
+        height: 75,
         content: '2026 GENEL KOLEKSİYON',
         fontSize: 32,
-        fontWeight: '800',
+        fontWeight: '900',
         letterSpacing: '0.05em',
         color: '#ffffff',
         align: 'center',
@@ -935,7 +211,7 @@ const PRESET_TEMPLATES = [
         id: 'el-c3',
         type: 'line',
         x: 235,
-        y: 185,
+        y: 180,
         width: 125,
         height: 2,
         color: '#b4823c',
@@ -945,9 +221,9 @@ const PRESET_TEMPLATES = [
         id: 'el-c4',
         type: 'image',
         x: 50,
-        y: 215,
+        y: 205,
         width: 495,
-        height: 510,
+        height: 520,
         src: '/renders/luxury_bathroom_calacatta_gold.jpg',
         borderRadius: 0,
         locked: false
@@ -956,7 +232,7 @@ const PRESET_TEMPLATES = [
         id: 'el-c5',
         type: 'text',
         x: 50,
-        y: 755,
+        y: 750,
         width: 495,
         height: 35,
         content: 'PORSELEN DEV PLAKALAR • DOĞAL TAŞ SERİLERİ • TS EN 14411',
@@ -970,9 +246,99 @@ const PRESET_TEMPLATES = [
     ]
   },
   {
+    id: 'concept-living-room',
+    name: '2. Büyük Mekân Konsept Tanıtımı',
+    badge: 'Konsept',
+    category: 'concept',
+    desc: 'Geniş editoryal mekan fotoğrafı, mimari konsept metni ve tasarımcı vizyon notu.',
+    bgColor: '#ffffff',
+    elements: [
+      {
+        id: 'el-con1',
+        type: 'text',
+        x: 50,
+        y: 45,
+        width: 495,
+        height: 25,
+        content: 'LIVING ARCHITECTURE & INTERIOR DESIGN',
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: '0.2em',
+        color: '#b4823c',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-con2',
+        type: 'text',
+        x: 50,
+        y: 75,
+        width: 495,
+        height: 45,
+        content: 'DOĞAL MEŞE VE SICAK TAŞ UYUMU',
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-con3',
+        type: 'image',
+        x: 50,
+        y: 130,
+        width: 495,
+        height: 450,
+        src: '/renders/modern_living_natural_oak.jpg',
+        borderRadius: 0,
+        locked: false
+      },
+      {
+        id: 'el-con4',
+        type: 'text',
+        x: 50,
+        y: 600,
+        width: 320,
+        height: 120,
+        content: 'Modern mimaride iç mekan sınırlarını kaldıran geniş format porselen karolar, ahşabın sıcak dokusunu yüksek dayanımlı seramik gövde ile birleştiriyor. Geniş salonlar, lobi alanları ve rezidanslar için kusursuz yüzey kalitesi sunar.',
+        fontSize: 12,
+        fontWeight: '400',
+        color: '#475569',
+        align: 'left',
+        lineHeight: 1.6,
+        locked: false
+      },
+      {
+        id: 'el-con5',
+        type: 'box',
+        x: 390,
+        y: 600,
+        width: 155,
+        height: 120,
+        color: '#f8fafc',
+        borderColor: '#e2e8f0',
+        locked: false
+      },
+      {
+        id: 'el-con6',
+        type: 'text',
+        x: 405,
+        y: 615,
+        width: 125,
+        height: 90,
+        content: 'ÖNERİLEN KULLANIM:\n• Salon & Oturma Alanı\n• Butik Otel Lobisi\n• Yerden Isıtmaya Uygun\n• R10 A+B Kaymazlık',
+        fontSize: 10,
+        fontWeight: '700',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      }
+    ]
+  },
+  {
     id: 'product-single-slab',
-    name: '120×280 Dev Plaka & Mekan',
-    badge: 'Ürün',
+    name: '3. Tek Ürün Odaklı Dev Plaka (120×280)',
+    badge: 'Dev Plaka',
     category: 'product',
     desc: 'Büyük mekan görseli, yan yana dikey plaka silueti ve teknik tablo.',
     bgColor: '#ffffff',
@@ -986,7 +352,7 @@ const PRESET_TEMPLATES = [
         height: 40,
         content: 'CALACATTA GOLD',
         fontSize: 26,
-        fontWeight: '800',
+        fontWeight: '900',
         color: '#0f172a',
         align: 'left',
         locked: false
@@ -1013,7 +379,7 @@ const PRESET_TEMPLATES = [
         y: 85,
         width: 495,
         height: 25,
-        content: 'İtalyan mermer dokusu • 120x280 cm • Full Lappato & Mat',
+        content: 'İtalyan mermer dokusu • 120×280 cm • Full Lappato & Mat',
         fontSize: 12,
         fontWeight: '500',
         color: '#64748b',
@@ -1027,7 +393,7 @@ const PRESET_TEMPLATES = [
         y: 120,
         width: 495,
         height: 380,
-        src: '/renders/modern_living_natural_oak.jpg',
+        src: '/renders/luxury_bathroom_calacatta_gold.jpg',
         locked: false
       },
       {
@@ -1048,9 +414,9 @@ const PRESET_TEMPLATES = [
         y: 545,
         width: 445,
         height: 195,
-        content: 'TEKNİK STANDARTLAR:\n• Ebat: 120×280 cm / 60×120 cm\n• Kalınlık: 6 mm İnce Porselen\n• Yüzey: Full Lappato Parlak / Rektifiyeli\n• Kaymazlık: R9 / PEI 4\n• Kullanım: Lobi, Banyo, Mutfak Tezgahı, Dış Cephe',
+        content: 'TEKNİK STANDARTLAR:\n• Ebat: 120×280 cm / 60×120 cm\n• Kalınlık: 6 mm İnce Porselen & 9 mm Standart\n• Yüzey: Full Lappato Parlak / Rektifiyeli Kesim\n• Kaymazlık: R9 / Aşınma Direnci: PEI 4\n• Kullanım: Lobi, Banyo, Mutfak Tezgahı, Dış Cephe Kaplama',
         fontSize: 13,
-        fontWeight: '500',
+        fontWeight: '600',
         color: '#1e293b',
         align: 'left',
         locked: false
@@ -1059,8 +425,8 @@ const PRESET_TEMPLATES = [
   },
   {
     id: 'product-dual-grid',
-    name: '2\'li Karşılaştırmalı Koleksiyon',
-    badge: 'Koleksiyon',
+    name: '4. 2\'li / 4\'lü Karşılaştırmalı Koleksiyon',
+    badge: 'Karşılaştırma',
     category: 'product',
     desc: 'Yan yana iki seramik modelinin görseli, ebat ve renk bilgisi.',
     bgColor: '#ffffff',
@@ -1131,7 +497,7 @@ const PRESET_TEMPLATES = [
   },
   {
     id: 'specs-matrix',
-    name: 'Teknik Şartname & Standartlar',
+    name: '5. Teknik Şartname & Matris (TS EN 14411)',
     badge: 'Şartname',
     category: 'specs',
     desc: 'TS EN 14411 uygunluk tablosu, kutu metrajları ve lojistik matrisi.',
@@ -1183,7 +549,7 @@ const PRESET_TEMPLATES = [
         y: 155,
         width: 445,
         height: 550,
-        content: 'STANDART TEST KRİTERLERİ (EN ISO 10545):\n\n• Su Emme Oranı: ≤ %0.1 (Yüksek Porselen Sınıfı)\n• Kırılma Dayanımı: ≥ 2200 N\n• Eğilme Mukavemeti: ≥ 45 N/mm²\n• Yüzey Aşınma Dayanımı (PEI): Sınıf 4 - 5\n• Derin Aşınma Dayanımı: ≤ 135 mm³\n• Isıl Şok Dayanımı: Tam Dayanıklı\n• Donma Dayanımı: Donmaya Karşı Tam Dirençli\n• Leke Tutma Dayanımı: Minimum Sınıf 5\n• Kimyasallara Direnç: A Sınıfı\n• Kaymazlık (DIN 51130): R9 / R10 / R11 seçenekleri\n\nPAKETLEME VE LOJİSTİK BİLGİLERİ:\n• Kutu İçi Adet: 1 Plaka\n• Kutu Metrajı: 3.36 m² (120x280 cm)\n• Palet Kapasitesi: 24 Kutu (80.64 m²)\n• Palet Ağırlığı: ~1180 kg',
+        content: 'STANDART TEST KRİTERLERİ (EN ISO 10545):\n\n• Su Emme Oranı: ≤ %0.1 (Yüksek Porselen Sınıfı)\n• Kırılma Dayanımı: ≥ 2200 N\n• Eğilme Mukavemeti: ≥ 45 N/mm²\n• Yüzey Aşınma Dayanımı (PEI): Sınıf 4 - 5\n• Derin Aşınma Dayanımı: ≤ 135 mm³\n• Isıl Şok Dayanımı: Tam Dayanıklı\n• Donma Dayanımı: Donmaya Karşı Tam Dirençli\n• Leke Tutma Dayanımı: Minimum Sınıf 5\n• Kimyasallara Direnç: A Sınıfı\n• Kaymazlık (DIN 51130): R9 / R10 / R11 seçenekleri\n\nPAKETLEME VE LOJİSTİK BİLGİLERİ:\n• Kutu İçi Adet: 1 Plaka\n• Kutu Metrajı: 3.36 m² (120×280 cm)\n• Palet Kapasitesi: 24 Kutu (80.64 m²)\n• Palet Ağırlığı: ~1180 kg',
         fontSize: 12,
         fontWeight: '500',
         color: '#1e293b',
@@ -1191,8 +557,498 @@ const PRESET_TEMPLATES = [
         locked: false
       }
     ]
+  },
+  {
+    id: 'variants-color-matrix',
+    name: '6. Renk ve Ebat Varyantları Matrisi',
+    badge: 'Varyantlar',
+    category: 'specs',
+    desc: 'Renk paleti, ebat seçenekleri (60×120, 120×280) ve yüzey varyasyonları matrisi.',
+    bgColor: '#ffffff',
+    elements: [
+      {
+        id: 'el-v1',
+        type: 'text',
+        x: 50,
+        y: 45,
+        width: 495,
+        height: 35,
+        content: 'RENK VE EBAT MATRİSİ',
+        fontSize: 22,
+        fontWeight: '900',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-v2',
+        type: 'text',
+        x: 50,
+        y: 80,
+        width: 495,
+        height: 25,
+        content: 'Proje ihtiyaçlarına göre üretilen modüler seramik spektrumu',
+        fontSize: 12,
+        fontWeight: '500',
+        color: '#64748b',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-v3',
+        type: 'box',
+        x: 50,
+        y: 125,
+        width: 110,
+        height: 140,
+        color: '#f8fafc',
+        borderColor: '#cbd5e1',
+        locked: false
+      },
+      {
+        id: 'el-v4',
+        type: 'box',
+        x: 175,
+        y: 125,
+        width: 110,
+        height: 140,
+        color: '#e2e8f0',
+        borderColor: '#94a3b8',
+        locked: false
+      },
+      {
+        id: 'el-v5',
+        type: 'box',
+        x: 300,
+        y: 125,
+        width: 110,
+        height: 140,
+        color: '#334155',
+        borderColor: '#1e293b',
+        locked: false
+      },
+      {
+        id: 'el-v6',
+        type: 'box',
+        x: 425,
+        y: 125,
+        width: 110,
+        height: 140,
+        color: '#1e293b',
+        borderColor: '#0f172a',
+        locked: false
+      },
+      {
+        id: 'el-v7',
+        type: 'text',
+        x: 50,
+        y: 280,
+        width: 495,
+        height: 200,
+        content: 'MEVCUT MODÜLER EBATLAR:\n• 120×280 cm (6 mm / 9 mm)\n• 60×120 cm (9 mm / 10 mm)\n• 80×80 cm (9.5 mm)\n• 60×60 cm (9 mm)\n\nYÜZEY TÜRLERİ:\n• Full Lappato Parlak (Yansıtıcı Ayna Yüzey)\n• Soft Touch İpeksi Mat (Parmak İzi Tutmaz)\n• R11 Antislip Rölyefli (Dış Mekan & Havuz Kenarı)',
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#1e293b',
+        align: 'left',
+        locked: false
+      }
+    ]
+  },
+  {
+    id: 'showroom-retail',
+    name: '7. Bayi Kataloğu & Perakende Liste',
+    badge: 'Bayi & Fiyat',
+    category: 'product',
+    desc: 'Bayi teşhir standı kodu, perakende m² liste fiyatı etiketi ve derz önerisi.',
+    bgColor: '#ffffff',
+    elements: [
+      {
+        id: 'el-r1',
+        type: 'text',
+        x: 50,
+        y: 45,
+        width: 495,
+        height: 35,
+        content: '2026 BAYİ TEŞHİR & TAVSİYE PERAKENDE LİSTESİ',
+        fontSize: 18,
+        fontWeight: '900',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-r2',
+        type: 'image',
+        x: 50,
+        y: 95,
+        width: 495,
+        height: 320,
+        src: '/renders/luxury_bathroom_loft_beton.jpg',
+        locked: false
+      },
+      {
+        id: 'el-r3',
+        type: 'box',
+        x: 50,
+        y: 440,
+        width: 235,
+        height: 200,
+        color: '#f8fafc',
+        borderColor: '#cbd5e1',
+        locked: false
+      },
+      {
+        id: 'el-r4',
+        type: 'box',
+        x: 310,
+        y: 440,
+        width: 235,
+        height: 200,
+        color: '#f8fafc',
+        borderColor: '#cbd5e1',
+        locked: false
+      },
+      {
+        id: 'el-r5',
+        type: 'text',
+        x: 65,
+        y: 455,
+        width: 205,
+        height: 170,
+        content: 'LOFT BETON GRİ\n• Ebat: 60×120 cm\n• Yüzey: Mat R10\n• Koli Metrajı: 1.44 m²\n• Tavsiye Perakende: 1.250 TL/m²\n• Önerilen Derz: Gri No:112',
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#1e293b',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-r6',
+        type: 'text',
+        x: 325,
+        y: 455,
+        width: 205,
+        height: 170,
+        content: 'ALBATROS ANTRASİT\n• Ebat: 120×280 cm\n• Yüzey: Lappato\n• Koli Metrajı: 3.36 m²\n• Tavsiye Perakende: 2.450 TL/m²\n• Önerilen Derz: Siyah No:120',
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#1e293b',
+        align: 'left',
+        locked: false
+      }
+    ]
+  },
+  {
+    id: 'back-cover-qr',
+    name: '8. İletişim, Bayi Ağı ve 3D QR Arka Kapak',
+    badge: 'Arka Kapak',
+    category: 'cover',
+    desc: 'Koyu zemin kurumsal arka kapak, 3D mekan görüntüleme QR kodu ve fabrika iletişim bilgileri.',
+    bgColor: '#18181b',
+    elements: [
+      {
+        id: 'el-b1',
+        type: 'text',
+        x: 50,
+        y: 100,
+        width: 495,
+        height: 30,
+        content: 'SERAMİKBAK TİCARET A.Ş.',
+        fontSize: 14,
+        fontWeight: '800',
+        letterSpacing: '0.2em',
+        color: '#b4823c',
+        align: 'center',
+        locked: false
+      },
+      {
+        id: 'el-b2',
+        type: 'text',
+        x: 50,
+        y: 135,
+        width: 495,
+        height: 40,
+        content: 'MİMARİ VE TEKNİK ÇÖZÜMLER MERKEZİ',
+        fontSize: 18,
+        fontWeight: '900',
+        color: '#ffffff',
+        align: 'center',
+        locked: false
+      },
+      {
+        id: 'el-b3',
+        type: 'line',
+        x: 235,
+        y: 190,
+        width: 125,
+        height: 2,
+        color: '#b4823c',
+        locked: false
+      },
+      {
+        id: 'el-b4',
+        type: 'qr',
+        x: 220,
+        y: 280,
+        width: 155,
+        height: 155,
+        qrUrl: 'https://seramikbak.com/3d-viewer',
+        locked: false
+      },
+      {
+        id: 'el-b5',
+        type: 'text',
+        x: 50,
+        y: 460,
+        width: 495,
+        height: 40,
+        content: 'KAMERANIZLA OKUTUN\n3D Sanal Showroom ve Mekan Görselleştiriciyi Keşfedin',
+        fontSize: 11,
+        fontWeight: '700',
+        color: '#ffffff',
+        align: 'center',
+        locked: false
+      },
+      {
+        id: 'el-b6',
+        type: 'text',
+        x: 50,
+        y: 650,
+        width: 495,
+        height: 120,
+        content: 'GENEL MÜDÜRLÜK & FABRİKA:\nOrganize Sanayi Bölgesi 4. Cadde No: 12, Bilecik / Türkiye\nTel: +90 (228) 216 00 00 • E-posta: mimari@seramikbak.com\nWeb: www.seramikbak.com • Instagram: @seramikbak',
+        fontSize: 10,
+        fontWeight: '500',
+        color: '#94a3b8',
+        align: 'center',
+        locked: false
+      }
+    ]
   }
 ];
+
+export const generateTemplateElementsForPage = (templateId, pageType, brandInfo = {}, product = null) => {
+  const brandName = (brandInfo.name || 'SERAMİK').toUpperCase();
+  const prodName = product?.name || 'CALACATTA GOLD';
+  const prodImg = product?.imageUrl || product?.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
+  const prodDim = product?.width && product?.height ? `${product.width}×${product.height} cm` : '120×280 cm';
+  const prodFinish = product?.finish || 'Full Lappato';
+  const prodCode = product?.code || product?.sku || 'SER-2026';
+
+  switch (templateId) {
+    case 'deco':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 30,
+          content: `${brandName} EXCLUSIVE • 2026 COLLECTION`,
+          fontSize: 11,
+          fontWeight: '700',
+          letterSpacing: '0.25em',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 45,
+          content: `${prodName} MONOGRAF`,
+          fontSize: 26,
+          fontWeight: '800',
+          letterSpacing: '0.08em',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 140,
+          width: 495,
+          height: 480,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'text',
+          x: 50,
+          y: 640,
+          width: 240,
+          height: 90,
+          content: `EBAT: ${prodDim}\nYÜZEY: ${prodFinish}\nKOD: ${prodCode}`,
+          fontSize: 12,
+          fontWeight: '700',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 305,
+          y: 640,
+          width: 240,
+          height: 90,
+          content: 'DEKOFON VE KOMBİNASYON:\nUyumlu Yer Karosu: 60×120 cm\nDerz Önerisi: Açık Gri / 2 mm',
+          fontSize: 12,
+          fontWeight: '500',
+          color: '#475569',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'lidya':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 45,
+          width: 495,
+          height: 25,
+          content: `${brandName} • PRO TECHNIC MATRİS`,
+          fontSize: 10,
+          fontWeight: '800',
+          letterSpacing: '0.2em',
+          color: '#059669',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 75,
+          width: 495,
+          height: 40,
+          content: `${prodName} MODÜLER SERİ`,
+          fontSize: 22,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 125,
+          width: 495,
+          height: 360,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 50,
+          y: 505,
+          width: 495,
+          height: 250,
+          color: '#f8fafc',
+          borderColor: '#e2e8f0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 75,
+          y: 525,
+          width: 445,
+          height: 210,
+          content: `TEKNİK ŞARTNAME MATRİSİ:\n• Ebat: ${prodDim} / Kalınlık: 9 mm Rektifiyeli\n• Kaymazlık Sınıfı: R10 A+B & R11 Seçenekleri\n• Su Emme Değeri: E ≤ %0.1 (TS EN 14411 Ek G Grup BIa)\n• Aşınma Direnci (PEI): PEI 4 (Ağır Yaya Trafiği)\n• Kimyasal Dayanım: Asit ve Alkalilere Tam Dirençli\n• Renk Mühendisliği: RAL 7035 / RAL 7040 Eşdeğerliği`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'milano':
+    default:
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 45,
+          width: 400,
+          height: 40,
+          content: prodName,
+          fontSize: 26,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 455,
+          y: 50,
+          width: 90,
+          height: 26,
+          content: 'MILANO SLAB',
+          fontSize: 10,
+          fontWeight: '800',
+          color: '#ffffff',
+          bgColor: '#b4823c',
+          align: 'center',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 25,
+          content: `${brandName} İtalyan mimari serisi • ${prodDim} • ${prodFinish}`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#64748b',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'image',
+          x: 50,
+          y: 120,
+          width: 495,
+          height: 480,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 50,
+          y: 620,
+          width: 495,
+          height: 90,
+          content: `ŞARTNAME VE KULLANIM BİLGİSİ:\nÜrün Kodu: ${prodCode} • Ebat: ${prodDim} • Yüzey: ${prodFinish}\nKullanım Alanı: Ticari lobi, konut banyo, ıslak hacim, cephe kaplama`,
+          fontSize: 12,
+          fontWeight: '500',
+          color: '#334155',
+          align: 'left',
+          locked: false
+        }
+      ];
+  }
+};
 
 const DEFAULT_PAGES = [
   PRESET_TEMPLATES[0],
@@ -1207,7 +1063,19 @@ const BADGE_PRESETS = [
   'R10 A+B KAYMAZ',
   'FULL LAPPATO',
   'EXCLUSIVE',
-  'TS EN 14411'
+  'TS EN 14411',
+  'DON DAYANIMI',
+  'SU EMME < %0.1',
+  'PEI 4-5 YÜKSEK TRAFİK',
+  'REKTİFİYELİ 2 MM DERZ'
+];
+
+const SAMPLE_RENDERS = [
+  { name: 'Calacatta Gold Lüks Banyo', src: '/renders/luxury_bathroom_calacatta_gold.jpg' },
+  { name: 'Albatros Antrasit Slate Lobi', src: '/renders/luxury_bathroom_albatros_antrasit.jpg' },
+  { name: 'Modern Yaşam Alanı Meşe', src: '/renders/modern_living_natural_oak.jpg' },
+  { name: 'Loft Brüt Beton Mimari', src: '/renders/luxury_bathroom_loft_beton.jpg' },
+  { name: 'Natural Oak Porselen Parke', src: '/renders/luxury_bathroom_natural_oak.jpg' }
 ];
 
 export default function CatalogVisualCanvasEditor({
@@ -1217,7 +1085,8 @@ export default function CatalogVisualCanvasEditor({
   currentTemplateId = 'milano',
   onSelectTemplate,
   onChangePages,
-  onSaveDraft
+  onSaveDraft,
+  onPublish
 }) {
   const [pages, setPages] = useState(() => {
     if (Array.isArray(initialPages) && initialPages.length > 0) return initialPages;
@@ -1226,14 +1095,32 @@ export default function CatalogVisualCanvasEditor({
 
   const [activePageIdx, setActivePageIdx] = useState(0);
   const [selectedElId, setSelectedElId] = useState(null);
-  const [activeLeftTab, setActiveLeftTab] = useState('templates'); // 'templates' | 'products' | 'pages' | 'badges'
-  const [templateSubTab, setTemplateSubTab] = useState('concepts'); // 'concepts' (Ana Şablonlar) | 'layouts' (Sayfa Mizanpajları)
+  const [activeLeftTab, setActiveLeftTab] = useState('templates'); // 'templates' | 'pages' | 'products' | 'media' | 'elements' | 'layers'
+  const [templateSubTab, setTemplateSubTab] = useState('concepts'); // 'concepts' | 'layouts'
   const [selectedTemplateId, setSelectedTemplateId] = useState(currentTemplateId || 'milano');
+  
+  // Canvas configuration
+  const [pageFormat, setPageFormat] = useState('portrait'); // 'portrait' (595x842) | 'landscape' (842x595) | 'square' (700x700)
   const [showGrid, setShowGrid] = useState(true);
   const [showBleed, setShowBleed] = useState(true);
-  const [zoomLevel, setZoomLevel] = useState(1); // 0.75, 1, 1.25
+  const [showSmartGuides, setShowSmartGuides] = useState(true);
+  const [snapLineX, setSnapLineX] = useState(null);
+  const [snapLineY, setSnapLineY] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [productSearch, setProductSearch] = useState('');
+  const [productCategoryFilter, setProductCategoryFilter] = useState('all');
   const [autoSaveStatus, setAutoSaveStatus] = useState('Kaydedildi');
+  
+  // Modals
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewPageIdx, setPreviewPageIdx] = useState(0);
+  const [addPageDropdownOpen, setAddPageDropdownOpen] = useState(false);
+
+  // Custom image upload
+  const fileInputRef = useRef(null);
+
+  const canvasWidth = pageFormat === 'landscape' ? 842 : pageFormat === 'square' ? 700 : 595;
+  const canvasHeight = pageFormat === 'landscape' ? 595 : pageFormat === 'square' ? 700 : 842;
 
   useEffect(() => {
     if (currentTemplateId) {
@@ -1247,7 +1134,7 @@ export default function CatalogVisualCanvasEditor({
   const canvasRef = useRef(null);
   const dragInfoRef = useRef(null);
 
-  const currentPage = pages[activePageIdx] || pages[0];
+  const currentPage = pages[activePageIdx] || pages[0] || { elements: [] };
   const selectedEl = currentPage?.elements?.find((e) => e.id === selectedElId) || null;
 
   // Sync back to parent
@@ -1280,23 +1167,32 @@ export default function CatalogVisualCanvasEditor({
     setPages(next);
   };
 
-  // Add an element
+  // Add element
   const addElement = (type, extra = {}) => {
+    const defaultW = type === 'text' ? 360 : type === 'line' ? 240 : type === 'qr' ? 140 : 260;
+    const defaultH = type === 'text' ? 50 : type === 'line' ? 3 : type === 'qr' ? 140 : 200;
+
     const newEl = {
-      id: `el-${Date.now()}`,
+      id: `el-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       type,
-      x: 60,
-      y: 120,
-      width: type === 'text' ? 360 : type === 'line' ? 240 : 260,
-      height: type === 'text' ? 50 : type === 'line' ? 3 : 200,
+      x: Math.round((canvasWidth - defaultW) / 2),
+      y: Math.round((canvasHeight - defaultH) / 2),
+      width: defaultW,
+      height: defaultH,
       content: type === 'text' ? 'Başlık veya Metin Alanı' : '',
       fontSize: 16,
       fontWeight: '700',
+      fontFamily: 'Inter, sans-serif',
       color: type === 'box' ? '#f8fafc' : currentPage.bgColor === '#18181b' ? '#ffffff' : '#0f172a',
       borderColor: '#cbd5e1',
+      borderWidth: 1,
       align: 'left',
+      letterSpacing: 'normal',
+      opacity: 100,
       src: extra.src || '/renders/luxury_bathroom_calacatta_gold.jpg',
+      qrUrl: extra.qrUrl || 'https://seramikbak.com',
       locked: false,
+      hidden: false,
       ...extra
     };
 
@@ -1332,22 +1228,22 @@ export default function CatalogVisualCanvasEditor({
     setSelectedElId(null);
   };
 
-  // Alignment helpers (Center horizontal, align left, etc.)
+  // Alignment helpers
   const alignElement = (alignment) => {
     if (!selectedEl) return;
     let patch = {};
     if (alignment === 'center-h') {
-      patch = { x: Math.round((595 - selectedEl.width) / 2) };
+      patch = { x: Math.round((canvasWidth - selectedEl.width) / 2) };
     } else if (alignment === 'left') {
       patch = { x: 50 };
     } else if (alignment === 'right') {
-      patch = { x: 595 - 50 - selectedEl.width };
+      patch = { x: canvasWidth - 50 - selectedEl.width };
     } else if (alignment === 'center-v') {
-      patch = { y: Math.round((842 - selectedEl.height) / 2) };
+      patch = { y: Math.round((canvasHeight - selectedEl.height) / 2) };
     } else if (alignment === 'top') {
       patch = { y: 50 };
     } else if (alignment === 'bottom') {
-      patch = { y: 842 - 50 - selectedEl.height };
+      patch = { y: canvasHeight - 50 - selectedEl.height };
     }
     updateSelectedElement(patch);
   };
@@ -1365,6 +1261,32 @@ export default function CatalogVisualCanvasEditor({
 
     const updated = pages.map((p, i) => (i === activePageIdx ? { ...p, elements: els } : p));
     pushHistory(updated);
+  };
+
+  // Add Page with optional preset
+  const handleAddNewPage = (preset = null) => {
+    const newPage = preset
+      ? {
+          ...preset,
+          id: `page-${Date.now()}`,
+          elements: preset.elements.map((el) => ({
+            ...el,
+            id: `el-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+          }))
+        }
+      : {
+          id: `page-${Date.now()}`,
+          title: `Sayfa #${pages.length + 1}`,
+          type: 'product',
+          bgColor: '#ffffff',
+          elements: []
+        };
+
+    const newPages = [...pages, newPage];
+    pushHistory(newPages);
+    setActivePageIdx(newPages.length - 1);
+    setSelectedElId(null);
+    setAddPageDropdownOpen(false);
   };
 
   // Apply a preset template to the active page
@@ -1425,7 +1347,6 @@ export default function CatalogVisualCanvasEditor({
     const p2 = brandProducts[1] || brandProducts[0] || null;
 
     const newPages = [
-      // 1. Kapak
       {
         id: `page-cover-${Date.now()}`,
         title: `${tmplObj.name} • Kapak`,
@@ -1480,7 +1401,6 @@ export default function CatalogVisualCanvasEditor({
             width: 495,
             height: 520,
             src: tmplObj.mockupImg || '/renders/luxury_bathroom_calacatta_gold.jpg',
-            borderRadius: 0,
             locked: false
           },
           {
@@ -1490,7 +1410,7 @@ export default function CatalogVisualCanvasEditor({
             y: 745,
             width: 495,
             height: 35,
-            content: `PORSELEN DEV PLAKALAR • ${tmplObj.tag} • TS EN 14411`,
+            content: `${tmplObj.tag} • ARCHITECTURAL PORCELAIN SLABS`,
             fontSize: 10,
             fontWeight: '700',
             letterSpacing: '0.15em',
@@ -1500,23 +1420,20 @@ export default function CatalogVisualCanvasEditor({
           }
         ]
       },
-      // 2. Ürün Sayfası 1
       {
         id: `page-prod1-${Date.now()}`,
-        title: `${tmplObj.name} • Ürün 1`,
+        title: `${tmplObj.name} • Ürün Sayfası #1`,
         type: 'product',
-        bgColor: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? tmplObj.bgColor : '#ffffff',
+        bgColor: tmplObj.bgColor === '#18181b' ? '#18181b' : '#ffffff',
         elements: generateTemplateElementsForPage(tmplId, 'product', brandInfo, p1)
       },
-      // 3. Ürün Sayfası 2
       {
         id: `page-prod2-${Date.now()}`,
-        title: `${tmplObj.name} • Ürün 2`,
+        title: `${tmplObj.name} • Ürün Sayfası #2`,
         type: 'product',
-        bgColor: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? tmplObj.bgColor : '#ffffff',
+        bgColor: tmplObj.bgColor === '#18181b' ? '#18181b' : '#ffffff',
         elements: generateTemplateElementsForPage(tmplId, 'product', brandInfo, p2)
       },
-      // 4. Teknik Şartname & Matris
       {
         id: `page-specs-${Date.now()}`,
         title: `${tmplObj.name} • Teknik Şartname`,
@@ -1524,79 +1441,12 @@ export default function CatalogVisualCanvasEditor({
         bgColor: '#ffffff',
         elements: PRESET_TEMPLATES.find((p) => p.id === 'specs-matrix')?.elements || []
       },
-      // 5. Arka Kapak & İletişim
       {
-        id: `page-contact-${Date.now()}`,
-        title: `${tmplObj.name} • İletişim & QR`,
-        type: 'contact',
-        bgColor: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? tmplObj.bgColor : '#090d16',
-        elements: [
-          {
-            id: `el-con-1`,
-            type: 'text',
-            x: 50,
-            y: 120,
-            width: 495,
-            height: 40,
-            content: brandName,
-            fontSize: 32,
-            fontWeight: '900',
-            letterSpacing: '0.1em',
-            color: '#ffffff',
-            align: 'center',
-            locked: false
-          },
-          {
-            id: `el-con-2`,
-            type: 'line',
-            x: 235,
-            y: 180,
-            width: 125,
-            height: 2,
-            color: tmplObj.accent || '#b4823c',
-            locked: false
-          },
-          {
-            id: `el-con-3`,
-            type: 'text',
-            x: 50,
-            y: 220,
-            width: 495,
-            height: 120,
-            content: 'DİJİTAL KATALOG & B2B MİMARİ MERKEZİ\n\nFabrika: Organize Sanayi Bölgesi\nWeb: www.seramikbak.com\nE-Posta: mimari@seramikbak.com',
-            fontSize: 14,
-            fontWeight: '600',
-            color: '#cbd5e1',
-            align: 'center',
-            locked: false
-          },
-          {
-            id: `el-con-4`,
-            type: 'box',
-            x: 217,
-            y: 380,
-            width: 160,
-            height: 160,
-            color: '#ffffff',
-            borderColor: '#e2e8f0',
-            borderRadius: 16,
-            locked: false
-          },
-          {
-            id: `el-con-5`,
-            type: 'text',
-            x: 50,
-            y: 570,
-            width: 495,
-            height: 40,
-            content: 'Kataloğu Mobil Cihazınızda 3D İncelemek İçin QR Kodu Okutun',
-            fontSize: 12,
-            fontWeight: '700',
-            color: '#94a3b8',
-            align: 'center',
-            locked: false
-          }
-        ]
+        id: `page-back-${Date.now()}`,
+        title: `${tmplObj.name} • Arka Kapak & QR`,
+        type: 'cover',
+        bgColor: '#18181b',
+        elements: PRESET_TEMPLATES.find((p) => p.id === 'back-cover-qr')?.elements || []
       }
     ];
 
@@ -1606,48 +1456,88 @@ export default function CatalogVisualCanvasEditor({
     setAutoSaveStatus(`Tüm katalog "${tmplObj.name}" şablonuna dönüştürüldü`);
   };
 
-  // Insert real brand product onto canvas with aesthetic layout
-  const handleInsertProduct = (prod) => {
+  // Insert real brand product onto canvas
+  const handleInsertProduct = (prod, mode = 'card') => {
     const prodImg = prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
     const mainText = `${prod.name}\n${prod.width || 60}×${prod.height || 120} cm • ${prod.finish || 'Parlak'}`;
     const skuText = `SKU: ${prod.sku || prod.code || 'BN-5501'}`;
 
-    // Add image
-    addElement('image', {
-      src: prodImg,
-      x: 50,
-      y: 120,
-      width: 495,
-      height: 380
-    });
-
-    // Add info banner
-    setTimeout(() => {
-      addElement('text', {
-        content: mainText,
+    if (mode === 'slab') {
+      // Large slab layout
+      addElement('image', {
+        src: prodImg,
+        x: 175,
+        y: 100,
+        width: 245,
+        height: 560
+      });
+      setTimeout(() => {
+        addElement('text', {
+          content: `${prod.name}\n${prod.width || 120}×${prod.height || 280} cm DEV PLAKA`,
+          x: 50,
+          y: 690,
+          width: 495,
+          height: 60,
+          fontSize: 18,
+          fontWeight: '800',
+          align: 'center'
+        });
+      }, 50);
+    } else {
+      // Standard product card
+      addElement('image', {
+        src: prodImg,
         x: 50,
-        y: 520,
-        width: 350,
-        height: 60,
-        fontSize: 18,
-        fontWeight: '800',
-        color: '#0f172a'
+        y: 120,
+        width: 495,
+        height: 380
       });
-      addElement('text', {
-        content: skuText,
-        x: 420,
-        y: 525,
-        width: 125,
-        height: 30,
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#b4823c',
-        align: 'right'
-      });
-    }, 40);
+      setTimeout(() => {
+        addElement('text', {
+          content: mainText,
+          x: 50,
+          y: 520,
+          width: 350,
+          height: 60,
+          fontSize: 18,
+          fontWeight: '800',
+          color: '#0f172a'
+        });
+        addElement('text', {
+          content: skuText,
+          x: 420,
+          y: 525,
+          width: 125,
+          height: 30,
+          fontSize: 12,
+          fontWeight: '700',
+          color: '#b4823c',
+          align: 'right'
+        });
+      }, 50);
+    }
   };
 
-  // Keyboard navigation & Shortcuts (Delete, Escape, Arrow keys)
+  // Handle local image file upload
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result;
+      if (typeof dataUrl === 'string') {
+        addElement('image', {
+          src: dataUrl,
+          width: 380,
+          height: 280
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  // Keyboard navigation & Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -1666,23 +1556,23 @@ export default function CatalogVisualCanvasEditor({
           updateSelectedElement({ x: Math.max(0, selectedEl.x - step) });
         } else if (e.key === 'ArrowRight') {
           e.preventDefault();
-          updateSelectedElement({ x: Math.min(595 - selectedEl.width, selectedEl.x + step) });
+          updateSelectedElement({ x: Math.min(canvasWidth - selectedEl.width, selectedEl.x + step) });
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
           updateSelectedElement({ y: Math.max(0, selectedEl.y - step) });
         } else if (e.key === 'ArrowDown') {
           e.preventDefault();
-          updateSelectedElement({ y: Math.min(842 - selectedEl.height, selectedEl.y + step) });
+          updateSelectedElement({ y: Math.min(canvasHeight - selectedEl.height, selectedEl.y + step) });
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElId, selectedEl]);
+  }, [selectedElId, selectedEl, canvasWidth, canvasHeight]);
 
-  // Dragging & Resizing Handlers
-  const handleMouseDownElement = (e, el, mode = 'move') => {
+  // Dragging & Resizing Handlers with 4 corners and Snap Guides
+  const handleMouseDownElement = (e, el, mode = 'move', corner = 'se') => {
     e.stopPropagation();
     setSelectedElId(el.id);
     if (el.locked) return;
@@ -1694,7 +1584,7 @@ export default function CatalogVisualCanvasEditor({
     const origW = el.width;
     const origH = el.height;
 
-    dragInfoRef.current = { id: el.id, mode, startX, startY, origX, origY, origW, origH };
+    dragInfoRef.current = { id: el.id, mode, corner, startX, startY, origX, origY, origW, origH };
 
     const handleMouseMove = (moveEvent) => {
       if (!dragInfoRef.current) return;
@@ -1702,6 +1592,26 @@ export default function CatalogVisualCanvasEditor({
       const dy = (moveEvent.clientY - dragInfoRef.current.startY) / zoomLevel;
 
       const snap = (val) => (showGrid ? Math.round(val / 5) * 5 : Math.round(val));
+
+      // Calculate Snap Lines (Center horizontal & vertical)
+      if (dragInfoRef.current.mode === 'move' && showSmartGuides) {
+        const currentCenterX = dragInfoRef.current.origX + dx + dragInfoRef.current.origW / 2;
+        const currentCenterY = dragInfoRef.current.origY + dy + dragInfoRef.current.origH / 2;
+        const pageCenterX = canvasWidth / 2;
+        const pageCenterY = canvasHeight / 2;
+
+        if (Math.abs(currentCenterX - pageCenterX) < 6) {
+          setSnapLineX(pageCenterX);
+        } else {
+          setSnapLineX(null);
+        }
+
+        if (Math.abs(currentCenterY - pageCenterY) < 6) {
+          setSnapLineY(pageCenterY);
+        } else {
+          setSnapLineY(null);
+        }
+      }
 
       setPages((prevPages) =>
         prevPages.map((p, pIdx) => {
@@ -1713,16 +1623,37 @@ export default function CatalogVisualCanvasEditor({
               if (dragInfoRef.current.mode === 'move') {
                 return {
                   ...item,
-                  x: Math.max(0, Math.min(595 - item.width, snap(dragInfoRef.current.origX + dx))),
-                  y: Math.max(0, Math.min(842 - item.height, snap(dragInfoRef.current.origY + dy)))
+                  x: Math.max(0, Math.min(canvasWidth - item.width, snap(dragInfoRef.current.origX + dx))),
+                  y: Math.max(0, Math.min(canvasHeight - item.height, snap(dragInfoRef.current.origY + dy)))
                 };
-              } else {
-                return {
-                  ...item,
-                  width: Math.max(30, snap(dragInfoRef.current.origW + dx)),
-                  height: Math.max(4, snap(dragInfoRef.current.origH + dy))
-                };
+              } else if (dragInfoRef.current.mode === 'resize') {
+                const c = dragInfoRef.current.corner;
+                let newX = item.x;
+                let newY = item.y;
+                let newW = item.width;
+                let newH = item.height;
+
+                if (c === 'se') {
+                  newW = Math.max(20, snap(dragInfoRef.current.origW + dx));
+                  newH = Math.max(4, snap(dragInfoRef.current.origH + dy));
+                } else if (c === 'sw') {
+                  newW = Math.max(20, snap(dragInfoRef.current.origW - dx));
+                  newX = snap(dragInfoRef.current.origX + dx);
+                  newH = Math.max(4, snap(dragInfoRef.current.origH + dy));
+                } else if (c === 'ne') {
+                  newW = Math.max(20, snap(dragInfoRef.current.origW + dx));
+                  newH = Math.max(4, snap(dragInfoRef.current.origH - dy));
+                  newY = snap(dragInfoRef.current.origY + dy);
+                } else if (c === 'nw') {
+                  newW = Math.max(20, snap(dragInfoRef.current.origW - dx));
+                  newH = Math.max(4, snap(dragInfoRef.current.origH - dy));
+                  newX = snap(dragInfoRef.current.origX + dx);
+                  newY = snap(dragInfoRef.current.origY + dy);
+                }
+
+                return { ...item, x: newX, y: newY, width: newW, height: newH };
               }
+              return item;
             })
           };
         })
@@ -1731,6 +1662,8 @@ export default function CatalogVisualCanvasEditor({
 
     const handleMouseUp = () => {
       dragInfoRef.current = null;
+      setSnapLineX(null);
+      setSnapLineY(null);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
@@ -1740,29 +1673,35 @@ export default function CatalogVisualCanvasEditor({
   };
 
   const filteredProducts = useMemo(() => {
-    if (!productSearch.trim()) return brandProducts;
-    const q = productSearch.toLowerCase();
-    return brandProducts.filter((p) => p.name?.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q));
-  }, [brandProducts, productSearch]);
+    let list = brandProducts;
+    if (productCategoryFilter !== 'all') {
+      list = list.filter((p) => p.category === productCategoryFilter || p.surface === productCategoryFilter);
+    }
+    if (productSearch.trim()) {
+      const q = productSearch.toLowerCase();
+      list = list.filter((p) => p.name?.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q) || p.code?.toLowerCase().includes(q));
+    }
+    return list;
+  }, [brandProducts, productSearch, productCategoryFilter]);
 
   return (
     <div className="bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col text-neutral-100 select-none">
       {/* ========================================================================= */}
-      {/* 1. TOP STUDIO CONTROL BAR (SİMETRİK VE ŞIK IN-DESIGN / FIGMA ARAÇ ÇUBUĞU)   */}
+      {/* 1. TOP STUDIO CONTROL BAR (PROFESYONEL VE SİMETRİK MATBAA KONTROL PANELİ) */}
       {/* ========================================================================= */}
       <div className="h-14 bg-neutral-950 border-b border-neutral-800 px-4 flex items-center justify-between gap-3 text-xs">
         {/* Left: Studio Branding & Zoom Controls */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="font-extrabold tracking-wide uppercase text-white font-mono text-[11px]">
+            <span className="font-extrabold tracking-wider uppercase text-white font-mono text-[11px]">
               STUDIO PRO
             </span>
           </div>
 
           <div className="h-5 w-px bg-neutral-800 hidden sm:block" />
 
-          {/* Active Template Badge & Quick Switcher */}
+          {/* Active Template Quick Switcher */}
           <button
             type="button"
             onClick={() => {
@@ -1778,6 +1717,42 @@ export default function CatalogVisualCanvasEditor({
               {CATALOG_MASTER_TEMPLATES.find((t) => t.id === selectedTemplateId)?.name || 'Milano Lookbook'}
             </span>
           </button>
+
+          <div className="h-5 w-px bg-neutral-800 hidden sm:block" />
+
+          {/* Orientation switch */}
+          <div className="flex items-center bg-neutral-900 rounded-lg p-0.5 border border-neutral-800 text-[10px] font-bold">
+            <button
+              type="button"
+              onClick={() => setPageFormat('portrait')}
+              className={`px-2 py-1 rounded transition cursor-pointer ${
+                pageFormat === 'portrait' ? 'bg-amber-500 text-neutral-950 font-black' : 'text-neutral-400 hover:text-white'
+              }`}
+              title="A4 Dikey (595×842 pt)"
+            >
+              A4 Dikey
+            </button>
+            <button
+              type="button"
+              onClick={() => setPageFormat('landscape')}
+              className={`px-2 py-1 rounded transition cursor-pointer ${
+                pageFormat === 'landscape' ? 'bg-amber-500 text-neutral-950 font-black' : 'text-neutral-400 hover:text-white'
+              }`}
+              title="A4 Yatay (842×595 pt)"
+            >
+              A4 Yatay
+            </button>
+            <button
+              type="button"
+              onClick={() => setPageFormat('square')}
+              className={`px-2 py-1 rounded transition cursor-pointer hidden md:inline ${
+                pageFormat === 'square' ? 'bg-amber-500 text-neutral-950 font-black' : 'text-neutral-400 hover:text-white'
+              }`}
+              title="1:1 Kare (Deco Standardı)"
+            >
+              1:1 Kare
+            </button>
+          </div>
 
           <div className="h-5 w-px bg-neutral-800 hidden sm:block" />
 
@@ -1813,12 +1788,12 @@ export default function CatalogVisualCanvasEditor({
           </div>
         </div>
 
-        {/* Center: Add Elements Bar (Simetrik Tuş Takımı) */}
+        {/* Center: Add Elements Bar */}
         <div className="flex items-center bg-neutral-900 p-1 rounded-xl border border-neutral-800 gap-1">
           <button
             type="button"
             onClick={() => addElement('text')}
-            className="px-3 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
             title="Metin Ekle"
           >
             <Type size={14} className="text-amber-400" />
@@ -1828,7 +1803,7 @@ export default function CatalogVisualCanvasEditor({
           <button
             type="button"
             onClick={() => addElement('image')}
-            className="px-3 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
             title="Görsel Ekle"
           >
             <ImageIcon size={14} className="text-sky-400" />
@@ -1838,7 +1813,7 @@ export default function CatalogVisualCanvasEditor({
           <button
             type="button"
             onClick={() => addElement('box')}
-            className="px-3 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
             title="Blok / Kutu Ekle"
           >
             <Square size={14} className="text-emerald-400" />
@@ -1848,16 +1823,40 @@ export default function CatalogVisualCanvasEditor({
           <button
             type="button"
             onClick={() => addElement('line')}
-            className="px-3 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
             title="Çizgi / Ayraç Ekle"
           >
             <Minus size={14} className="text-purple-400" />
             <span className="hidden md:inline">Çizgi</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => addElement('qr')}
+            className="px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            title="QR Kod Ekle"
+          >
+            <QrCode size={14} className="text-amber-400" />
+            <span className="hidden md:inline">QR Kod</span>
+          </button>
         </div>
 
-        {/* Right: History, Guides & Save Draft */}
+        {/* Right: History, Guides & Preview */}
         <div className="flex items-center gap-2">
+          {/* Smart Guides Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowSmartGuides(!showSmartGuides)}
+            className={`p-2 rounded-lg border transition cursor-pointer ${
+              showSmartGuides
+                ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
+                : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
+            }`}
+            title="Akıllı Hizalama Çizgileri (Smart Guides)"
+          >
+            <Compass size={14} />
+          </button>
+
           {/* Grid Guides Toggle */}
           <button
             type="button"
@@ -1872,7 +1871,7 @@ export default function CatalogVisualCanvasEditor({
             <Grid size={14} />
           </button>
 
-          {/* Bleed / Print Margin Toggle */}
+          {/* Bleed Toggle */}
           <button
             type="button"
             onClick={() => setShowBleed(!showBleed)}
@@ -1883,7 +1882,7 @@ export default function CatalogVisualCanvasEditor({
             }`}
             title="Matbaa Güvenli Alan & Kesim Payı (Bleed)"
           >
-            Matbaa Kesim Çizgisi
+            Kesim Çizgisi
           </button>
 
           <div className="h-5 w-px bg-neutral-800" />
@@ -1910,14 +1909,39 @@ export default function CatalogVisualCanvasEditor({
             </button>
           </div>
 
+          {/* Live Preview Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setPreviewPageIdx(activePageIdx);
+              setPreviewOpen(true);
+            }}
+            className="px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            title="Kataloğu Tam Ekran İncele"
+          >
+            <Eye size={13} className="text-sky-400" />
+            <span className="hidden sm:inline">Önizle</span>
+          </button>
+
           {onSaveDraft && (
             <button
               type="button"
               onClick={() => onSaveDraft(pages)}
-              className="px-3.5 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer ml-1"
+              className="px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs flex items-center gap-1.5 border border-neutral-700 transition cursor-pointer ml-1"
             >
               <Save size={13} />
               <span>Kaydet</span>
+            </button>
+          )}
+
+          {onPublish && (
+            <button
+              type="button"
+              onClick={() => onPublish(pages)}
+              className="px-3.5 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+            >
+              <Sparkles size={13} />
+              <span>Yayınla</span>
             </button>
           )}
         </div>
@@ -1926,17 +1950,19 @@ export default function CatalogVisualCanvasEditor({
       {/* ========================================================================= */}
       {/* 2. MAIN 3-PANEL WORKSPACE                                                 */}
       {/* ========================================================================= */}
-      <div className="flex flex-col lg:flex-row min-h-[720px] max-h-[820px] overflow-hidden">
-        {/* ==================== LEFT TOOLBOX PANEL (320px) ==================== */}
-        <div className="w-full lg:w-80 bg-neutral-950 border-r border-neutral-800 flex flex-col justify-between flex-shrink-0">
+      <div className="flex flex-col lg:flex-row min-h-[750px] max-h-[850px] overflow-hidden">
+        {/* ==================== LEFT TOOLBOX PANEL (330px) ==================== */}
+        <div className="w-full lg:w-84 bg-neutral-950 border-r border-neutral-800 flex flex-col justify-between flex-shrink-0">
           <div>
-            {/* Left Nav Tabs */}
-            <div className="grid grid-cols-4 p-2 bg-neutral-900/60 border-b border-neutral-800 text-[11px] font-bold">
+            {/* 6 Specialist Tabs */}
+            <div className="grid grid-cols-6 p-1.5 bg-neutral-900/60 border-b border-neutral-800 text-[10px] font-bold">
               {[
-                { id: 'templates', label: 'Şablonlar', icon: LayoutTemplate },
-                { id: 'products', label: 'Ürünler', icon: Box },
-                { id: 'pages', label: 'Sayfalar', icon: Layers },
-                { id: 'badges', label: 'Rozetler', icon: Sparkles }
+                { id: 'templates', label: 'Şablon', icon: LayoutTemplate },
+                { id: 'pages', label: 'Sayfa', icon: Layers },
+                { id: 'products', label: 'Ürün', icon: Box },
+                { id: 'media', label: 'Görsel', icon: ImageIcon },
+                { id: 'elements', label: 'Öğe', icon: Sparkles },
+                { id: 'layers', label: 'Katman', icon: Sliders }
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeLeftTab === tab.id;
@@ -1951,17 +1977,17 @@ export default function CatalogVisualCanvasEditor({
                         : 'text-neutral-400 hover:text-neutral-200'
                     }`}
                   >
-                    <Icon size={15} />
-                    <span>{tab.label}</span>
+                    <Icon size={14} />
+                    <span className="truncate">{tab.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* TAB CONTENT: 1. HAZIR MİZANPAJ VE KATALOG ŞABLONLARI */}
+            {/* TAB CONTENT 1: ŞABLONLAR & MİZANPAJLAR */}
             {activeLeftTab === 'templates' && (
-              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[660px]">
-                {/* Sub Tab Switcher: Ana Katalog Şablonları vs Sayfa Mizanpajları */}
+              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[690px]">
+                {/* Sub Tab Switcher */}
                 <div className="flex bg-neutral-900 p-1 rounded-xl border border-neutral-800 text-[11px] font-bold">
                   <button
                     type="button"
@@ -1983,11 +2009,10 @@ export default function CatalogVisualCanvasEditor({
                         : 'text-neutral-400 hover:text-white'
                     }`}
                   >
-                    Sayfa Mizanpajları
+                    Sayfa Mizanpajları ({PRESET_TEMPLATES.length})
                   </button>
                 </div>
 
-                {/* VIEW 1: GÖRSELDEKİ ANA KATALOG ŞABLONLARI (10 ADET) */}
                 {templateSubTab === 'concepts' && (
                   <div className="space-y-3">
                     <p className="text-[11px] text-neutral-400 leading-relaxed">
@@ -2006,7 +2031,6 @@ export default function CatalogVisualCanvasEditor({
                                 : 'border-neutral-800 bg-neutral-900/70 hover:border-neutral-700'
                             }`}
                           >
-                            {/* Card Header with Image Banner & Tag matching screenshot */}
                             <div
                               className="h-28 w-full p-3 flex flex-col justify-between text-white relative cursor-pointer"
                               style={{
@@ -2034,13 +2058,11 @@ export default function CatalogVisualCanvasEditor({
                               </div>
                             </div>
 
-                            {/* Card Body & Description */}
                             <div className="p-3 flex-1 flex flex-col justify-between bg-neutral-900/90">
                               <p className="text-[11px] text-neutral-300 leading-relaxed mb-3">
                                 {tmpl.desc}
                               </p>
 
-                              {/* Interactive Action Buttons */}
                               <div className="pt-2 border-t border-neutral-800/80 flex flex-col gap-2">
                                 <div className="flex items-center justify-between">
                                   <button
@@ -2084,11 +2106,10 @@ export default function CatalogVisualCanvasEditor({
                   </div>
                 )}
 
-                {/* VIEW 2: TEKİL SAYFA MİZANPAJLARI (PRESET LAYOUTS) */}
                 {templateSubTab === 'layouts' && (
                   <div className="space-y-2.5">
                     <p className="text-[11px] text-neutral-400">
-                      Aktif sayfaya eklemek istediğiniz mizanpaj bloğunu seçin:
+                      Aktif sayfaya uygulamak istediğiniz seramik sayfa mizanpajını seçin:
                     </p>
                     {PRESET_TEMPLATES.map((tmpl) => (
                       <button
@@ -2109,7 +2130,7 @@ export default function CatalogVisualCanvasEditor({
                           {tmpl.desc}
                         </p>
                         <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-400 opacity-0 group-hover:opacity-100 transition">
-                          <span>Sayfaya Uygula</span>
+                          <span>Bu Mizanpajı Sayfaya Uygula</span>
                           <ChevronRight size={12} />
                         </div>
                       </button>
@@ -2119,80 +2140,56 @@ export default function CatalogVisualCanvasEditor({
               </div>
             )}
 
-            {/* TAB CONTENT: 2. GERÇEK ÜRÜN KÜTÜPHANESİ */}
-            {activeLeftTab === 'products' && (
-              <div className="p-3.5 space-y-3 flex flex-col max-h-[620px]">
-                <div className="relative">
-                  <Search size={14} className="absolute left-3 top-2.5 text-neutral-400" />
-                  <input
-                    type="text"
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                    placeholder="Ürün adı veya kod ara..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:border-amber-500"
-                  />
-                </div>
-
-                <p className="text-[11px] text-neutral-400">
-                  Tıkladığınız ürün şık bir görsel & teknik kart olarak tuvale eklenir:
-                </p>
-
-                <div className="space-y-2 overflow-y-auto flex-1 pr-1">
-                  {filteredProducts.map((prod) => (
-                    <button
-                      key={prod.id}
-                      type="button"
-                      onClick={() => handleInsertProduct(prod)}
-                      className="w-full p-2.5 rounded-xl border border-neutral-800 bg-neutral-900/70 hover:bg-neutral-800 hover:border-amber-400/50 flex items-center gap-3 text-left transition group cursor-pointer"
-                    >
-                      <img
-                        src={prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
-                        alt={prod.name}
-                        className="w-10 h-10 rounded-lg object-cover border border-neutral-700 flex-shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-white group-hover:text-amber-300 truncate">
-                          {prod.name}
-                        </p>
-                        <p className="text-[10px] text-neutral-400 font-mono mt-0.5">
-                          {prod.width}×{prod.height} cm • {prod.finish || 'Mat'}
-                        </p>
-                      </div>
-                      <Plus size={14} className="text-amber-400 flex-shrink-0" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* TAB CONTENT: 3. SAYFALAR DİZİNİ */}
+            {/* TAB CONTENT 2: SAYFALAR LİSTESİ & KÜÇÜK ÖNİZLEMELER */}
             {activeLeftTab === 'pages' && (
-              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[620px]">
+              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[690px]">
                 <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
                   <span className="text-xs font-bold text-neutral-300">
                     Katalog Sayfaları ({pages.length})
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newP = {
-                        id: `page-${Date.now()}`,
-                        title: `Sayfa #${pages.length + 1}`,
-                        type: 'product',
-                        bgColor: '#ffffff',
-                        elements: []
-                      };
-                      pushHistory([...pages, newP]);
-                      setActivePageIdx(pages.length);
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-[11px] flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus size={12} />
-                    <span>Sayfa Ekle</span>
-                  </button>
+                  
+                  {/* Add Page Dropdown */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setAddPageDropdownOpen(!addPageDropdownOpen)}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                    >
+                      <Plus size={12} />
+                      <span>Sayfa Ekle</span>
+                      <ChevronDown size={11} />
+                    </button>
+
+                    {addPageDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl p-2 z-50 space-y-1 text-left">
+                        <button
+                          type="button"
+                          onClick={() => handleAddNewPage(null)}
+                          className="w-full px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-2 cursor-pointer"
+                        >
+                          <Square size={13} className="text-amber-400" />
+                          <span>Boş Sayfa Ekle</span>
+                        </button>
+                        <div className="h-px bg-neutral-800 my-1" />
+                        <span className="text-[10px] font-mono text-neutral-400 px-2 block">HAZIR SERAMİK MİZANPAJLARI:</span>
+                        {PRESET_TEMPLATES.map((preset) => (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() => handleAddNewPage(preset)}
+                            className="w-full px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-300 hover:text-white text-[11px] flex items-center justify-between cursor-pointer"
+                          >
+                            <span className="truncate">{preset.name}</span>
+                            <span className="text-[9px] font-mono text-amber-400">{preset.badge}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* Page Thumbnails */}
+                <div className="space-y-2.5">
                   {pages.map((p, idx) => {
                     const isActive = idx === activePageIdx;
                     return (
@@ -2202,19 +2199,35 @@ export default function CatalogVisualCanvasEditor({
                           setActivePageIdx(idx);
                           setSelectedElId(null);
                         }}
-                        className={`p-2.5 rounded-xl border flex items-center justify-between transition cursor-pointer ${
+                        className={`p-2 rounded-xl border flex items-center gap-3 transition cursor-pointer ${
                           isActive
-                            ? 'bg-neutral-800 border-amber-500 text-white font-bold ring-1 ring-amber-500/30'
+                            ? 'bg-neutral-800/90 border-amber-500 text-white font-bold ring-2 ring-amber-500/30'
                             : 'bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="w-5 h-5 rounded bg-neutral-800 text-amber-400 text-[10px] font-mono flex items-center justify-center font-bold">
-                            {idx + 1}
+                        {/* Miniature Page Visual Preview */}
+                        <div
+                          style={{ backgroundColor: p.bgColor || '#ffffff' }}
+                          className="w-10 h-14 rounded border border-neutral-700 flex-shrink-0 relative overflow-hidden flex flex-col justify-between p-0.5 shadow-xs"
+                        >
+                          <div className="w-full h-1 bg-amber-500/40 rounded-full" />
+                          <span className="text-[8px] font-mono font-bold text-neutral-600 text-center">
+                            #{idx + 1}
                           </span>
-                          <span className="text-xs truncate">{p.title}</span>
+                          <div className="w-2/3 h-1 bg-neutral-400/30 rounded-full self-center" />
                         </div>
 
+                        {/* Title and details */}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs truncate font-bold text-neutral-200">
+                            {p.title}
+                          </p>
+                          <p className="text-[10px] text-neutral-400 font-mono mt-0.5">
+                            {p.elements?.length || 0} Öğe • {p.type || 'Ürün'}
+                          </p>
+                        </div>
+
+                        {/* Quick Page Actions */}
                         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <button
                             type="button"
@@ -2241,7 +2254,7 @@ export default function CatalogVisualCanvasEditor({
                           <button
                             type="button"
                             onClick={() => {
-                              if (pages.length <= 1) return alert('En az 1 sayfa kalmalıdır.');
+                              if (pages.length <= 1) return alert('Katalogda en az 1 sayfa bulunmalıdır.');
                               const arr = pages.filter((_, i) => i !== idx);
                               pushHistory(arr);
                               setActivePageIdx(Math.max(0, idx - 1));
@@ -2259,49 +2272,278 @@ export default function CatalogVisualCanvasEditor({
               </div>
             )}
 
-            {/* TAB CONTENT: 4. ROZETLER & GRAFİK ÖĞELER */}
-            {activeLeftTab === 'badges' && (
-              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[620px]">
-                <div className="pb-1 border-b border-neutral-800">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
-                    MİMARİ & MATBAA ROZETLERİ
-                  </p>
-                  <p className="text-xs text-neutral-300 mt-0.5">
-                    Sayfaya tek tıkla şık rozet ekleyin:
-                  </p>
+            {/* TAB CONTENT 3: ÜRÜN KÜTÜPHANESİ */}
+            {activeLeftTab === 'products' && (
+              <div className="p-3.5 space-y-3 flex flex-col max-h-[690px]">
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-2.5 text-neutral-400" />
+                  <input
+                    type="text"
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    placeholder="Ürün adı veya kod ara..."
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:border-amber-500"
+                  />
                 </div>
 
-                <div className="grid grid-cols-1 gap-2">
-                  {BADGE_PRESETS.map((badgeText) => (
+                <p className="text-[11px] text-neutral-400">
+                  Ürünü seçip tuvale ekleme modunu belirleyin:
+                </p>
+
+                <div className="space-y-2 overflow-y-auto flex-1 pr-1">
+                  {filteredProducts.map((prod) => (
+                    <div
+                      key={prod.id}
+                      className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-900/70 hover:border-amber-400/50 flex flex-col gap-2 transition"
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
+                          alt={prod.name}
+                          className="w-12 h-12 rounded-lg object-cover border border-neutral-700 flex-shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-white truncate">
+                            {prod.name}
+                          </p>
+                          <p className="text-[10px] text-neutral-400 font-mono mt-0.5">
+                            {prod.width}×{prod.height} cm • {prod.finish || 'Mat'}
+                          </p>
+                          <p className="text-[9px] font-mono text-amber-400">
+                            {prod.sku || prod.code || 'SER-2026'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-neutral-800/80">
+                        <button
+                          type="button"
+                          onClick={() => handleInsertProduct(prod, 'card')}
+                          className="px-2 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-300 text-[10px] font-bold text-center transition cursor-pointer"
+                        >
+                          + Kart Olarak Ekle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleInsertProduct(prod, 'slab')}
+                          className="px-2 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold text-center border border-amber-500/40 transition cursor-pointer"
+                        >
+                          + Dev Plaka Silueti
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB CONTENT 4: GÖRSELLER & MEDYA KÜTÜPHANESİ */}
+            {activeLeftTab === 'media' && (
+              <div className="p-3.5 space-y-3.5 overflow-y-auto max-h-[690px]">
+                {/* Upload Custom Image Button */}
+                <div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full py-2.5 px-3 rounded-xl border border-dashed border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+                  >
+                    <Upload size={14} />
+                    <span>Özel Görsel Yükle</span>
+                  </button>
+                </div>
+
+                {/* Brand Logo Insertion */}
+                {brandInfo.logoUrl && (
+                  <div className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-900">
+                    <p className="text-[10px] font-mono uppercase text-neutral-400 mb-2">MARKA LOGOSU</p>
+                    <div className="flex items-center justify-between">
+                      <img src={brandInfo.logoUrl} alt="Logo" className="h-8 max-w-[140px] object-contain" />
+                      <button
+                        type="button"
+                        onClick={() => addElement('image', { src: brandInfo.logoUrl, width: 140, height: 50 })}
+                        className="px-2 py-1 rounded bg-amber-500 text-neutral-950 font-bold text-[10px] cursor-pointer"
+                      >
+                        Tuvale Ekle
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Room Application Renders */}
+                <div>
+                  <p className="text-[10px] font-mono uppercase text-neutral-400 mb-2">
+                    LÜKS MEKAN UYGULAMA FOTOĞRAFLARI
+                  </p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {SAMPLE_RENDERS.map((render, rIdx) => (
+                      <div
+                        key={rIdx}
+                        onClick={() => addElement('image', { src: render.src, width: 495, height: 350 })}
+                        className="group relative rounded-xl overflow-hidden border border-neutral-800 hover:border-amber-400/60 cursor-pointer h-24 flex items-end p-2.5"
+                        style={{
+                          background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%), url(${render.src}) center/cover no-repeat`
+                        }}
+                      >
+                        <p className="text-xs font-bold text-white group-hover:text-amber-300 transition">
+                          {render.name}
+                        </p>
+                        <span className="absolute top-2 right-2 p-1 rounded-md bg-black/60 text-amber-400 opacity-0 group-hover:opacity-100 transition">
+                          <Plus size={12} />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB CONTENT 5: TASARIM ÖĞELERİ & ROZETLER */}
+            {activeLeftTab === 'elements' && (
+              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[690px]">
+                {/* Typography Quick Inserts */}
+                <div>
+                  <p className="text-[10px] font-mono uppercase text-neutral-400 mb-2">TİPOGRAFİ BLOKLARI</p>
+                  <div className="grid grid-cols-2 gap-2">
                     <button
-                      key={badgeText}
                       type="button"
                       onClick={() =>
                         addElement('text', {
-                          content: badgeText,
-                          fontSize: 10,
-                          fontWeight: '800',
-                          color: '#ffffff',
-                          bgColor: '#0f172a',
-                          width: 140,
-                          height: 28,
-                          align: 'center'
+                          content: 'KOLEKSİYON BAŞLIĞI',
+                          fontSize: 28,
+                          fontWeight: '900',
+                          letterSpacing: '0.05em'
                         })
                       }
-                      className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 hover:border-amber-400/50 flex items-center justify-between text-left transition cursor-pointer"
+                      className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 hover:border-amber-400/50 text-left cursor-pointer"
                     >
-                      <span className="text-xs font-bold text-amber-300 font-mono">{badgeText}</span>
-                      <Plus size={13} className="text-neutral-400" />
+                      <p className="text-xs font-black text-white">Büyük Başlık (H1)</p>
+                      <p className="text-[10px] text-neutral-400">28px Bold</p>
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        addElement('text', {
+                          content: 'Alt Başlık veya Mimari Seri',
+                          fontSize: 16,
+                          fontWeight: '700'
+                        })
+                      }
+                      className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 hover:border-amber-400/50 text-left cursor-pointer"
+                    >
+                      <p className="text-xs font-bold text-white">Alt Başlık (H2)</p>
+                      <p className="text-[10px] text-neutral-400">16px Semibold</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Ceramic Print Badges */}
+                <div className="pt-2 border-t border-neutral-800">
+                  <p className="text-[10px] font-mono uppercase text-neutral-400 mb-2">MİMARİ & MATBAA ROZETLERİ</p>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {BADGE_PRESETS.map((badgeText) => (
+                      <button
+                        key={badgeText}
+                        type="button"
+                        onClick={() =>
+                          addElement('text', {
+                            content: badgeText,
+                            fontSize: 10,
+                            fontWeight: '800',
+                            color: '#ffffff',
+                            bgColor: '#0f172a',
+                            width: 150,
+                            height: 28,
+                            align: 'center'
+                          })
+                        }
+                        className="p-2 rounded-xl border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 hover:border-amber-400/50 flex items-center justify-between text-left transition cursor-pointer"
+                      >
+                        <span className="text-xs font-bold text-amber-300 font-mono">{badgeText}</span>
+                        <Plus size={13} className="text-neutral-400" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB CONTENT 6: KATMANLAR LİSTESİ */}
+            {activeLeftTab === 'layers' && (
+              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[690px]">
+                <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
+                  <span className="text-xs font-bold text-neutral-300">
+                    Sayfa Katmanları ({currentPage.elements?.length || 0})
+                  </span>
+                  <span className="text-[10px] font-mono text-neutral-500">Z-Index Sırası</span>
+                </div>
+
+                <div className="space-y-1.5">
+                  {[...(currentPage.elements || [])].reverse().map((el, revIdx) => {
+                    const isSelected = el.id === selectedElId;
+                    return (
+                      <div
+                        key={el.id}
+                        onClick={() => setSelectedElId(el.id)}
+                        className={`p-2 rounded-xl border flex items-center justify-between transition cursor-pointer ${
+                          isSelected
+                            ? 'bg-neutral-800 border-amber-500 text-white font-bold ring-1 ring-amber-500/40'
+                            : 'bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          {el.type === 'text' ? (
+                            <Type size={13} className="text-amber-400 flex-shrink-0" />
+                          ) : el.type === 'image' ? (
+                            <ImageIcon size={13} className="text-sky-400 flex-shrink-0" />
+                          ) : el.type === 'box' ? (
+                            <Square size={13} className="text-emerald-400 flex-shrink-0" />
+                          ) : el.type === 'qr' ? (
+                            <QrCode size={13} className="text-amber-400 flex-shrink-0" />
+                          ) : (
+                            <Minus size={13} className="text-purple-400 flex-shrink-0" />
+                          )}
+                          <span className="text-xs truncate">
+                            {el.type.toUpperCase()}: {el.content ? el.content.slice(0, 16) : el.type}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => updateSelectedElement({ locked: !el.locked })}
+                            className="p-1 hover:text-amber-400 text-neutral-500"
+                            title={el.locked ? 'Kilidi Aç' : 'Kilitle'}
+                          >
+                            {el.locked ? <Lock size={12} className="text-amber-400" /> : <Unlock size={12} />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={deleteSelectedElement}
+                            className="p-1 hover:text-rose-400 text-neutral-500"
+                            title="Katmanı Sil"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Bottom helper */}
-          <div className="p-3 border-t border-neutral-800/80 text-[10px] text-neutral-500 font-mono">
-            <span>A4 Standart: 210 × 297 mm</span>
+          {/* Bottom helper info */}
+          <div className="p-3 border-t border-neutral-800/80 text-[10px] text-neutral-500 font-mono flex items-center justify-between">
+            <span>Ölçü: {canvasWidth} × {canvasHeight} pt</span>
+            <span className="text-emerald-400">● 300 DPI Vektör Baskı</span>
           </div>
         </div>
 
@@ -2322,8 +2564,8 @@ export default function CatalogVisualCanvasEditor({
             <div
               ref={canvasRef}
               style={{
-                width: '595px',
-                height: '842px',
+                width: `${canvasWidth}px`,
+                height: `${canvasHeight}px`,
                 backgroundColor: currentPage?.bgColor || '#ffffff',
                 backgroundImage: showGrid
                   ? 'radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 1px)'
@@ -2332,7 +2574,7 @@ export default function CatalogVisualCanvasEditor({
               }}
               className="relative shadow-2xl border border-neutral-700/80 select-none overflow-hidden"
             >
-              {/* Optional Bleed Line (Matbaa Kesim Payı Çerçevesi: 20px iç margin) */}
+              {/* Optional Bleed Line (3mm Kesim Payı: 20px iç margin) */}
               {showBleed && (
                 <div className="absolute inset-[20px] border border-dashed border-red-500/25 pointer-events-none z-50">
                   <span className="absolute top-1 left-1 text-[8px] font-mono text-red-400/50 uppercase tracking-widest">
@@ -2341,8 +2583,23 @@ export default function CatalogVisualCanvasEditor({
                 </div>
               )}
 
+              {/* Smart Guide Lines (Snap to page center X & Y) */}
+              {snapLineX !== null && (
+                <div
+                  style={{ left: `${snapLineX}px` }}
+                  className="absolute top-0 bottom-0 w-px border-l border-dashed border-sky-400 z-50 pointer-events-none"
+                />
+              )}
+              {snapLineY !== null && (
+                <div
+                  style={{ top: `${snapLineY}px` }}
+                  className="absolute left-0 right-0 h-px border-t border-dashed border-sky-400 z-50 pointer-events-none"
+                />
+              )}
+
               {/* Elements on Canvas */}
               {currentPage?.elements?.map((el) => {
+                if (el.hidden) return null;
                 const isSelected = el.id === selectedElId;
 
                 return (
@@ -2355,7 +2612,8 @@ export default function CatalogVisualCanvasEditor({
                       top: `${el.y}px`,
                       width: `${el.width}px`,
                       height: `${el.height}px`,
-                      cursor: el.locked ? 'not-allowed' : 'move'
+                      cursor: el.locked ? 'not-allowed' : 'move',
+                      opacity: (el.opacity || 100) / 100
                     }}
                     className={`group ${
                       isSelected
@@ -2369,14 +2627,16 @@ export default function CatalogVisualCanvasEditor({
                         style={{
                           fontSize: `${el.fontSize || 14}px`,
                           fontWeight: el.fontWeight || '600',
+                          fontFamily: el.fontFamily || 'Inter, sans-serif',
                           color: el.color || '#0f172a',
                           backgroundColor: el.bgColor || 'transparent',
                           textAlign: el.align || 'left',
                           letterSpacing: el.letterSpacing || 'normal',
+                          textTransform: el.textTransform || 'none',
                           width: '100%',
                           height: '100%',
                           whiteSpace: 'pre-wrap',
-                          lineHeight: 1.35
+                          lineHeight: el.lineHeight || 1.35
                         }}
                         className="p-1 overflow-hidden"
                       >
@@ -2389,7 +2649,11 @@ export default function CatalogVisualCanvasEditor({
                         src={el.src}
                         alt=""
                         draggable={false}
-                        className="w-full h-full object-cover pointer-events-none"
+                        style={{
+                          objectFit: el.objectFit || 'cover',
+                          borderRadius: `${el.borderRadius || 0}px`
+                        }}
+                        className="w-full h-full pointer-events-none"
                       />
                     )}
 
@@ -2397,7 +2661,9 @@ export default function CatalogVisualCanvasEditor({
                       <div
                         style={{
                           backgroundColor: el.color || '#f8fafc',
-                          borderColor: el.borderColor || '#cbd5e1'
+                          borderColor: el.borderColor || '#cbd5e1',
+                          borderWidth: `${el.borderWidth || 1}px`,
+                          borderRadius: `${el.borderRadius || 0}px`
                         }}
                         className="w-full h-full border"
                       />
@@ -2413,13 +2679,39 @@ export default function CatalogVisualCanvasEditor({
                       />
                     )}
 
-                    {/* Resize Handle (Bottom-Right) */}
+                    {el.type === 'qr' && (
+                      <div className="w-full h-full p-2 bg-white flex flex-col items-center justify-center border border-neutral-300">
+                        <QrCode size={Math.min(el.width, el.height) - 20} className="text-neutral-900" />
+                        <span className="text-[7px] font-mono text-neutral-500 mt-0.5 truncate max-w-full">
+                          {el.qrUrl || 'seramikbak.com'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* 4 Corner Resize Handles */}
                     {isSelected && !el.locked && (
-                      <div
-                        onMouseDown={(e) => handleMouseDownElement(e, el, 'resize')}
-                        className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -bottom-1.5 -right-1.5 cursor-nwse-resize z-40"
-                        title="Boyutlandır"
-                      />
+                      <>
+                        <div
+                          onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'se')}
+                          className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -bottom-1.5 -right-1.5 cursor-nwse-resize z-40"
+                          title="Boyutlandır (Güneydoğu)"
+                        />
+                        <div
+                          onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'sw')}
+                          className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -bottom-1.5 -left-1.5 cursor-nesw-resize z-40"
+                          title="Boyutlandır (Güneybatı)"
+                        />
+                        <div
+                          onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'ne')}
+                          className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -top-1.5 -right-1.5 cursor-nesw-resize z-40"
+                          title="Boyutlandır (Kuzeydoğu)"
+                        />
+                        <div
+                          onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'nw')}
+                          className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -top-1.5 -left-1.5 cursor-nwse-resize z-40"
+                          title="Boyutlandır (Kuzeybatı)"
+                        />
+                      </>
                     )}
                   </div>
                 );
@@ -2433,11 +2725,11 @@ export default function CatalogVisualCanvasEditor({
           </div>
         </div>
 
-        {/* ==================== RIGHT INSPECTOR PANEL (300px) ==================== */}
-        <div className="w-full lg:w-76 bg-neutral-950 border-l border-neutral-800 p-4 space-y-4 overflow-y-auto flex-shrink-0">
+        {/* ==================== RIGHT INSPECTOR PANEL (310px) ==================== */}
+        <div className="w-full lg:w-80 bg-neutral-950 border-l border-neutral-800 p-4 space-y-4 overflow-y-auto flex-shrink-0">
           <div className="pb-2 border-b border-neutral-800 flex items-center justify-between">
             <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold">
-              {selectedEl ? `SEÇİLİ ÖĞE: ${selectedEl.type.toUpperCase()}` : 'SAYFA ÖZELLİKLERİ'}
+              {selectedEl ? `SEÇİLİ ÖĞE: ${selectedEl.type.toUpperCase()}` : 'SAYFA AYARLARI'}
             </span>
             {selectedEl && (
               <div className="flex items-center gap-1">
@@ -2464,7 +2756,7 @@ export default function CatalogVisualCanvasEditor({
           {/* INSPECTOR BODY */}
           {selectedEl ? (
             <div className="space-y-3.5 text-xs">
-              {/* Text Content Editor */}
+              {/* Text Inspector */}
               {selectedEl.type === 'text' && (
                 <>
                   <div>
@@ -2477,6 +2769,24 @@ export default function CatalogVisualCanvasEditor({
                       onChange={(e) => updateSelectedElement({ content: e.target.value })}
                       className="w-full px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white"
                     />
+                  </div>
+
+                  {/* Font Family */}
+                  <div>
+                    <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                      Yazı Tipi (Font Ailesi)
+                    </label>
+                    <select
+                      value={selectedEl.fontFamily || 'Inter, sans-serif'}
+                      onChange={(e) => updateSelectedElement({ fontFamily: e.target.value })}
+                      className="w-full px-2 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white"
+                    >
+                      <option value="Inter, sans-serif">Inter (Modern & Net)</option>
+                      <option value="'Playfair Display', serif">Playfair Display (Lüks Editoryal)</option>
+                      <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Kurumsal)</option>
+                      <option value="'Montserrat', sans-serif">Montserrat (Geometrik)</option>
+                      <option value="'Roboto Mono', monospace">Roboto Mono (Teknik Matris)</option>
+                    </select>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -2504,6 +2814,7 @@ export default function CatalogVisualCanvasEditor({
                         <option value="600">Semibold (600)</option>
                         <option value="700">Bold (700)</option>
                         <option value="800">Extra Bold (800)</option>
+                        <option value="900">Black (900)</option>
                       </select>
                     </div>
                   </div>
@@ -2549,25 +2860,115 @@ export default function CatalogVisualCanvasEditor({
                       </div>
                     </div>
                   </div>
+
+                  {/* Letter Spacing & UPPERCASE */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                        Harf Aralığı
+                      </label>
+                      <select
+                        value={selectedEl.letterSpacing || 'normal'}
+                        onChange={(e) => updateSelectedElement({ letterSpacing: e.target.value })}
+                        className="w-full px-2 py-1 rounded bg-neutral-900 border border-neutral-800 text-xs text-white"
+                      >
+                        <option value="normal">Normal</option>
+                        <option value="0.1em">Geniş (0.1em)</option>
+                        <option value="0.25em">Çok Geniş (0.25em)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                        Dönüştürme
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateSelectedElement({
+                            textTransform: selectedEl.textTransform === 'uppercase' ? 'none' : 'uppercase'
+                          })
+                        }
+                        className={`w-full py-1.5 px-2 rounded text-center text-xs font-bold border transition ${
+                          selectedEl.textTransform === 'uppercase'
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                            : 'bg-neutral-900 border-neutral-800 text-neutral-400'
+                        }`}
+                      >
+                        BÜYÜK HARF
+                      </button>
+                    </div>
+                  </div>
                 </>
               )}
 
-              {/* Image URL Editor */}
+              {/* Image Inspector */}
               {selectedEl.type === 'image' && (
+                <>
+                  <div>
+                    <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                      Görsel Kaynağı (URL)
+                    </label>
+                    <input
+                      type="text"
+                      value={selectedEl.src || ''}
+                      onChange={(e) => updateSelectedElement({ src: e.target.value })}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                        Sığdırma Modu
+                      </label>
+                      <select
+                        value={selectedEl.objectFit || 'cover'}
+                        onChange={(e) => updateSelectedElement({ objectFit: e.target.value })}
+                        className="w-full px-2 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white"
+                      >
+                        <option value="cover">Cover (Kırp & Doldur)</option>
+                        <option value="contain">Contain (Orantılı)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                        Köşe Yuvarlama
+                      </label>
+                      <select
+                        value={selectedEl.borderRadius || 0}
+                        onChange={(e) => updateSelectedElement({ borderRadius: Number(e.target.value) })}
+                        className="w-full px-2 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white"
+                      >
+                        <option value="0">Keskin (0px)</option>
+                        <option value="8">Hafif (8px)</option>
+                        <option value="16">Modern (16px)</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* QR Code Inspector */}
+              {selectedEl.type === 'qr' && (
                 <div>
                   <label className="text-[10px] font-bold text-neutral-400 block mb-1">
-                    Görsel URL
+                    Hedef Web / 3D Mekan URL
                   </label>
                   <input
                     type="text"
-                    value={selectedEl.src || ''}
-                    onChange={(e) => updateSelectedElement({ src: e.target.value })}
+                    value={selectedEl.qrUrl || ''}
+                    onChange={(e) => updateSelectedElement({ qrUrl: e.target.value })}
                     className="w-full px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-white"
                   />
+                  <p className="text-[10px] text-neutral-400 mt-1">
+                    Katalog sayfasına yerleştirilen QR kodu cep telefonu kamerasıyla okutulduğunda bu bağlantı açılır.
+                  </p>
                 </div>
               )}
 
-              {/* Box or Line color */}
+              {/* Box or Line Inspector */}
               {(selectedEl.type === 'box' || selectedEl.type === 'line') && (
                 <div>
                   <label className="text-[10px] font-bold text-neutral-400 block mb-1">
@@ -2582,7 +2983,7 @@ export default function CatalogVisualCanvasEditor({
                 </div>
               )}
 
-              {/* Quick Alignment Tools (Simetrik Matbaa Yerleşimi) */}
+              {/* Alignment Tools */}
               <div className="pt-2 border-t border-neutral-800">
                 <label className="text-[10px] font-bold text-neutral-400 block mb-1.5">
                   Tuvale Simetrik Hizala
@@ -2591,42 +2992,42 @@ export default function CatalogVisualCanvasEditor({
                   <button
                     type="button"
                     onClick={() => alignElement('left')}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer"
                   >
                     Sol Kenar
                   </button>
                   <button
                     type="button"
                     onClick={() => alignElement('center-h')}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-amber-400 font-bold"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-amber-400 font-bold cursor-pointer"
                   >
                     Yatay Ortala
                   </button>
                   <button
                     type="button"
                     onClick={() => alignElement('right')}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer"
                   >
                     Sağ Kenar
                   </button>
                   <button
                     type="button"
                     onClick={() => alignElement('top')}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer"
                   >
                     Üst Kenar
                   </button>
                   <button
                     type="button"
                     onClick={() => alignElement('center-v')}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-amber-400 font-bold"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-amber-400 font-bold cursor-pointer"
                   >
                     Dikey Ortala
                   </button>
                   <button
                     type="button"
                     onClick={() => alignElement('bottom')}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer"
                   >
                     Alt Kenar
                   </button>
@@ -2642,7 +3043,7 @@ export default function CatalogVisualCanvasEditor({
                   <button
                     type="button"
                     onClick={() => changeLayerOrder(1)}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-200 flex items-center justify-center gap-1"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-200 flex items-center justify-center gap-1 cursor-pointer"
                   >
                     <MoveUp size={11} />
                     <span>Öne Getir</span>
@@ -2650,7 +3051,7 @@ export default function CatalogVisualCanvasEditor({
                   <button
                     type="button"
                     onClick={() => changeLayerOrder(-1)}
-                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-200 flex items-center justify-center gap-1"
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-200 flex items-center justify-center gap-1 cursor-pointer"
                   >
                     <MoveDown size={11} />
                     <span>Arkaya Gönder</span>
@@ -2694,7 +3095,7 @@ export default function CatalogVisualCanvasEditor({
                         pushHistory(updated);
                       }}
                       style={{ backgroundColor: hex }}
-                      className={`w-6 h-6 rounded-full border ${
+                      className={`w-6 h-6 rounded-full border cursor-pointer ${
                         currentPage?.bgColor === hex
                           ? 'ring-2 ring-amber-400 border-white'
                           : 'border-neutral-700'
@@ -2705,12 +3106,148 @@ export default function CatalogVisualCanvasEditor({
               </div>
 
               <div className="p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 text-neutral-400 text-[11px] leading-relaxed">
-                Düzenlemek istediğiniz metin, görsel veya şeklin üzerine tıklayarak grafik ve tipografi özelliklerini değiştirebilirsiniz.
+                Düzenlemek istediğiniz metin, görsel veya şeklin üzerine tıklayarak tipografi ve grafik özelliklerini değiştirebilirsiniz.
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 3. FULLSCREEN LIVE PREVIEW MODAL                                          */}
+      {/* ========================================================================= */}
+      {previewOpen && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-between p-4 sm:p-8 animate-fadeIn">
+          {/* Header */}
+          <div className="w-full max-w-5xl flex items-center justify-between text-white pb-4 border-b border-neutral-800">
+            <div className="flex items-center gap-3">
+              <span className="font-extrabold text-amber-400 font-mono text-sm tracking-wider">
+                CANLI KATALOG ÖNİZLEMESİ
+              </span>
+              <span className="text-xs text-neutral-400">
+                Sayfa {previewPageIdx + 1} / {pages.length}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(false)}
+              className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white cursor-pointer"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Center Page Preview */}
+          <div className="flex-1 flex items-center justify-center my-4 overflow-auto">
+            <div
+              style={{
+                width: `${canvasWidth * 0.9}px`,
+                height: `${canvasHeight * 0.9}px`,
+                backgroundColor: pages[previewPageIdx]?.bgColor || '#ffffff',
+                transform: 'scale(1)',
+                transformOrigin: 'center center'
+              }}
+              className="relative shadow-2xl rounded-sm overflow-hidden border border-neutral-700"
+            >
+              {pages[previewPageIdx]?.elements?.map((el) => {
+                if (el.hidden) return null;
+                const scale = 0.9;
+                return (
+                  <div
+                    key={el.id}
+                    style={{
+                      position: 'absolute',
+                      left: `${el.x * scale}px`,
+                      top: `${el.y * scale}px`,
+                      width: `${el.width * scale}px`,
+                      height: `${el.height * scale}px`,
+                      opacity: (el.opacity || 100) / 100
+                    }}
+                  >
+                    {el.type === 'text' && (
+                      <div
+                        style={{
+                          fontSize: `${(el.fontSize || 14) * scale}px`,
+                          fontWeight: el.fontWeight || '600',
+                          fontFamily: el.fontFamily || 'Inter, sans-serif',
+                          color: el.color || '#0f172a',
+                          backgroundColor: el.bgColor || 'transparent',
+                          textAlign: el.align || 'left',
+                          letterSpacing: el.letterSpacing || 'normal',
+                          textTransform: el.textTransform || 'none',
+                          lineHeight: el.lineHeight || 1.35
+                        }}
+                        className="p-1"
+                      >
+                        {el.content}
+                      </div>
+                    )}
+                    {el.type === 'image' && (
+                      <img
+                        src={el.src}
+                        alt=""
+                        style={{
+                          objectFit: el.objectFit || 'cover',
+                          borderRadius: `${(el.borderRadius || 0) * scale}px`
+                        }}
+                        className="w-full h-full"
+                      />
+                    )}
+                    {el.type === 'box' && (
+                      <div
+                        style={{
+                          backgroundColor: el.color || '#f8fafc',
+                          borderColor: el.borderColor || '#cbd5e1'
+                        }}
+                        className="w-full h-full border"
+                      />
+                    )}
+                    {el.type === 'line' && (
+                      <div
+                        style={{
+                          backgroundColor: el.color || '#b4823c',
+                          height: `${(el.height || 2) * scale}px`
+                        }}
+                        className="w-full"
+                      />
+                    )}
+                    {el.type === 'qr' && (
+                      <div className="w-full h-full p-2 bg-white flex flex-col items-center justify-center border border-neutral-300">
+                        <QrCode size={(Math.min(el.width, el.height) - 20) * scale} className="text-neutral-900" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Footer Navigation */}
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              disabled={previewPageIdx === 0}
+              onClick={() => setPreviewPageIdx((idx) => Math.max(0, idx - 1))}
+              className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <ChevronLeft size={14} />
+              <span>Önceki Sayfa</span>
+            </button>
+            <span className="text-neutral-400 font-mono text-xs">
+              {previewPageIdx + 1} / {pages.length}
+            </span>
+            <button
+              type="button"
+              disabled={previewPageIdx >= pages.length - 1}
+              onClick={() => setPreviewPageIdx((idx) => Math.min(pages.length - 1, idx + 1))}
+              className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Sonraki Sayfa</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
