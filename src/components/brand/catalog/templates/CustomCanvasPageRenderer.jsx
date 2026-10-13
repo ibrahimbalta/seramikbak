@@ -74,6 +74,8 @@ function SingleCanvasPage({ page, scale = 1, isPrint = false, isLast = false }) 
                 width: `${el.width}px`,
                 height: `${el.height}px`,
                 opacity: (el.opacity || 100) / 100,
+                transform: el.rotation ? `rotate(${el.rotation}deg)` : 'none',
+                transformOrigin: 'center center',
                 pointerEvents: el.type === 'qr' && !isPrint ? 'auto' : 'none',
                 WebkitPrintColorAdjust: 'exact',
                 printColorAdjust: 'exact'

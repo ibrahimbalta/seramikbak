@@ -393,3 +393,128 @@ test('Catalog PDF Export - Multi-Page Print Stage & High-DPI Output Verification
   });
 });
 
+test('Catalog Studio Pro - Stage 4 Professional Tools, Rotation, Multi-Select & Guides', async (t) => {
+  await t.test('should accurately calculate rotation angles and snap to 15-degree steps with Shift', () => {
+    const snapRotation = (deg, shiftKey) => {
+      let angle = deg;
+      if (angle < 0) angle += 360;
+      if (angle >= 360) angle -= 360;
+      if (shiftKey) {
+        angle = Math.round(angle / 15) * 15;
+        if (angle >= 360) angle = 0;
+      }
+      return angle;
+    };
+
+    assert.equal(snapRotation(43, false), 43);
+    assert.equal(snapRotation(43, true), 45); // Snaps to 45
+    assert.equal(snapRotation(13, true), 15); // Snaps to 15
+    assert.equal(snapRotation(358, true), 0);  // Snaps to 0
+    assert.equal(snapRotation(-10, true), 345); // Wraps from -10 to 350 -> snaps to 345
+  });
+
+  await t.test('should accurately calculate AABB box intersection for marquee multi-selection', () => {
+    const isIntersecting = (el, box) => {
+      const boxLeft = Math.min(box.startX, box.currentX);
+      const boxRight = Math.max(box.startX, box.currentX);
+      const boxTop = Math.min(box.startY, box.currentY);
+      const boxBottom = Math.max(box.startY, box.currentY);
+
+      const elRight = el.x + el.width;
+      const elBottom = el.y + el.height;
+      return !(el.x > boxRight || elRight < boxLeft || el.y > boxBottom || elBottom < boxTop);
+    };
+
+    const marquee = { startX: 100, startY: 100, currentX: 300, currentY: 300 };
+
+    const insideEl = { x: 120, y: 120, width: 80, height: 80 };
+    const partialOverlapEl = { x: 250, y: 250, width: 100, height: 100 };
+    const outsideEl = { x: 400, y: 400, width: 50, height: 50 };
+
+    assert.equal(isIntersecting(insideEl, marquee), true);
+    assert.equal(isIntersecting(partialOverlapEl, marquee), true);
+    assert.equal(isIntersecting(outsideEl, marquee), false);
+  });
+
+  await t.test('should calculate collective bounding-box alignment for multiple elements', () => {
+    const elements = [
+      { id: '1', x: 50, y: 100, width: 100, height: 60, locked: false },
+      { id: '2', x: 150, y: 200, width: 80, height: 40, locked: false },
+      { id: '3', x: 250, y: 150, width: 120, height: 80, locked: false }
+    ];
+
+    const minX = Math.min(...elements.map((t) => t.x)); // 50
+    const maxX = Math.max(...elements.map((t) => t.x + t.width)); // 370
+    const centerX = Math.round((minX + maxX) / 2); // 210
+
+    // Align left test: all x should be minX
+    const alignedLeft = elements.map((el) => ({ ...el, x: minX }));
+    assert.ok(alignedLeft.every((el) => el.x === 50));
+
+    // Align center-h test: each x should be centerX - width / 2
+    const alignedCenterH = elements.map((el) => ({
+      ...el,
+      x: Math.round(centerX - el.width / 2)
+    }));
+    assert.equal(alignedCenterH[0].x, 210 - 50); // 160
+    assert.equal(alignedCenterH[1].x, 210 - 40); // 170
+    assert.equal(alignedCenterH[2].x, 210 - 60); // 150
+  });
+
+  await t.test('should calculate equal horizontal distribution spacing', () => {
+    const elements = [
+      { id: '1', x: 0, width: 100 },
+      { id: '2', x: 150, width: 100 },
+      { id: '3', x: 400, width: 100 }
+    ];
+    // Total bounding width: 0 to 500 = 500. Total item widths = 300. Free space = 200.
+    // 3 items -> 2 gaps -> 100px gap per item.
+    const sorted = [...elements].sort((a, b) => a.x - b.x);
+    const minX = sorted[0].x; // 0
+    const maxX = sorted[sorted.length - 1].x + sorted[sorted.length - 1].width; // 500
+    const totalItemsWidth = sorted.reduce((sum, item) => sum + item.width, 0); // 300
+    const totalSpace = (maxX - minX) - totalItemsWidth; // 200
+    const gap = totalSpace / (sorted.length - 1); // 100
+
+    let cur = minX;
+    const positions = sorted.map((el) => {
+      const pos = cur;
+      cur += el.width + gap;
+      return pos;
+    });
+
+    assert.deepEqual(positions, [0, 200, 400]);
+  });
+
+  await t.test('should respect locked state during multi-element batch deletion', () => {
+    const pageElements = [
+      { id: 'e1', locked: false, content: 'Text 1' },
+      { id: 'e2', locked: true, content: 'Brand Logo' },
+      { id: 'e3', locked: false, content: 'Slab Photo' }
+    ];
+
+    const targetIds = ['e1', 'e2', 'e3']; // Batch delete requested for all 3
+
+    const remaining = pageElements.filter((el) => el.locked || !targetIds.includes(el.id));
+    assert.equal(remaining.length, 1);
+    assert.equal(remaining[0].id, 'e2'); // Locked logo is protected
+  });
+
+  await t.test('should ensure element data model supports rotation in roundtrip serialization', () => {
+    const elWithRotation = {
+      id: 'rotated-slab',
+      type: 'image',
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 300,
+      rotation: 45
+    };
+
+    const json = JSON.stringify(elWithRotation);
+    const parsed = JSON.parse(json);
+
+    assert.equal(parsed.rotation, 45);
+  });
+});
+

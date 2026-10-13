@@ -1106,6 +1106,10 @@ export default function CatalogVisualCanvasEditor({
 
   const [activePageIdx, setActivePageIdx] = useState(0);
   const [selectedElId, setSelectedElId] = useState(null);
+  const [selectedElIds, setSelectedElIds] = useState([]);
+  const [selectionBox, setSelectionBox] = useState(null); // { startX, startY, currentX, currentY }
+  const [smartGuides, setSmartGuides] = useState({ xLines: [], yLines: [] });
+  const [aspectRatioLocked, setAspectRatioLocked] = useState(false);
   const [activeLeftTab, setActiveLeftTab] = useState('templates'); // 'templates' | 'pages' | 'products' | 'media' | 'elements' | 'layers'
   const [templateSubTab, setTemplateSubTab] = useState('concepts'); // 'concepts' | 'layouts'
   const [selectedTemplateId, setSelectedTemplateId] = useState(currentTemplateId || 'milano');
@@ -1165,7 +1169,51 @@ export default function CatalogVisualCanvasEditor({
   const dragInfoRef = useRef(null);
 
   const currentPage = pages[activePageIdx] || pages[0] || { elements: [] };
-  const selectedEl = (currentPage?.elements || []).find((e) => e && e.id === selectedElId) || null;
+  const currentElements = useMemo(
+    () => (Array.isArray(currentPage?.elements) ? currentPage.elements.filter(Boolean) : []),
+    [currentPage]
+  );
+
+  const selectedEls = useMemo(() => {
+    if (selectedElIds.length === 0 && selectedElId) {
+      const match = currentElements.find((e) => e.id === selectedElId);
+      return match ? [match] : [];
+    }
+    return currentElements.filter((e) => selectedElIds.includes(e.id));
+  }, [currentElements, selectedElIds, selectedElId]);
+
+  const selectedEl = useMemo(() => {
+    if (selectedElId) {
+      const found = currentElements.find((e) => e.id === selectedElId);
+      if (found) return found;
+    }
+    return selectedEls[0] || null;
+  }, [currentElements, selectedElId, selectedEls]);
+
+  const selectElement = (id, isMulti = false) => {
+    if (isMulti) {
+      setSelectedElIds((prev) => {
+        const exists = prev.includes(id);
+        const next = exists ? prev.filter((item) => item !== id) : [...prev, id];
+        setSelectedElId(next[next.length - 1] || null);
+        return next;
+      });
+    } else {
+      setSelectedElIds([id]);
+      setSelectedElId(id);
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedElIds([]);
+    setSelectedElId(null);
+  };
+
+  const selectAllElements = () => {
+    const ids = currentElements.filter((e) => !e.hidden).map((e) => e.id);
+    setSelectedElIds(ids);
+    setSelectedElId(ids[0] || null);
+  };
 
   // Sync back to parent
   useEffect(() => {
@@ -1220,6 +1268,7 @@ export default function CatalogVisualCanvasEditor({
 
     if (cleanEls[0]?.id) {
       setSelectedElId(cleanEls[0].id);
+      setSelectedElIds([cleanEls[0].id]);
     }
   };
 
@@ -1235,6 +1284,7 @@ export default function CatalogVisualCanvasEditor({
       y: Math.round((canvasHeight - defaultH) / 2),
       width: defaultW,
       height: defaultH,
+      rotation: 0,
       content: type === 'text' ? 'Başlık veya Metin Alanı' : '',
       fontSize: 16,
       fontWeight: '700',
@@ -1256,14 +1306,19 @@ export default function CatalogVisualCanvasEditor({
   };
 
   const updateSelectedElement = (patch) => {
-    if (!selectedElId) return;
+    const targetIds = selectedElIds.length > 0 ? selectedElIds : (selectedElId ? [selectedElId] : []);
+    if (targetIds.length === 0) return;
+
     setPages((prevPages) => {
       const updated = prevPages.map((p, idx) => {
         if (idx !== activePageIdx) return p;
         const currentElements = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
         return {
           ...p,
-          elements: currentElements.map((el) => (el && el.id === selectedElId ? { ...el, ...patch } : el))
+          elements: currentElements.map((el) => {
+            if (!el || !targetIds.includes(el.id)) return el;
+            return { ...el, ...patch };
+          })
         };
       });
       setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
@@ -1273,41 +1328,124 @@ export default function CatalogVisualCanvasEditor({
   };
 
   const deleteSelectedElement = () => {
-    if (!selectedElId) return;
+    const targetIds = selectedElIds.length > 0 ? selectedElIds : (selectedElId ? [selectedElId] : []);
+    if (targetIds.length === 0) return;
+
     setPages((prevPages) => {
       const updated = prevPages.map((p, idx) => {
         if (idx !== activePageIdx) return p;
         const currentElements = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
         return {
           ...p,
-          elements: currentElements.filter((el) => el && el.id !== selectedElId)
+          elements: currentElements.filter((el) => !el || el.locked || !targetIds.includes(el.id))
         };
       });
       setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
       setFuture([]);
       return updated;
     });
-    setSelectedElId(null);
+    clearSelection();
   };
 
-  // Alignment helpers
+  // Alignment helpers (Single to Canvas, Multi relative to Bounding Box / Distribution)
   const alignElement = (alignment) => {
-    if (!selectedEl) return;
-    let patch = {};
-    if (alignment === 'center-h') {
-      patch = { x: Math.round((canvasWidth - selectedEl.width) / 2) };
-    } else if (alignment === 'left') {
-      patch = { x: 50 };
-    } else if (alignment === 'right') {
-      patch = { x: canvasWidth - 50 - selectedEl.width };
-    } else if (alignment === 'center-v') {
-      patch = { y: Math.round((canvasHeight - selectedEl.height) / 2) };
-    } else if (alignment === 'top') {
-      patch = { y: 50 };
-    } else if (alignment === 'bottom') {
-      patch = { y: canvasHeight - 50 - selectedEl.height };
+    const targetIds = selectedElIds.length > 0 ? selectedElIds : (selectedElId ? [selectedElId] : []);
+    if (targetIds.length === 0) return;
+
+    // Single element alignment to canvas edges/centers
+    if (targetIds.length === 1 && selectedEl) {
+      let patch = {};
+      if (alignment === 'center-h') {
+        patch = { x: Math.round((canvasWidth - selectedEl.width) / 2) };
+      } else if (alignment === 'left') {
+        patch = { x: 50 };
+      } else if (alignment === 'right') {
+        patch = { x: canvasWidth - 50 - selectedEl.width };
+      } else if (alignment === 'center-v') {
+        patch = { y: Math.round((canvasHeight - selectedEl.height) / 2) };
+      } else if (alignment === 'top') {
+        patch = { y: 50 };
+      } else if (alignment === 'bottom') {
+        patch = { y: canvasHeight - 50 - selectedEl.height };
+      }
+      updateSelectedElement(patch);
+      return;
     }
-    updateSelectedElement(patch);
+
+    // Multi-element alignment relative to collective bounding box
+    if (targetIds.length > 1) {
+      const targets = currentElements.filter((e) => targetIds.includes(e.id) && !e.locked);
+      if (targets.length <= 1) return;
+
+      const minX = Math.min(...targets.map((t) => t.x));
+      const maxX = Math.max(...targets.map((t) => t.x + t.width));
+      const minY = Math.min(...targets.map((t) => t.y));
+      const maxY = Math.max(...targets.map((t) => t.y + t.height));
+      const centerX = Math.round((minX + maxX) / 2);
+      const centerY = Math.round((minY + maxY) / 2);
+
+      setPages((prevPages) => {
+        const updated = prevPages.map((p, idx) => {
+          if (idx !== activePageIdx) return p;
+          const els = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+
+          // Equal horizontal distribution
+          if (alignment === 'distribute-h') {
+            const sorted = [...targets].sort((a, b) => a.x - b.x);
+            const totalItemsWidth = sorted.reduce((sum, item) => sum + item.width, 0);
+            const totalSpace = (maxX - minX) - totalItemsWidth;
+            const gap = sorted.length > 1 ? totalSpace / (sorted.length - 1) : 0;
+            let currentX = minX;
+            const posMap = {};
+            sorted.forEach((item) => {
+              posMap[item.id] = Math.round(currentX);
+              currentX += item.width + gap;
+            });
+            return {
+              ...p,
+              elements: els.map((el) => (posMap[el.id] !== undefined ? { ...el, x: posMap[el.id] } : el))
+            };
+          }
+
+          // Equal vertical distribution
+          if (alignment === 'distribute-v') {
+            const sorted = [...targets].sort((a, b) => a.y - b.y);
+            const totalItemsHeight = sorted.reduce((sum, item) => sum + item.height, 0);
+            const totalSpace = (maxY - minY) - totalItemsHeight;
+            const gap = sorted.length > 1 ? totalSpace / (sorted.length - 1) : 0;
+            let currentY = minY;
+            const posMap = {};
+            sorted.forEach((item) => {
+              posMap[item.id] = Math.round(currentY);
+              currentY += item.height + gap;
+            });
+            return {
+              ...p,
+              elements: els.map((el) => (posMap[el.id] !== undefined ? { ...el, y: posMap[el.id] } : el))
+            };
+          }
+
+          return {
+            ...p,
+            elements: els.map((el) => {
+              if (!targetIds.includes(el.id) || el.locked) return el;
+              let nextX = el.x;
+              let nextY = el.y;
+              if (alignment === 'left') nextX = minX;
+              else if (alignment === 'right') nextX = maxX - el.width;
+              else if (alignment === 'center-h') nextX = Math.round(centerX - el.width / 2);
+              else if (alignment === 'top') nextY = minY;
+              else if (alignment === 'bottom') nextY = maxY - el.height;
+              else if (alignment === 'center-v') nextY = Math.round(centerY - el.height / 2);
+              return { ...el, x: nextX, y: nextY };
+            })
+          };
+        });
+        setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
+        setFuture([]);
+        return updated;
+      });
+    }
   };
 
   const changeLayerOrder = (direction) => {
@@ -1639,121 +1777,384 @@ export default function CatalogVisualCanvasEditor({
   // Keyboard navigation & Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (
+        e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TEXTAREA' ||
+        e.target.isContentEditable
+      ) {
+        return;
+      }
 
+      // 1. Undo / Redo
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+        return;
+      }
+
+      // 2. Select All
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        selectAllElements();
+        return;
+      }
+
+      // 3. Escape (Deselect)
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        clearSelection();
+        return;
+      }
+
+      // 4. Delete / Backspace
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedElId) {
+        if (selectedElIds.length > 0 || selectedElId) {
           e.preventDefault();
           deleteSelectedElement();
         }
-      } else if (e.key === 'Escape') {
-        setSelectedElId(null);
-      } else if (selectedEl) {
+        return;
+      }
+
+      // 5. Arrow Key Stepping
+      const targetIds = selectedElIds.length > 0 ? selectedElIds : (selectedElId ? [selectedElId] : []);
+      if (targetIds.length > 0) {
         const step = e.shiftKey ? 10 : 2;
-        if (e.key === 'ArrowLeft') {
+        let dx = 0;
+        let dy = 0;
+        if (e.key === 'ArrowLeft') dx = -step;
+        else if (e.key === 'ArrowRight') dx = step;
+        else if (e.key === 'ArrowUp') dy = -step;
+        else if (e.key === 'ArrowDown') dy = step;
+
+        if (dx !== 0 || dy !== 0) {
           e.preventDefault();
-          updateSelectedElement({ x: Math.max(0, selectedEl.x - step) });
-        } else if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          updateSelectedElement({ x: Math.min(canvasWidth - selectedEl.width, selectedEl.x + step) });
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          updateSelectedElement({ y: Math.max(0, selectedEl.y - step) });
-        } else if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          updateSelectedElement({ y: Math.min(canvasHeight - selectedEl.height, selectedEl.y + step) });
+          setPages((prevPages) =>
+            prevPages.map((p, idx) => {
+              if (idx !== activePageIdx) return p;
+              const els = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+              return {
+                ...p,
+                elements: els.map((item) => {
+                  if (!item || !targetIds.includes(item.id) || item.locked) return item;
+                  return {
+                    ...item,
+                    x: Math.max(0, Math.min(canvasWidth - (item.width || 50), item.x + dx)),
+                    y: Math.max(0, Math.min(canvasHeight - (item.height || 50), item.y + dy))
+                  };
+                })
+              };
+            })
+          );
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElId, selectedEl, canvasWidth, canvasHeight]);
+  }, [selectedElIds, selectedElId, activePageIdx, canvasWidth, canvasHeight, currentElements]);
 
-  // Dragging & Resizing Handlers with 4 corners and Snap Guides
+  // Canvas Blank Area Marquee Selection Handler
+  const handleMouseDownCanvas = (e) => {
+    // Only trigger marquee if clicking directly on the canvas backdrop
+    if (!canvasRef.current) return;
+    const isBackdrop =
+      e.target === canvasRef.current ||
+      e.target.dataset.canvasBackground === 'true' ||
+      e.target.classList.contains('canvas-bleed-guide') ||
+      e.target.classList.contains('canvas-grid-pattern');
+
+    if (!isBackdrop) return;
+
+    if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      clearSelection();
+    }
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const startX = (e.clientX - rect.left) / zoomLevel;
+    const startY = (e.clientY - rect.top) / zoomLevel;
+
+    setSelectionBox({ startX, startY, currentX: startX, currentY: startY });
+
+    const handleMarqueeMove = (moveEvent) => {
+      const curX = (moveEvent.clientX - rect.left) / zoomLevel;
+      const curY = (moveEvent.clientY - rect.top) / zoomLevel;
+      setSelectionBox((prev) => (prev ? { ...prev, currentX: curX, currentY: curY } : null));
+
+      // Calculate intersection with all unlocked elements
+      const boxLeft = Math.min(startX, curX);
+      const boxRight = Math.max(startX, curX);
+      const boxTop = Math.min(startY, curY);
+      const boxBottom = Math.max(startY, curY);
+
+      const intersectingIds = currentElements
+        .filter((el) => {
+          if (!el || el.hidden || el.locked) return false;
+          const elRight = el.x + el.width;
+          const elBottom = el.y + el.height;
+          return !(el.x > boxRight || elRight < boxLeft || el.y > boxBottom || elBottom < boxTop);
+        })
+        .map((el) => el.id);
+
+      setSelectedElIds(intersectingIds);
+      setSelectedElId(intersectingIds[0] || null);
+    };
+
+    const handleMarqueeUp = () => {
+      setSelectionBox(null);
+      window.removeEventListener('mousemove', handleMarqueeMove);
+      window.removeEventListener('mouseup', handleMarqueeUp);
+    };
+
+    window.addEventListener('mousemove', handleMarqueeMove);
+    window.addEventListener('mouseup', handleMarqueeUp);
+  };
+
+  // Dragging, Resizing, and Free Rotation Handlers
   const handleMouseDownElement = (e, el, mode = 'move', corner = 'se') => {
     e.stopPropagation();
-    setSelectedElId(el.id);
+
+    const isMultiClick = e.ctrlKey || e.metaKey || e.shiftKey;
+
+    if (mode === 'move') {
+      if (isMultiClick) {
+        selectElement(el.id, true);
+      } else {
+        if (!selectedElIds.includes(el.id)) {
+          selectElement(el.id, false);
+        } else {
+          setSelectedElId(el.id);
+        }
+      }
+    } else {
+      setSelectedElId(el.id);
+      if (!selectedElIds.includes(el.id)) {
+        setSelectedElIds([el.id]);
+      }
+    }
+
     if (el.locked) return;
 
     const startX = e.clientX;
     const startY = e.clientY;
-    const origX = el.x;
-    const origY = el.y;
-    const origW = el.width;
-    const origH = el.height;
 
-    dragInfoRef.current = { id: el.id, mode, corner, startX, startY, origX, origY, origW, origH };
+    const activeIds =
+      mode === 'move' && selectedElIds.includes(el.id)
+        ? selectedElIds
+        : [el.id];
+
+    const initialPositions = {};
+    activeIds.forEach((id) => {
+      const match = currentElements.find((item) => item.id === id);
+      if (match) {
+        initialPositions[id] = {
+          x: match.x,
+          y: match.y,
+          width: match.width,
+          height: match.height,
+          rotation: match.rotation || 0
+        };
+      }
+    });
+
+    dragInfoRef.current = {
+      id: el.id,
+      activeIds,
+      mode,
+      corner,
+      startX,
+      startY,
+      origX: el.x,
+      origY: el.y,
+      origW: el.width,
+      origH: el.height,
+      origRotation: el.rotation || 0,
+      initialPositions
+    };
 
     const handleMouseMove = (moveEvent) => {
       const currentDrag = dragInfoRef.current;
       if (!currentDrag) return;
-      const dx = (moveEvent.clientX - currentDrag.startX) / zoomLevel;
-      const dy = (moveEvent.clientY - currentDrag.startY) / zoomLevel;
 
+      // 1. FREE ROTATION MODE
+      if (currentDrag.mode === 'rotate') {
+        if (!canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const centerScreenX = rect.left + (currentDrag.origX + currentDrag.origW / 2) * zoomLevel;
+        const centerScreenY = rect.top + (currentDrag.origY + currentDrag.origH / 2) * zoomLevel;
+
+        const rad = Math.atan2(moveEvent.clientY - centerScreenY, moveEvent.clientX - centerScreenX);
+        let deg = Math.round(rad * (180 / Math.PI)) + 90; // Top handle is 0 degrees
+        if (deg < 0) deg += 360;
+        if (deg >= 360) deg -= 360;
+
+        // Shift key snaps to 15-degree steps
+        if (moveEvent.shiftKey) {
+          deg = Math.round(deg / 15) * 15;
+          if (deg >= 360) deg = 0;
+        }
+
+        setPages((prevPages) =>
+          prevPages.map((p, pIdx) => {
+            if (pIdx !== activePageIdx) return p;
+            const els = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+            return {
+              ...p,
+              elements: els.map((item) => (item.id === currentDrag.id ? { ...item, rotation: deg } : item))
+            };
+          })
+        );
+        return;
+      }
+
+      // 2. MOVE OR RESIZE MODES
+      const rawDx = (moveEvent.clientX - currentDrag.startX) / zoomLevel;
+      const rawDy = (moveEvent.clientY - currentDrag.startY) / zoomLevel;
       const snap = (val) => (showGrid ? Math.round(val / 5) * 5 : Math.round(val));
 
-      // Calculate Snap Lines (Center horizontal & vertical)
+      let effectiveDx = snap(rawDx);
+      let effectiveDy = snap(rawDy);
+
+      // Smart Snapping & Alignment Guides during Move
       if (currentDrag.mode === 'move' && showSmartGuides) {
-        const currentCenterX = currentDrag.origX + dx + currentDrag.origW / 2;
-        const currentCenterY = currentDrag.origY + dy + currentDrag.origH / 2;
+        const primaryOrig = currentDrag.origX;
+        const primaryOrigY = currentDrag.origY;
+        const targetLeft = primaryOrig + effectiveDx;
+        const targetTop = primaryOrigY + effectiveDy;
+        const targetCenterX = targetLeft + currentDrag.origW / 2;
+        const targetCenterY = targetTop + currentDrag.origH / 2;
+        const targetRight = targetLeft + currentDrag.origW;
+        const targetBottom = targetTop + currentDrag.origH;
+
+        let detectedSnapX = null;
+        let detectedSnapY = null;
+        const snapThreshold = 6;
+
+        // Page center snappings
         const pageCenterX = canvasWidth / 2;
         const pageCenterY = canvasHeight / 2;
 
-        if (Math.abs(currentCenterX - pageCenterX) < 6) {
-          setSnapLineX(pageCenterX);
-        } else {
-          setSnapLineX(null);
+        if (Math.abs(targetCenterX - pageCenterX) < snapThreshold) {
+          detectedSnapX = pageCenterX;
+          effectiveDx = pageCenterX - (primaryOrig + currentDrag.origW / 2);
+        }
+        if (Math.abs(targetCenterY - pageCenterY) < snapThreshold) {
+          detectedSnapY = pageCenterY;
+          effectiveDy = pageCenterY - (primaryOrigY + currentDrag.origH / 2);
         }
 
-        if (Math.abs(currentCenterY - pageCenterY) < 6) {
-          setSnapLineY(pageCenterY);
-        } else {
-          setSnapLineY(null);
+        // Other elements snappings
+        const otherElements = currentElements.filter(
+          (item) => !currentDrag.activeIds.includes(item.id) && !item.hidden
+        );
+
+        for (const other of otherElements) {
+          const otherCenterX = other.x + other.width / 2;
+          const otherCenterY = other.y + other.height / 2;
+          const otherRight = other.x + other.width;
+          const otherBottom = other.y + other.height;
+
+          // X alignment (Center to Center, Left to Left, Right to Right)
+          if (!detectedSnapX) {
+            if (Math.abs(targetCenterX - otherCenterX) < snapThreshold) {
+              detectedSnapX = otherCenterX;
+              effectiveDx = otherCenterX - (primaryOrig + currentDrag.origW / 2);
+            } else if (Math.abs(targetLeft - other.x) < snapThreshold) {
+              detectedSnapX = other.x;
+              effectiveDx = other.x - primaryOrig;
+            } else if (Math.abs(targetRight - otherRight) < snapThreshold) {
+              detectedSnapX = otherRight;
+              effectiveDx = otherRight - (primaryOrig + currentDrag.origW);
+            }
+          }
+
+          // Y alignment (Center to Center, Top to Top, Bottom to Bottom)
+          if (!detectedSnapY) {
+            if (Math.abs(targetCenterY - otherCenterY) < snapThreshold) {
+              detectedSnapY = otherCenterY;
+              effectiveDy = otherCenterY - (primaryOrigY + currentDrag.origH / 2);
+            } else if (Math.abs(targetTop - other.y) < snapThreshold) {
+              detectedSnapY = other.y;
+              effectiveDy = other.y - primaryOrigY;
+            } else if (Math.abs(targetBottom - otherBottom) < snapThreshold) {
+              detectedSnapY = otherBottom;
+              effectiveDy = otherBottom - (primaryOrigY + currentDrag.origH);
+            }
+          }
         }
+
+        setSnapLineX(detectedSnapX);
+        setSnapLineY(detectedSnapY);
       }
 
       setPages((prevPages) =>
         prevPages.map((p, pIdx) => {
           if (pIdx !== activePageIdx) return p;
           if (!p || !Array.isArray(p.elements)) return p;
+
           return {
             ...p,
             elements: p.elements.map((item) => {
-              if (!item || !currentDrag || item.id !== currentDrag.id) return item;
+              if (!item || !currentDrag) return item;
+
+              // Group movement for all selected items
               if (currentDrag.mode === 'move') {
+                if (!currentDrag.activeIds.includes(item.id) || item.locked) return item;
+                const orig = currentDrag.initialPositions[item.id] || { x: item.x, y: item.y };
                 return {
                   ...item,
-                  x: Math.max(0, Math.min(canvasWidth - (item.width || 50), snap(currentDrag.origX + dx))),
-                  y: Math.max(0, Math.min(canvasHeight - (item.height || 50), snap(currentDrag.origY + dy)))
+                  x: Math.max(0, Math.min(canvasWidth - (item.width || 50), Math.round(orig.x + effectiveDx))),
+                  y: Math.max(0, Math.min(canvasHeight - (item.height || 50), Math.round(orig.y + effectiveDy)))
                 };
-              } else if (currentDrag.mode === 'resize') {
+              }
+
+              // Single element corner resizing
+              if (currentDrag.mode === 'resize' && item.id === currentDrag.id) {
                 const c = currentDrag.corner;
                 let newX = item.x;
                 let newY = item.y;
                 let newW = item.width;
                 let newH = item.height;
 
+                const origRatio = currentDrag.origW / Math.max(1, currentDrag.origH);
+
                 if (c === 'se') {
-                  newW = Math.max(20, snap(currentDrag.origW + dx));
-                  newH = Math.max(4, snap(currentDrag.origH + dy));
+                  newW = Math.max(20, snap(currentDrag.origW + effectiveDx));
+                  newH = aspectRatioLocked
+                    ? Math.round(newW / origRatio)
+                    : Math.max(4, snap(currentDrag.origH + effectiveDy));
                 } else if (c === 'sw') {
-                  newW = Math.max(20, snap(currentDrag.origW - dx));
-                  newX = snap(currentDrag.origX + dx);
-                  newH = Math.max(4, snap(currentDrag.origH + dy));
+                  newW = Math.max(20, snap(currentDrag.origW - effectiveDx));
+                  newX = snap(currentDrag.origX + effectiveDx);
+                  newH = aspectRatioLocked
+                    ? Math.round(newW / origRatio)
+                    : Math.max(4, snap(currentDrag.origH + effectiveDy));
                 } else if (c === 'ne') {
-                  newW = Math.max(20, snap(currentDrag.origW + dx));
-                  newH = Math.max(4, snap(currentDrag.origH - dy));
-                  newY = snap(currentDrag.origY + dy);
+                  newW = Math.max(20, snap(currentDrag.origW + effectiveDx));
+                  newH = aspectRatioLocked
+                    ? Math.round(newW / origRatio)
+                    : Math.max(4, snap(currentDrag.origH - effectiveDy));
+                  newY = snap(currentDrag.origY + effectiveDy);
                 } else if (c === 'nw') {
-                  newW = Math.max(20, snap(currentDrag.origW - dx));
-                  newH = Math.max(4, snap(currentDrag.origH - dy));
-                  newX = snap(currentDrag.origX + dx);
-                  newY = snap(currentDrag.origY + dy);
+                  newW = Math.max(20, snap(currentDrag.origW - effectiveDx));
+                  newH = aspectRatioLocked
+                    ? Math.round(newW / origRatio)
+                    : Math.max(4, snap(currentDrag.origH - effectiveDy));
+                  newX = snap(currentDrag.origX + effectiveDx);
+                  newY = snap(currentDrag.origY + effectiveDy);
                 }
 
                 return { ...item, x: newX, y: newY, width: newW, height: newH };
               }
+
               return item;
             })
           };
@@ -2580,19 +2981,21 @@ export default function CatalogVisualCanvasEditor({
               <div className="p-3.5 space-y-3 overflow-y-auto max-h-[690px]">
                 <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
                   <span className="text-xs font-bold text-neutral-300">
-                    Sayfa Katmanları ({currentPage.elements?.length || 0})
+                    Sayfa Katmanları ({currentElements.length})
                   </span>
-                  <span className="text-[10px] font-mono text-neutral-500">Z-Index Sırası</span>
+                  <span className="text-[10px] font-mono text-neutral-500">
+                    {selectedElIds.length > 0 ? `${selectedElIds.length} seçili` : 'Z-Index Sırası'}
+                  </span>
                 </div>
 
                 <div className="space-y-1.5">
-                  {[...(currentPage.elements || [])].filter(Boolean).reverse().map((el, revIdx) => {
+                  {[...currentElements].reverse().map((el) => {
                     if (!el || !el.id) return null;
-                    const isSelected = el.id === selectedElId;
+                    const isSelected = selectedElIds.includes(el.id);
                     return (
                       <div
                         key={el.id}
-                        onClick={() => setSelectedElId(el.id)}
+                        onClick={(e) => selectElement(el.id, e.ctrlKey || e.metaKey || e.shiftKey)}
                         className={`p-2 rounded-xl border flex items-center justify-between transition cursor-pointer ${
                           isSelected
                             ? 'bg-neutral-800 border-amber-500 text-white font-bold ring-1 ring-amber-500/40'
@@ -2611,23 +3014,65 @@ export default function CatalogVisualCanvasEditor({
                           ) : (
                             <Minus size={13} className="text-purple-400 flex-shrink-0" />
                           )}
-                          <span className="text-xs truncate">
-                            {el.type.toUpperCase()}: {el.content ? el.content.slice(0, 16) : el.type}
+                          <span className={`text-xs truncate ${el.hidden ? 'line-through opacity-50' : ''}`}>
+                            {el.content ? el.content.slice(0, 18) : el.type.toUpperCase()}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          {/* Toggle Visibility (Hide/Show) */}
                           <button
                             type="button"
-                            onClick={() => updateSelectedElement({ locked: !el.locked })}
+                            onClick={() => {
+                              setPages((prevPages) =>
+                                prevPages.map((p, idx) => {
+                                  if (idx !== activePageIdx) return p;
+                                  const els = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+                                  return {
+                                    ...p,
+                                    elements: els.map((item) =>
+                                      item.id === el.id ? { ...item, hidden: !item.hidden } : item
+                                    )
+                                  };
+                                })
+                              );
+                            }}
+                            className={`p-1 transition ${el.hidden ? 'text-neutral-600 hover:text-neutral-400' : 'text-neutral-400 hover:text-white'}`}
+                            title={el.hidden ? 'Katmanı Göster' : 'Katmanı Gizle'}
+                          >
+                            {el.hidden ? <EyeOff size={12} /> : <Eye size={12} />}
+                          </button>
+
+                          {/* Toggle Lock */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPages((prevPages) =>
+                                prevPages.map((p, idx) => {
+                                  if (idx !== activePageIdx) return p;
+                                  const els = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+                                  return {
+                                    ...p,
+                                    elements: els.map((item) =>
+                                      item.id === el.id ? { ...item, locked: !item.locked } : item
+                                    )
+                                  };
+                                })
+                              );
+                            }}
                             className="p-1 hover:text-amber-400 text-neutral-500"
                             title={el.locked ? 'Kilidi Aç' : 'Kilitle'}
                           >
                             {el.locked ? <Lock size={12} className="text-amber-400" /> : <Unlock size={12} />}
                           </button>
+
+                          {/* Delete */}
                           <button
                             type="button"
-                            onClick={deleteSelectedElement}
+                            onClick={() => {
+                              selectElement(el.id, false);
+                              deleteSelectedElement();
+                            }}
                             className="p-1 hover:text-rose-400 text-neutral-500"
                             title="Katmanı Sil"
                           >
@@ -2665,6 +3110,8 @@ export default function CatalogVisualCanvasEditor({
           >
             <div
               ref={canvasRef}
+              onMouseDown={handleMouseDownCanvas}
+              data-canvas-background="true"
               style={{
                 width: `${canvasWidth}px`,
                 height: `${canvasHeight}px`,
@@ -2685,24 +3132,37 @@ export default function CatalogVisualCanvasEditor({
                 </div>
               )}
 
-              {/* Smart Guide Lines (Snap to page center X & Y) */}
+              {/* Smart Guide Lines (Snap to page center X & Y or element alignments) */}
               {snapLineX !== null && (
                 <div
                   style={{ left: `${snapLineX}px` }}
-                  className="absolute top-0 bottom-0 w-px border-l border-dashed border-sky-400 z-50 pointer-events-none"
+                  className="absolute top-0 bottom-0 w-px border-l-2 border-dashed border-rose-500 z-50 pointer-events-none"
                 />
               )}
               {snapLineY !== null && (
                 <div
                   style={{ top: `${snapLineY}px` }}
-                  className="absolute left-0 right-0 h-px border-t border-dashed border-sky-400 z-50 pointer-events-none"
+                  className="absolute left-0 right-0 h-px border-t-2 border-dashed border-rose-500 z-50 pointer-events-none"
+                />
+              )}
+
+              {/* Canvas Blank Area Marquee Selection Rectangle */}
+              {selectionBox && (
+                <div
+                  style={{
+                    left: `${Math.min(selectionBox.startX, selectionBox.currentX)}px`,
+                    top: `${Math.min(selectionBox.startY, selectionBox.currentY)}px`,
+                    width: `${Math.abs(selectionBox.currentX - selectionBox.startX)}px`,
+                    height: `${Math.abs(selectionBox.currentY - selectionBox.startY)}px`
+                  }}
+                  className="absolute border border-dashed border-amber-400 bg-amber-500/15 pointer-events-none z-50 rounded-sm"
                 />
               )}
 
               {/* Elements on Canvas */}
               {currentPage?.elements?.filter(Boolean).map((el) => {
                 if (!el || !el.id || el.hidden) return null;
-                const isSelected = el.id === selectedElId;
+                const isSelected = selectedElIds.includes(el.id);
 
                 return (
                   <div
@@ -2714,6 +3174,8 @@ export default function CatalogVisualCanvasEditor({
                       top: `${el.y}px`,
                       width: `${el.width}px`,
                       height: `${el.height}px`,
+                      transform: el.rotation ? `rotate(${el.rotation}deg)` : 'none',
+                      transformOrigin: 'center center',
                       cursor: el.locked ? 'not-allowed' : 'move',
                       opacity: (el.opacity || 100) / 100
                     }}
@@ -2723,6 +3185,31 @@ export default function CatalogVisualCanvasEditor({
                         : 'hover:ring-1 hover:ring-amber-400/50 z-10'
                     }`}
                   >
+                    {/* Multi-Selection Counter Badge */}
+                    {selectedElIds.length > 1 && isSelected && (
+                      <div className="absolute -top-2.5 -left-2.5 w-4 h-4 rounded-full bg-amber-500 text-neutral-950 font-bold text-[9px] flex items-center justify-center shadow-md z-40 pointer-events-none">
+                        {selectedElIds.indexOf(el.id) + 1}
+                      </div>
+                    )}
+
+                    {/* Rotation Handle (Centered above element) */}
+                    {isSelected && !el.locked && (
+                      <div
+                        onMouseDown={(e) => handleMouseDownElement(e, el, 'rotate')}
+                        style={{
+                          position: 'absolute',
+                          top: '-26px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          cursor: 'grab'
+                        }}
+                        className="w-5 h-5 rounded-full bg-neutral-900 border-2 border-amber-500 shadow flex items-center justify-center text-amber-400 z-50 hover:scale-110 active:cursor-grabbing transition"
+                        title="Döndür (Shift ile 15° adımlarla kenetle)"
+                      >
+                        <RotateCcw size={10} />
+                      </div>
+                    )}
+
                     {/* Render by element type */}
                     {el.type === 'text' && (
                       <div
@@ -2830,24 +3317,31 @@ export default function CatalogVisualCanvasEditor({
         {/* ==================== RIGHT INSPECTOR PANEL (310px) ==================== */}
         <div className="w-full lg:w-80 bg-neutral-950 border-l border-neutral-800 p-4 space-y-4 overflow-y-auto flex-shrink-0">
           <div className="pb-2 border-b border-neutral-800 flex items-center justify-between">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold">
-              {selectedEl ? `SEÇİLİ ÖĞE: ${selectedEl.type.toUpperCase()}` : 'SAYFA AYARLARI'}
+            <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold truncate">
+              {selectedEls.length > 1
+                ? `SEÇİLİ: ${selectedEls.length} NESNE`
+                : selectedEl
+                ? `SEÇİLİ: ${selectedEl.type.toUpperCase()}`
+                : 'SAYFA AYARLARI'}
             </span>
-            {selectedEl && (
+            {(selectedEl || selectedEls.length > 0) && (
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => updateSelectedElement({ locked: !selectedEl.locked })}
+                  onClick={() => {
+                    const anyUnlocked = selectedEls.some((e) => !e.locked);
+                    updateSelectedElement({ locked: anyUnlocked });
+                  }}
                   className="p-1 rounded text-neutral-400 hover:text-white"
-                  title={selectedEl.locked ? 'Kilidi Aç' : 'Kilitle'}
+                  title={selectedEls.every((e) => e.locked) ? 'Kilitleri Aç' : 'Kilitle'}
                 >
-                  {selectedEl.locked ? <Lock size={13} className="text-amber-400" /> : <Unlock size={13} />}
+                  {selectedEls.every((e) => e.locked) ? <Lock size={13} className="text-amber-400" /> : <Unlock size={13} />}
                 </button>
                 <button
                   type="button"
                   onClick={deleteSelectedElement}
                   className="p-1 rounded text-rose-400 hover:text-rose-300"
-                  title="Sil"
+                  title="Seçilileri Sil (Delete)"
                 >
                   <Trash2 size={13} />
                 </button>
@@ -2855,9 +3349,254 @@ export default function CatalogVisualCanvasEditor({
             )}
           </div>
 
-          {/* INSPECTOR BODY */}
-          {selectedEl ? (
+          {/* 1. MULTI-SELECTION BATCH INSPECTOR */}
+          {selectedEls.length > 1 ? (
+            <div className="space-y-4 text-xs">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-amber-300">{selectedEls.length} Öğe Birlikte Seçildi</p>
+                  <p className="text-[10px] text-neutral-400">Toplu taşıma, hizalama ve dağıtma aktif</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  className="px-2 py-1 rounded bg-neutral-900 border border-neutral-700 text-[10px] hover:text-white"
+                >
+                  Seçimi Kaldır
+                </button>
+              </div>
+
+              {/* Collective Alignment Tools */}
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1.5">
+                  Grup İçi Kenar Hizalamaları
+                </label>
+                <div className="grid grid-cols-3 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => alignElement('left')}
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer text-center"
+                    title="En Sol Nesneye Hizala"
+                  >
+                    Sola Hizala
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alignElement('center-h')}
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-amber-400 font-bold cursor-pointer text-center"
+                    title="Yatay Merkezde Eşitle"
+                  >
+                    Yatay Ortala
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alignElement('right')}
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer text-center"
+                    title="En Sağ Nesneye Hizala"
+                  >
+                    Sağa Hizala
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alignElement('top')}
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer text-center"
+                    title="En Üst Nesneye Hizala"
+                  >
+                    Üste Hizala
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alignElement('center-v')}
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-amber-400 font-bold cursor-pointer text-center"
+                    title="Dikey Merkezde Eşitle"
+                  >
+                    Dikey Ortala
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alignElement('bottom')}
+                    className="p-1.5 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-300 cursor-pointer text-center"
+                    title="En Alt Nesneye Hizala"
+                  >
+                    Alta Hizala
+                  </button>
+                </div>
+              </div>
+
+              {/* Distribution Tools */}
+              <div className="pt-2 border-t border-neutral-800">
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1.5">
+                  Eşit Boşluklu Dağıt
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => alignElement('distribute-h')}
+                    className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] font-semibold text-neutral-200 cursor-pointer text-center"
+                  >
+                    ↔ Yatay Eşit Dağıt
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alignElement('distribute-v')}
+                    className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] font-semibold text-neutral-200 cursor-pointer text-center"
+                  >
+                    ↕ Dikey Eşit Dağıt
+                  </button>
+                </div>
+              </div>
+
+              {/* Collective Rotation */}
+              <div className="pt-2 border-t border-neutral-800">
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1.5">
+                  Toplu Döndürme Açısı (°)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="360"
+                    placeholder="0"
+                    onChange={(e) => updateSelectedElement({ rotation: Number(e.target.value) || 0 })}
+                    className="w-20 px-2 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ rotation: 0 })}
+                    className="px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] font-semibold text-neutral-300"
+                  >
+                    0° Sıfırla
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : selectedEl ? (
+            /* 2. SINGLE ELEMENT INSPECTOR */
             <div className="space-y-3.5 text-xs">
+              {/* Geometry: Position, Size & Aspect Lock */}
+              <div className="p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-neutral-400 uppercase font-bold">
+                    KONUM VE EBAT
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setAspectRatioLocked(!aspectRatioLocked)}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono flex items-center gap-1 transition ${
+                      aspectRatioLocked
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        : 'text-neutral-500 hover:text-neutral-300'
+                    }`}
+                    title={aspectRatioLocked ? 'En-boy oranı kilitli' : 'Oranı kilitle'}
+                  >
+                    {aspectRatioLocked ? <Lock size={10} /> : <Unlock size={10} />}
+                    <span>{aspectRatioLocked ? 'Oran Kilitli' : 'Serbest'}</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-mono">X (px)</span>
+                    <input
+                      type="number"
+                      value={selectedEl.x || 0}
+                      onChange={(e) => updateSelectedElement({ x: Number(e.target.value) || 0 })}
+                      className="w-full px-2 py-1 rounded bg-neutral-950 border border-neutral-800 text-xs text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-mono">Y (px)</span>
+                    <input
+                      type="number"
+                      value={selectedEl.y || 0}
+                      onChange={(e) => updateSelectedElement({ y: Number(e.target.value) || 0 })}
+                      className="w-full px-2 py-1 rounded bg-neutral-950 border border-neutral-800 text-xs text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-mono">Genişlik (W)</span>
+                    <input
+                      type="number"
+                      value={selectedEl.width || 50}
+                      onChange={(e) => {
+                        const newW = Math.max(10, Number(e.target.value) || 10);
+                        const patch = { width: newW };
+                        if (aspectRatioLocked && selectedEl.width) {
+                          const ratio = selectedEl.width / selectedEl.height;
+                          patch.height = Math.round(newW / ratio);
+                        }
+                        updateSelectedElement(patch);
+                      }}
+                      className="w-full px-2 py-1 rounded bg-neutral-950 border border-neutral-800 text-xs text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-neutral-500 font-mono">Yükseklik (H)</span>
+                    <input
+                      type="number"
+                      value={selectedEl.height || 50}
+                      onChange={(e) => {
+                        const newH = Math.max(4, Number(e.target.value) || 4);
+                        const patch = { height: newH };
+                        if (aspectRatioLocked && selectedEl.height) {
+                          const ratio = selectedEl.width / selectedEl.height;
+                          patch.width = Math.round(newH * ratio);
+                        }
+                        updateSelectedElement(patch);
+                      }}
+                      className="w-full px-2 py-1 rounded bg-neutral-950 border border-neutral-800 text-xs text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Rotation Inspector */}
+              <div className="p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-neutral-400 uppercase font-bold">
+                    DÖNDÜRME (ROTATION)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ rotation: 0 })}
+                    className="text-[10px] font-mono text-amber-400 hover:text-amber-300"
+                    title="Açıyı sıfırla"
+                  >
+                    0° Sıfırla
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={selectedEl.rotation || 0}
+                    onChange={(e) => updateSelectedElement({ rotation: Number(e.target.value) || 0 })}
+                    className="flex-1 accent-amber-500 cursor-pointer"
+                  />
+                  <div className="flex items-center gap-1 w-16">
+                    <input
+                      type="number"
+                      min="0"
+                      max="360"
+                      value={selectedEl.rotation || 0}
+                      onChange={(e) => {
+                        let val = Number(e.target.value) || 0;
+                        if (val < 0) val = 0;
+                        if (val > 360) val = 360;
+                        updateSelectedElement({ rotation: val });
+                      }}
+                      className="w-full px-1.5 py-1 rounded bg-neutral-950 border border-neutral-800 text-xs text-white font-mono text-center"
+                    />
+                    <span className="text-neutral-400 font-mono text-xs">°</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Text Inspector */}
               {selectedEl.type === 'text' && (
                 <>
@@ -3085,7 +3824,7 @@ export default function CatalogVisualCanvasEditor({
                 </div>
               )}
 
-              {/* Alignment Tools */}
+              {/* Alignment Tools (Single to Canvas) */}
               <div className="pt-2 border-t border-neutral-800">
                 <label className="text-[10px] font-bold text-neutral-400 block mb-1.5">
                   Tuvale Simetrik Hizala
