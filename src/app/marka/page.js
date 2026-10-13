@@ -90,6 +90,7 @@ export default function BrandPortalPage() {
   // Layout states
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
+  const [catalogSubSection, setCatalogSubSection] = useState('all');
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMoreMenu, setShowMobileMoreMenu] = useState(false);
   const [mobileOutletView, setMobileOutletView] = useState('form'); // 'form' | 'listings'
@@ -1754,32 +1755,106 @@ export default function BrandPortalPage() {
             ].map(item => {
               const isActive = activePortalTab === item.id;
               return (
-                <button
-                  key={item.id}
-                  onClick={() => setActivePortalTab(item.id)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
-                    color: isActive ? '#d4af37' : '#94a3b8',
-                    cursor: 'pointer',
-                    fontSize: '0.82rem',
-                    fontWeight: isActive ? '700' : '500',
-                    textAlign: 'left',
-                    transition: 'all 0.15s',
-                    boxSizing: 'border-box'
-                  }}
-                  title={isSidebarCollapsed ? item.label : undefined}
-                  className="sidebar-link-btn"
-                >
-                  {item.icon}
-                  {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
-                </button>
+                <div key={item.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                  <button
+                    onClick={() => {
+                      setActivePortalTab(item.id);
+                      if (item.id === 'catalogs') setCatalogSubSection('all');
+                    }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                      color: isActive ? '#d4af37' : '#94a3b8',
+                      cursor: 'pointer',
+                      fontSize: '0.82rem',
+                      fontWeight: isActive ? '700' : '500',
+                      textAlign: 'left',
+                      transition: 'all 0.15s',
+                      boxSizing: 'border-box'
+                    }}
+                    title={isSidebarCollapsed ? item.label : undefined}
+                    className="sidebar-link-btn"
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      {item.icon}
+                      {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
+                    </span>
+                    {!isSidebarCollapsed && item.id === 'catalogs' && (
+                      <ChevronRight
+                        size={14}
+                        style={{
+                          transform: isActive ? 'rotate(90deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.2s'
+                        }}
+                      />
+                    )}
+                  </button>
+
+                  {/* Sub-tree for Dijital Kataloglar (Studio) matching visual reference */}
+                  {!isSidebarCollapsed && item.id === 'catalogs' && isActive && (
+                    <div
+                      style={{
+                        marginLeft: '22px',
+                        marginTop: '4px',
+                        marginBottom: '6px',
+                        paddingLeft: '12px',
+                        borderLeft: '1px solid rgba(212, 175, 55, 0.3)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px'
+                      }}
+                    >
+                      {[
+                        { subId: 'all', label: 'Tüm Kataloglar' },
+                        { subId: 'create', label: 'Yeni Katalog Oluştur' },
+                        { subId: 'templates', label: 'Şablonlar' },
+                        { subId: 'published', label: 'Yayınlananlar' },
+                        { subId: 'draft', label: 'Taslaklar' },
+                        { subId: 'archived', label: 'Arşiv' }
+                      ].map((sub) => {
+                        const isSubActive = catalogSubSection === sub.subId;
+                        return (
+                          <button
+                            key={sub.subId}
+                            type="button"
+                            onClick={() => setCatalogSubSection(sub.subId)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              padding: '5px 8px',
+                              borderRadius: '6px',
+                              textAlign: 'left',
+                              fontSize: '0.75rem',
+                              fontWeight: isSubActive ? '700' : '500',
+                              color: isSubActive ? '#d4af37' : '#94a3b8',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: '5px',
+                                height: '5px',
+                                borderRadius: '50%',
+                                background: isSubActive ? '#d4af37' : 'rgba(148,163,184,0.4)'
+                              }}
+                            />
+                            <span>{sub.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
@@ -5862,7 +5937,7 @@ export default function BrandPortalPage() {
 
               {/* -------------------- TAB: DIGITAL CATALOG STUDIO & LOOKBOOK -------------------- */}
               {activePortalTab === 'catalogs' && (
-                <CatalogStudioTab brandInfo={brandInfo} />
+                <CatalogStudioTab brandInfo={brandInfo} externalSubSection={catalogSubSection} />
               )}
 
               {/* -------------------- TAB: WHITE-LABEL 3D EMBED STUDIO & KIOSK SDK -------------------- */}

@@ -2,12 +2,34 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, BookOpen, ShieldCheck, Loader2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  BookOpen,
+  Loader2,
+  Activity,
+  Layers,
+  Box,
+  BarChart3,
+  Award,
+  UploadCloud,
+  Building2,
+  Globe,
+  TrendingUp,
+  Users,
+  Megaphone,
+  Tag,
+  CreditCard,
+  ChevronRight,
+  Search,
+  Bell,
+  HelpCircle
+} from 'lucide-react';
 import CatalogStudioTab from '@/components/brand/CatalogStudioTab';
 
 export default function BrandCatalogsStandalonePage() {
   const [brandInfo, setBrandInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [catalogSubSection, setCatalogSubSection] = useState('all');
 
   useEffect(() => {
     try {
@@ -38,11 +60,11 @@ export default function BrandCatalogsStandalonePage() {
         </div>
         <h1 className="text-2xl font-bold mb-2">Marka Oturumu Gerekli</h1>
         <p className="text-sm text-neutral-400 max-w-md mb-6">
-          Catalog Studio'yu kullanabilmek ve markanıza ait dijital katalogları yönetmek için lütfen marka paneline giriş yapın.
+          Catalog Studio&apos;yu kullanabilmek ve markanıza ait dijital katalogları yönetmek için lütfen marka paneline giriş yapın.
         </p>
         <Link
           href="/marka"
-          className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold text-sm transition"
+          className="px-6 py-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-semibold text-sm transition"
         >
           Marka Girişine Git &rarr;
         </Link>
@@ -50,38 +72,186 @@ export default function BrandCatalogsStandalonePage() {
     );
   }
 
+  const initials = (brandInfo.name || 'SB')
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
-    <div className="min-h-screen bg-neutral-100 flex flex-col">
-      {/* Top Header */}
-      <header className="bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/marka"
-            className="text-xs font-semibold text-neutral-600 hover:text-neutral-900 flex items-center gap-1.5 transition"
-          >
-            <ArrowLeft size={16} />
-            <span>Marka Paneli</span>
-          </Link>
-          <div className="h-4 w-px bg-neutral-200" />
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-sm text-neutral-900">{brandInfo.name}</span>
-            <span className="text-xs text-neutral-400">&bull;</span>
-            <span className="text-xs text-amber-600 font-medium">Catalog Studio</span>
+    <div className="min-h-screen bg-[#f6f6f4] flex flex-col lg:flex-row font-sans text-neutral-900">
+      {/* Left Dark Sidebar matching reference image */}
+      <aside className="hidden lg:flex w-64 bg-[#11151f] text-slate-300 flex-col justify-between flex-shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-white/5">
+        <div>
+          {/* Top Brand Logo */}
+          <div className="p-5 flex items-center gap-3 border-b border-white/10">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500 to-[#b4823c] text-neutral-950 font-black flex items-center justify-center text-sm shadow">
+              SB
+            </div>
+            <div>
+              <span className="font-extrabold text-white text-base tracking-tight block leading-none">
+                SeramikBak
+              </span>
+              <span className="text-[10px] text-slate-400">Markalar İçin Dijital Çözümler</span>
+            </div>
           </div>
+
+          {/* Marka Paneli PRO Header */}
+          <div className="px-4 pt-4 pb-2">
+            <div className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white">Marka Paneli</span>
+                <span className="px-1.5 py-0.5 rounded bg-[#b4823c] text-white text-[9px] font-extrabold uppercase">
+                  PRO
+                </span>
+              </div>
+              <ChevronRight size={14} className="text-slate-400 rotate-90" />
+            </div>
+          </div>
+
+          {/* Navigation Items */}
+          <nav className="px-3 py-2 space-y-1 text-xs">
+            <Link
+              href="/marka"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition"
+            >
+              <Activity size={16} />
+              <span>Gösterge Paneli</span>
+            </Link>
+
+            <Link
+              href="/marka"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition"
+            >
+              <Layers size={16} />
+              <span>Ürün Kataloğum</span>
+            </Link>
+
+            {/* Active Dijital Kataloglar (Studio) with Sub-Tree */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setCatalogSubSection('all')}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#b4823c]/25 border border-[#b4823c]/40 text-amber-300 font-bold"
+              >
+                <span className="flex items-center gap-2.5">
+                  <BookOpen size={16} />
+                  <span>Dijital Kataloglar (Studio)</span>
+                </span>
+                <ChevronRight size={14} className="rotate-90" />
+              </button>
+
+              <div className="ml-5 mt-1.5 mb-2 pl-3 border-l border-[#b4823c]/40 space-y-1">
+                {[
+                  { id: 'all', label: 'Tüm Kataloglar' },
+                  { id: 'create', label: 'Yeni Katalog Oluştur' },
+                  { id: 'templates', label: 'Şablonlar' },
+                  { id: 'published', label: 'Yayınlananlar' },
+                  { id: 'draft', label: 'Taslaklar' },
+                  { id: 'archived', label: 'Arşiv' }
+                ].map((sub) => (
+                  <button
+                    key={sub.id}
+                    type="button"
+                    onClick={() => setCatalogSubSection(sub.id)}
+                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 transition cursor-pointer ${
+                      catalogSubSection === sub.id
+                        ? 'text-amber-300 font-bold bg-white/5'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        catalogSubSection === sub.id ? 'bg-amber-400' : 'bg-slate-600'
+                      }`}
+                    />
+                    <span>{sub.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {[
+              { label: '3D Kiosk & Embed SDK', icon: Box },
+              { label: 'Pazar Trend Raporları', icon: BarChart3 },
+              { label: 'Marka Sağlığı & SEO', icon: Award },
+              { label: 'Toplu Ürün & ERP', icon: UploadCloud },
+              { label: 'B2B Proje Talepleri', icon: Building2 },
+              { label: 'Küresel Ülke Analitiği', icon: Globe },
+              { label: 'Bölgesel Trendler', icon: TrendingUp },
+              { label: 'Satış & Bayi Yönetimi', icon: Users },
+              { label: 'Reklam Yönetimi', icon: Megaphone },
+              { label: 'Outlet & Seri Sonu', icon: Tag },
+              { label: 'Lisans & Ödemeler', icon: CreditCard }
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={i}
+                  href="/marka"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition"
+                >
+                  <Icon size={16} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        <Link
-          href="/marka"
-          className="text-xs text-neutral-500 hover:text-neutral-800 transition"
-        >
-          Tüm Modüller &rarr;
-        </Link>
-      </header>
+        {/* Bottom Help & Copyright */}
+        <div className="p-4 border-t border-white/10 space-y-2 text-xs text-slate-400">
+          <Link href="/iletisim" className="flex items-center justify-between hover:text-white transition">
+            <span className="flex items-center gap-2">
+              <HelpCircle size={15} />
+              <span>Yardım & Destek</span>
+            </span>
+            <ChevronRight size={13} />
+          </Link>
+          <p className="text-[10px] text-slate-500 pt-1">SeramikBak &copy; {new Date().getFullYear()}</p>
+        </div>
+      </aside>
 
-      {/* Main Studio Tab Content */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
-        <CatalogStudioTab brandInfo={brandInfo} />
-      </main>
+      {/* Right Main Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top White Header with Global Search & Profile */}
+        <header className="bg-white border-b border-neutral-200/80 px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+          <div className="relative w-full max-w-md">
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              type="text"
+              placeholder="Katalog, ürün, koleksiyon veya şablon ara..."
+              className="w-full pl-9 pr-12 py-2 rounded-xl bg-neutral-100/80 border border-neutral-200/80 text-xs focus:bg-white focus:outline-none focus:border-[#b4823c]"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-neutral-400 bg-white px-1.5 py-0.5 rounded border border-neutral-200">
+              ⌘K
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 rounded-xl text-neutral-500 hover:bg-neutral-100">
+              <Bell size={18} />
+              <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-1.5" />
+            </button>
+
+            <div className="flex items-center gap-2.5 pl-2 border-l border-neutral-200">
+              <div className="w-8 h-8 rounded-full bg-neutral-900 text-white text-xs font-bold flex items-center justify-center">
+                {initials}
+              </div>
+              <div className="hidden sm:block text-left">
+                <p className="text-xs font-extrabold text-neutral-900 leading-none">{brandInfo.name}</p>
+                <span className="text-[10px] text-neutral-400">Marka Yöneticisi</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Studio Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto">
+          <CatalogStudioTab brandInfo={brandInfo} externalSubSection={catalogSubSection} />
+        </main>
+      </div>
     </div>
   );
 }
