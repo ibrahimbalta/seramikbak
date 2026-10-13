@@ -44,6 +44,852 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
+// ANA KATALOG ŞABLONLARI (10 ADET KURUMSAL MATBAA ŞABLONU)
+// ============================================================================
+export const CATALOG_MASTER_TEMPLATES = [
+  {
+    id: 'milano',
+    name: 'Milano Lookbook',
+    badge: '120×280 & Dev Ebat Matbaa Baskısı',
+    tag: 'MİMARLAR & TASARIMCILAR',
+    desc: 'İtalyan Cersaie ve Milano matbaa standardında 2 sayfalı mimari monograf mizanpajı: Sol sayfada yaşam alanı uygulaması ve teknik şartname matrisi; sağ sayfada tam boy dikey plaka ve varyasyonlar.',
+    accent: '#b4823c',
+    mockupImg: '/renders/modern_living_natural_oak.jpg',
+    bgColor: '#18181b',
+    format: 'A4 Dikey Çift Sayfa'
+  },
+  {
+    id: 'deco',
+    name: 'Deco Exclusive',
+    badge: 'Bien Kare Monograf & Dekofon',
+    tag: 'EXCLUSIVE & LÜKS KONSEPT',
+    desc: 'Bien Seramik Exclusive dergi standardında kare (1:1) editoryal katalog: Sol sayfada tam boy mekan fotoğrafı, sağ sayfada geniş harf aralıklı koleksiyon başlığı, kare REC/M yüzey rozetleri ve dekofon karolar.',
+    accent: '#0f172a',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    bgColor: '#ffffff',
+    format: '1:1 Kare Editoryal'
+  },
+  {
+    id: 'lidya',
+    name: 'Lidya Pro Technic',
+    badge: 'Mimari Modüler & Şartname',
+    tag: 'MİMARİ PROJELER & ŞARTNAME',
+    desc: 'Mimari şartname ve teknik matris standardında modüler seramik kataloğu: Renk mühendisliği (Colour engineering), RAL renk paletleri, tel kafes modüler formlar ve R9-R12 kaymazlık matrisleri.',
+    accent: '#059669',
+    mockupImg: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+    bgColor: '#ffffff',
+    format: 'A4 Dikey Mimari Matris'
+  },
+  {
+    id: 'spec-sheet',
+    name: 'Architectural Spec Sheet',
+    badge: 'TS EN 14411 & BIM',
+    tag: 'İHALE & ŞARTNAME',
+    desc: 'Mimarlar, mühendisler ve kamu ihale dosyaları için CAD/BIM standartlarında teknik matris. TS EN 14411 uygunluğu, PEI aşınma, R kaymazlık, kutu/palet metrajı.',
+    accent: '#0284c7',
+    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg',
+    bgColor: '#ffffff',
+    format: 'A4 Yatay / Dikey CAD/BIM'
+  },
+  {
+    id: 'showroom',
+    name: 'Showroom & Collection',
+    badge: 'Perakende & Bayi Satış',
+    tag: 'MAĞAZA & MÜŞTERİ',
+    desc: 'Bayi teşhirleri ve mağaza satış ekipleri için yan yana ürün kartları, önerilen mekan etiketleri (Banyo, Mutfak, Salon), derz eşleştirmeleri ve perakende liste etiketleri.',
+    accent: '#d97706',
+    mockupImg: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+    bgColor: '#ffffff',
+    format: 'A4 Dikey Bayi Kataloğu'
+  },
+  {
+    id: 'global-export',
+    name: 'Global Export & B2B',
+    badge: 'Konteyner & Lojistik',
+    tag: 'GLOBAL İHRACAT',
+    desc: 'Yurtdışı distribütörler ve ihracat fuarları için çok dilli (EN/DE/AR) format. 20ft/40ft konteyner yükleme kapasiteleri, GTİP / HS Kodu (6907), CE / ISO sertifikaları.',
+    accent: '#2563eb',
+    mockupImg: '/renders/luxury_bathroom_natural_oak.jpg',
+    bgColor: '#ffffff',
+    format: 'A4 Dikey Çok Dilli'
+  },
+  {
+    id: 'verona',
+    name: 'Verona Natural Stone & Marble',
+    badge: 'Bookmatch & Damar Eşleme',
+    tag: 'İTALYAN MERMER & REZİDANS',
+    desc: 'İtalyan Verona ocakları kalitesinde lüks doğal taş lookbook: Simetrik bookmatch kelebek damar takibi, altın parıltılı lüks iç mekanlar, honlu/cilalı yüzey karşılaştırmaları.',
+    accent: '#c59b27',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    bgColor: '#18181b',
+    format: 'A4 Dikey Bookmatch Lookbook'
+  },
+  {
+    id: 'nordic',
+    name: 'Nordic Concrete & Industrial Loft',
+    badge: 'Çimento & Terrazzo Monograf',
+    tag: 'BRÜT BETON & LOFT MİMARİ',
+    desc: 'Modern endüstriyel mimari için minimalist brüt beton serisi: Geniş antrasit/gri spektrumlar, çimento ve mikro-terrazzo dokuları ile çağdaş kentsel mekan tasarım rehberi.',
+    accent: '#475569',
+    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg',
+    bgColor: '#f8fafc',
+    format: 'A4 Dikey Minimalist Grid'
+  },
+  {
+    id: 'artisan',
+    name: 'Artisan Boutique & Mediterranean Zellige',
+    badge: 'Rölyef & Parlak Sır Koleksiyonu',
+    tag: 'AKDENİZ ÇİNİ & BUTİK KARO',
+    desc: 'Geleneksel Akdeniz zellige ve butik seramik sanatı: Parlak dalgalı sırlar, canlı kobalt & adaçayı tonları, balıksırtı/altıgen dizilimler ve otel/kafe butik mizanpajı.',
+    accent: '#0d9488',
+    mockupImg: '/renders/modern_living_natural_oak.jpg',
+    bgColor: '#fdfbf7',
+    format: 'A4 Dikey Butik Çini'
+  },
+  {
+    id: 'outdoor',
+    name: 'Outdoor 20mm & Landscape Architecture',
+    badge: 'R11-C Kaymazlık & Kuru Montaj',
+    tag: '2 CM KALIN DIŞ MEKAN & TERAS',
+    desc: 'Bahçe, teras, havuz kenarları için 20 mm ekstra mukavemetli porselen plaka şartnamesi: Yükseltilmiş döşeme ayakları, çim/çakıl üzeri kuru montaj şeması ve don dayanımı.',
+    accent: '#15803d',
+    mockupImg: '/renders/luxury_bathroom_natural_oak.jpg',
+    bgColor: '#ffffff',
+    format: 'A4 Dikey Peyzaj Şartnamesi'
+  }
+];
+
+export const generateTemplateElementsForPage = (templateId, pageType, brandInfo = {}, product = null) => {
+  const brandName = (brandInfo.name || 'SERAMİK').toUpperCase();
+  const prodName = product?.name || 'CALACATTA GOLD';
+  const prodImg = product?.imageUrl || product?.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
+  const prodDim = product?.width && product?.height ? `${product.width}×${product.height} cm` : '120×280 cm';
+  const prodFinish = product?.finish || 'Full Lappato';
+  const prodCode = product?.code || product?.sku || 'SER-2026';
+
+  switch (templateId) {
+    case 'deco':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 30,
+          content: `${brandName} EXCLUSIVE • 2026 COLLECTION`,
+          fontSize: 11,
+          fontWeight: '800',
+          letterSpacing: '0.3em',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 50,
+          content: prodName,
+          fontSize: 28,
+          fontWeight: '900',
+          letterSpacing: '0.08em',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 145,
+          width: 495,
+          height: 420,
+          src: prodImg,
+          borderRadius: 4,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 50,
+          y: 580,
+          width: 495,
+          height: 180,
+          color: '#f8fafc',
+          borderColor: '#e2e8f0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 75,
+          y: 600,
+          width: 445,
+          height: 140,
+          content: `EBAT & DETAYLAR: ${prodDim} • ${prodFinish} • Kod: ${prodCode}\n\nDEKOFON VE YÜZEY SEÇENEKLERİ:\n• Kare Monografik Yüzey (REC / M)\n• Uyumlu Bordür ve Mozaik Seçenekleri\n• Banyo, Mutfak ve Otel Projeleri İçin Lüks Doku`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#334155',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'lidya':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 30,
+          content: `${brandName} PRO TECHNIC • MODULAR ARCHITECTURE`,
+          fontSize: 11,
+          fontWeight: '800',
+          letterSpacing: '0.2em',
+          color: '#059669',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 45,
+          content: `${prodName} — COLOUR ENGINEERING`,
+          fontSize: 24,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 140,
+          width: 320,
+          height: 400,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 385,
+          y: 140,
+          width: 160,
+          height: 400,
+          color: '#ecfdf5',
+          borderColor: '#a7f3d0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 395,
+          y: 155,
+          width: 140,
+          height: 370,
+          content: `TEKNİK PARAMETRELER:\n\n• Ebat: ${prodDim}\n• RAL Kodu: RAL 7016\n• Kaymazlık: R10 / R11\n• Yüzey: ${prodFinish}\n• Su Emme: ≤ %0.1\n• Kırılma: ≥ 2500 N\n• PEI Değeri: Sınıf 4\n• Tel Kafes Modüler\n• BIM / Revit Uyumlu`,
+          fontSize: 11,
+          fontWeight: '600',
+          color: '#065f46',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-6`,
+          type: 'box',
+          x: 50,
+          y: 560,
+          width: 495,
+          height: 190,
+          color: '#f8fafc',
+          borderColor: '#e2e8f0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-7`,
+          type: 'text',
+          x: 75,
+          y: 580,
+          width: 445,
+          height: 150,
+          content: 'ŞARTNAME NOTU:\nKamusal projeler, metro istasyonları, havalimanları ve yoğun yaya trafiğine sahip ticari alanlar için TS EN 14411 Ek G standartlarına tam uygun mimari porselen karo şartnamesi.',
+          fontSize: 12,
+          fontWeight: '500',
+          color: '#1e293b',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'verona':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 25,
+          content: `${brandName} • VERONA NATURAL MARBLE LOOKBOOK`,
+          fontSize: 10,
+          fontWeight: '800',
+          letterSpacing: '0.25em',
+          color: '#c59b27',
+          align: 'center',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 80,
+          width: 495,
+          height: 45,
+          content: `${prodName} BOOKMATCH A / B`,
+          fontSize: 26,
+          fontWeight: '800',
+          color: '#ffffff',
+          align: 'center',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 135,
+          width: 240,
+          height: 460,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'image',
+          x: 305,
+          y: 135,
+          width: 240,
+          height: 460,
+          src: '/renders/luxury_bathroom_calacatta_gold.jpg',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'box',
+          x: 50,
+          y: 610,
+          width: 495,
+          height: 160,
+          color: '#27272a',
+          borderColor: '#3f3f46',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-6`,
+          type: 'text',
+          x: 75,
+          y: 630,
+          width: 445,
+          height: 120,
+          content: `DAMAR EŞLEŞTİRME & HEVESKÂR DETAY:\n• Ebat: ${prodDim} Dev Plaka Porselen\n• Yüzey: Full Lappato Parlak Ayna Cilası\n• Kitap Açılımı (Bookmatch) Simetrisi ile Kesintisiz Damar Takibi\n• Lüks Rezidans, Lobi, Şömine ve Banyo Zemin/Duvar Uygulamaları`,
+          fontSize: 12,
+          fontWeight: '500',
+          color: '#e4e4e7',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'nordic':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 25,
+          content: `${brandName} • NORDIC ARCHITECTURAL CONCRETE`,
+          fontSize: 11,
+          fontWeight: '800',
+          letterSpacing: '0.2em',
+          color: '#475569',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 80,
+          width: 495,
+          height: 45,
+          content: `${prodName} — BRÜT BETON & LOFT`,
+          fontSize: 24,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 135,
+          width: 495,
+          height: 390,
+          src: '/renders/luxury_bathroom_loft_beton.jpg',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 50,
+          y: 545,
+          width: 495,
+          height: 210,
+          color: '#f8fafc',
+          borderColor: '#e2e8f0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 75,
+          y: 565,
+          width: 445,
+          height: 170,
+          content: `İSKANDİNAV MİMARİ SERİSİ:\n• Ebat Seçenekleri: 60×120 cm / 80×80 cm / 120×120 cm\n• Yüzey: Mat Rölyefli / Doğal Çimento Dokusu\n• Kaymazlık: R10 A+B\n• Akustik ve Dayanıklılık: Yüksek Aşınma Mukavemeti PEI 4\n• Kullanım: Loft Daireler, Ofisler, Kafeler ve Modern Konutlar`,
+          fontSize: 12,
+          fontWeight: '500',
+          color: '#1e293b',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'artisan':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 25,
+          content: `${brandName} • ARTISAN MEDITERRANEAN ZELLIGE`,
+          fontSize: 11,
+          fontWeight: '800',
+          letterSpacing: '0.2em',
+          color: '#0d9488',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 80,
+          width: 495,
+          height: 45,
+          content: `${prodName} — BUTİK SIRLI KARO`,
+          fontSize: 24,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 135,
+          width: 495,
+          height: 400,
+          src: '/renders/modern_living_natural_oak.jpg',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 50,
+          y: 550,
+          width: 495,
+          height: 200,
+          color: '#f0fdfa',
+          borderColor: '#99f6e4',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 75,
+          y: 570,
+          width: 445,
+          height: 160,
+          content: `GELENEKSEL EL İŞÇİLİĞİ VE PARLAK SIR:\n• Modüler Formlar: 7.5×30 cm Balıksırtı / 15×15 cm Zellige\n• Yüzey Parlaklığı: Dalgalı Parlak El İşi Sır (Artisanal Glaze)\n• Renk Varyasyonu: V3 - Zengin Ton Geçişleri\n• Kullanım Alanı: Butik Oteller, Mutfak Tezgah Arası, Banyo Nişleri`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#134e4a',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'outdoor':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 25,
+          content: `${brandName} • 20MM OUTDOOR & LANDSCAPE`,
+          fontSize: 11,
+          fontWeight: '800',
+          letterSpacing: '0.2em',
+          color: '#15803d',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 80,
+          width: 495,
+          height: 45,
+          content: `${prodName} — 2 CM DIŞ MEKAN`,
+          fontSize: 24,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 135,
+          width: 495,
+          height: 380,
+          src: '/renders/luxury_bathroom_natural_oak.jpg',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 50,
+          y: 535,
+          width: 495,
+          height: 220,
+          color: '#f0fdf4',
+          borderColor: '#bbf7d0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 75,
+          y: 555,
+          width: 445,
+          height: 180,
+          content: `20 MM EKSTRA MUKAVEMETLİ DIŞ MEKAN STANDARDI:\n• Kalınlık: 20 mm (Kırılma Yükü: > 10.000 N)\n• Montaj Türü: Çim / Çakıl Üzeri Kuru Montaj & Yükseltilmiş Döşeme\n• Kaymazlık Sınıfı: R11 A+B+C (Islak Zemin & Havuz Kenarı)\n• Dayanım: %100 Donmaya, Tuza, Klora ve Ağır Yüke Dirençli\n• Ebat: 60×60×2 cm / 60×120×2 cm`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#14532d',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'spec-sheet':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 35,
+          content: `${brandName} ARCHITECTURAL SPECIFICATION`,
+          fontSize: 20,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 25,
+          content: 'TS EN 14411 EK G — GRUP BIa PORSELEN TEKNİK ŞARTNAME MATRİSİ',
+          fontSize: 10,
+          fontWeight: '700',
+          color: '#0284c7',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'box',
+          x: 50,
+          y: 120,
+          width: 495,
+          height: 640,
+          color: '#f8fafc',
+          borderColor: '#cbd5e1',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'text',
+          x: 75,
+          y: 145,
+          width: 445,
+          height: 590,
+          content: `ÜRÜN GRUBU: ${prodName} (${prodDim})\n\n1. FİZİKSEL & MEKANİK PERFORMANS:\n• Su Emme Oranı: ≤ %0.08\n• Kırılma Dayanımı: ≥ 2400 N\n• Eğilme Mukavemeti: ≥ 48 N/mm²\n• Yüzey Sertliği (Mohs): 7 - 8\n\n2. GÜVENLİK VE STANDARTLAR:\n• Kaymazlık Değeri: R10 / R11 seçenekleri\n• PEI Aşınma Dayanımı: Sınıf 4 (Yoğun Trafik)\n• Kimyasal ve Asit Direnci: A Sınıfı\n• Yanmazlık Standardı: A1FL (Hiç Yanmaz)\n\n3. LOJİSTİK VE KUTU BİLGİSİ:\n• Koli Metrajı: 2.88 m²\n• Koli İçi Adet: 2 Adet\n• Palet Ağırlığı: 1140 kg / 24 Kutu`,
+          fontSize: 12,
+          fontWeight: '500',
+          color: '#1e293b',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'showroom':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 35,
+          content: `${brandName} SHOWROOM & MAĞAZA KATALOĞU`,
+          fontSize: 22,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'center',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'image',
+          x: 50,
+          y: 105,
+          width: 235,
+          height: 420,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 310,
+          y: 105,
+          width: 235,
+          height: 420,
+          src: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'text',
+          x: 50,
+          y: 545,
+          width: 235,
+          height: 100,
+          content: `${prodName}\n${prodDim} • ${prodFinish}\nÖneri: Banyo / Mutfak`,
+          fontSize: 13,
+          fontWeight: '700',
+          color: '#0f172a',
+          align: 'center',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 310,
+          y: 545,
+          width: 235,
+          height: 100,
+          content: `ALBATROS ANTRASİT\n120×280 cm • Mat\nÖneri: Salon / Lobi`,
+          fontSize: 13,
+          fontWeight: '700',
+          color: '#0f172a',
+          align: 'center',
+          locked: false
+        }
+      ];
+
+    case 'global-export':
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 50,
+          width: 495,
+          height: 30,
+          content: `${brandName} • GLOBAL EXPORT SPECIFICATION`,
+          fontSize: 11,
+          fontWeight: '800',
+          letterSpacing: '0.2em',
+          color: '#2563eb',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 45,
+          content: `${prodName} (HS CODE: 6907.21)`,
+          fontSize: 22,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'image',
+          x: 50,
+          y: 140,
+          width: 495,
+          height: 350,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'box',
+          x: 50,
+          y: 505,
+          width: 495,
+          height: 250,
+          color: '#eff6ff',
+          borderColor: '#bfdbfe',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'text',
+          x: 75,
+          y: 525,
+          width: 445,
+          height: 210,
+          content: `INTERNATIONAL CONTAINER LOADING (20ft / 40ft):\n• Slab Dimensions: ${prodDim} / Thickness: 9 mm\n• Surface Finish: ${prodFinish} / Rectified\n• 20ft Container Capacity: 22 Pallets (~1,850 m²)\n• 40ft HC Container Capacity: 26 Pallets (~2,180 m²)\n• Compliance: CE Certificate, ISO 9001, TS EN 14411 Group BIa\n• Export Packaging: Euro Wooden Crates with Protective Film`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#1e3a8a',
+          align: 'left',
+          locked: false
+        }
+      ];
+
+    case 'milano':
+    default:
+      return [
+        {
+          id: `el-${Date.now()}-1`,
+          type: 'text',
+          x: 50,
+          y: 45,
+          width: 400,
+          height: 40,
+          content: prodName,
+          fontSize: 26,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-2`,
+          type: 'text',
+          x: 455,
+          y: 50,
+          width: 90,
+          height: 26,
+          content: 'MILANO SLAB',
+          fontSize: 10,
+          fontWeight: '800',
+          color: '#ffffff',
+          bgColor: '#b4823c',
+          align: 'center',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-3`,
+          type: 'text',
+          x: 50,
+          y: 85,
+          width: 495,
+          height: 25,
+          content: `${brandName} İtalyan mimari serisi • ${prodDim} • ${prodFinish}`,
+          fontSize: 12,
+          fontWeight: '600',
+          color: '#64748b',
+          align: 'left',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-4`,
+          type: 'image',
+          x: 50,
+          y: 120,
+          width: 495,
+          height: 380,
+          src: prodImg,
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-5`,
+          type: 'box',
+          x: 50,
+          y: 525,
+          width: 495,
+          height: 240,
+          color: '#f8fafc',
+          borderColor: '#e2e8f0',
+          locked: false
+        },
+        {
+          id: `el-${Date.now()}-6`,
+          type: 'text',
+          x: 75,
+          y: 545,
+          width: 445,
+          height: 195,
+          content: `TEKNİK STANDARTLAR:\n• Ebat: ${prodDim}\n• Kalınlık: 6 mm / 9 mm İnce Porselen\n• Yüzey: ${prodFinish} / Rektifiyeli\n• Kaymazlık: R9 / PEI 4\n• Kullanım: Lobi, Banyo, Mutfak Tezgahı, Dış Cephe\n• Sertifikasyon: TS EN 14411 Grup BIa`,
+          fontSize: 13,
+          fontWeight: '500',
+          color: '#1e293b',
+          align: 'left',
+          locked: false
+        }
+      ];
+  }
+};
+
+// ============================================================================
 // MATBAA DÜZEYİNDE HAZIR MİZANPAJ ŞABLONLARI (PRESET LAYOUT TEMPLATES)
 // ============================================================================
 const PRESET_TEMPLATES = [
@@ -368,6 +1214,8 @@ export default function CatalogVisualCanvasEditor({
   initialPages,
   brandProducts = [],
   brandInfo = {},
+  currentTemplateId = 'milano',
+  onSelectTemplate,
   onChangePages,
   onSaveDraft
 }) {
@@ -379,11 +1227,19 @@ export default function CatalogVisualCanvasEditor({
   const [activePageIdx, setActivePageIdx] = useState(0);
   const [selectedElId, setSelectedElId] = useState(null);
   const [activeLeftTab, setActiveLeftTab] = useState('templates'); // 'templates' | 'products' | 'pages' | 'badges'
+  const [templateSubTab, setTemplateSubTab] = useState('concepts'); // 'concepts' (Ana Şablonlar) | 'layouts' (Sayfa Mizanpajları)
+  const [selectedTemplateId, setSelectedTemplateId] = useState(currentTemplateId || 'milano');
   const [showGrid, setShowGrid] = useState(true);
   const [showBleed, setShowBleed] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1); // 0.75, 1, 1.25
   const [productSearch, setProductSearch] = useState('');
   const [autoSaveStatus, setAutoSaveStatus] = useState('Kaydedildi');
+
+  useEffect(() => {
+    if (currentTemplateId) {
+      setSelectedTemplateId(currentTemplateId);
+    }
+  }, [currentTemplateId]);
 
   const [history, setHistory] = useState([]);
   const [future, setFuture] = useState([]);
@@ -528,6 +1384,226 @@ export default function CatalogVisualCanvasEditor({
     });
     pushHistory(updated);
     setSelectedElId(null);
+  };
+
+  // Master Template Handlers
+  const handleSelectMasterTemplate = (tmplId) => {
+    setSelectedTemplateId(tmplId);
+    if (onSelectTemplate) {
+      onSelectTemplate(tmplId);
+    }
+    const tmplObj = CATALOG_MASTER_TEMPLATES.find((t) => t.id === tmplId);
+    setAutoSaveStatus(`Aktif şablon: ${tmplObj?.name || tmplId}`);
+  };
+
+  const handleApplyMasterTemplateToPage = (tmplId) => {
+    const tmplObj = CATALOG_MASTER_TEMPLATES.find((t) => t.id === tmplId) || CATALOG_MASTER_TEMPLATES[0];
+    handleSelectMasterTemplate(tmplId);
+    const sampleProduct = brandProducts[activePageIdx % Math.max(1, brandProducts.length)] || brandProducts[0] || null;
+    const elements = generateTemplateElementsForPage(tmplId, 'product', brandInfo, sampleProduct);
+
+    const updated = pages.map((p, idx) => {
+      if (idx !== activePageIdx) return p;
+      return {
+        ...p,
+        title: `${tmplObj.name} - Sayfa #${idx + 1}`,
+        type: 'product',
+        bgColor: tmplObj.bgColor || '#ffffff',
+        elements
+      };
+    });
+    pushHistory(updated);
+    setSelectedElId(null);
+    setAutoSaveStatus(`"${tmplObj.name}" sayfaya uygulandı`);
+  };
+
+  const handleApplyMasterTemplateToAllPages = (tmplId) => {
+    const tmplObj = CATALOG_MASTER_TEMPLATES.find((t) => t.id === tmplId) || CATALOG_MASTER_TEMPLATES[0];
+    handleSelectMasterTemplate(tmplId);
+    const brandName = (brandInfo.name || 'SERAMİK').toUpperCase();
+    const p1 = brandProducts[0] || null;
+    const p2 = brandProducts[1] || brandProducts[0] || null;
+
+    const newPages = [
+      // 1. Kapak
+      {
+        id: `page-cover-${Date.now()}`,
+        title: `${tmplObj.name} • Kapak`,
+        type: 'cover',
+        bgColor: tmplObj.bgColor || '#18181b',
+        elements: [
+          {
+            id: `el-cov-1`,
+            type: 'text',
+            x: 50,
+            y: 60,
+            width: 495,
+            height: 25,
+            content: `${brandName} • 2026 GENERAL CATALOGUE`,
+            fontSize: 11,
+            fontWeight: '800',
+            letterSpacing: '0.25em',
+            color: tmplObj.accent || '#b4823c',
+            align: 'center',
+            locked: false
+          },
+          {
+            id: `el-cov-2`,
+            type: 'text',
+            x: 50,
+            y: 95,
+            width: 495,
+            height: 65,
+            content: tmplObj.name.toUpperCase(),
+            fontSize: 28,
+            fontWeight: '900',
+            letterSpacing: '0.05em',
+            color: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? '#ffffff' : '#0f172a',
+            align: 'center',
+            locked: false
+          },
+          {
+            id: `el-cov-3`,
+            type: 'line',
+            x: 235,
+            y: 175,
+            width: 125,
+            height: 2,
+            color: tmplObj.accent || '#b4823c',
+            locked: false
+          },
+          {
+            id: `el-cov-4`,
+            type: 'image',
+            x: 50,
+            y: 200,
+            width: 495,
+            height: 520,
+            src: tmplObj.mockupImg || '/renders/luxury_bathroom_calacatta_gold.jpg',
+            borderRadius: 0,
+            locked: false
+          },
+          {
+            id: `el-cov-5`,
+            type: 'text',
+            x: 50,
+            y: 745,
+            width: 495,
+            height: 35,
+            content: `PORSELEN DEV PLAKALAR • ${tmplObj.tag} • TS EN 14411`,
+            fontSize: 10,
+            fontWeight: '700',
+            letterSpacing: '0.15em',
+            color: '#a1a1aa',
+            align: 'center',
+            locked: false
+          }
+        ]
+      },
+      // 2. Ürün Sayfası 1
+      {
+        id: `page-prod1-${Date.now()}`,
+        title: `${tmplObj.name} • Ürün 1`,
+        type: 'product',
+        bgColor: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? tmplObj.bgColor : '#ffffff',
+        elements: generateTemplateElementsForPage(tmplId, 'product', brandInfo, p1)
+      },
+      // 3. Ürün Sayfası 2
+      {
+        id: `page-prod2-${Date.now()}`,
+        title: `${tmplObj.name} • Ürün 2`,
+        type: 'product',
+        bgColor: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? tmplObj.bgColor : '#ffffff',
+        elements: generateTemplateElementsForPage(tmplId, 'product', brandInfo, p2)
+      },
+      // 4. Teknik Şartname & Matris
+      {
+        id: `page-specs-${Date.now()}`,
+        title: `${tmplObj.name} • Teknik Şartname`,
+        type: 'specs',
+        bgColor: '#ffffff',
+        elements: PRESET_TEMPLATES.find((p) => p.id === 'specs-matrix')?.elements || []
+      },
+      // 5. Arka Kapak & İletişim
+      {
+        id: `page-contact-${Date.now()}`,
+        title: `${tmplObj.name} • İletişim & QR`,
+        type: 'contact',
+        bgColor: tmplObj.bgColor === '#18181b' || tmplObj.bgColor === '#1c1917' ? tmplObj.bgColor : '#090d16',
+        elements: [
+          {
+            id: `el-con-1`,
+            type: 'text',
+            x: 50,
+            y: 120,
+            width: 495,
+            height: 40,
+            content: brandName,
+            fontSize: 32,
+            fontWeight: '900',
+            letterSpacing: '0.1em',
+            color: '#ffffff',
+            align: 'center',
+            locked: false
+          },
+          {
+            id: `el-con-2`,
+            type: 'line',
+            x: 235,
+            y: 180,
+            width: 125,
+            height: 2,
+            color: tmplObj.accent || '#b4823c',
+            locked: false
+          },
+          {
+            id: `el-con-3`,
+            type: 'text',
+            x: 50,
+            y: 220,
+            width: 495,
+            height: 120,
+            content: 'DİJİTAL KATALOG & B2B MİMARİ MERKEZİ\n\nFabrika: Organize Sanayi Bölgesi\nWeb: www.seramikbak.com\nE-Posta: mimari@seramikbak.com',
+            fontSize: 14,
+            fontWeight: '600',
+            color: '#cbd5e1',
+            align: 'center',
+            locked: false
+          },
+          {
+            id: `el-con-4`,
+            type: 'box',
+            x: 217,
+            y: 380,
+            width: 160,
+            height: 160,
+            color: '#ffffff',
+            borderColor: '#e2e8f0',
+            borderRadius: 16,
+            locked: false
+          },
+          {
+            id: `el-con-5`,
+            type: 'text',
+            x: 50,
+            y: 570,
+            width: 495,
+            height: 40,
+            content: 'Kataloğu Mobil Cihazınızda 3D İncelemek İçin QR Kodu Okutun',
+            fontSize: 12,
+            fontWeight: '700',
+            color: '#94a3b8',
+            align: 'center',
+            locked: false
+          }
+        ]
+      }
+    ];
+
+    pushHistory(newPages);
+    setActivePageIdx(0);
+    setSelectedElId(null);
+    setAutoSaveStatus(`Tüm katalog "${tmplObj.name}" şablonuna dönüştürüldü`);
   };
 
   // Insert real brand product onto canvas with aesthetic layout
@@ -683,6 +1759,25 @@ export default function CatalogVisualCanvasEditor({
               STUDIO PRO
             </span>
           </div>
+
+          <div className="h-5 w-px bg-neutral-800 hidden sm:block" />
+
+          {/* Active Template Badge & Quick Switcher */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveLeftTab('templates');
+              setTemplateSubTab('concepts');
+            }}
+            className="flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 px-2.5 py-1 rounded-lg border border-neutral-800 hover:border-amber-400/50 transition cursor-pointer text-xs"
+            title="Şablon Değiştir"
+          >
+            <LayoutTemplate size={13} className="text-amber-400" />
+            <span className="text-[10px] text-neutral-400 font-medium hidden md:inline">Şablon:</span>
+            <span className="font-bold text-amber-300 truncate max-w-[130px]">
+              {CATALOG_MASTER_TEMPLATES.find((t) => t.id === selectedTemplateId)?.name || 'Milano Lookbook'}
+            </span>
+          </button>
 
           <div className="h-5 w-px bg-neutral-800 hidden sm:block" />
 
@@ -863,44 +1958,164 @@ export default function CatalogVisualCanvasEditor({
               })}
             </div>
 
-            {/* TAB CONTENT: 1. HAZIR MİZANPAJ ŞABLONLARI */}
+            {/* TAB CONTENT: 1. HAZIR MİZANPAJ VE KATALOG ŞABLONLARI */}
             {activeLeftTab === 'templates' && (
-              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[620px]">
-                <div className="pb-1 border-b border-neutral-800">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
-                    MATBAA DÜZENLERİ
-                  </p>
-                  <p className="text-xs text-neutral-300 mt-0.5">
-                    Aktif sayfaya tek tıkla profesyonel mizanpaj uygulayın:
-                  </p>
+              <div className="p-3.5 space-y-3 overflow-y-auto max-h-[660px]">
+                {/* Sub Tab Switcher: Ana Katalog Şablonları vs Sayfa Mizanpajları */}
+                <div className="flex bg-neutral-900 p-1 rounded-xl border border-neutral-800 text-[11px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setTemplateSubTab('concepts')}
+                    className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
+                      templateSubTab === 'concepts'
+                        ? 'bg-amber-500 text-neutral-950 font-black shadow'
+                        : 'text-neutral-400 hover:text-white'
+                    }`}
+                  >
+                    Katalog Şablonları ({CATALOG_MASTER_TEMPLATES.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTemplateSubTab('layouts')}
+                    className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
+                      templateSubTab === 'layouts'
+                        ? 'bg-neutral-800 text-amber-300 font-black'
+                        : 'text-neutral-400 hover:text-white'
+                    }`}
+                  >
+                    Sayfa Mizanpajları
+                  </button>
                 </div>
 
-                <div className="space-y-2.5">
-                  {PRESET_TEMPLATES.map((tmpl) => (
-                    <button
-                      key={tmpl.id}
-                      type="button"
-                      onClick={() => handleApplyPresetTemplate(tmpl)}
-                      className="w-full p-3 rounded-xl border border-neutral-800 bg-neutral-900/80 hover:bg-neutral-800/90 hover:border-amber-400/60 text-left transition group cursor-pointer"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white group-hover:text-amber-300">
-                          {tmpl.name}
-                        </span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400">
-                          {tmpl.badge}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
-                        {tmpl.desc}
-                      </p>
-                      <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-400 opacity-0 group-hover:opacity-100 transition">
-                        <span>Sayfaya Uygula</span>
-                        <ChevronRight size={12} />
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                {/* VIEW 1: GÖRSELDEKİ ANA KATALOG ŞABLONLARI (10 ADET) */}
+                {templateSubTab === 'concepts' && (
+                  <div className="space-y-3">
+                    <p className="text-[11px] text-neutral-400 leading-relaxed">
+                      Kataloğunuz için kurumsal matbaa şablonu seçin veya aktif sayfaya/tüm kataloğa uygulayın:
+                    </p>
+
+                    <div className="space-y-3">
+                      {CATALOG_MASTER_TEMPLATES.map((tmpl) => {
+                        const isSelected = selectedTemplateId === tmpl.id;
+                        return (
+                          <div
+                            key={tmpl.id}
+                            className={`rounded-xl border-2 transition overflow-hidden flex flex-col justify-between ${
+                              isSelected
+                                ? 'border-[#b4823c] bg-neutral-900 shadow-lg ring-1 ring-[#b4823c]/40'
+                                : 'border-neutral-800 bg-neutral-900/70 hover:border-neutral-700'
+                            }`}
+                          >
+                            {/* Card Header with Image Banner & Tag matching screenshot */}
+                            <div
+                              className="h-28 w-full p-3 flex flex-col justify-between text-white relative cursor-pointer"
+                              style={{
+                                background: `linear-gradient(135deg, rgba(9, 13, 22, 0.90) 0%, rgba(17, 24, 39, 0.75) 100%), url(${tmpl.mockupImg}) center/cover no-repeat`
+                              }}
+                              onClick={() => handleSelectMasterTemplate(tmpl.id)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-black/60 uppercase text-amber-300 tracking-wider">
+                                  {tmpl.tag}
+                                </span>
+                                {isSelected && (
+                                  <span className="w-5 h-5 rounded-full bg-[#b4823c] text-white flex items-center justify-center font-bold text-xs shadow">
+                                    <Check size={12} />
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-sm font-serif font-extrabold text-white">
+                                  {tmpl.name}
+                                </p>
+                                <span className="text-[9px] font-mono text-neutral-300">
+                                  {tmpl.badge}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Card Body & Description */}
+                            <div className="p-3 flex-1 flex flex-col justify-between bg-neutral-900/90">
+                              <p className="text-[11px] text-neutral-300 leading-relaxed mb-3">
+                                {tmpl.desc}
+                              </p>
+
+                              {/* Interactive Action Buttons */}
+                              <div className="pt-2 border-t border-neutral-800/80 flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSelectMasterTemplate(tmpl.id)}
+                                    className={`text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                                      isSelected
+                                        ? 'text-amber-400 font-extrabold'
+                                        : 'text-neutral-400 hover:text-white'
+                                    }`}
+                                  >
+                                    <span>{isSelected ? '✓ Aktif Şablon' : 'Bu Şablonu Seç'}</span>
+                                  </button>
+                                  <span className="text-[10px] text-neutral-500 font-mono">Baskı & Web</span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-1.5 pt-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleApplyMasterTemplateToPage(tmpl.id)}
+                                    className="px-2 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-300 hover:text-amber-200 text-[10px] font-bold text-center transition cursor-pointer"
+                                    title="Seçili sayfaya bu şablonun mizanpajını uygular"
+                                  >
+                                    Sayfaya Uygula
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleApplyMasterTemplateToAllPages(tmpl.id)}
+                                    className="px-2 py-1.5 rounded-lg bg-[#b4823c]/20 hover:bg-[#b4823c]/30 text-amber-300 hover:text-amber-100 text-[10px] font-bold text-center border border-[#b4823c]/40 transition cursor-pointer"
+                                    title="Tüm kataloğu bu şablonun tam sayfa setine dönüştürür"
+                                  >
+                                    Tüm Kataloğu Kur
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* VIEW 2: TEKİL SAYFA MİZANPAJLARI (PRESET LAYOUTS) */}
+                {templateSubTab === 'layouts' && (
+                  <div className="space-y-2.5">
+                    <p className="text-[11px] text-neutral-400">
+                      Aktif sayfaya eklemek istediğiniz mizanpaj bloğunu seçin:
+                    </p>
+                    {PRESET_TEMPLATES.map((tmpl) => (
+                      <button
+                        key={tmpl.id}
+                        type="button"
+                        onClick={() => handleApplyPresetTemplate(tmpl)}
+                        className="w-full p-3 rounded-xl border border-neutral-800 bg-neutral-900/80 hover:bg-neutral-800/90 hover:border-amber-400/60 text-left transition group cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white group-hover:text-amber-300">
+                            {tmpl.name}
+                          </span>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-amber-400">
+                            {tmpl.badge}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-neutral-400 mt-1 leading-relaxed">
+                          {tmpl.desc}
+                        </p>
+                        <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-amber-400 opacity-0 group-hover:opacity-100 transition">
+                          <span>Sayfaya Uygula</span>
+                          <ChevronRight size={12} />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

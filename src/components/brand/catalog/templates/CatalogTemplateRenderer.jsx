@@ -100,15 +100,19 @@ export default function CatalogTemplateRenderer({
 
     switch (template) {
       case 'spec-sheet':
+      case 'nordic':
         return <ArchitecturalSpecSheetTemplate {...props} />;
       case 'showroom':
         return <ShowroomCollectionTemplate {...props} />;
       case 'global-export':
         return <GlobalExportTemplate {...props} />;
       case 'lidya':
+      case 'outdoor':
         return <LidyaTechnicTemplate {...props} />;
       case 'deco':
+      case 'artisan':
         return <DecoExclusiveTemplate {...props} />;
+      case 'verona':
       case 'milano':
       default:
         return <MilanoLookbookTemplate {...props} />;

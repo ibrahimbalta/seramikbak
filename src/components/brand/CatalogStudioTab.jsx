@@ -48,7 +48,7 @@ import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
 import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
 
-const TEMPLATES = [
+export const TEMPLATES = [
   {
     id: 'milano',
     name: 'Milano Lookbook',
@@ -107,6 +107,46 @@ const TEMPLATES = [
     accent: '#2563eb',
     icon: Globe,
     tag: 'Global İhracat',
+    mockupImg: '/renders/luxury_bathroom_natural_oak.jpg'
+  },
+  {
+    id: 'verona',
+    name: 'Verona Natural Stone & Marble',
+    badge: 'Bookmatch & Damar Eşleme',
+    desc: 'İtalyan Verona ocakları kalitesinde lüks doğal taş lookbook: Simetrik bookmatch kelebek damar takibi, altın parıltılı lüks iç mekanlar, honlu/cilalı yüzey karşılaştırmaları.',
+    accent: '#c59b27',
+    icon: Sparkles,
+    tag: 'İtalyan Mermer & Rezidans',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg'
+  },
+  {
+    id: 'nordic',
+    name: 'Nordic Concrete & Industrial Loft',
+    badge: 'Çimento & Terrazzo Monograf',
+    desc: 'Modern endüstriyel mimari için minimalist brüt beton serisi: Geniş antrasit/gri spektrumlar, çimento ve mikro-terrazzo dokuları ile çağdaş kentsel mekan tasarım rehberi.',
+    accent: '#475569',
+    icon: Layers,
+    tag: 'Brüt Beton & Loft Mimari',
+    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg'
+  },
+  {
+    id: 'artisan',
+    name: 'Artisan Boutique & Mediterranean Zellige',
+    badge: 'Rölyef & Parlak Sır Koleksiyonu',
+    desc: 'Geleneksel Akdeniz zellige ve butik seramik sanatı: Parlak dalgalı sırlar, canlı kobalt & adaçayı tonları, balıksırtı/altıgen dizilimler ve otel/kafe butik mizanpajı.',
+    accent: '#0d9488',
+    icon: Palette,
+    tag: 'Akdeniz Çini & Butik Karo',
+    mockupImg: '/renders/modern_living_natural_oak.jpg'
+  },
+  {
+    id: 'outdoor',
+    name: 'Outdoor 20mm & Landscape Architecture',
+    badge: 'R11-C Kaymazlık & Kuru Montaj',
+    desc: 'Bahçe, teras, havuz kenarları için 20 mm ekstra mukavemetli porselen plaka şartnamesi: Yükseltilmiş döşeme ayakları, çim/çakıl üzeri kuru montaj şeması ve don dayanımı.',
+    accent: '#15803d',
+    icon: Building,
+    tag: '2 cm Kalın Dış Mekan & Teras',
     mockupImg: '/renders/luxury_bathroom_natural_oak.jpg'
   }
 ];
@@ -1724,6 +1764,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               initialPages={formData.customCanvasPages}
               brandProducts={availableProducts}
               brandInfo={brandInfo}
+              currentTemplateId={formData.template}
+              onSelectTemplate={(tmplId) => setFormData((prev) => ({ ...prev, template: tmplId }))}
               onChangePages={(updatedPages) =>
                 setFormData((prev) => ({ ...prev, customCanvasPages: updatedPages }))
               }
