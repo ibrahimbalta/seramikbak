@@ -1088,8 +1088,18 @@ export default function CatalogVisualCanvasEditor({
   onSaveDraft,
   onPublish
 }) {
+  const isInternalUpdateRef = useRef(false);
+
   const [pages, setPages] = useState(() => {
-    if (Array.isArray(initialPages) && initialPages.length > 0) return initialPages;
+    if (Array.isArray(initialPages) && initialPages.length > 0) {
+      return initialPages
+        .filter(Boolean)
+        .map((p, pIdx) => ({
+          ...p,
+          id: p?.id || `page-${pIdx + 1}`,
+          elements: Array.isArray(p?.elements) ? p.elements.filter(Boolean) : []
+        }));
+    }
     return DEFAULT_PAGES;
   });
 
@@ -1128,6 +1138,25 @@ export default function CatalogVisualCanvasEditor({
     }
   }, [currentTemplateId]);
 
+  // Sync external initialPages if changed externally
+  useEffect(() => {
+    if (isInternalUpdateRef.current) {
+      isInternalUpdateRef.current = false;
+      return;
+    }
+    if (Array.isArray(initialPages) && initialPages.length > 0) {
+      setPages(
+        initialPages
+          .filter(Boolean)
+          .map((p, pIdx) => ({
+            ...p,
+            id: p?.id || `page-${pIdx + 1}`,
+            elements: Array.isArray(p?.elements) ? p.elements.filter(Boolean) : []
+          }))
+      );
+    }
+  }, [initialPages]);
+
   const [history, setHistory] = useState([]);
   const [future, setFuture] = useState([]);
 
@@ -1135,10 +1164,11 @@ export default function CatalogVisualCanvasEditor({
   const dragInfoRef = useRef(null);
 
   const currentPage = pages[activePageIdx] || pages[0] || { elements: [] };
-  const selectedEl = currentPage?.elements?.find((e) => e.id === selectedElId) || null;
+  const selectedEl = (currentPage?.elements || []).find((e) => e && e.id === selectedElId) || null;
 
   // Sync back to parent
   useEffect(() => {
+    isInternalUpdateRef.current = true;
     if (onChangePages) {
       onChangePages(pages);
     }
@@ -1167,7 +1197,32 @@ export default function CatalogVisualCanvasEditor({
     setPages(next);
   };
 
-  // Add element
+  // Atomic batch add elements (crash-proof)
+  const addMultipleElements = (newEls) => {
+    if (!Array.isArray(newEls) || newEls.length === 0) return;
+    const cleanEls = newEls.filter(Boolean);
+    if (cleanEls.length === 0) return;
+
+    setPages((prevPages) => {
+      const updated = prevPages.map((p, idx) => {
+        if (idx !== activePageIdx) return p;
+        const currentElements = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+        return {
+          ...p,
+          elements: [...currentElements, ...cleanEls]
+        };
+      });
+      setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
+      setFuture([]);
+      return updated;
+    });
+
+    if (cleanEls[0]?.id) {
+      setSelectedElId(cleanEls[0].id);
+    }
+  };
+
+  // Add single element
   const addElement = (type, extra = {}) => {
     const defaultW = type === 'text' ? 360 : type === 'line' ? 240 : type === 'qr' ? 140 : 260;
     const defaultH = type === 'text' ? 50 : type === 'line' ? 3 : type === 'qr' ? 140 : 200;
@@ -1196,35 +1251,41 @@ export default function CatalogVisualCanvasEditor({
       ...extra
     };
 
-    const updated = pages.map((p, idx) =>
-      idx === activePageIdx ? { ...p, elements: [...(p.elements || []), newEl] } : p
-    );
-    pushHistory(updated);
-    setSelectedElId(newEl.id);
+    addMultipleElements([newEl]);
   };
 
   const updateSelectedElement = (patch) => {
     if (!selectedElId) return;
-    const updated = pages.map((p, idx) => {
-      if (idx !== activePageIdx) return p;
-      return {
-        ...p,
-        elements: p.elements.map((el) => (el.id === selectedElId ? { ...el, ...patch } : el))
-      };
+    setPages((prevPages) => {
+      const updated = prevPages.map((p, idx) => {
+        if (idx !== activePageIdx) return p;
+        const currentElements = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+        return {
+          ...p,
+          elements: currentElements.map((el) => (el && el.id === selectedElId ? { ...el, ...patch } : el))
+        };
+      });
+      setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
+      setFuture([]);
+      return updated;
     });
-    pushHistory(updated);
   };
 
   const deleteSelectedElement = () => {
     if (!selectedElId) return;
-    const updated = pages.map((p, idx) => {
-      if (idx !== activePageIdx) return p;
-      return {
-        ...p,
-        elements: p.elements.filter((el) => el.id !== selectedElId)
-      };
+    setPages((prevPages) => {
+      const updated = prevPages.map((p, idx) => {
+        if (idx !== activePageIdx) return p;
+        const currentElements = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+        return {
+          ...p,
+          elements: currentElements.filter((el) => el && el.id !== selectedElId)
+        };
+      });
+      setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
+      setFuture([]);
+      return updated;
     });
-    pushHistory(updated);
     setSelectedElId(null);
   };
 
@@ -1250,17 +1311,23 @@ export default function CatalogVisualCanvasEditor({
 
   const changeLayerOrder = (direction) => {
     if (!selectedElId) return;
-    const els = [...currentPage.elements];
-    const idx = els.findIndex((e) => e.id === selectedElId);
-    if (idx === -1) return;
-    const targetIdx = idx + direction;
-    if (targetIdx < 0 || targetIdx >= els.length) return;
-    const temp = els[idx];
-    els[idx] = els[targetIdx];
-    els[targetIdx] = temp;
+    setPages((prevPages) => {
+      const p = prevPages[activePageIdx];
+      if (!p || !Array.isArray(p.elements)) return prevPages;
+      const els = [...p.elements.filter(Boolean)];
+      const idx = els.findIndex((e) => e && e.id === selectedElId);
+      if (idx === -1) return prevPages;
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= els.length) return prevPages;
+      const temp = els[idx];
+      els[idx] = els[targetIdx];
+      els[targetIdx] = temp;
 
-    const updated = pages.map((p, i) => (i === activePageIdx ? { ...p, elements: els } : p));
-    pushHistory(updated);
+      const updated = prevPages.map((page, i) => (i === activePageIdx ? { ...page, elements: els } : page));
+      setHistory((prevHist) => [...prevHist.slice(-19), prevPages]);
+      setFuture([]);
+      return updated;
+    });
   };
 
   // Add Page with optional preset
@@ -1456,65 +1523,93 @@ export default function CatalogVisualCanvasEditor({
     setAutoSaveStatus(`Tüm katalog "${tmplObj.name}" şablonuna dönüştürüldü`);
   };
 
-  // Insert real brand product onto canvas
+  // Insert real brand product onto canvas (ATOMIC & CRASH-PROOF)
   const handleInsertProduct = (prod, mode = 'card') => {
+    if (!prod) return;
     const prodImg = prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
-    const mainText = `${prod.name}\n${prod.width || 60}×${prod.height || 120} cm • ${prod.finish || 'Parlak'}`;
+    const mainText = `${prod.name || 'Seramik Karo'}\n${prod.width || 60}×${prod.height || 120} cm • ${prod.finish || 'Parlak'}`;
     const skuText = `SKU: ${prod.sku || prod.code || 'BN-5501'}`;
+    const ts = Date.now();
 
     if (mode === 'slab') {
       // Large slab layout
-      addElement('image', {
-        src: prodImg,
-        x: 175,
-        y: 100,
-        width: 245,
-        height: 560
-      });
-      setTimeout(() => {
-        addElement('text', {
-          content: `${prod.name}\n${prod.width || 120}×${prod.height || 280} cm DEV PLAKA`,
+      addMultipleElements([
+        {
+          id: `el-slab-img-${ts}`,
+          type: 'image',
+          src: prodImg,
+          x: 175,
+          y: 90,
+          width: 245,
+          height: 560,
+          objectFit: 'cover',
+          borderRadius: 0,
+          locked: false,
+          hidden: false
+        },
+        {
+          id: `el-slab-txt-${ts}`,
+          type: 'text',
+          content: `${prod.name || 'DEV PLAKA'}\n${prod.width || 120}×${prod.height || 280} cm DEV PLAKA`,
           x: 50,
-          y: 690,
+          y: 680,
           width: 495,
           height: 60,
           fontSize: 18,
           fontWeight: '800',
-          align: 'center'
-        });
-      }, 50);
+          color: '#0f172a',
+          align: 'center',
+          locked: false,
+          hidden: false
+        }
+      ]);
     } else {
       // Standard product card
-      addElement('image', {
-        src: prodImg,
-        x: 50,
-        y: 120,
-        width: 495,
-        height: 380
-      });
-      setTimeout(() => {
-        addElement('text', {
+      addMultipleElements([
+        {
+          id: `el-card-img-${ts}`,
+          type: 'image',
+          src: prodImg,
+          x: 50,
+          y: 110,
+          width: 495,
+          height: 380,
+          objectFit: 'cover',
+          borderRadius: 0,
+          locked: false,
+          hidden: false
+        },
+        {
+          id: `el-card-title-${ts}`,
+          type: 'text',
           content: mainText,
           x: 50,
-          y: 520,
-          width: 350,
+          y: 510,
+          width: 340,
           height: 60,
           fontSize: 18,
           fontWeight: '800',
-          color: '#0f172a'
-        });
-        addElement('text', {
+          color: '#0f172a',
+          align: 'left',
+          locked: false,
+          hidden: false
+        },
+        {
+          id: `el-card-sku-${ts}`,
+          type: 'text',
           content: skuText,
-          x: 420,
-          y: 525,
-          width: 125,
+          x: 400,
+          y: 515,
+          width: 145,
           height: 30,
           fontSize: 12,
           fontWeight: '700',
           color: '#b4823c',
-          align: 'right'
-        });
-      }, 50);
+          align: 'right',
+          locked: false,
+          hidden: false
+        }
+      ]);
     }
   };
 
@@ -1587,16 +1682,17 @@ export default function CatalogVisualCanvasEditor({
     dragInfoRef.current = { id: el.id, mode, corner, startX, startY, origX, origY, origW, origH };
 
     const handleMouseMove = (moveEvent) => {
-      if (!dragInfoRef.current) return;
-      const dx = (moveEvent.clientX - dragInfoRef.current.startX) / zoomLevel;
-      const dy = (moveEvent.clientY - dragInfoRef.current.startY) / zoomLevel;
+      const currentDrag = dragInfoRef.current;
+      if (!currentDrag) return;
+      const dx = (moveEvent.clientX - currentDrag.startX) / zoomLevel;
+      const dy = (moveEvent.clientY - currentDrag.startY) / zoomLevel;
 
       const snap = (val) => (showGrid ? Math.round(val / 5) * 5 : Math.round(val));
 
       // Calculate Snap Lines (Center horizontal & vertical)
-      if (dragInfoRef.current.mode === 'move' && showSmartGuides) {
-        const currentCenterX = dragInfoRef.current.origX + dx + dragInfoRef.current.origW / 2;
-        const currentCenterY = dragInfoRef.current.origY + dy + dragInfoRef.current.origH / 2;
+      if (currentDrag.mode === 'move' && showSmartGuides) {
+        const currentCenterX = currentDrag.origX + dx + currentDrag.origW / 2;
+        const currentCenterY = currentDrag.origY + dy + currentDrag.origH / 2;
         const pageCenterX = canvasWidth / 2;
         const pageCenterY = canvasHeight / 2;
 
@@ -1616,39 +1712,40 @@ export default function CatalogVisualCanvasEditor({
       setPages((prevPages) =>
         prevPages.map((p, pIdx) => {
           if (pIdx !== activePageIdx) return p;
+          if (!p || !Array.isArray(p.elements)) return p;
           return {
             ...p,
             elements: p.elements.map((item) => {
-              if (item.id !== dragInfoRef.current.id) return item;
-              if (dragInfoRef.current.mode === 'move') {
+              if (!item || !currentDrag || item.id !== currentDrag.id) return item;
+              if (currentDrag.mode === 'move') {
                 return {
                   ...item,
-                  x: Math.max(0, Math.min(canvasWidth - item.width, snap(dragInfoRef.current.origX + dx))),
-                  y: Math.max(0, Math.min(canvasHeight - item.height, snap(dragInfoRef.current.origY + dy)))
+                  x: Math.max(0, Math.min(canvasWidth - (item.width || 50), snap(currentDrag.origX + dx))),
+                  y: Math.max(0, Math.min(canvasHeight - (item.height || 50), snap(currentDrag.origY + dy)))
                 };
-              } else if (dragInfoRef.current.mode === 'resize') {
-                const c = dragInfoRef.current.corner;
+              } else if (currentDrag.mode === 'resize') {
+                const c = currentDrag.corner;
                 let newX = item.x;
                 let newY = item.y;
                 let newW = item.width;
                 let newH = item.height;
 
                 if (c === 'se') {
-                  newW = Math.max(20, snap(dragInfoRef.current.origW + dx));
-                  newH = Math.max(4, snap(dragInfoRef.current.origH + dy));
+                  newW = Math.max(20, snap(currentDrag.origW + dx));
+                  newH = Math.max(4, snap(currentDrag.origH + dy));
                 } else if (c === 'sw') {
-                  newW = Math.max(20, snap(dragInfoRef.current.origW - dx));
-                  newX = snap(dragInfoRef.current.origX + dx);
-                  newH = Math.max(4, snap(dragInfoRef.current.origH + dy));
+                  newW = Math.max(20, snap(currentDrag.origW - dx));
+                  newX = snap(currentDrag.origX + dx);
+                  newH = Math.max(4, snap(currentDrag.origH + dy));
                 } else if (c === 'ne') {
-                  newW = Math.max(20, snap(dragInfoRef.current.origW + dx));
-                  newH = Math.max(4, snap(dragInfoRef.current.origH - dy));
-                  newY = snap(dragInfoRef.current.origY + dy);
+                  newW = Math.max(20, snap(currentDrag.origW + dx));
+                  newH = Math.max(4, snap(currentDrag.origH - dy));
+                  newY = snap(currentDrag.origY + dy);
                 } else if (c === 'nw') {
-                  newW = Math.max(20, snap(dragInfoRef.current.origW - dx));
-                  newH = Math.max(4, snap(dragInfoRef.current.origH - dy));
-                  newX = snap(dragInfoRef.current.origX + dx);
-                  newY = snap(dragInfoRef.current.origY + dy);
+                  newW = Math.max(20, snap(currentDrag.origW - dx));
+                  newH = Math.max(4, snap(currentDrag.origH - dy));
+                  newX = snap(currentDrag.origX + dx);
+                  newY = snap(currentDrag.origY + dy);
                 }
 
                 return { ...item, x: newX, y: newY, width: newW, height: newH };
@@ -2485,7 +2582,8 @@ export default function CatalogVisualCanvasEditor({
                 </div>
 
                 <div className="space-y-1.5">
-                  {[...(currentPage.elements || [])].reverse().map((el, revIdx) => {
+                  {[...(currentPage.elements || [])].filter(Boolean).reverse().map((el, revIdx) => {
+                    if (!el || !el.id) return null;
                     const isSelected = el.id === selectedElId;
                     return (
                       <div
@@ -2598,8 +2696,8 @@ export default function CatalogVisualCanvasEditor({
               )}
 
               {/* Elements on Canvas */}
-              {currentPage?.elements?.map((el) => {
-                if (el.hidden) return null;
+              {currentPage?.elements?.filter(Boolean).map((el) => {
+                if (!el || !el.id || el.hidden) return null;
                 const isSelected = el.id === selectedElId;
 
                 return (
@@ -3149,8 +3247,8 @@ export default function CatalogVisualCanvasEditor({
               }}
               className="relative shadow-2xl rounded-sm overflow-hidden border border-neutral-700"
             >
-              {pages[previewPageIdx]?.elements?.map((el) => {
-                if (el.hidden) return null;
+              {pages[previewPageIdx]?.elements?.filter(Boolean).map((el) => {
+                if (!el || !el.id || el.hidden) return null;
                 const scale = 0.9;
                 return (
                   <div
