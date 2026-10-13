@@ -193,14 +193,20 @@ export default function CatalogVisibilityGraphicEditor({
   return (
     <div className="space-y-6">
       {/* Step 5 Main Header */}
-      <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-stone-50 via-amber-50/20 to-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
-            <Sliders size={20} className="text-[#b4823c]" />
-            <span>5. Sayfa Tipleri, Görünürlük & Grafik Müdahale Stüdyosu</span>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/10 text-[#b4823c] font-mono text-[10px] font-bold uppercase tracking-wider">
+              ADIM 5 / 6
+            </span>
+            <span className="text-xs font-mono text-neutral-400">• Yayın Denetimi</span>
+          </div>
+          <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-1 flex items-center gap-2">
+            <Sliders size={18} className="text-[#b4823c]" />
+            <span>Sayfa Tipleri, Görünürlük & Grafik Müdahale Stüdyosu</span>
           </h3>
-          <p className="text-xs text-neutral-500 mt-1">
-            Kataloğunuzda yer alacak sayfaları seçin, yanlış gelen ürün bilgilerini ve yerleşimleri grafik tasarım aracı gibi doğrudan düzeltin.
+          <p className="text-xs text-neutral-500 mt-0.5">
+            Kataloğunuzda yer alacak sayfa modüllerini açıp kapatın; ürün verilerini ve tipografiyi doğrudan canlı düzenleyin.
           </p>
         </div>
 
@@ -208,7 +214,7 @@ export default function CatalogVisibilityGraphicEditor({
           <button
             type="button"
             onClick={onOpenCanvasStudio}
-            className="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-2 flex-shrink-0 shadow-xs cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-2 flex-shrink-0 shadow-xs hover:shadow-md transition cursor-pointer"
           >
             <Wand2 size={14} className="text-amber-400" />
             <span>Gelişmiş Studio (Tuval) ile Aç</span>
@@ -216,7 +222,7 @@ export default function CatalogVisibilityGraphicEditor({
         )}
       </div>
 
-      {/* 8 Primary Section Cards Grid (Matching user's layout + direct inline editing) */}
+      {/* 8 Primary Section Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {SECTIONS.map((sec) => {
           const isEnabled = Boolean(formData[sec.key]);
@@ -226,63 +232,80 @@ export default function CatalogVisibilityGraphicEditor({
           return (
             <div
               key={sec.id}
-              onClick={() => {
-                setActiveSectionId(sec.id);
-              }}
-              className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+              onClick={() => setActiveSectionId(sec.id)}
+              className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between group ${
                 isSelectedForEdit
-                  ? 'border-[#b4823c] bg-amber-50/40 ring-2 ring-[#b4823c]/20 shadow-sm'
+                  ? 'border-[#b4823c] bg-gradient-to-br from-amber-50/50 to-orange-50/20 ring-2 ring-[#b4823c]/20 shadow-sm'
                   : isEnabled
-                  ? 'border-neutral-300/80 bg-white hover:border-[#b4823c]/60'
-                  : 'border-neutral-200 bg-neutral-50/60 opacity-70'
+                  ? 'border-neutral-200 bg-white hover:border-[#b4823c]/50 hover:shadow-2xs'
+                  : 'border-neutral-200/60 bg-neutral-50/50 opacity-65 hover:opacity-90'
               }`}
             >
-              <div className="flex items-start justify-between gap-2.5">
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={isEnabled}
-                    onChange={(e) => {
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3.5">
+                  <div
+                    onClick={(e) => {
                       e.stopPropagation();
-                      setFormData({ ...formData, [sec.key]: e.target.checked });
+                      setFormData({ ...formData, [sec.key]: !isEnabled });
                     }}
-                    className="mt-1 w-4 h-4 accent-[#b4823c] rounded cursor-pointer"
-                  />
+                    className={`mt-0.5 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-colors cursor-pointer ${
+                      isEnabled
+                        ? 'border-[#b4823c] bg-[#b4823c] text-white'
+                        : 'border-neutral-300 bg-white hover:border-neutral-400'
+                    }`}
+                  >
+                    {isEnabled && <Check size={12} strokeWidth={3} />}
+                  </div>
+
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs font-extrabold text-neutral-900">{sec.title}</p>
+                      <p className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
+                        {sec.title}
+                      </p>
                       <span
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                          isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-600'
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                          isEnabled
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                            : 'bg-neutral-100 text-neutral-500'
                         }`}
                       >
-                        {isEnabled ? 'Aktif' : 'Gizli'}
+                        {isEnabled ? 'Aktif Modül' : 'Gizli'}
                       </span>
                     </div>
-                    <p className="text-[11px] text-neutral-500 mt-0.5 leading-relaxed">{sec.desc}</p>
+                    <p className="text-[11px] text-neutral-500 mt-1 leading-relaxed">{sec.desc}</p>
                   </div>
                 </div>
 
-                <SecIcon size={16} className={isSelectedForEdit ? 'text-[#b4823c]' : 'text-neutral-400'} />
+                <div
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                    isSelectedForEdit
+                      ? 'bg-[#b4823c] text-white shadow-2xs'
+                      : isEnabled
+                      ? 'bg-amber-50 text-[#b4823c]'
+                      : 'bg-neutral-100 text-neutral-400'
+                  }`}
+                >
+                  <SecIcon size={15} />
+                </div>
               </div>
 
-              {/* Bottom Quick Action / Status Bar of the Card */}
-              <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px]">
-                <span className="text-neutral-400 font-mono text-[10px]">{sec.badge}</span>
+              {/* Bottom Quick Action / Status Bar */}
+              <div className="mt-3.5 pt-2.5 border-t border-neutral-100 flex items-center justify-between text-[11px]">
+                <span className="text-neutral-400 font-mono text-[10px] tracking-wide">{sec.badge}</span>
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setActiveSectionId(sec.id);
                   }}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
                     isSelectedForEdit
-                      ? 'bg-[#b4823c] text-white shadow-2xs'
+                      ? 'bg-[#b4823c] text-white shadow-xs'
                       : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
                   }`}
                 >
-                  <Edit3 size={11} />
-                  <span>{isSelectedForEdit ? 'Düzenleniyor' : 'Grafik & Bilgi Düzenle'}</span>
+                  <Edit3 size={12} />
+                  <span>{isSelectedForEdit ? 'Denetçi Açık' : 'Grafik & Bilgi Düzenle'}</span>
                 </button>
               </div>
             </div>
@@ -293,36 +316,36 @@ export default function CatalogVisibilityGraphicEditor({
       {/* ========================================================================= */}
       {/* DEDICATED GRAPHIC & DATA INSPECTOR STUDIO (CANLI MÜDAHALE ALANI)          */}
       {/* ========================================================================= */}
-      <div className="bg-white rounded-2xl border-2 border-neutral-800/10 shadow-md overflow-hidden mt-6">
+      <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm overflow-hidden mt-6">
         {/* Inspector Header */}
-        <div className="bg-neutral-900 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-amber-500 text-neutral-950 flex items-center justify-center font-bold">
-              <Sparkles size={15} />
+        <div className="bg-gradient-to-r from-neutral-950 via-neutral-900 to-stone-900 text-white px-5 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-[#b4823c] text-neutral-950 flex items-center justify-center font-bold shadow-md">
+              <Sparkles size={16} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono tracking-widest uppercase text-amber-400">
-                  GRAFİK & YERLEŞİM DENETÇİSİ
+                <span className="text-[10px] font-mono tracking-widest uppercase text-amber-400 font-bold">
+                  CANLI MÜDAHALE & GRAFİK DENETÇİSİ
                 </span>
-                <span className="text-[10px] text-neutral-400">• Canlı Düzenleme</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               </div>
               <h4 className="text-sm font-extrabold text-white">
-                {SECTIONS.find((s) => s.id === activeSectionId)?.title} Alanı Düzenleniyor
+                {SECTIONS.find((s) => s.id === activeSectionId)?.title} Bölümü Düzenleniyor
               </h4>
             </div>
           </div>
 
           {/* Quick Section Tab Switcher in Inspector */}
-          <div className="flex items-center gap-1 overflow-x-auto max-w-full">
+          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full p-1 bg-white/5 rounded-xl border border-white/10">
             {SECTIONS.map((sec) => (
               <button
                 key={sec.id}
                 type="button"
                 onClick={() => setActiveSectionId(sec.id)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                   activeSectionId === sec.id
-                    ? 'bg-[#b4823c] text-white'
+                    ? 'bg-[#b4823c] text-white shadow-xs'
                     : 'text-neutral-400 hover:text-white hover:bg-white/10'
                 }`}
               >

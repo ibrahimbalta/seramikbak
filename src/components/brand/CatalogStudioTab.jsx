@@ -883,12 +883,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   };
 
   const STEPS = [
-    { num: 1, label: 'Katalog Bilgileri', desc: 'Başlık, kapak & dil' },
-    { num: 2, label: `Ürün Seçimi (${formData.selectedItems.length})`, desc: 'Koleksiyon karoları' },
-    { num: 3, label: 'Şablon Seçimi', desc: 'Profesyonel presetler' },
-    { num: 4, label: 'Kurumsal Kimlik', desc: 'Logo & renkler' },
-    { num: 5, label: 'Görünürlük', desc: 'Fiyat, QR & sayfalar' },
-    { num: 6, label: 'Önizleme & Yayın', desc: 'PDF ve Web yayını' }
+    { num: 1, label: 'Katalog Bilgileri', desc: 'Başlık, kapak & dil', icon: FileText },
+    { num: 2, label: `Ürün Seçimi (${formData.selectedItems.length})`, desc: 'Koleksiyon karoları', icon: Layers },
+    { num: 3, label: 'Şablon Mimarisi', desc: 'Editoryal mizanpajlar', icon: LayoutTemplate },
+    { num: 4, label: 'Kurumsal Kimlik', desc: 'Logo, renk & iletişim', icon: Palette },
+    { num: 5, label: 'Görünürlük & Grafik', desc: 'Sayfa tipleri & modüller', icon: Sliders },
+    { num: 6, label: 'Önizleme & Yayın', desc: 'Baskı PDF & Web', icon: Sparkles }
   ];
 
   // Aggregate KPI totals
@@ -1833,46 +1833,69 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
           ) : (
             /* ==================== MODE B: KOLAY MOD (6 ADIMLI SİHİRBAZ) ==================== */
             <>
-              {/* Stepper Navigation */}
-              <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-3 sm:p-4">
-                <div className="hidden lg:grid grid-cols-6 gap-2">
+              {/* High-End Stepper Navigation */}
+              <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-3.5 sm:p-4.5">
+                {/* Stepper Progress Bar Header */}
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-100 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="font-mono text-[11px] font-extrabold uppercase tracking-wider text-neutral-500">
+                      Adım {activeStep} / 6 • {STEPS[activeStep - 1]?.label}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold text-neutral-400">İlerleme:</span>
+                    <div className="w-28 h-2 rounded-full bg-neutral-100 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-[#b4823c] transition-all duration-300"
+                        style={{ width: `${Math.round((activeStep / 6) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-[11px] font-mono font-bold text-neutral-700">
+                      %{Math.round((activeStep / 6) * 100)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="hidden lg:grid grid-cols-6 gap-2.5">
                   {STEPS.map((step) => {
                     const isActive = activeStep === step.num;
                     const isPassed = activeStep > step.num;
+                    const StepIcon = step.icon || FileText;
 
                     return (
                       <button
                         key={step.num}
                         type="button"
                         onClick={() => setActiveStep(step.num)}
-                        className={`p-2.5 rounded-xl text-left border transition flex items-center gap-2.5 cursor-pointer ${
+                        className={`group relative p-3 rounded-xl text-left border transition-all duration-200 flex items-center gap-3 cursor-pointer ${
                           isActive
-                            ? 'border-[#b4823c] bg-amber-50/50 shadow-2xs ring-2 ring-[#b4823c]/20'
+                            ? 'border-amber-500/80 bg-gradient-to-br from-amber-50/70 to-orange-50/40 shadow-sm ring-2 ring-amber-500/20'
                             : isPassed
-                            ? 'border-emerald-200 bg-emerald-50/40 text-emerald-900'
-                            : 'border-neutral-200 bg-neutral-50/40 text-neutral-500 hover:bg-neutral-100'
+                            ? 'border-emerald-200 bg-emerald-50/30 text-emerald-950 hover:bg-emerald-50/60'
+                            : 'border-neutral-200/80 bg-neutral-50/40 text-neutral-500 hover:bg-neutral-100 hover:border-neutral-300'
                         }`}
                       >
-                        <span
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                        <div
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 transition-transform group-hover:scale-105 shadow-2xs ${
                             isActive
-                              ? 'bg-[#b4823c] text-white'
+                              ? 'bg-gradient-to-br from-[#b4823c] to-amber-600 text-white shadow-amber-500/20'
                               : isPassed
                               ? 'bg-emerald-600 text-white'
-                              : 'bg-neutral-200 text-neutral-600'
+                              : 'bg-white border border-neutral-200 text-neutral-400'
                           }`}
                         >
-                          {isPassed ? <Check size={13} /> : step.num}
-                        </span>
-                        <div className="overflow-hidden">
+                          {isPassed ? <Check size={14} strokeWidth={2.5} /> : <StepIcon size={14} />}
+                        </div>
+                        <div className="overflow-hidden min-w-0">
                           <p
-                            className={`text-xs font-bold truncate ${
-                              isActive ? 'text-neutral-900' : isPassed ? 'text-emerald-950' : 'text-neutral-700'
+                            className={`text-xs font-extrabold truncate ${
+                              isActive ? 'text-neutral-900' : isPassed ? 'text-emerald-900' : 'text-neutral-700'
                             }`}
                           >
-                            {step.label}
+                            {step.num}. {step.label}
                           </p>
-                          <p className="text-[10px] text-neutral-400 truncate">{step.desc}</p>
+                          <p className="text-[10px] text-neutral-400 truncate mt-0.5">{step.desc}</p>
                         </div>
                       </button>
                     );
@@ -1880,21 +1903,30 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 </div>
 
                 {/* Mobile Stepper */}
-                <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto pb-1">
-                  {STEPS.map((step) => (
-                    <button
-                      key={step.num}
-                      type="button"
-                      onClick={() => setActiveStep(step.num)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
-                        activeStep === step.num
-                          ? 'bg-[#b4823c] text-white'
-                          : 'bg-neutral-100 text-neutral-600'
-                      }`}
-                    >
-                      {step.num}. {step.label}
-                    </button>
-                  ))}
+                <div className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                  {STEPS.map((step) => {
+                    const isActive = activeStep === step.num;
+                    const isPassed = activeStep > step.num;
+                    const StepIcon = step.icon || FileText;
+
+                    return (
+                      <button
+                        key={step.num}
+                        type="button"
+                        onClick={() => setActiveStep(step.num)}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+                          isActive
+                            ? 'bg-neutral-900 text-amber-400 shadow-sm'
+                            : isPassed
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-neutral-100 text-neutral-600'
+                        }`}
+                      >
+                        <StepIcon size={12} />
+                        <span>{step.num}. {step.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1902,154 +1934,267 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-5 sm:p-8">
                 {/* STEP 1: KATALOG BİLGİLERİ & ÇOK DİLLİ AYARLAR */}
                 {activeStep === 1 && (
-                  <div className="space-y-6 max-w-3xl">
-                    <div className="border-b border-neutral-100 pb-4">
-                      <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
-                        <FileText size={20} className="text-[#b4823c]" />
-                        <span>1. Katalog Temel Bilgileri & Yayın Dili</span>
-                      </h3>
-                      <p className="text-xs text-neutral-500 mt-1">
-                        Kataloğunuzun başlığı, kapak metinleri, dil seçeneği ve ürün senkronizasyon davranışını belirleyin.
-                      </p>
+                  <div className="space-y-6">
+                    {/* Header Banner */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-stone-50 via-amber-50/20 to-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/10 text-[#b4823c] font-mono text-[10px] font-bold uppercase tracking-wider">
+                            ADIM 1 / 6
+                          </span>
+                          <span className="text-xs font-mono text-neutral-400">• Mimari Standart</span>
+                        </div>
+                        <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-1 flex items-center gap-2">
+                          <FileText size={18} className="text-[#b4823c]" />
+                          <span>Katalog Temel Bilgileri & Yayın Dili</span>
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-0.5">
+                          Kataloğunuzun başlığı, kapak metinleri, ölçü oryantasyonu ve hedef pazar dilini belirleyin.
+                        </p>
+                      </div>
+                      <div className="hidden md:flex items-center gap-2 text-xs font-bold text-neutral-600 bg-white px-3 py-2 rounded-xl border border-neutral-200 shadow-2xs">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span>Canlı Önizleme Aktif</span>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1.5 md:col-span-2">
-                        <label className="text-xs font-bold text-neutral-800">Katalog Resmi Adı *</label>
-                        <input
-                          type="text"
-                          value={formData.title}
-                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                          placeholder="Örn: 2026 Genel Katalog"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#b4823c]"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Kapak Ana Başlığı</label>
-                        <input
-                          type="text"
-                          value={formData.coverTitle}
-                          onChange={(e) => setFormData({ ...formData, coverTitle: e.target.value })}
-                          placeholder="SERAMİK KOLEKSİYONU 2026"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#b4823c]"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Kapak Alt Başlığı</label>
-                        <input
-                          type="text"
-                          value={formData.coverSubtitle}
-                          onChange={(e) => setFormData({ ...formData, coverSubtitle: e.target.value })}
-                          placeholder="TECHNICAL & ARCHITECTURAL CATALOG"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#b4823c]"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5 md:col-span-2">
-                        <label className="text-xs font-bold text-neutral-800">Giriş / Koleksiyon Önsöz Metni</label>
-                        <textarea
-                          rows={3}
-                          value={formData.introText}
-                          onChange={(e) => setFormData({ ...formData, introText: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#b4823c]"
-                        />
-                      </div>
-
-                      {/* Orientation */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Sayfa Yönlendirmesi & Ölçü</label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, orientation: 'portrait' })}
-                            className={`p-3 rounded-xl border-2 text-left transition ${
-                              formData.orientation === 'portrait'
-                                ? 'border-[#b4823c] bg-amber-50/40 font-bold'
-                                : 'border-neutral-200 bg-neutral-50'
-                            }`}
-                          >
-                            <p className="text-xs font-bold">A4 Dikey (Portrait)</p>
-                            <p className="text-[10px] text-neutral-400">210 × 297 mm</p>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, orientation: 'landscape' })}
-                            className={`p-3 rounded-xl border-2 text-left transition ${
-                              formData.orientation === 'landscape'
-                                ? 'border-[#b4823c] bg-amber-50/40 font-bold'
-                                : 'border-neutral-200 bg-neutral-50'
-                            }`}
-                          >
-                            <p className="text-xs font-bold">A4 Yatay (Landscape)</p>
-                            <p className="text-[10px] text-neutral-400">297 × 210 mm</p>
-                          </button>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                      {/* Left: Input Form (7 cols) */}
+                      <div className="lg:col-span-7 space-y-4.5">
+                        {/* Title Input */}
+                        <div className="space-y-1.5 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <label className="text-xs font-extrabold text-neutral-800 flex items-center justify-between">
+                            <span>Katalog Resmi Adı *</span>
+                            <span className="text-[10px] font-normal text-neutral-400">Marka panelinde görünür</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            placeholder="Örn: Bien Seramik 2026 Genel Katalog"
+                            className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs sm:text-sm font-semibold text-neutral-900 transition-all outline-none"
+                          />
                         </div>
-                      </div>
 
-                      {/* Multi-Language Support (TR, EN, DE, AR) */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Katalog Yayın Dili</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {[
-                            { code: 'tr', label: '🇹🇷 Türkçe', sub: 'İç Pazar' },
-                            { code: 'en', label: '🇬🇧 English', sub: 'Global Export' },
-                            { code: 'de', label: '🇩🇪 Deutsch', sub: 'Avrupa Pazarı' },
-                            { code: 'ar', label: '🇸🇦 العربية', sub: 'MENA Pazarı' }
-                          ].map((lang) => (
+                        {/* Cover Titles */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-neutral-800 block">Kapak Ana Başlığı</label>
+                            <input
+                              type="text"
+                              value={formData.coverTitle}
+                              onChange={(e) => setFormData({ ...formData, coverTitle: e.target.value })}
+                              placeholder="SERAMİK KOLEKSİYONU 2026"
+                              className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-semibold text-neutral-900 transition-all outline-none"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-extrabold text-neutral-800 block">Kapak Alt Başlığı</label>
+                            <input
+                              type="text"
+                              value={formData.coverSubtitle}
+                              onChange={(e) => setFormData({ ...formData, coverSubtitle: e.target.value })}
+                              placeholder="TECHNICAL & ARCHITECTURAL CATALOG"
+                              className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-semibold text-neutral-900 transition-all outline-none"
+                            />
+                          </div>
+                          <div className="sm:col-span-2 space-y-1.5 pt-1">
+                            <label className="text-xs font-extrabold text-neutral-800 block">Koleksiyon Önsöz / Manifesto Metni</label>
+                            <textarea
+                              rows={3}
+                              value={formData.introText}
+                              onChange={(e) => setFormData({ ...formData, introText: e.target.value })}
+                              placeholder="Yenilikçi yüzey teknolojileri, yüksek dayanımlı porselen gövde ve çağdaş tasarım estetiği..."
+                              className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-800 transition-all outline-none leading-relaxed"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Orientation Selection */}
+                        <div className="space-y-2 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <label className="text-xs font-extrabold text-neutral-800 block">Sayfa Yönlendirmesi & Ölçü Standartı</label>
+                          <div className="grid grid-cols-2 gap-3">
                             <button
-                              key={lang.code}
                               type="button"
-                              onClick={() => setFormData({ ...formData, language: lang.code })}
-                              className={`p-2.5 rounded-xl border-2 text-left transition ${
-                                formData.language === lang.code
-                                  ? 'border-[#b4823c] bg-amber-50/40 font-bold'
-                                  : 'border-neutral-200 bg-neutral-50'
+                              onClick={() => setFormData({ ...formData, orientation: 'portrait' })}
+                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 cursor-pointer ${
+                                formData.orientation === 'portrait'
+                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
+                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
                               }`}
                             >
-                              <p className="text-xs font-bold">{lang.label}</p>
-                              <p className="text-[10px] text-neutral-400">{lang.sub}</p>
+                              <div
+                                className={`w-7 h-9 rounded border-2 flex items-center justify-center text-[9px] font-mono font-bold flex-shrink-0 ${
+                                  formData.orientation === 'portrait'
+                                    ? 'border-[#b4823c] bg-[#b4823c]/10 text-[#b4823c]'
+                                    : 'border-neutral-300 text-neutral-400'
+                                }`}
+                              >
+                                A4
+                              </div>
+                              <div>
+                                <p className="text-xs font-extrabold text-neutral-900">A4 Dikey (Portrait)</p>
+                                <p className="text-[10px] text-neutral-400 font-mono">210 × 297 mm • Standart</p>
+                              </div>
                             </button>
-                          ))}
+
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, orientation: 'landscape' })}
+                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 cursor-pointer ${
+                                formData.orientation === 'landscape'
+                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
+                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                              }`}
+                            >
+                              <div
+                                className={`w-9 h-7 rounded border-2 flex items-center justify-center text-[9px] font-mono font-bold flex-shrink-0 ${
+                                  formData.orientation === 'landscape'
+                                    ? 'border-[#b4823c] bg-[#b4823c]/10 text-[#b4823c]'
+                                    : 'border-neutral-300 text-neutral-400'
+                                }`}
+                              >
+                                A4
+                              </div>
+                              <div>
+                                <p className="text-xs font-extrabold text-neutral-900">A4 Yatay (Landscape)</p>
+                                <p className="text-[10px] text-neutral-400 font-mono">297 × 210 mm • Lookbook</p>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Multi-Language Selection */}
+                        <div className="space-y-2 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <label className="text-xs font-extrabold text-neutral-800 block">Katalog Yayın Dili</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            {[
+                              { code: 'tr', flag: '🇹🇷', label: 'Türkçe', sub: 'İç Pazar' },
+                              { code: 'en', flag: '🇬🇧', label: 'English', sub: 'Global Export' },
+                              { code: 'de', flag: '🇩🇪', label: 'Deutsch', sub: 'DACH Bölgesi' },
+                              { code: 'ar', flag: '🇸🇦', label: 'العربية', sub: 'MENA Pazarı' }
+                            ].map((lang) => {
+                              const isSelected = formData.language === lang.code;
+                              return (
+                                <button
+                                  key={lang.code}
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, language: lang.code })}
+                                  className={`p-2.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${
+                                    isSelected
+                                      ? 'border-[#b4823c] bg-amber-50/50 shadow-2xs'
+                                      : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <span className="text-base">{lang.flag}</span>
+                                    <span className="text-xs font-extrabold text-neutral-900">{lang.label}</span>
+                                  </div>
+                                  <p className="text-[10px] text-neutral-400 truncate">{lang.sub}</p>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Data Sync Mode: Live vs Snapshot */}
+                        <div className="space-y-2 bg-white p-4 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <label className="text-xs font-extrabold text-neutral-800 block">
+                            Akıllı Ürün Güncelleme ve Sürümleme Davranışı
+                          </label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, dataMode: 'live' })}
+                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${
+                                formData.dataMode === 'live'
+                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
+                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <RefreshCw size={13} className="text-[#b4823c]" />
+                                <span className="text-xs font-extrabold text-neutral-900">Canlı Veri Modu (Önerilen)</span>
+                              </div>
+                              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                                Fabrika veritabanındaki ürün resmi veya ebat değiştikçe tasarımı bozmadan senkronize eder.
+                              </p>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, dataMode: 'snapshot' })}
+                              className={`p-3.5 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${
+                                formData.dataMode === 'snapshot'
+                                  ? 'border-[#b4823c] bg-amber-50/40 shadow-xs'
+                                  : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <Archive size={13} className="text-neutral-600" />
+                                <span className="text-xs font-extrabold text-neutral-900">Sabit Sürüm (Arşiv)</span>
+                              </div>
+                              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                                Tasarım o anki verilerle dondurulur; sonraki ürün değişikliklerinden asla etkilenmez.
+                              </p>
+                            </button>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Data Sync Mode: Live vs Snapshot */}
-                      <div className="space-y-1.5 md:col-span-2 pt-2">
-                        <label className="text-xs font-bold text-neutral-800">
-                          Akıllı Ürün Güncelleme ve Sürüm Davranışı
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, dataMode: 'live' })}
-                            className={`p-3.5 rounded-xl border-2 text-left transition ${
-                              formData.dataMode === 'live'
-                                ? 'border-[#b4823c] bg-amber-50/40'
-                                : 'border-neutral-200 bg-neutral-50'
-                            }`}
-                          >
-                            <p className="text-xs font-extrabold text-neutral-900">1. Canlı Veri Modu (Önerilen)</p>
-                            <p className="text-[11px] text-neutral-500 mt-0.5">
-                              Ürün görseli veya ebadı güncellendiğinde sizi bilgilendirir; onayınızla sayfa tasarımını bozmadan günceller.
-                            </p>
-                          </button>
+                      {/* Right: Modern Live Card Preview (5 cols) */}
+                      <div className="lg:col-span-5 sticky top-6 space-y-3">
+                        <div className="flex items-center justify-between text-xs font-bold text-neutral-600 px-1">
+                          <span className="flex items-center gap-1.5">
+                            <Sparkles size={13} className="text-[#b4823c]" />
+                            <span>Kapak Canlı Kartı</span>
+                          </span>
+                          <span className="font-mono text-[10px] text-neutral-400 uppercase">
+                            {formData.orientation === 'landscape' ? '297×210 mm' : '210×297 mm'}
+                          </span>
+                        </div>
 
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, dataMode: 'snapshot' })}
-                            className={`p-3.5 rounded-xl border-2 text-left transition ${
-                              formData.dataMode === 'snapshot'
-                                ? 'border-[#b4823c] bg-amber-50/40'
-                                : 'border-neutral-200 bg-neutral-50'
-                            }`}
-                          >
-                            <p className="text-xs font-extrabold text-neutral-900">2. Sabit Sürüm (Arşiv Korumalı)</p>
-                            <p className="text-[11px] text-neutral-500 mt-0.5">
-                              Yayın anındaki ürün bilgileri ve katalog tasarımı sabitlenir, sonraki ürün değişikliklerinden etkilenmez.
-                            </p>
-                          </button>
+                        {/* Interactive Simulated Book Cover */}
+                        <div className="bg-neutral-950 rounded-2xl p-5 border border-neutral-800 shadow-xl overflow-hidden relative group text-white">
+                          <div
+                            className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700"
+                            style={{
+                              backgroundImage: `url(${CARD_COVERS[0]})`
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-transparent" />
+
+                          <div className="relative z-10 flex flex-col justify-between h-[360px]">
+                            {/* Top Brand Header */}
+                            <div className="flex items-center justify-between text-[10px] font-mono tracking-widest text-neutral-400 uppercase pb-2 border-b border-white/10">
+                              <span>{brandInfo?.name || 'SERAMİKBAK'}</span>
+                              <span className="text-amber-400 font-bold">{formData.language?.toUpperCase() || 'TR'}</span>
+                            </div>
+
+                            {/* Middle Title Display */}
+                            <div className="my-auto text-center px-4 space-y-2">
+                              <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[9px] font-mono tracking-widest uppercase border border-amber-400/30">
+                                2026 ARCHITECTURAL CATALOG
+                              </span>
+                              <h4 className="text-xl sm:text-2xl font-serif font-black tracking-tight text-white uppercase drop-shadow-md">
+                                {formData.coverTitle || formData.title || 'SERAMİK KOLEKSİYONU'}
+                              </h4>
+                              <p className="text-xs text-neutral-300 font-sans tracking-wide">
+                                {formData.coverSubtitle || 'TECHNICAL & ARCHITECTURAL CATALOG'}
+                              </p>
+                            </div>
+
+                            {/* Bottom Card Footer */}
+                            <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-neutral-400 font-mono">
+                              <span>{formData.orientation === 'landscape' ? 'A4 YATAY' : 'A4 DİKEY'}</span>
+                              <span className="text-amber-400/90">• {formData.dataMode === 'live' ? 'CANLI SENKRON' : 'SABİT ARŞİV'}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-[11px] text-neutral-500 flex items-center gap-2">
+                          <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0" />
+                          <span>Bu bilgiler katalog kapağında ve içindekiler sayfasında otomatik biçimlendirilecektir.</span>
                         </div>
                       </div>
                     </div>
@@ -2304,95 +2449,215 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
                 {/* STEP 4: KURUMSAL KİMLİK */}
                 {activeStep === 4 && (
-                  <div className="space-y-6 max-w-3xl">
-                    <div className="border-b border-neutral-100 pb-4">
-                      <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
-                        <Palette size={20} className="text-[#b4823c]" />
-                        <span>4. Kurumsal Kimlik & Marka Bilgileri</span>
-                      </h3>
-                      <p className="text-xs text-neutral-500 mt-1">
-                        Mevcut marka kaydınızdan otomatik alınan logo, renk ve iletişim bilgilerini özelleştirin.
-                      </p>
+                  <div className="space-y-6">
+                    {/* Header Banner */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-stone-50 via-amber-50/20 to-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/10 text-[#b4823c] font-mono text-[10px] font-bold uppercase tracking-wider">
+                            ADIM 4 / 6
+                          </span>
+                          <span className="text-xs font-mono text-neutral-400">• Brand Kit Entegrasyonu</span>
+                        </div>
+                        <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-1 flex items-center gap-2">
+                          <Palette size={18} className="text-[#b4823c]" />
+                          <span>Kurumsal Kimlik & Marka Bilgileri</span>
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-0.5">
+                          Katalog sayfalarında ve arka kapakta yer alacak marka logonuzu, imza renginizi ve iletişim bilgilerinizi özelleştirin.
+                        </p>
+                      </div>
+                      <div className="hidden md:flex items-center gap-2 text-xs font-bold text-neutral-600 bg-white px-3 py-2 rounded-xl border border-neutral-200 shadow-2xs">
+                        <span className="w-2 h-2 rounded-full bg-[#b4823c]" />
+                        <span>{brandInfo?.name || 'Aktif Marka'}</span>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1.5 md:col-span-2">
-                        <label className="text-xs font-bold text-neutral-800">Marka Logo Görseli URL</label>
-                        <input
-                          type="text"
-                          value={formData.customLogoUrl}
-                          onChange={(e) => setFormData({ ...formData, customLogoUrl: e.target.value })}
-                          placeholder="https://... (Boş bırakılırsa marka profili logonuz kullanılır)"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm"
-                        />
-                      </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                      {/* Left: Input Form (7 cols) */}
+                      <div className="lg:col-span-7 space-y-4.5">
+                        {/* Logo URL Input with Preview */}
+                        <div className="space-y-2 bg-white p-4.5 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <label className="text-xs font-extrabold text-neutral-800 flex items-center justify-between">
+                            <span>Marka Logo Görseli URL</span>
+                            <span className="text-[10px] text-neutral-400">Önerilen: Şeffaf PNG veya SVG</span>
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl border border-neutral-200 bg-neutral-50 flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
+                              {formData.customLogoUrl || brandInfo?.logoUrl ? (
+                                <img
+                                  src={formData.customLogoUrl || brandInfo?.logoUrl}
+                                  alt="Logo"
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
+                              ) : (
+                                <Building size={20} className="text-neutral-400" />
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              value={formData.customLogoUrl}
+                              onChange={(e) => setFormData({ ...formData, customLogoUrl: e.target.value })}
+                              placeholder={brandInfo?.logoUrl || '/logos/marka.png'}
+                              className="flex-1 px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-900 transition-all outline-none"
+                            />
+                          </div>
+                          <p className="text-[11px] text-neutral-400">
+                            Boş bırakırsanız profilinizdeki resmi marka logosu otomatik olarak kullanılır.
+                          </p>
+                        </div>
 
-                      <div className="space-y-2 md:col-span-2">
-                        <label className="text-xs font-bold text-neutral-800">Kurumsal Vurgu Rengi</label>
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          {COLOR_PRESETS.map((preset) => (
-                            <button
-                              key={preset.hex}
-                              type="button"
-                              onClick={() => setFormData({ ...formData, primaryColor: preset.hex })}
-                              className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 transition ${
-                                formData.primaryColor === preset.hex
-                                  ? 'border-neutral-900 bg-neutral-900 text-white'
-                                  : 'border-neutral-200 bg-white text-neutral-700'
-                              }`}
-                            >
-                              <span
-                                className="w-3.5 h-3.5 rounded-full border border-black/10"
-                                style={{ backgroundColor: preset.hex }}
+                        {/* Color Presets */}
+                        <div className="space-y-2.5 bg-white p-4.5 rounded-xl border border-neutral-200/90 shadow-2xs">
+                          <label className="text-xs font-extrabold text-neutral-800 flex items-center justify-between">
+                            <span>Kurumsal İmza Rengi & Vurgu Tonu</span>
+                            <span className="font-mono text-[11px] text-[#b4823c] font-bold">{formData.primaryColor}</span>
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {COLOR_PRESETS.map((preset) => {
+                              const isSelected = formData.primaryColor === preset.hex;
+                              return (
+                                <button
+                                  key={preset.hex}
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, primaryColor: preset.hex })}
+                                  className={`p-2.5 rounded-xl border-2 text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                                    isSelected
+                                      ? 'border-neutral-900 bg-neutral-900 text-white shadow-xs'
+                                      : 'border-neutral-200/80 bg-neutral-50/50 hover:border-neutral-300 text-neutral-800'
+                                  }`}
+                                >
+                                  <span
+                                    className="w-4 h-4 rounded-full border border-white/20 flex-shrink-0 shadow-2xs"
+                                    style={{ backgroundColor: preset.hex }}
+                                  />
+                                  <span className="text-xs font-bold truncate">{preset.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <div className="pt-2 flex items-center gap-3">
+                            <span className="text-xs font-semibold text-neutral-500">Özel Hex Rengi:</span>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={formData.primaryColor || '#b4823c'}
+                                onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
+                                className="w-8 h-8 rounded-lg border border-neutral-300 cursor-pointer bg-transparent"
                               />
-                              <span>{preset.name}</span>
-                            </button>
-                          ))}
+                              <input
+                                type="text"
+                                value={formData.primaryColor || ''}
+                                onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
+                                placeholder="#b4823c"
+                                className="w-24 px-2.5 py-1 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-mono font-bold uppercase text-neutral-800"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Contact Information Cards */}
+                        <div className="bg-white p-4.5 rounded-xl border border-neutral-200/90 shadow-2xs space-y-3.5">
+                          <label className="text-xs font-extrabold text-neutral-800 block">
+                            Arka Kapak ve İletişim Bilgileri
+                          </label>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-neutral-600">Web Sitesi</span>
+                              <input
+                                type="text"
+                                value={formData.websiteUrl}
+                                onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                                placeholder="www.bienseramik.com.tr"
+                                className="w-full px-3 py-2 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-800 outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-neutral-600">Telefon / Proje Hattı</span>
+                              <input
+                                type="text"
+                                value={formData.contactPhone}
+                                onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
+                                placeholder="+90 (212) 000 00 00"
+                                className="w-full px-3 py-2 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-800 outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-neutral-600">Kurumsal E-Posta</span>
+                              <input
+                                type="email"
+                                value={formData.contactEmail}
+                                onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                                placeholder="mimari@bienseramik.com.tr"
+                                className="w-full px-3 py-2 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-800 outline-none"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-neutral-600">Fabrika / Genel Müdürlük</span>
+                              <input
+                                type="text"
+                                value={formData.contactAddress}
+                                onChange={(e) => setFormData({ ...formData, contactAddress: e.target.value })}
+                                placeholder="Bilecik OSB, 4. Cadde No:12, Türkiye"
+                                className="w-full px-3 py-2 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] focus:bg-white rounded-xl text-xs font-medium text-neutral-800 outline-none"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Web Sitesi</label>
-                        <input
-                          type="text"
-                          value={formData.websiteUrl}
-                          onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
-                          placeholder="www.markaniz.com.tr"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm"
-                        />
-                      </div>
+                      {/* Right: Modern Brand Kit Stationery Mockup (5 cols) */}
+                      <div className="lg:col-span-5 sticky top-6 space-y-3">
+                        <div className="flex items-center justify-between text-xs font-bold text-neutral-600 px-1">
+                          <span className="flex items-center gap-1.5">
+                            <Sparkles size={13} className="text-[#b4823c]" />
+                            <span>Marka Kimliği Canlı Önizleme</span>
+                          </span>
+                          <span className="font-mono text-[10px] text-neutral-400">ARKA KAPAK STANDARDI</span>
+                        </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Telefon / Proje Hattı</label>
-                        <input
-                          type="text"
-                          value={formData.contactPhone}
-                          onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
-                          placeholder="+90 (212) 000 00 00"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm"
-                        />
-                      </div>
+                        {/* Interactive Stationery Card */}
+                        <div className="bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-xl overflow-hidden text-white flex flex-col justify-between h-[360px] relative">
+                          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3.5 h-3.5 rounded-full shadow-sm"
+                                style={{ backgroundColor: formData.primaryColor || '#b4823c' }}
+                              />
+                              <span className="font-mono text-[11px] font-extrabold uppercase tracking-widest text-neutral-200">
+                                {brandInfo?.name || 'SERAMİKBAK'}
+                              </span>
+                            </div>
+                            <span className="text-[9px] font-mono text-neutral-400">LOOKBOOK BACK COVER</span>
+                          </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Kurumsal E-Posta</label>
-                        <input
-                          type="email"
-                          value={formData.contactEmail}
-                          onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                          placeholder="info@markaniz.com.tr"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm"
-                        />
-                      </div>
+                          <div className="my-auto space-y-3 text-center px-4">
+                            <div className="w-14 h-14 mx-auto rounded-2xl bg-white/10 p-2 flex items-center justify-center border border-white/10">
+                              <Building size={24} style={{ color: formData.primaryColor || '#b4823c' }} />
+                            </div>
+                            <h5 className="text-base font-extrabold text-white tracking-wide uppercase">
+                              {brandInfo?.name || 'SERAMİK FABRİKASI'}
+                            </h5>
+                            <p className="text-[11px] text-neutral-300 max-w-xs mx-auto leading-relaxed">
+                              {formData.contactAddress || 'Organize Sanayi Bölgesi, Türkiye'}
+                            </p>
+                          </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-neutral-800">Fabrika / Merkez Adresi</label>
-                        <input
-                          type="text"
-                          value={formData.contactAddress}
-                          onChange={(e) => setFormData({ ...formData, contactAddress: e.target.value })}
-                          placeholder="Organize Sanayi Bölgesi, Türkiye"
-                          className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm"
-                        />
+                          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-neutral-400 font-mono">
+                            <span>{formData.websiteUrl || 'www.seramikbak.com'}</span>
+                            <span style={{ color: formData.primaryColor || '#b4823c' }} className="font-bold">
+                              {formData.contactPhone || '+90 (212) 000 00 00'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-[11px] text-neutral-500 flex items-center gap-2">
+                          <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0" />
+                          <span>Seçtiğiniz kurumsal renk sayfa şeritlerinde, rozetlerde ve teknik tablolarda otomatik uygulanır.</span>
+                        </div>
                       </div>
                     </div>
                   </div>
