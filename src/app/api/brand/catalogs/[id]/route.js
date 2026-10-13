@@ -95,11 +95,12 @@ async function enrichCatalogProducts(catalog) {
     })
   );
 
-  const firstItemMeta = items.find((i) => typeof i === 'object' && i._metaSectionSettings);
+  const firstItemMeta = items.find((i) => typeof i === 'object' && (i._metaSectionSettings || i._metaCustomCanvasPages));
 
   return {
     ...catalog,
     sectionSettings: firstItemMeta?._metaSectionSettings || null,
+    customCanvasPages: Array.isArray(firstItemMeta?._metaCustomCanvasPages) ? firstItemMeta._metaCustomCanvasPages : [],
     products: enrichedProducts.filter(Boolean),
   };
 }
@@ -191,6 +192,7 @@ export async function PUT(request, { params }) {
       showContactPage,
       showPageNumbers,
       productItems,
+      customCanvasPages,
       isPublished,
       isDraft,
     } = body;
@@ -225,12 +227,36 @@ export async function PUT(request, { params }) {
     if (isPublished !== undefined) updateData.isPublished = Boolean(isPublished);
     if (isDraft !== undefined) updateData.isDraft = Boolean(isDraft);
 
-    if (productItems !== undefined) {
-      const rawItems = Array.isArray(productItems)
-        ? productItems
-        : typeof productItems === 'string'
-        ? JSON.parse(productItems || '[]')
-        : [];
+    if (productItems !== undefined || customCanvasPages !== undefined) {
+      let rawItems = [];
+      if (productItems !== undefined) {
+        rawItems = Array.isArray(productItems)
+          ? productItems
+          : typeof productItems === 'string'
+          ? JSON.parse(productItems || '[]')
+          : [];
+      } else {
+        try {
+          rawItems = JSON.parse(existing.productItems || '[]');
+        } catch (e) {
+          rawItems = [];
+        }
+      }
+
+      // Safely embed customCanvasPages inside metadata
+      if (Array.isArray(customCanvasPages)) {
+        if (customCanvasPages.length > 50) {
+          return NextResponse.json({ error: 'Maksimum sayfa sayısı (50) aşıldı.' }, { status: 400 });
+        }
+        if (rawItems.length === 0) {
+          rawItems = [{ _isMetaOnly: true, _metaCustomCanvasPages: customCanvasPages }];
+        } else {
+          rawItems[0] = {
+            ...rawItems[0],
+            _metaCustomCanvasPages: customCanvasPages
+          };
+        }
+      }
 
       // Validate products belong to brand
       if (rawItems.length > 0) {

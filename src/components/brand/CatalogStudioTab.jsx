@@ -314,27 +314,39 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     try {
       const parsed = JSON.parse(rawProductItems || '[]');
       if (Array.isArray(parsed)) {
-        const items = parsed.map((i) => (typeof i === 'string' ? { productId: i } : i));
-        const firstMeta = items.find((i) => i && i._metaSectionSettings);
+        const items = parsed
+          .filter((i) => i && !i._isMetaOnly && (typeof i === 'string' || i.productId))
+          .map((i) => (typeof i === 'string' ? { productId: i } : i));
+        const firstMeta = parsed.find(
+          (i) => i && typeof i === 'object' && (i._metaSectionSettings || i._metaCustomCanvasPages || i._metaVersions)
+        );
         return {
           items,
           sectionSettings: firstMeta?._metaSectionSettings || {},
           collectionTag: firstMeta?._metaCollectionTag || '',
-          customCanvasPages: [],
-          versions: [],
+          customCanvasPages: Array.isArray(firstMeta?._metaCustomCanvasPages) ? firstMeta._metaCustomCanvasPages : [],
+          versions: Array.isArray(firstMeta?._metaVersions) ? firstMeta._metaVersions : [],
           dataMode: 'live',
           isArchived: false
         };
       }
       if (parsed && typeof parsed === 'object') {
-        const items = (parsed.items || []).map((i) => (typeof i === 'string' ? { productId: i } : i));
-        const firstMeta = items.find((i) => i && i._metaSectionSettings);
+        const items = (parsed.items || [])
+          .filter((i) => i && !i._isMetaOnly && (typeof i === 'string' || i.productId))
+          .map((i) => (typeof i === 'string' ? { productId: i } : i));
+        const firstMeta = (parsed.items || []).find(
+          (i) => i && typeof i === 'object' && (i._metaSectionSettings || i._metaCustomCanvasPages || i._metaVersions)
+        );
         return {
           items,
           sectionSettings: parsed.sectionSettings || firstMeta?._metaSectionSettings || {},
           collectionTag: parsed.collectionTag || firstMeta?._metaCollectionTag || '',
-          customCanvasPages: parsed.customCanvasPages || [],
-          versions: parsed.versions || [],
+          customCanvasPages: Array.isArray(parsed.customCanvasPages)
+            ? parsed.customCanvasPages
+            : Array.isArray(firstMeta?._metaCustomCanvasPages)
+            ? firstMeta._metaCustomCanvasPages
+            : [],
+          versions: parsed.versions || firstMeta?._metaVersions || [],
           dataMode: parsed.dataMode || 'live',
           isArchived: Boolean(parsed.isArchived)
         };
@@ -661,13 +673,25 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       alert('Lütfen bir katalog başlığı girin.');
       return;
     }
-    if (formData.selectedItems.length === 0) {
-      alert('Lütfen kataloğa en az 1 seramik ürün ekleyin.');
+    const hasCustomPages = Array.isArray(formData.customCanvasPages) && formData.customCanvasPages.length > 0;
+    if (formData.selectedItems.length === 0 && !hasCustomPages) {
+      alert('Lütfen kataloğa en az 1 seramik ürün veya tuval sayfası ekleyin.');
       return;
     }
 
     setSaving(true);
     try {
+      // Clean and sanitize custom canvas pages
+      const safeCanvasPages = hasCustomPages
+        ? formData.customCanvasPages.filter(Boolean).map((p, pIdx) => ({
+            id: p?.id || `page-${pIdx + 1}`,
+            title: p?.title || `Sayfa ${pIdx + 1}`,
+            bgColor: p?.bgColor || '#ffffff',
+            format: p?.format || formData.orientation || 'portrait',
+            elements: Array.isArray(p?.elements) ? p.elements.filter(Boolean) : []
+          }))
+        : [];
+
       // Create version history entry
       const newVersionEntry = {
         versionNumber: (formData.versions?.length || 0) + 1,
@@ -675,23 +699,41 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         status: publish ? 'Yayınlandı' : 'Taslak',
         itemCount: formData.selectedItems.length,
         template: formData.template,
-        language: formData.language
+        language: formData.language,
+        pageCount: safeCanvasPages.length
       };
 
-      const enrichedSelectedItems = formData.selectedItems.map((item, idx) => ({
+      let enrichedSelectedItems = (formData.selectedItems || []).map((item, idx) => ({
         ...item,
         ...(idx === 0
           ? {
               _metaSectionSettings: formData.sectionSettings || {},
-              _metaCollectionTag: formData.collectionTag || ''
+              _metaCollectionTag: formData.collectionTag || '',
+              _metaCustomCanvasPages: safeCanvasPages
             }
           : {}),
         _metaVersions: [...(formData.versions || []), newVersionEntry].slice(-10)
       }));
 
+      // If user is designing in canvas with 0 products selected, preserve metadata via meta-only container
+      if (enrichedSelectedItems.length === 0) {
+        enrichedSelectedItems = [
+          {
+            _isMetaOnly: true,
+            _metaSectionSettings: formData.sectionSettings || {},
+            _metaCollectionTag: formData.collectionTag || '',
+            _metaCustomCanvasPages: safeCanvasPages,
+            _metaVersions: [newVersionEntry]
+          }
+        ];
+      } else {
+        enrichedSelectedItems[0]._metaCustomCanvasPages = safeCanvasPages;
+      }
+
       const payload = {
         ...formData,
         brandId,
+        customCanvasPages: safeCanvasPages,
         productItems: enrichedSelectedItems,
         isPublished: publish ? true : formData.isPublished,
         isDraft: publish ? false : true
@@ -1769,6 +1811,22 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               onChangePages={(updatedPages) =>
                 setFormData((prev) => ({ ...prev, customCanvasPages: updatedPages }))
               }
+              onUseProduct={(prod) => {
+                if (!prod || !prod.id) return;
+                setFormData((prev) => {
+                  const exists = (prev.selectedItems || []).some(
+                    (item) => (item.productId || item.id) === prod.id
+                  );
+                  if (exists) return prev;
+                  return {
+                    ...prev,
+                    selectedItems: [
+                      ...(prev.selectedItems || []),
+                      { productId: prod.id, order: (prev.selectedItems || []).length + 1 }
+                    ]
+                  };
+                });
+              }}
               onSaveDraft={() => handleSaveCatalog(false)}
               onPublish={() => handleSaveCatalog(true)}
             />

@@ -38,18 +38,24 @@ export async function GET(request) {
       }
     });
 
-    // Format catalogs with product count
+    // Format catalogs with product count & custom canvas indicator
     const formatted = catalogs.map((cat) => {
       let itemCount = 0;
+      let hasCustomCanvas = false;
       try {
         const parsed = JSON.parse(cat.productItems || '[]');
-        itemCount = Array.isArray(parsed) ? parsed.length : 0;
+        if (Array.isArray(parsed)) {
+          itemCount = parsed.filter(i => (typeof i === 'string' && i) || (i && i.productId)).length;
+          const firstMeta = parsed.find(i => typeof i === 'object' && i._metaCustomCanvasPages);
+          hasCustomCanvas = Boolean(Array.isArray(firstMeta?._metaCustomCanvasPages) && firstMeta._metaCustomCanvasPages.length > 0);
+        }
       } catch (e) {
         itemCount = 0;
       }
       return {
         ...cat,
         itemCount,
+        hasCustomCanvas
       };
     });
 
@@ -96,6 +102,7 @@ export async function POST(request) {
       showContactPage = true,
       showPageNumbers = true,
       productItems = [],
+      customCanvasPages = [],
       isPublished = false,
       isDraft = true,
     } = body;
@@ -124,11 +131,26 @@ export async function POST(request) {
     }
 
     // Parse and validate productItems
-    const rawItems = Array.isArray(productItems)
+    let rawItems = Array.isArray(productItems)
       ? productItems
       : typeof productItems === 'string'
       ? JSON.parse(productItems || '[]')
       : [];
+
+    // Safely embed customCanvasPages inside metadata
+    if (Array.isArray(customCanvasPages) && customCanvasPages.length > 0) {
+      if (customCanvasPages.length > 50) {
+        return NextResponse.json({ error: 'Maksimum sayfa sayısı (50) aşıldı.' }, { status: 400 });
+      }
+      if (rawItems.length === 0) {
+        rawItems = [{ _isMetaOnly: true, _metaCustomCanvasPages: customCanvasPages }];
+      } else {
+        rawItems[0] = {
+          ...rawItems[0],
+          _metaCustomCanvasPages: customCanvasPages
+        };
+      }
+    }
 
     // Verify that all selected products belong to this brand (multi-tenant security)
     if (rawItems.length > 0) {
@@ -202,7 +224,8 @@ export async function POST(request) {
       success: true,
       catalog: {
         ...created,
-        itemCount: rawItems.length,
+        itemCount: rawItems.filter(i => (typeof i === 'string' && i) || (i && i.productId)).length,
+        customCanvasPages: customCanvasPages || []
       }
     }, { status: 201 });
 

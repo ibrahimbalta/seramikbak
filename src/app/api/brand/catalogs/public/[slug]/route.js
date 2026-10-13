@@ -139,13 +139,14 @@ export async function GET(request, { params }) {
       );
     }
 
-    const firstItemMeta = items.find((i) => typeof i === 'object' && i._metaSectionSettings);
+    const firstItemMeta = items.find((i) => typeof i === 'object' && (i._metaSectionSettings || i._metaCustomCanvasPages));
 
     return NextResponse.json({
       success: true,
       catalog: {
         ...catalog,
         sectionSettings: firstItemMeta?._metaSectionSettings || null,
+        customCanvasPages: Array.isArray(firstItemMeta?._metaCustomCanvasPages) ? firstItemMeta._metaCustomCanvasPages : [],
         products: enrichedProducts.filter(Boolean),
       }
     });

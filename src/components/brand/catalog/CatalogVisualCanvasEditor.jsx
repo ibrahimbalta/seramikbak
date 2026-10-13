@@ -1085,6 +1085,7 @@ export default function CatalogVisualCanvasEditor({
   currentTemplateId = 'milano',
   onSelectTemplate,
   onChangePages,
+  onUseProduct,
   onSaveDraft,
   onPublish
 }) {
@@ -1526,6 +1527,9 @@ export default function CatalogVisualCanvasEditor({
   // Insert real brand product onto canvas (ATOMIC & CRASH-PROOF)
   const handleInsertProduct = (prod, mode = 'card') => {
     if (!prod) return;
+    if (onUseProduct) {
+      onUseProduct(prod);
+    }
     const prodImg = prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
     const mainText = `${prod.name || 'Seramik Karo'}\n${prod.width || 60}×${prod.height || 120} cm • ${prod.finish || 'Parlak'}`;
     const skuText = `SKU: ${prod.sku || prod.code || 'BN-5501'}`;
