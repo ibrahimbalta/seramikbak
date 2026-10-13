@@ -946,7 +946,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             {/* ==================== LEFT MAIN COLUMN (9 COLS) ==================== */}
             <div className="xl:col-span-9 space-y-5">
               {/* 1. LUXURY EDITORIAL HERO SHOWCASE */}
-              <div className="relative rounded-3xl bg-neutral-950 text-white overflow-hidden shadow-2xl border border-neutral-800 p-6 sm:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 group">
+              <div className="relative rounded-lg bg-neutral-950 text-white overflow-hidden shadow-2xl border border-neutral-800 p-6 sm:p-8 md:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 group">
                 {/* Background Ambience Layers */}
                 <div
                   className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-1000"
@@ -962,7 +962,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     <span className="text-[11px] font-mono tracking-[0.25em] font-extrabold text-amber-400 uppercase">
                       CERAMIC STUDIO & LOOKBOOK SUITE
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-mono text-neutral-300">
+                    <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono text-neutral-300">
                       B2B PLATFORM
                     </span>
                   </div>
@@ -988,7 +988,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                       return (
                         <div
                           key={idx}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-neutral-200 hover:bg-white/15 transition-all"
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-neutral-200 hover:bg-white/15 transition-all"
                         >
                           <PillIcon size={13} className="text-amber-400" />
                           <span className="whitespace-nowrap">{pill.label}</span>
@@ -1002,11 +1002,11 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 <div className="relative z-10 flex-shrink-0 w-full sm:w-auto flex justify-center">
                   <div
                     onClick={() => handleStartNew('milano', 1)}
-                    className="cursor-pointer bg-neutral-900/90 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/20 flex items-center gap-5 hover:border-amber-400/60 hover:scale-[1.03] transition-all max-w-sm group/card"
+                    className="cursor-pointer bg-neutral-900/90 backdrop-blur-xl rounded-lg p-4 shadow-2xl border border-white/20 flex items-center gap-5 hover:border-amber-400/60 hover:scale-[1.02] transition-all max-w-sm group/card"
                   >
                     {/* Simulated 3D Book Cover */}
                     <div
-                      className="w-28 h-40 rounded-xl overflow-hidden relative shadow-2xl flex flex-col justify-between p-3.5 text-white flex-shrink-0 border border-white/20"
+                      className="w-28 h-40 rounded-md overflow-hidden relative shadow-2xl flex flex-col justify-between p-3.5 text-white flex-shrink-0 border border-white/20"
                       style={{
                         background:
                           'linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.85) 100%), url(/renders/luxury_bathroom_calacatta_gold.jpg) center/cover no-repeat'
@@ -1027,7 +1027,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
                     {/* CTA Info */}
                     <div className="pr-1 space-y-2">
-                      <span className="inline-block px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-mono font-bold">
+                      <span className="inline-block px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 text-[10px] font-mono font-bold">
                         HIZLI BAŞLAT
                       </span>
                       <h4 className="text-sm font-extrabold text-white leading-snug group-hover/card:text-amber-300 transition-colors">
@@ -1531,10 +1531,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             {/* ==================== RIGHT SIDEBAR COLUMN (3 COLS) ==================== */}
             <div className="xl:col-span-3 space-y-5">
               {/* 1. Hızlı İşlemler Card (High-Tech Quick Studio Tools) */}
-              <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-sm space-y-4">
+              <div className="bg-white rounded-lg border border-neutral-200/90 p-5 shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-1 border-b border-neutral-100">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-[#b4823c] flex items-center justify-center font-bold">
+                    <div className="w-7 h-7 rounded-md bg-amber-50 text-[#b4823c] flex items-center justify-center font-bold">
                       <Sparkles size={14} />
                     </div>
                     <h3 className="text-sm font-extrabold text-neutral-900">Stüdyo Kısayolları</h3>
@@ -1546,9 +1546,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   <button
                     type="button"
                     onClick={() => handleStartNew('milano', 1)}
-                    className="w-full p-3 rounded-2xl border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
+                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
                       <Plus size={16} strokeWidth={2.5} />
                     </div>
                     <div>
@@ -1562,9 +1562,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   <button
                     type="button"
                     onClick={() => handleStartNew('milano', 2)}
-                    className="w-full p-3 rounded-2xl border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
+                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
                       <Layers size={16} />
                     </div>
                     <div>
@@ -1578,9 +1578,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   <button
                     type="button"
                     onClick={() => setViewMode('templates-gallery')}
-                    className="w-full p-3 rounded-2xl border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
+                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
                       <LayoutTemplate size={16} />
                     </div>
                     <div>
@@ -1594,9 +1594,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   <button
                     type="button"
                     onClick={() => handleStartNew('milano', 4)}
-                    className="w-full p-3 rounded-2xl border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
+                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
                       <Settings size={16} />
                     </div>
                     <div>
@@ -1610,10 +1610,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               </div>
 
               {/* 2. Son Aktiviteler Card */}
-              <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-sm space-y-4">
+              <div className="bg-white rounded-lg border border-neutral-200/90 p-5 shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-1 border-b border-neutral-100">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-neutral-100 text-neutral-700 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-md bg-neutral-100 text-neutral-700 flex items-center justify-center">
                       <Clock size={14} />
                     </div>
                     <h3 className="text-sm font-extrabold text-neutral-900">Son Aktiviteler</h3>
@@ -1631,7 +1631,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   {recentActivities.map((act) => (
                     <div key={act.id} className="flex items-start gap-3 group">
                       <div
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs ${
+                        className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs ${
                           act.type === 'published'
                             ? 'bg-amber-50 text-[#b4823c]'
                             : act.type === 'draft'
@@ -1660,14 +1660,14 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
               {/* 3. Luxury Discovery Promo Card */}
               <div
-                className="rounded-3xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[210px] group border border-white/10"
+                className="rounded-lg p-6 sm:p-7 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[220px] group border border-neutral-800"
                 style={{
                   background:
-                    'linear-gradient(135deg, rgba(15,23,42,0.96) 0%, rgba(24,24,27,0.85) 60%, rgba(180,130,60,0.5) 100%), url(/renders/luxury_bathroom_albatros_antrasit.jpg) center/cover no-repeat'
+                    'linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(24,24,27,0.9) 60%, rgba(180,130,60,0.5) 100%), url(/renders/luxury_bathroom_albatros_antrasit.jpg) center/cover no-repeat'
                 }}
               >
-                <div className="space-y-2 z-10 max-w-[220px]">
-                  <span className="text-[9px] font-mono tracking-widest uppercase text-amber-300 font-bold">
+                <div className="space-y-2.5 z-10 max-w-[240px]">
+                  <span className="text-[9px] font-mono tracking-widest uppercase text-amber-300 font-bold block">
                     SERAMİKBAK PRO SUITE
                   </span>
                   <h4 className="text-base font-serif font-bold text-white leading-snug">
@@ -1678,11 +1678,11 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   </p>
                 </div>
 
-                <div className="pt-4 z-10">
+                <div className="pt-5 z-10">
                   <button
                     type="button"
                     onClick={() => handleStartNew('milano', 1)}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#b4823c] to-amber-600 hover:from-[#9f7131] hover:to-amber-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-md hover:shadow-lg transition cursor-pointer"
+                    className="px-4 py-2.5 rounded-md bg-gradient-to-r from-[#b4823c] to-amber-600 hover:from-[#9f7131] hover:to-amber-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-md hover:shadow-lg transition cursor-pointer"
                   >
                     <span>Stüdyo Rehberi</span>
                     <ArrowRight size={13} />
