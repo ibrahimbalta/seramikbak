@@ -29,6 +29,9 @@ import {
   Briefcase,
   Layers,
   ChevronRight,
+  ChevronLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
   Eye,
   MousePointerClick,
   Handshake,
@@ -118,6 +121,13 @@ export default function BrandPortalPage() {
     handleResize();
     window.addEventListener('resize', handleResize);
 
+    try {
+      const savedCollapsed = localStorage.getItem('sb_brand_sidebar_collapsed');
+      if (savedCollapsed !== null) {
+        setIsSidebarCollapsed(savedCollapsed === 'true');
+      }
+    } catch (e) {}
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('tab') === 'register') {
@@ -127,6 +137,16 @@ export default function BrandPortalPage() {
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('sb_brand_sidebar_collapsed', String(next));
+      } catch (e) {}
+      return next;
+    });
+  };
 
   const handleBrandRegister = async (e) => {
     e.preventDefault();
@@ -1680,45 +1700,100 @@ export default function BrandPortalPage() {
         }}>
           {/* Sidebar Header (Fixed at top) */}
           <div style={{
-            padding: '18px 16px',
+            padding: isSidebarCollapsed ? '16px 8px' : '18px 16px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
+            gap: isSidebarCollapsed ? '0' : '12px',
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
             overflow: 'hidden',
             flexShrink: 0
           }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
-              color: '#ffffff',
-              border: '1.5px solid #d4af37',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '900',
-              fontSize: '1.1rem',
-              flexShrink: 0,
-              boxShadow: '0 0 10px rgba(212,175,55,0.2)'
-            }}>SB</div>
-            {!isSidebarCollapsed && (
-              <div style={{ minWidth: 0 }}>
-                <h2 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {brandInfo.name}
-                </h2>
-                <span style={{ 
-                  fontSize: '0.62rem', 
-                  padding: '2px 6px', 
-                  borderRadius: '8px', 
-                  display: 'inline-block',
-                  marginTop: '2px',
-                  ...getPlanBadgeStyle(currentPlan)
-                }}>
-                  {currentPlan} ÜYE
-                </span>
-              </div>
+            {isSidebarCollapsed ? (
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                title="Menüyü Genişlet"
+                aria-label="Menüyü Genişlet"
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+                  color: '#ffffff',
+                  border: '1.5px solid #d4af37',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '900',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 12px rgba(212,175,55,0.25)',
+                  transition: 'all 0.2s ease',
+                  padding: 0
+                }}
+              >
+                SB
+              </button>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+                    color: '#ffffff',
+                    border: '1.5px solid #d4af37',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '900',
+                    fontSize: '1.1rem',
+                    flexShrink: 0,
+                    boxShadow: '0 0 10px rgba(212,175,55,0.2)'
+                  }}>SB</div>
+                  <div style={{ minWidth: 0 }}>
+                    <h2 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {brandInfo.name}
+                    </h2>
+                    <span style={{ 
+                      fontSize: '0.62rem', 
+                      padding: '2px 6px', 
+                      borderRadius: '8px', 
+                      display: 'inline-block',
+                      marginTop: '2px',
+                      ...getPlanBadgeStyle(currentPlan)
+                    }}>
+                      {currentPlan} ÜYE
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleSidebar}
+                  title="Menüyü Daralt"
+                  aria-label="Menüyü Daralt"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '8px',
+                    width: '30px',
+                    height: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#94a3b8',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+              </>
             )}
           </div>
 
@@ -1727,10 +1802,10 @@ export default function BrandPortalPage() {
             className="brand-sidebar-nav"
             style={{ 
               flex: 1, 
-              padding: '10px 8px', 
+              padding: isSidebarCollapsed ? '10px 6px' : '10px 8px', 
               display: 'flex', 
               flexDirection: 'column', 
-              gap: '2px',
+              gap: '3px',
               overflowY: 'auto',
               overflowX: 'hidden',
               scrollbarWidth: 'thin',
@@ -1765,24 +1840,31 @@ export default function BrandPortalPage() {
                       width: '100%',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '10px',
-                      padding: '8px 12px',
+                      justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
+                      gap: isSidebarCollapsed ? '0' : '10px',
+                      padding: isSidebarCollapsed ? '10px 0' : '8px 12px',
                       borderRadius: '8px',
-                      border: 'none',
+                      border: isActive && isSidebarCollapsed ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
                       background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
                       color: isActive ? '#d4af37' : '#94a3b8',
                       cursor: 'pointer',
                       fontSize: '0.82rem',
                       fontWeight: isActive ? '700' : '500',
-                      textAlign: 'left',
+                      textAlign: isSidebarCollapsed ? 'center' : 'left',
                       transition: 'all 0.15s',
                       boxSizing: 'border-box'
                     }}
-                    title={isSidebarCollapsed ? item.label : undefined}
+                    title={item.label}
                     className="sidebar-link-btn"
                   >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                    <span style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                      gap: '10px', 
+                      minWidth: 0,
+                      width: isSidebarCollapsed ? '100%' : 'auto'
+                    }}>
                       {item.icon}
                       {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
                     </span>
@@ -1861,7 +1943,7 @@ export default function BrandPortalPage() {
 
           {/* Sidebar Collapse Toggle & Logout (Fixed at bottom) */}
           <div style={{
-            padding: '10px 8px',
+            padding: isSidebarCollapsed ? '10px 6px' : '10px 8px',
             borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             flexDirection: 'column',
@@ -1870,24 +1952,26 @@ export default function BrandPortalPage() {
             background: '#090d16'
           }}>
             <button
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              onClick={toggleSidebar}
               style={{
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                 gap: '10px',
-                padding: '8px 12px',
+                padding: isSidebarCollapsed ? '10px 0' : '8px 12px',
                 borderRadius: '8px',
                 border: 'none',
-                background: 'transparent',
-                color: '#64748b',
+                background: isSidebarCollapsed ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                color: isSidebarCollapsed ? '#d4af37' : '#64748b',
                 cursor: 'pointer',
                 fontSize: '0.78rem',
-                textAlign: 'left',
+                textAlign: isSidebarCollapsed ? 'center' : 'left',
                 transition: 'all 0.15s'
               }}
+              title={isSidebarCollapsed ? "Paneli Genişlet" : "Paneli Daralt"}
             >
-              <Menu size={16} />
+              {isSidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={16} />}
               {!isSidebarCollapsed && <span>Paneli Daralt</span>}
             </button>
             <button
@@ -1896,8 +1980,9 @@ export default function BrandPortalPage() {
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                 gap: '10px',
-                padding: '8px 12px',
+                padding: isSidebarCollapsed ? '10px 0' : '8px 12px',
                 borderRadius: '8px',
                 border: 'none',
                 background: 'rgba(239, 68, 68, 0.08)',
@@ -1905,9 +1990,10 @@ export default function BrandPortalPage() {
                 cursor: 'pointer',
                 fontSize: '0.78rem',
                 fontWeight: '700',
-                textAlign: 'left',
+                textAlign: isSidebarCollapsed ? 'center' : 'left',
                 transition: 'all 0.15s'
               }}
+              title={isSidebarCollapsed ? "Çıkış Yap" : undefined}
             >
               <LogOut size={16} />
               {!isSidebarCollapsed && <span>Çıkış Yap</span>}
@@ -2036,26 +2122,53 @@ export default function BrandPortalPage() {
             </div>
           ) : (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div>
-                <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
-                  {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                  {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
-                  {activePortalTab === 'catalogs' && '📖 Dijital Kataloglar & Lookbook Oluşturucu'}
-                  {activePortalTab === 'embed-studio' && '🎮 White-Label 3D Visualizer & Mağaza Kiosk SDK'}
-                  {activePortalTab === 'market-intel' && '📊 Canlı Pazar İstihbaratı & Trend Radarı'}
-                  {activePortalTab === 'brand-health' && '🏆 Dijital Marka Sağlığı & Google SERP Görünürlüğü'}
-                  {activePortalTab === 'bulk-import' && '⚡ Toplu Ürün & ERP Aktarım Sihirbazı'}
-                  {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
-                  {activePortalTab === 'country-analytics' && 'Küresel Ülke Analitiği & İhracat Trafiği'}
-                  {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
-                  {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
-                  {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
-                  {activePortalTab === 'outlet' && 'Fabrika Çıkışlı Outlet & Seri Sonu İlan Yönetimi'}
-                  {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
-                </h1>
-                <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
-                  {brandInfo.name} fabrikası için B2B2C yönetim merkezi.
-                </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <button
+                  type="button"
+                  onClick={toggleSidebar}
+                  title={isSidebarCollapsed ? "Sol Menüyü Genişlet (Çalışma Alanı Daralır)" : "Sol Menüyü Daralt (Geniş Çalışma Alanı)"}
+                  aria-label={isSidebarCollapsed ? "Sol Menüyü Genişlet" : "Sol Menüyü Daralt"}
+                  style={{
+                    background: isSidebarCollapsed ? '#090d16' : '#f8fafc',
+                    color: isSidebarCollapsed ? '#d4af37' : '#475569',
+                    border: isSidebarCollapsed ? '1.5px solid #d4af37' : '1px solid #e2e8f0',
+                    borderRadius: '9px',
+                    padding: '7px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    cursor: 'pointer',
+                    fontSize: '0.78rem',
+                    fontWeight: '700',
+                    boxShadow: isSidebarCollapsed ? '0 2px 10px rgba(212,175,55,0.2)' : '0 1px 2px rgba(0,0,0,0.04)',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0
+                  }}
+                >
+                  {isSidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+                  <span className="hidden sm:inline">{isSidebarCollapsed ? 'Menüyü Aç' : 'Menüyü Daralt'}</span>
+                </button>
+                <div>
+                  <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                    {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                    {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
+                    {activePortalTab === 'catalogs' && '📖 Dijital Kataloglar & Lookbook Oluşturucu'}
+                    {activePortalTab === 'embed-studio' && '🎮 White-Label 3D Visualizer & Mağaza Kiosk SDK'}
+                    {activePortalTab === 'market-intel' && '📊 Canlı Pazar İstihbaratı & Trend Radarı'}
+                    {activePortalTab === 'brand-health' && '🏆 Dijital Marka Sağlığı & Google SERP Görünürlüğü'}
+                    {activePortalTab === 'bulk-import' && '⚡ Toplu Ürün & ERP Aktarım Sihirbazı'}
+                    {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
+                    {activePortalTab === 'country-analytics' && 'Küresel Ülke Analitiği & İhracat Trafiği'}
+                    {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
+                    {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
+                    {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
+                    {activePortalTab === 'outlet' && 'Fabrika Çıkışlı Outlet & Seri Sonu İlan Yönetimi'}
+                    {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
+                  </h1>
+                  <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
+                    {brandInfo.name} fabrikası için B2B2C yönetim merkezi.
+                  </p>
+                </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -2080,7 +2193,15 @@ export default function BrandPortalPage() {
         </header>
 
         {/* PORTAL MAIN TAB CONTAINER */}
-        <main style={{ padding: isMobile ? '16px 12px 120px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto', overflowX: 'hidden' }}>
+        <main style={{ 
+          padding: isMobile ? '16px 12px 120px 12px' : (activePortalTab === 'catalogs' ? '20px 24px' : '32px'), 
+          maxWidth: activePortalTab === 'catalogs' ? '100%' : (isSidebarCollapsed ? '1600px' : '1400px'), 
+          width: '100%', 
+          boxSizing: 'border-box', 
+          margin: '0 auto', 
+          overflowX: 'hidden',
+          transition: 'max-width 0.25s ease, padding 0.25s ease'
+        }}>
           
           {statsLoading && !b2bStats ? (
             <div style={{ textAlign: 'center', padding: '120px 0', color: '#64748b' }}>
