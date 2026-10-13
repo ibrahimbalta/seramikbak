@@ -154,9 +154,11 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const [activeStep, setActiveStep] = useState(1); // 1 to 6
   const [saving, setSaving] = useState(false);
 
-  // Version History & Smart Product Sync Modal State
+  // Version History, Smart Product Sync & Delete Confirmation Modal State
   const [versionModalCatalog, setVersionModalCatalog] = useState(null);
   const [syncModalCatalog, setSyncModalCatalog] = useState(null);
+  const [deleteConfirmCatalog, setDeleteConfirmCatalog] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -502,33 +504,53 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     }
   };
 
-  const handleDelete = async (target) => {
+  const handleDelete = (target, e) => {
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
     setOpenMenuId(null);
     const cat =
       typeof target === 'object' && target !== null
         ? target
-        : catalogs.find((c) => c.id === target) || { id: target, title: 'Katalog' };
+        : catalogs.find((c) => c.id === target) || { id: target, title: formData.title || 'Katalog' };
 
     const catId = cat.id || (typeof target === 'string' ? target : null);
     if (!catId) return;
 
-    const catalogTitle = cat.title || 'Bu kataloğu';
-    if (!confirm(`"${catalogTitle}" kalıcı olarak silmek istediğinizden emin misiniz?`)) return;
+    setDeleteConfirmCatalog({ id: catId, title: cat.title || 'Bu Katalog' });
+  };
 
+  const executeDeleteCatalog = async (targetCat) => {
+    const cat = targetCat || deleteConfirmCatalog;
+    if (!cat || !cat.id) return;
+    const catId = cat.id;
+
+    setDeletingId(catId);
+    setErrorMsg('');
     try {
-      const res = await fetch(`/api/brand/catalogs/${catId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/brand/catalogs/${catId}?brandId=${brandId || ''}`, {
+        method: 'DELETE'
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         setSuccessMsg('Katalog başarıyla silindi.');
         setCatalogs((prev) => prev.filter((c) => c.id !== catId));
+        setDeleteConfirmCatalog(null);
+        if (activeCatalogId === catId || previewCatalog?.id === catId) {
+          setActiveCatalogId(null);
+          setPreviewCatalog(null);
+          setViewMode('list');
+        }
         setTimeout(() => {
           loadCatalogs();
         }, 200);
       } else {
-        alert(data.error || 'Silme işlemi başarısız.');
+        setErrorMsg(data.error || 'Silme işlemi başarısız.');
       }
     } catch (err) {
-      alert('Hata: ' + err.message);
+      setErrorMsg('Silme hatası: ' + err.message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -1096,12 +1118,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     return (
                       <div
                         key={cat.id}
-                        className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md hover:border-amber-300/80 transition-all overflow-hidden flex flex-col justify-between group relative"
+                        className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md hover:border-amber-300/80 transition-all flex flex-col justify-between group relative"
                       >
                         {/* Top Cover Visual */}
                         <div
                           onClick={() => handleOpenPreview(cat)}
-                          className="relative h-44 w-full cursor-pointer overflow-hidden p-4 flex flex-col justify-between text-white"
+                          className="relative h-44 w-full cursor-pointer rounded-t-2xl overflow-hidden p-4 flex flex-col justify-between text-white"
                           style={{
                             background: `linear-gradient(180deg, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.2) 45%, rgba(15,23,42,0.85) 100%), url(${coverImg}) center/cover no-repeat`,
                             backgroundColor: '#18181b'
@@ -1155,7 +1177,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         </div>
 
                         {/* Card Body: Title, Subtitle, Stats & Actions */}
-                        <div className="p-4 flex-1 flex flex-col justify-between bg-white">
+                        <div className="p-4 flex-1 flex flex-col justify-between bg-white rounded-b-2xl">
                           <div>
                             <div className="flex items-start justify-between gap-2">
                               <h3
@@ -1166,22 +1188,31 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                 {cat.title}
                               </h3>
 
-                              {/* 3-Dots Context Menu */}
-                              <div className="relative">
+                              {/* Quick Delete + 3-Dots Context Menu */}
+                              <div className="flex items-center gap-0.5 relative">
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleDelete(cat, e)}
+                                  className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition cursor-pointer"
+                                  title="Kataloğu Sil"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
                                 <button
                                   type="button"
                                   onClick={() => setOpenMenuId(openMenuId === cat.id ? null : cat.id)}
                                   className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+                                  title="Diğer İşlemler"
                                 >
                                   <MoreVertical size={15} />
                                 </button>
 
                                 {openMenuId === cat.id && (
-                                  <div className="absolute right-0 top-7 w-48 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-40 text-xs font-semibold text-neutral-700">
+                                  <div className="absolute right-0 top-8 w-48 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-40 text-xs font-semibold text-neutral-700">
                                     <button
                                       type="button"
                                       onClick={() => handleEdit(cat, true)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2 cursor-pointer"
                                     >
                                       <Wand2 size={13} />
                                       <span>Gelişmiş Studio ile Aç</span>
@@ -1189,7 +1220,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                     <button
                                       type="button"
                                       onClick={() => handleCopyLink(cat.publicSlug)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                                     >
                                       <Share2 size={13} />
                                       <span>Paylaşım Linkini Kopyala</span>
@@ -1197,7 +1228,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                     <button
                                       type="button"
                                       onClick={() => handleDuplicate(cat)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                                     >
                                       <Copy size={13} />
                                       <span>Kataloğu Kopyala</span>
@@ -1208,7 +1239,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                         setOpenMenuId(null);
                                         setVersionModalCatalog(cat);
                                       }}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                                     >
                                       <History size={13} />
                                       <span>Sürüm Geçmişi</span>
@@ -1216,7 +1247,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                     <button
                                       type="button"
                                       onClick={() => handleToggleArchive(cat)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2"
+                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                                     >
                                       <Archive size={13} />
                                       <span>{cat._isArchived ? 'Arşivden Çıkar' : 'Arşivle'}</span>
@@ -1224,8 +1255,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                     <div className="my-1 border-t border-neutral-100" />
                                     <button
                                       type="button"
-                                      onClick={() => handleDelete(cat)}
-                                      className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                                      onClick={(e) => handleDelete(cat, e)}
+                                      className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
                                     >
                                       <Trash2 size={13} />
                                       <span>Kataloğu Sil</span>
@@ -1255,12 +1286,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                             </div>
                           </div>
 
-                          {/* Dual Bottom Action Buttons: [ Önizle ] [ Düzenle ] */}
-                          <div className="grid grid-cols-2 gap-2 mt-3.5 pt-1">
+                          {/* Bottom Action Buttons: [ Önizle ] [ Düzenle ] [ Sil ] */}
+                          <div className="flex items-center gap-1.5 mt-3.5 pt-1">
                             <button
                               type="button"
                               onClick={() => handleOpenPreview(cat)}
-                              className="py-2 px-3 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                              className="flex-1 py-2 px-2.5 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
                             >
                               <Eye size={13} />
                               <span>Önizle</span>
@@ -1269,10 +1300,20 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                             <button
                               type="button"
                               onClick={() => handleEdit(cat, false)}
-                              className="py-2 px-3 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer"
+                              className="flex-1 py-2 px-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer"
                             >
                               <Edit size={13} />
                               <span>Düzenle</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={(e) => handleDelete(cat, e)}
+                              className="py-2 px-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
+                              title="Kataloğu Sil"
+                            >
+                              <Trash2 size={13} />
+                              <span>Sil</span>
                             </button>
                           </div>
                         </div>
@@ -1323,7 +1364,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                           <button
                             type="button"
                             onClick={() => handleOpenPreview(cat)}
-                            className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-100 text-xs font-bold text-neutral-700 flex items-center gap-1.5"
+                            className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-100 text-xs font-bold text-neutral-700 flex items-center gap-1.5 cursor-pointer"
                           >
                             <Eye size={13} />
                             <span>Önizle</span>
@@ -1331,18 +1372,19 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                           <button
                             type="button"
                             onClick={() => handleEdit(cat, false)}
-                            className="px-3.5 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center gap-1.5"
+                            className="px-3.5 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                           >
                             <Edit size={13} />
                             <span>Düzenle</span>
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDelete(cat)}
-                            className="p-2 rounded-xl border border-neutral-200 hover:bg-rose-50 text-neutral-500 hover:text-rose-600"
-                            title="Sil"
+                            onClick={(e) => handleDelete(cat, e)}
+                            className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                            title="Kataloğu Sil"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={13} />
+                            <span>Sil</span>
                           </button>
                         </div>
                       </div>
@@ -1618,8 +1660,19 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               </button>
             </div>
 
-            {/* Right: Save Draft & Publish Buttons */}
-            <div className="flex items-center gap-2">
+            {/* Right: Delete, Save Draft & Publish Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
+              {activeCatalogId && (
+                <button
+                  type="button"
+                  onClick={(e) => handleDelete({ id: activeCatalogId, title: formData.title }, e)}
+                  className="px-3.5 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  title="Kataloğu Sil"
+                >
+                  <Trash2 size={14} />
+                  <span>Kataloğu Sil</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => handleSaveCatalog(false)}
@@ -2378,7 +2431,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {previewCatalog.publicSlug && (
                 <a
                   href={`/katalog/${previewCatalog.publicSlug}`}
@@ -2398,10 +2451,71 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 <Edit size={13} />
                 <span>Kataloğu Düzenle</span>
               </button>
+              <button
+                type="button"
+                onClick={(e) => handleDelete(previewCatalog, e)}
+                className="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Trash2 size={13} />
+                <span>Kataloğu Sil</span>
+              </button>
             </div>
           </div>
 
           <CatalogTemplateRenderer catalog={previewCatalog} products={previewProducts} mode="preview" />
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: DELETE CONFIRMATION (KATALOG SİLME ONAYI)                          */}
+      {/* ========================================================================= */}
+      {deleteConfirmCatalog && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-neutral-200 max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                  <Trash2 size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-neutral-900">Kataloğu Sil</h3>
+                  <p className="text-[11px] text-neutral-500">Bu işlem geri alınamaz</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmCatalog(null)}
+                disabled={Boolean(deletingId)}
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200/80 text-xs text-neutral-700 leading-relaxed">
+              <strong className="text-neutral-900">"{deleteConfirmCatalog.title}"</strong> adlı kataloğu kalıcı olarak silmek istediğinizden emin misiniz?
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmCatalog(null)}
+                disabled={Boolean(deletingId)}
+                className="px-4 py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-700 cursor-pointer"
+              >
+                Vazgeç
+              </button>
+              <button
+                type="button"
+                onClick={() => executeDeleteCatalog(deleteConfirmCatalog)}
+                disabled={Boolean(deletingId)}
+                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+              >
+                {deletingId ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                <span>{deletingId ? 'Siliniyor...' : 'Evet, Kalıcı Olarak Sil'}</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
