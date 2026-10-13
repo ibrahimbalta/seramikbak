@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import CatalogTemplateRenderer from '@/components/brand/catalog/templates/CatalogTemplateRenderer';
+import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 
 export default function PublicCatalogViewerPage() {
   const params = useParams();
@@ -26,6 +27,7 @@ export default function PublicCatalogViewerPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPrinting, setIsPrinting] = useState(false);
 
   // Interactive Product Search & QR Modal in Public Web Catalog
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,9 +59,15 @@ export default function PublicCatalogViewerPage() {
     }
   };
 
-  const handlePrint = () => {
-    fetch(`/api/brand/catalogs/public/${slug}?download=true`).catch(() => {});
-    window.print();
+  const handlePrint = async () => {
+    if (isPrinting) return;
+    setIsPrinting(true);
+    try {
+      fetch(`/api/brand/catalogs/public/${slug}?download=true`).catch(() => {});
+      await prepareAndPrintCatalog({ stageId: 'catalog-print-stage' });
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   const handleShare = () => {
@@ -177,10 +185,11 @@ export default function PublicCatalogViewerPage() {
           <button
             type="button"
             onClick={handlePrint}
-            className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer"
+            disabled={isPrinting}
+            className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer"
           >
-            <Printer size={15} />
-            <span>PDF İndir / Yazdır</span>
+            {isPrinting ? <Loader2 size={15} className="animate-spin" /> : <Printer size={15} />}
+            <span>{isPrinting ? 'PDF Hazırlanıyor...' : 'PDF İndir / Yazdır'}</span>
           </button>
         </div>
       </header>

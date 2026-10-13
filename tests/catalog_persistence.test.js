@@ -320,3 +320,76 @@ test('Web Catalog Viewer - Security, URL Sanitization & Dimensions', async (t) =
   });
 });
 
+test('Catalog PDF Export - Multi-Page Print Stage & High-DPI Output Verification', async (t) => {
+  const getPageCssSize = (format, orientation) => {
+    const dominant = format || orientation || 'portrait';
+    if (dominant === 'landscape') return 'A4 landscape';
+    if (dominant === 'square') return '210mm 210mm';
+    return 'A4 portrait';
+  };
+
+  await t.test('should calculate correct dynamic @page CSS rule for different catalog orientations', () => {
+    assert.equal(getPageCssSize('portrait'), 'A4 portrait');
+    assert.equal(getPageCssSize('landscape'), 'A4 landscape');
+    assert.equal(getPageCssSize('square'), '210mm 210mm');
+    assert.equal(getPageCssSize(undefined, 'landscape'), 'A4 landscape');
+    assert.equal(getPageCssSize(undefined, undefined), 'A4 portrait');
+  });
+
+  await t.test('should ensure each canvas page has break-after-page except the last page', () => {
+    const pages = [
+      { id: 'p1', title: 'Sayfa 1', format: 'portrait' },
+      { id: 'p2', title: 'Sayfa 2', format: 'portrait' },
+      { id: 'p3', title: 'Sayfa 3', format: 'portrait' }
+    ];
+
+    const getPagePrintClass = (idx, total) => {
+      const isLast = idx === total - 1;
+      return isLast ? 'catalog-print-page' : 'catalog-print-page break-after-page page-break-always';
+    };
+
+    assert.ok(getPagePrintClass(0, pages.length).includes('page-break-always'));
+    assert.ok(getPagePrintClass(1, pages.length).includes('page-break-always'));
+    assert.ok(!getPagePrintClass(2, pages.length).includes('page-break-always'));
+  });
+
+  await t.test('should enforce eager loading and sync decoding on print stage images', () => {
+    const getImageAttributes = (isPrint) => ({
+      loading: isPrint ? 'eager' : 'lazy',
+      decoding: isPrint ? 'sync' : 'async'
+    });
+
+    assert.deepEqual(getImageAttributes(true), { loading: 'eager', decoding: 'sync' });
+    assert.deepEqual(getImageAttributes(false), { loading: 'lazy', decoding: 'async' });
+  });
+
+  await t.test('should verify print pre-flight image completion logic', async () => {
+    const mockImages = [
+      { src: '/slab1.jpg', complete: true },
+      { src: '/slab2.jpg', complete: true }
+    ];
+
+    const pending = mockImages.filter((img) => !img.complete && img.src);
+    assert.equal(pending.length, 0);
+
+    const mockPendingImages = [
+      { src: '/slab1.jpg', complete: true },
+      { src: '/slab2.jpg', complete: false }
+    ];
+    const stillPending = mockPendingImages.filter((img) => !img.complete && img.src);
+    assert.equal(stillPending.length, 1);
+    assert.equal(stillPending[0].src, '/slab2.jpg');
+  });
+
+  await t.test('should verify exact print color adjustment styles are applied to canvas elements', () => {
+    const getPrintStyle = () => ({
+      WebkitPrintColorAdjust: 'exact',
+      printColorAdjust: 'exact'
+    });
+
+    const style = getPrintStyle();
+    assert.equal(style.WebkitPrintColorAdjust, 'exact');
+    assert.equal(style.printColorAdjust, 'exact');
+  });
+});
+

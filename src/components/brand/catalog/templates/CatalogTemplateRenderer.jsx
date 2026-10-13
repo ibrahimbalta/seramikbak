@@ -9,7 +9,8 @@ import {
   Printer,
   BookOpen,
   LayoutGrid,
-  FileText
+  FileText,
+  Loader2
 } from 'lucide-react';
 import MilanoLookbookTemplate from './MilanoLookbookTemplate';
 import ArchitecturalSpecSheetTemplate from './ArchitecturalSpecSheetTemplate';
@@ -18,6 +19,7 @@ import GlobalExportTemplate from './GlobalExportTemplate';
 import LidyaTechnicTemplate from './LidyaTechnicTemplate';
 import DecoExclusiveTemplate from './DecoExclusiveTemplate';
 import CustomCanvasPageRenderer from './CustomCanvasPageRenderer';
+import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 
 export default function CatalogTemplateRenderer({
   catalog,
@@ -28,6 +30,7 @@ export default function CatalogTemplateRenderer({
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [viewFormat, setViewFormat] = useState('single'); // 'single' | 'spread' | 'all'
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   const containerRef = useRef(null);
 
   if (!catalog) return null;
@@ -92,6 +95,19 @@ export default function CatalogTemplateRenderer({
     } else {
       document.exitFullscreen().catch(() => {});
       setIsFullscreen(false);
+    }
+  };
+
+  const handlePrint = async () => {
+    if (isPrinting) return;
+    setIsPrinting(true);
+    try {
+      if (catalog?.slug) {
+        fetch(`/api/brand/catalogs/public/${catalog.slug}?download=true`).catch(() => {});
+      }
+      await prepareAndPrintCatalog({ stageId: 'catalog-print-stage' });
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -339,12 +355,13 @@ export default function CatalogTemplateRenderer({
           {/* Right: Print & Fullscreen */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
-              onClick={() => window.print()}
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow transition"
+              onClick={handlePrint}
+              disabled={isPrinting}
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer"
               title="Yazdır / PDF Olarak Kaydet"
             >
-              <Printer size={14} />
-              <span className="hidden sm:inline">PDF İndir</span>
+              {isPrinting ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
+              <span className="hidden sm:inline">{isPrinting ? 'Hazırlanıyor...' : 'PDF İndir'}</span>
             </button>
 
             <button
