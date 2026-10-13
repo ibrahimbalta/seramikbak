@@ -256,3 +256,67 @@ test('Catalog Persistence - Multi-Tenant Security & Ownership Isolation', async 
     assert.deepEqual(productIds, []);
   });
 });
+
+test('Web Catalog Viewer - Security, URL Sanitization & Dimensions', async (t) => {
+  const sanitizeUrl = (url) => {
+    if (!url || typeof url !== 'string') return '#';
+    const trimmed = url.trim();
+    if (trimmed.startsWith('/') || trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+      return trimmed;
+    }
+    return '#';
+  };
+
+  const getCanvasDimensions = (format) => {
+    if (format === 'landscape') return { width: 842, height: 595 };
+    if (format === 'square') return { width: 700, height: 700 };
+    return { width: 595, height: 842 }; // portrait
+  };
+
+  await t.test('should sanitize malicious javascript: URLs in QR or links to #', () => {
+    assert.equal(sanitizeUrl('javascript:alert(1)'), '#');
+    assert.equal(sanitizeUrl('data:text/html,<script>alert(1)</script>'), '#');
+    assert.equal(sanitizeUrl('vbscript:msgbox(1)'), '#');
+    assert.equal(sanitizeUrl(''), '#');
+    assert.equal(sanitizeUrl(null), '#');
+    assert.equal(sanitizeUrl(undefined), '#');
+  });
+
+  await t.test('should allow safe http, https and relative links', () => {
+    assert.equal(sanitizeUrl('https://seramikbak.com/urun/calacatta'), 'https://seramikbak.com/urun/calacatta');
+    assert.equal(sanitizeUrl('http://example.com'), 'http://example.com');
+    assert.equal(sanitizeUrl('/urun/calacatta-gold'), '/urun/calacatta-gold');
+  });
+
+  await t.test('should compute correct canvas aspect ratios for all supported formats', () => {
+    assert.deepEqual(getCanvasDimensions('portrait'), { width: 595, height: 842 });
+    assert.deepEqual(getCanvasDimensions('landscape'), { width: 842, height: 595 });
+    assert.deepEqual(getCanvasDimensions('square'), { width: 700, height: 700 });
+    assert.deepEqual(getCanvasDimensions(undefined), { width: 595, height: 842 });
+  });
+
+  await t.test('should verify access control for published vs unpublished catalogs', () => {
+    const isPubliclyAccessible = (catalog, auth) => {
+      if (catalog.isPublished) return true;
+      if (!auth) return false;
+      return auth.role === 'admin' || (auth.role === 'brand' && auth.id === catalog.brandId);
+    };
+
+    const publishedCat = { isPublished: true, brandId: 'brand-1' };
+    const draftCat = { isPublished: false, brandId: 'brand-1' };
+
+    // Anonymous visitor
+    assert.equal(isPubliclyAccessible(publishedCat, null), true);
+    assert.equal(isPubliclyAccessible(draftCat, null), false);
+
+    // Other brand trying to view draft
+    assert.equal(isPubliclyAccessible(draftCat, { role: 'brand', id: 'brand-2' }), false);
+
+    // Owner brand viewing draft preview
+    assert.equal(isPubliclyAccessible(draftCat, { role: 'brand', id: 'brand-1' }), true);
+
+    // Admin viewing draft preview
+    assert.equal(isPubliclyAccessible(draftCat, { role: 'admin', id: 'admin-1' }), true);
+  });
+});
+

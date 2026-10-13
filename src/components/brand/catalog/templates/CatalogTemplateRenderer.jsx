@@ -17,6 +17,7 @@ import ShowroomCollectionTemplate from './ShowroomCollectionTemplate';
 import GlobalExportTemplate from './GlobalExportTemplate';
 import LidyaTechnicTemplate from './LidyaTechnicTemplate';
 import DecoExclusiveTemplate from './DecoExclusiveTemplate';
+import CustomCanvasPageRenderer from './CustomCanvasPageRenderer';
 
 export default function CatalogTemplateRenderer({
   catalog,
@@ -31,14 +32,18 @@ export default function CatalogTemplateRenderer({
 
   if (!catalog) return null;
 
+  const hasCustomCanvas = Array.isArray(catalog?.customCanvasPages) && catalog.customCanvasPages.length > 0;
   const template = catalog.template || 'milano';
   const isLandscape = catalog.orientation === 'landscape';
 
-  // Calculate total pages dynamically based on active template
+  // Calculate total pages dynamically (Custom canvas pages vs Easy mode templates)
   let extraPages = 0;
   let productPagesCount = products.length > 0 ? products.length : 2;
 
-  if (template === 'milano') {
+  if (hasCustomCanvas) {
+    productPagesCount = 0;
+    extraPages = 0;
+  } else if (template === 'milano') {
     extraPages += 1; // Manifesto & Innovation page
     productPagesCount = productPagesCount * 2; // 2 pages per product (Sol: Mekan & Teknik / Sağ: Dikey Plaka)
     if (catalog.showSpecs !== false) extraPages += 1; // Technical standards page
@@ -57,12 +62,13 @@ export default function CatalogTemplateRenderer({
     productPagesCount = Math.max(1, Math.ceil(productPagesCount / 2));
   }
 
-  const totalPages =
-    (catalog.showCover !== false ? 1 : 0) +
-    (catalog.showTOC !== false ? 1 : 0) +
-    productPagesCount +
-    extraPages +
-    (catalog.showContactPage !== false ? 1 : 0);
+  const totalPages = hasCustomCanvas
+    ? catalog.customCanvasPages.length
+    : (catalog.showCover !== false ? 1 : 0) +
+      (catalog.showTOC !== false ? 1 : 0) +
+      productPagesCount +
+      extraPages +
+      (catalog.showContactPage !== false ? 1 : 0);
 
   // Keyboard navigation
   useEffect(() => {
@@ -90,6 +96,21 @@ export default function CatalogTemplateRenderer({
   };
 
   const renderTemplateComponent = () => {
+    if (hasCustomCanvas) {
+      return (
+        <CustomCanvasPageRenderer
+          catalog={catalog}
+          activePageIndex={currentPage}
+          viewFormat={viewFormat}
+          mode={mode}
+          onSelectPage={(idx) => {
+            setCurrentPage(idx);
+            setViewFormat('single');
+          }}
+        />
+      );
+    }
+
     const props = {
       catalog,
       products,

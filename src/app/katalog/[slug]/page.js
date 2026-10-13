@@ -138,21 +138,23 @@ export default function PublicCatalogViewerPage() {
               {catalog.title}
             </h1>
             <p className="text-[11px] text-neutral-400 font-medium">
-              {brand.name} &bull; {products.length} Seramik Ürün
+              {brand.name} &bull; {products.length > 0 ? `${products.length} Seramik Ürün` : `${catalog.customCanvasPages?.length || 0} Özel Tasarım Sayfası`}
             </p>
           </div>
         </div>
 
         {/* Center: Quick Product Search inside Catalog */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowProductDrawer(!showProductDrawer)}
-            className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
-          >
-            <Search size={14} className="text-amber-400" />
-            <span>Katalogda Ürün Ara ({products.length})</span>
-          </button>
+          {products.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowProductDrawer(!showProductDrawer)}
+              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+            >
+              <Search size={14} className="text-amber-400" />
+              <span>Katalogda Ürün Ara ({products.length})</span>
+            </button>
+          )}
 
           <button
             type="button"
