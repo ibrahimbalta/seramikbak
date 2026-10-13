@@ -2523,38 +2523,35 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {/* MODAL: DELETE CONFIRMATION (KATALOG SİLME ONAYI)                          */}
       {/* ========================================================================= */}
       {deleteConfirmCatalog && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
-                  <Trash2 size={18} />
-                </div>
-                <div>
-                  <h3 className="text-base font-extrabold text-neutral-900">Kataloğu Sil</h3>
-                  <p className="text-[11px] text-neutral-500">Bu işlem geri alınamaz</p>
-                </div>
-              </div>
+        <div className="fixed inset-0 z-50 bg-neutral-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="relative bg-white rounded-3xl border border-neutral-100 max-w-sm sm:max-w-md w-full p-6 sm:p-7 shadow-2xl text-center space-y-5">
+            <button
+              type="button"
+              onClick={() => setDeleteConfirmCatalog(null)}
+              disabled={Boolean(deletingId)}
+              className="absolute top-4 right-4 p-2 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition cursor-pointer"
+              title="Kapat"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100/80 flex items-center justify-center text-rose-600 shadow-xs">
+              <Trash2 size={24} strokeWidth={2} />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-neutral-900 tracking-tight">Kataloğu Sil</h3>
+              <p className="text-sm text-neutral-500 leading-relaxed max-w-xs mx-auto">
+                <span className="font-semibold text-neutral-800 break-words">"{deleteConfirmCatalog.title}"</span> adlı katalog kalıcı olarak silinecektir. Bu işlem geri alınamaz.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setDeleteConfirmCatalog(null)}
                 disabled={Boolean(deletingId)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200/80 text-xs text-neutral-700 leading-relaxed">
-              <strong className="text-neutral-900">"{deleteConfirmCatalog.title}"</strong> adlı kataloğu kalıcı olarak silmek istediğinizden emin misiniz?
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeleteConfirmCatalog(null)}
-                disabled={Boolean(deletingId)}
-                className="px-4 py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-700 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 active:scale-[0.98] text-sm font-semibold text-neutral-700 transition cursor-pointer disabled:opacity-50"
               >
                 Vazgeç
               </button>
@@ -2562,10 +2559,19 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 type="button"
                 onClick={() => executeDeleteCatalog(deleteConfirmCatalog)}
                 disabled={Boolean(deletingId)}
-                className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-rose-600/20 transition cursor-pointer disabled:opacity-50"
               >
-                {deletingId ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                <span>{deletingId ? 'Siliniyor...' : 'Evet, Kalıcı Olarak Sil'}</span>
+                {deletingId ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Siliniyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={15} />
+                    <span>Sil</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
