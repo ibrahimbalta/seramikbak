@@ -211,13 +211,22 @@ function clearZone(zone) {
         .forEach((el) => (el.style.display = ""));
 }
 
-setupZone(hallZone, hallInput, hallRemove, (file) => {
+setupZone(hallZone, hallInput, hallRemove, async (file) => {
     hallFile = file;
     activePresetUrl = null;
     document.querySelectorAll(".preset-pill").forEach(p => p.classList.remove("active"));
     if (hallUrl) URL.revokeObjectURL(hallUrl);
     hallUrl = showPreview(hallZone, file);
     updateDetectBtn();
+
+    try {
+        hallImageEl = await loadImage(hallUrl);
+        const w = hallImageEl.naturalWidth;
+        const h = hallImageEl.naturalHeight;
+        await generateIntelligentMask(w, h, selectedSurface, null, hallImageEl);
+    } catch (e) {
+        console.warn("[Visualizer] Preload image failed:", e);
+    }
 });
 
 setupZone(tileZone, tileInput, tileRemove, (file) => {
@@ -259,7 +268,14 @@ async function loadRoomFromPreset(url, pillBtn = null) {
         if (pillBtn) pillBtn.classList.add("active");
 
         updateDetectBtn();
-        showToast("Örnek oda seçildi. 'Zemini Algıla' butonuna tıklayabilirsiniz.", "success", 2500);
+
+        // Preload image and pre-generate intelligent surface mask
+        hallImageEl = await loadImage(hallUrl);
+        const w = hallImageEl.naturalWidth;
+        const h = hallImageEl.naturalHeight;
+        await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
+
+        showToast("Örnek oda seçildi. Doğrudan 'Seramiği Odaya Uygula' butonuna tıklayabilirsiniz.", "success", 2500);
     } catch (err) {
         showToast("Örnek oda yüklenemedi: " + err.message);
     } finally {
@@ -384,6 +400,10 @@ function updateDebugPanel() {
  * - Continuous Solid Floor: Zero punctures, zero splotches
  */
 async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null) {
+    if (roomImg) {
+        hallImageEl = roomImg;
+    }
+
     if (presetUrl) {
         let maskName = null;
         if (presetUrl.includes("bathroom")) maskName = "easy_bathroom";
@@ -392,16 +412,44 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
         if (maskName) {
             try {
-                const maskImg = await loadImage(`/hero/masks/${maskName}_${surface}.png`);
-                const c = document.createElement("canvas");
-                c.width = w; c.height = h;
-                const cx = c.getContext("2d");
-                cx.drawImage(maskImg, 0, 0, w, h);
-                const dataUrl = c.toDataURL("image/png");
-                window.__debugLayers.rawMask = dataUrl;
-                window.__debugLayers.finalApplyMask = dataUrl;
-                updateDebugPanel();
-                return dataUrl.split(",")[1];
+                // Precomputed floor mask
+                const floorMaskImg = await loadImage(`/hero/masks/${maskName}_floor.png`).catch(() => null);
+                if (floorMaskImg) {
+                    if (!surfaceMasks.floor) surfaceMasks.floor = document.createElement("canvas");
+                    surfaceMasks.floor.width = w; surfaceMasks.floor.height = h;
+                    const smfCtx = surfaceMasks.floor.getContext("2d");
+                    smfCtx.clearRect(0, 0, w, h);
+                    smfCtx.drawImage(floorMaskImg, 0, 0, w, h);
+                    window.__debugLayers.floorMask = surfaceMasks.floor.toDataURL("image/png");
+                }
+
+                // Precomputed wall mask
+                const wallMaskImg = await loadImage(`/hero/masks/${maskName}_wall.png`).catch(() => null);
+                if (wallMaskImg) {
+                    if (!surfaceMasks.wall) surfaceMasks.wall = document.createElement("canvas");
+                    surfaceMasks.wall.width = w; surfaceMasks.wall.height = h;
+                    const smwCtx = surfaceMasks.wall.getContext("2d");
+                    smwCtx.clearRect(0, 0, w, h);
+                    smwCtx.drawImage(wallMaskImg, 0, 0, w, h);
+                    window.__debugLayers.wallMask = surfaceMasks.wall.toDataURL("image/png");
+                }
+
+                // Object protection buffer
+                if (!objectProtectionMask) objectProtectionMask = document.createElement("canvas");
+                objectProtectionMask.width = w; objectProtectionMask.height = h;
+                const opCtx = objectProtectionMask.getContext("2d");
+                opCtx.clearRect(0, 0, w, h);
+
+                const dataB64 = getActiveMaskBase64();
+                if (dataB64 && dataB64.length > 50) {
+                    window.__debugLayers.rawMask = "data:image/png;base64," + dataB64;
+                    window.__debugLayers.finalApplyMask = "data:image/png;base64," + dataB64;
+                    if (roomImg) {
+                        window.__debugLayers.original = roomImg.src;
+                    }
+                    updateDebugPanel();
+                    return dataB64;
+                }
             } catch (err) {
                 console.warn("[Visualizer] Precomputed mask load skipped, using calibrated vector polygon:", err);
             }
@@ -748,9 +796,8 @@ function getActiveMaskCanvas() {
 }
 
 function getActiveMaskBase64() {
-    if (!hallImageEl) return "";
-    const w = hallImageEl.naturalWidth;
-    const h = hallImageEl.naturalHeight;
+    const w = (hallImageEl && hallImageEl.naturalWidth) || (surfaceMasks.floor && surfaceMasks.floor.width) || (surfaceMasks.wall && surfaceMasks.wall.width) || 800;
+    const h = (hallImageEl && hallImageEl.naturalHeight) || (surfaceMasks.floor && surfaceMasks.floor.height) || (surfaceMasks.wall && surfaceMasks.wall.height) || 600;
     const combCanvas = document.createElement("canvas");
     combCanvas.width = w;
     combCanvas.height = h;
@@ -1217,9 +1264,28 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     }
 
     if (topRow === -1 || activePixels < 50) {
-        const err = new Error("Seçilen yüzeyde kaplanacak alan tespit edilemedi. Lütfen 'Yüzey Maskesi İnce Ayarı' adımından yüzeyi fırça ile boyayın veya 'Otomatik Kalibrasyon' seçeneğini kullanın.");
-        err.isQualityError = true;
-        throw err;
+        console.warn("[Visualizer] Maskede kaplanacak alan yetersiz (<50 px), otomatik perspektif yüzey geometrisi ile kurtarılıyor...");
+        const isPortrait = (h > w);
+        if (surface === "wall") {
+            const wallTop = Math.round(h * 0.18);
+            const wallBot = Math.round(h * 0.75);
+            for (let y = wallTop; y < wallBot; y++) {
+                const rowOffset = y * w * 4;
+                for (let x = 0; x < w; x++) {
+                    maskPixels[rowOffset + x * 4 + 3] = 255;
+                    activePixels++;
+                }
+            }
+        } else { // "floor" or "both"
+            const floorTop = Math.round(h * (isPortrait ? 0.78 : 0.65));
+            for (let y = floorTop; y < h; y++) {
+                const rowOffset = y * w * 4;
+                for (let x = 0; x < w; x++) {
+                    maskPixels[rowOffset + x * 4 + 3] = 255;
+                    activePixels++;
+                }
+            }
+        }
     }
 
     // 4. Create tile swatch with crisp architectural grout line
@@ -1369,11 +1435,32 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
 }
 
 applyBtn.addEventListener("click", async () => {
-    if (!hallFile || !tileFile) return;
+    if (!hallFile || !tileFile) {
+        showToast("Lütfen hem mekân fotoğrafını hem de seramik görselini seçin.");
+        return;
+    }
 
     showLoading("Perspektif dönüşümü ve gerçekçi ışık haritalaması uygulanıyor…");
 
     try {
+        // Ensure hallImageEl is loaded
+        if (!hallImageEl && hallUrl) {
+            hallImageEl = await loadImage(hallUrl);
+        }
+        if (!hallImageEl) {
+            throw new Error("Mekân görseli yüklenemedi. Lütfen görseli yeniden seçin.");
+        }
+        const w = hallImageEl.naturalWidth;
+        const h = hallImageEl.naturalHeight;
+
+        // Auto-generate surface mask if not yet initialized
+        let maskB64 = getMaskBase64();
+        if (!maskB64 || maskB64.length < 50 || (!surfaceMasks.floor && !surfaceMasks.wall)) {
+            console.log("[Visualizer] Yüzey maskesi bulunamadı, otomatik oluşturuluyor...");
+            maskB64 = await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
+            maskB64 = getMaskBase64();
+        }
+
         let blobResult = null;
 
         // Try Python Microservice first
@@ -1381,7 +1468,7 @@ applyBtn.addEventListener("click", async () => {
             const fd = new FormData();
             fd.append("hall_image",  hallFile);
             fd.append("tile_image",  tileFile);
-            fd.append("mask",        getMaskBase64());
+            fd.append("mask",        maskB64);
             fd.append("pattern",     patternSelect.value);
             fd.append("tile_scale",  scaleSlider.value);
             fd.append("surface",     selectedSurface);
@@ -1400,7 +1487,7 @@ applyBtn.addEventListener("click", async () => {
             blobResult = await renderClientPerspectiveTile(
                 hallImageEl,
                 tileImgEl,
-                getMaskBase64(),
+                maskB64,
                 patternSelect.value,
                 parseFloat(scaleSlider.value) || 1.0,
                 selectedSurface
@@ -1441,31 +1528,39 @@ applyBtn.addEventListener("click", async () => {
 if (renderRetryBtn) {
     renderRetryBtn.addEventListener("click", async () => {
         if (renderErrorBox) renderErrorBox.style.display = "none";
-        if (hallImageEl) {
-            showLoading("Yapay zekâ yüzeyi yeniden kalibre ediyor…");
-            try {
-                const w = hallImageEl.naturalWidth;
-                const h = hallImageEl.naturalHeight;
-                const b64 = await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
-                maskImage = await loadImage("data:image/png;base64," + b64);
-                maskCanvas.width = w;
-                maskCanvas.height = h;
-                maskCtx.clearRect(0, 0, w, h);
-                maskCtx.drawImage(maskImage, 0, 0, w, h);
-                renderComposite();
-                applyBtn.click();
-            } catch (retryErr) {
-                console.error(retryErr);
-                hideLoading();
-                showToast("Yeniden deneme başarısız: " + retryErr.message);
+        showLoading("Yapay zekâ yüzeyi yeniden kalibre ediyor…");
+        try {
+            if (!hallImageEl && hallUrl) {
+                hallImageEl = await loadImage(hallUrl);
             }
+            if (!hallImageEl) throw new Error("Mekân görseli bulunamadı.");
+            const w = hallImageEl.naturalWidth;
+            const h = hallImageEl.naturalHeight;
+            await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
+            if (!editorCanvas.width) {
+                await initEditor(w, h);
+            } else {
+                renderComposite();
+                checkMaskCollisionsAndCoverage();
+            }
+            applyBtn.click();
+        } catch (retryErr) {
+            console.error(retryErr);
+            hideLoading();
+            showToast("Yeniden deneme başarısız: " + retryErr.message);
         }
     });
 }
 
 if (renderManualBtn) {
-    renderManualBtn.addEventListener("click", () => {
+    renderManualBtn.addEventListener("click", async () => {
         if (renderErrorBox) renderErrorBox.style.display = "none";
+        if (!hallImageEl && hallUrl) {
+            hallImageEl = await loadImage(hallUrl);
+        }
+        if (hallImageEl && (!editorCanvas.width || !surfaceMasks.floor)) {
+            await initEditor(hallImageEl.naturalWidth, hallImageEl.naturalHeight);
+        }
         editorSection.classList.add("visible");
         editorSection.scrollIntoView({ behavior: "smooth", block: "start" });
     });
