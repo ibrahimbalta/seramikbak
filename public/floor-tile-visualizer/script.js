@@ -491,16 +491,19 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     }
     const rgbData = tempCtx.getImageData(0, 0, w, h).data;
 
-    const isEasyBathroom = (presetUrl && presetUrl.includes("bathroom")) || (activePresetUrl && activePresetUrl.includes("bathroom")) || (w === 1024 && h === 1024);
+    const isLuxuryBathroom = (presetUrl && presetUrl.includes("luxury_bathroom")) || (activePresetUrl && activePresetUrl.includes("luxury_bathroom"));
+    const isEasyBathroom = !isLuxuryBathroom && ((presetUrl && presetUrl.includes("bathroom")) || (activePresetUrl && activePresetUrl.includes("bathroom")) || (w === 1024 && h === 1024));
     const isPortraitBathroomQA = (w === 475 && h === 625);
     const isPortrait = (h > w);
 
     // 1. Tavan ve Spotlar (Ceiling): y in [0, ceilingY]
-    const ceilingY = Math.round(h * 0.176);
+    const ceilingY = Math.round(h * (isLuxuryBathroom ? 0.115 : 0.176));
 
     // 2. Floor Horizon Line:
     let floorY;
-    if (isEasyBathroom) {
+    if (isLuxuryBathroom) {
+        floorY = Math.round(h * 0.835);
+    } else if (isEasyBathroom) {
         floorY = Math.round(h * 0.72);
     } else if (isPortraitBathroomQA) {
         floorY = Math.round(h * 0.856);
@@ -563,6 +566,25 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
                 isProtected = true; // Tavan %100 Korumalı
             } else if (isPlant || isBathMat) {
                 isProtected = true; // Bitki ve paspas %100 Korumalı
+            } else if (isLuxuryBathroom) {
+                // luxury_bathroom.png (Klozet, Banyo Dolabı, Duşakabin, Ayna)
+                if (x < Math.round(w * 0.35) && y < floorY) {
+                    isProtected = true; // Duşakabin
+                } else if (x >= Math.round(w * 0.40) && x <= Math.round(w * 0.63) && y >= Math.round(h * 0.29) && y <= Math.round(h * 0.45)) {
+                    isProtected = true; // Duvar Nişi
+                } else if (x >= Math.round(w * 0.47) && x <= Math.round(w * 0.55) && y >= Math.round(h * 0.48) && y <= Math.round(h * 0.58)) {
+                    isProtected = true; // Gömme Rezervuar Butonu
+                } else if (x >= Math.round(w * 0.44) && x <= Math.round(w * 0.62) && y >= Math.round(h * 0.60) && y <= Math.round(h * 0.86)) {
+                    isProtected = true; // Klozet ve fırça
+                } else if (Math.pow((x - w * 0.786) / (w * 0.175), 2) + Math.pow((y - h * 0.254) / (h * 0.175), 2) <= 1.0) {
+                    isProtected = true; // Yuvarlak Ayna
+                } else if (x >= Math.round(w * 0.62) && x <= Math.round(w * 0.98) && y >= Math.round(h * 0.45) && y <= Math.round(h * 0.88)) {
+                    isProtected = true; // Banyo Dolabı ve Lavabo
+                } else if (x >= Math.round(w * 0.92)) {
+                    isProtected = true; // Ahşap panel
+                } else if (x <= Math.round(w * 0.12)) {
+                    isProtected = true; // Pencere jaluzi
+                }
             } else if (isEasyBathroom) {
                 // easy_bathroom.jpg (1024x1024 Kare Banyo Odası)
                 // Sol ahşap duvar ve asılı beyaz havlu

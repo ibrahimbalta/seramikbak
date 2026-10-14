@@ -548,6 +548,70 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
     assert.equal(historyStack.redo.length, 1);
   });
 
+  test('Luxury Bathroom Fixture Exclusion - Vanity, Toilet, and Shower Enclosure Must Be Strictly Protected', () => {
+    const w = 1024;
+    const h = 1024;
+    const ceilingY = Math.round(h * 0.115);
+    const floorY = Math.round(h * 0.835);
+
+    const isLuxuryProtected = (x, y) => {
+      if (y < ceilingY) return true; // Ceiling
+      if (x < Math.round(w * 0.35) && y < floorY) return true; // Duşakabin (shower cabin & glass partition)
+      if (x >= Math.round(w * 0.40) && x <= Math.round(w * 0.63) && y >= Math.round(h * 0.29) && y <= Math.round(h * 0.45)) return true; // Niche
+      if (x >= Math.round(w * 0.47) && x <= Math.round(w * 0.55) && y >= Math.round(h * 0.48) && y <= Math.round(h * 0.58)) return true; // Flush plate
+      if (x >= Math.round(w * 0.44) && x <= Math.round(w * 0.62) && y >= Math.round(h * 0.60) && y <= Math.round(h * 0.86)) return true; // Toilet bowl
+      if (Math.pow((x - w * 0.786) / (w * 0.175), 2) + Math.pow((y - h * 0.254) / (h * 0.175), 2) <= 1.0) return true; // Mirror
+      if (x >= Math.round(w * 0.62) && x <= Math.round(w * 0.98) && y >= Math.round(h * 0.45) && y <= Math.round(h * 0.88)) return true; // Vanity unit (banyo dolabı)
+      if (x >= Math.round(w * 0.92)) return true; // Wood slats & towel
+      if (x <= Math.round(w * 0.12)) return true; // Window
+      return false;
+    };
+
+    // 1. Vanity Unit (Banyo Dolabı): drawers & basin
+    const vanityDrawerX = Math.round(w * 0.75);
+    const vanityDrawerY = Math.round(h * 0.72);
+    assert.equal(isLuxuryProtected(vanityDrawerX, vanityDrawerY), true, 'Banyo dolabı drawers must be protected from tiles');
+
+    const vanityBasinX = Math.round(w * 0.75);
+    const vanityBasinY = Math.round(h * 0.58);
+    assert.equal(isLuxuryProtected(vanityBasinX, vanityBasinY), true, 'Banyo dolabı basin/countertop must be protected');
+
+    // 2. Toilet (Klozet) & flush actuator
+    const toiletBowlX = Math.round(w * 0.50);
+    const toiletBowlY = Math.round(h * 0.75);
+    assert.equal(isLuxuryProtected(toiletBowlX, toiletBowlY), true, 'Klozet bowl must be protected from tiles');
+
+    const flushPlateX = Math.round(w * 0.51);
+    const flushPlateY = Math.round(h * 0.52);
+    assert.equal(isLuxuryProtected(flushPlateX, flushPlateY), true, 'Flush plate must be protected');
+
+    // 3. Shower Cabin (Duşakabin) & Glass Partition
+    const showerHeadX = Math.round(w * 0.25);
+    const showerHeadY = Math.round(h * 0.14);
+    assert.equal(isLuxuryProtected(showerHeadX, showerHeadY), true, 'Duşakabin showerhead must be protected');
+
+    const showerGlassX = Math.round(w * 0.30);
+    const showerGlassY = Math.round(h * 0.50);
+    assert.equal(isLuxuryProtected(showerGlassX, showerGlassY), true, 'Duşakabin glass partition must be protected');
+
+    // 4. Circular Mirror (Ayna)
+    const mirrorCenterX = Math.round(w * 0.786);
+    const mirrorCenterY = Math.round(h * 0.254);
+    assert.equal(isLuxuryProtected(mirrorCenterX, mirrorCenterY), true, 'Circular backlit mirror must be protected');
+
+    // 5. Tileable Wall Surface around fixtures (between shower and toilet, or above vanity)
+    const wallPixelX = Math.round(w * 0.38);
+    const wallPixelY = Math.round(h * 0.25);
+    assert.equal(isLuxuryProtected(wallPixelX, wallPixelY), false, 'Clear wall surface behind/around fixtures must remain tileable');
+    assert.ok(wallPixelY >= ceilingY && wallPixelY < floorY, 'Wall pixel must fall within wall zone');
+
+    // 6. Tileable Floor Surface in front of toilet/shower
+    const floorPixelX = Math.round(w * 0.50);
+    const floorPixelY = Math.round(h * 0.92);
+    assert.equal(isLuxuryProtected(floorPixelX, floorPixelY), false, 'Open floor surface must remain tileable');
+    assert.ok(floorPixelY >= floorY, 'Floor pixel must fall within floor zone');
+  });
+
 });
 
 

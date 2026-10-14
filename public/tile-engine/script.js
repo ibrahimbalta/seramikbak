@@ -98,13 +98,14 @@
             isBathroom: false
         },
         'luxury_bathroom': {
-            floorY: 0.68,
-            ceilingY: 0.15,
+            floorY: 0.835,
+            ceilingY: 0.115,
             horizonY: 0.48,
             vanishingX: 0.50,
             vanishingY: 0.48,
             fgUrl: '/hero/luxury_bathroom_fg.png',
-            isBathroom: true
+            isBathroom: true,
+            layout: 'luxury'
         },
         'easy_kitchen': {
             floorY: 0.57,
@@ -131,28 +132,51 @@
             vanishingX: 0.50,
             vanishingY: 0.48,
             fgUrl: '/hero/easy_bathroom_fg.png',
-            isBathroom: true
-        }
-    };
-
-    function getRoomConfig(url, w, h) {
-        if (url) {
-            const cleanUrl = url.toLowerCase();
-            for (const [key, conf] of Object.entries(ROOM_PRESETS)) {
-                if (cleanUrl.includes(key)) {
-                    return conf;
-                }
-            }
-        }
-        const isPortrait = h > w;
-        return {
-            floorY: isPortrait ? 0.70 : 0.62,
-            ceilingY: 0.16,
+            isBathroom: true,
+            layout: 'easy'
+        },
+        'antrasit_gri_banyo': {
+            floorY: 0.856,
+            ceilingY: 0.176,
             horizonY: 0.48,
             vanishingX: 0.50,
             vanishingY: 0.48,
             fgUrl: null,
-            isBathroom: Boolean(url && url.toLowerCase().includes('bathroom'))
+            isBathroom: true,
+            layout: 'antrasit'
+        }
+    };
+
+    function getRoomConfig(url, w, h, name = '') {
+        const textToSearch = `${url || ''} ${name || ''}`.toLowerCase();
+        for (const [key, conf] of Object.entries(ROOM_PRESETS)) {
+            if (textToSearch.includes(key) || textToSearch.includes(key.replace(/_/g, ' '))) {
+                return conf;
+            }
+        }
+        const isPortrait = h > w;
+        const isBathroom = Boolean(
+            textToSearch.includes('bathroom') ||
+            textToSearch.includes('banyo') ||
+            textToSearch.includes('klozet') ||
+            textToSearch.includes('toilet') ||
+            textToSearch.includes('wc') ||
+            textToSearch.includes('shower') ||
+            textToSearch.includes('dus') ||
+            textToSearch.includes('lavabo')
+        );
+
+        const isAntrasitLayout = isBathroom && (isPortrait || (w > 0 && h > 0 && Math.abs((w / h) - (475 / 625)) < 0.18));
+
+        return {
+            floorY: isAntrasitLayout ? 0.856 : (isBathroom ? (isPortrait ? 0.80 : 0.76) : (isPortrait ? 0.70 : 0.62)),
+            ceilingY: isBathroom ? 0.16 : 0.16,
+            horizonY: 0.48,
+            vanishingX: 0.50,
+            vanishingY: 0.48,
+            fgUrl: null,
+            isBathroom: isBathroom,
+            layout: isAntrasitLayout ? 'antrasit' : (isBathroom ? 'general_bathroom' : 'general')
         };
     }
 
@@ -348,7 +372,7 @@
             roomImageEl = await loadImage(url);
             roomDims.textContent = `${roomImageEl.naturalWidth}×${roomImageEl.naturalHeight}px`;
 
-            const conf = getRoomConfig(url, roomImageEl.naturalWidth, roomImageEl.naturalHeight);
+            const conf = getRoomConfig(url, roomImageEl.naturalWidth, roomImageEl.naturalHeight, name);
             if (conf.fgUrl) {
                 try {
                     roomFgImageEl = await loadImage(conf.fgUrl);
@@ -402,9 +426,10 @@
             fgData = fgCtx.getImageData(0, 0, w, h).data;
         }
 
-        const conf = getRoomConfig(activeRoomUrl, w, h);
+        const conf = getRoomConfig(activeRoomUrl, w, h, activeRoomName);
         const floorY = Math.round(h * conf.floorY);
         const ceilingY = Math.round(h * conf.ceilingY);
+        const isPortrait = h > w;
 
         // Independent Mask Buffers (Zero Overlap Disjoint Partition)
         const activeImgData  = maskCtx.createImageData(w, h);
@@ -430,6 +455,11 @@
                 const g = rgbData[idx + 1];
                 const b = rgbData[idx + 2];
 
+                const lum = r * 0.299 + g * 0.587 + b * 0.114;
+                const maxC = Math.max(r, g, b);
+                const minC = Math.min(r, g, b);
+                const chroma = maxC - minC;
+
                 let isProtected = false;
 
                 // 1. Precise foreground layer check (covers sofa, table, chairs, shower glass, armatures, mirror, vanity)
@@ -445,27 +475,94 @@
                     isProtected = true;
                 }
 
-                // 4. Fallback bathroom geometry when no separate fg file exists
-                if (conf.isBathroom && !roomFgImageEl) {
-                    // Right Shower Glass, Frame & Shower Fixtures (armatürler)
-                    if (x > Math.round(w * 0.58) && y < floorY) {
-                        isProtected = true;
-                    }
-                    // Mirror (elliptical boundary)
-                    else if (Math.pow((x - w * 0.50) / (w * 0.125), 2) + Math.pow((y - h * 0.36) / (h * 0.165), 2) <= 1.0) {
-                        isProtected = true;
-                    }
-                    // Vessel Sink & Faucet
-                    else if (x >= Math.round(w * 0.43) && x <= Math.round(w * 0.57) && y >= Math.round(h * 0.49) && y <= Math.round(h * 0.59)) {
-                        isProtected = true;
-                    }
-                    // Vanity Countertop & Drawers
-                    else if (x >= Math.round(w * 0.36) && x <= Math.round(w * 0.64) && y >= Math.round(h * 0.58) && y <= Math.round(h * 0.73)) {
-                        isProtected = true;
-                    }
-                    // Left wood accent cabinet / towel
-                    else if (x < Math.round(w * 0.28) && y < floorY) {
-                        isProtected = true;
+                // 4. White porcelain ceramic fixture protection (toilet bowls, vessel sinks, freestanding tubs)
+                if (conf.isBathroom && lum > 185 && chroma < 28 && y >= ceilingY && y <= Math.round(h * 0.90)) {
+                    isProtected = true;
+                }
+
+                // 5. Floor rugs, bath mats and deep void protection
+                if (isFloorZone && ((chroma > 45 && lum < 75) || (lum < 18))) {
+                    isProtected = true;
+                }
+
+                // 6. Architectural and fixture geometry protection for bathrooms
+                if (conf.isBathroom) {
+                    if (conf.layout === 'luxury') {
+                        // Shower cabin (duşakabin): walk-in glass, rain shower, niche, hose & drain
+                        if (x < Math.round(w * 0.35) && y < floorY) {
+                            isProtected = true;
+                        }
+                        // Wall niche above toilet with decorative items & plants
+                        else if (x >= Math.round(w * 0.40) && x <= Math.round(w * 0.63) && y >= Math.round(h * 0.29) && y <= Math.round(h * 0.45)) {
+                            isProtected = true;
+                        }
+                        // Flush actuator plate
+                        else if (x >= Math.round(w * 0.47) && x <= Math.round(w * 0.55) && y >= Math.round(h * 0.48) && y <= Math.round(h * 0.58)) {
+                            isProtected = true;
+                        }
+                        // Toilet bowl (klozet), brush & paper roll
+                        else if (x >= Math.round(w * 0.44) && x <= Math.round(w * 0.62) && y >= Math.round(h * 0.60) && y <= Math.round(h * 0.86)) {
+                            isProtected = true;
+                        }
+                        // Circular illuminated mirror (ayna)
+                        else if (Math.pow((x - w * 0.786) / (w * 0.175), 2) + Math.pow((y - h * 0.254) / (h * 0.175), 2) <= 1.0) {
+                            isProtected = true;
+                        }
+                        // Vanity cabinet (banyo dolabı), countertop, basin, faucet & toiletries
+                        else if (x >= Math.round(w * 0.62) && x <= Math.round(w * 0.98) && y >= Math.round(h * 0.45) && y <= Math.round(h * 0.88)) {
+                            isProtected = true;
+                        }
+                        // Wood slats & towel
+                        else if (x >= Math.round(w * 0.92)) {
+                            isProtected = true;
+                        }
+                        // Window blinds on left
+                        else if (x <= Math.round(w * 0.12)) {
+                            isProtected = true;
+                        }
+                    } else if (conf.layout === 'antrasit' || isPortrait) {
+                        // Compact / portrait bathroom (e.g. Antrasit banyo)
+                        // Toilet bowl (klozet)
+                        if (x >= Math.round(w * 0.158) && x <= Math.round(w * 0.36) && y >= Math.round(h * 0.68) && y <= Math.round(h * 0.86)) {
+                            isProtected = true;
+                        }
+                        // Flush plate
+                        else if (x >= Math.round(w * 0.20) && x <= Math.round(w * 0.34) && y >= Math.round(h * 0.52) && y <= Math.round(h * 0.61)) {
+                            isProtected = true;
+                        }
+                        // Vanity cabinet, countertop & vessel sink (banyo dolabı)
+                        else if (x >= Math.round(w * 0.38) && x <= Math.round(w * 0.95) && y >= Math.round(h * 0.64) && y <= Math.round(h * 0.85)) {
+                            isProtected = true;
+                        }
+                        // Upper wall cabinet & backlit mirror
+                        else if (x >= Math.round(w * 0.38) && x <= Math.round(w * 0.95) && y >= Math.round(h * 0.17) && y <= Math.round(h * 0.64)) {
+                            isProtected = true;
+                        }
+                        // Left towel radiator
+                        else if (x < Math.round(w * 0.15) && y >= Math.round(h * 0.25) && y <= Math.round(h * 0.85)) {
+                            isProtected = true;
+                        }
+                    } else if (conf.layout === 'easy' || (!roomFgImageEl && conf.isBathroom)) {
+                        // Right shower cabin & glass partition (duşakabin)
+                        if (x > Math.round(w * 0.68) && y < floorY) {
+                            isProtected = true;
+                        }
+                        // Mirror above vanity
+                        else if (x >= Math.round(w * 0.38) && x <= Math.round(w * 0.62) && y >= Math.round(h * 0.22) && y <= Math.round(h * 0.50)) {
+                            isProtected = true;
+                        }
+                        // Vessel sink & faucet
+                        else if (x >= Math.round(w * 0.42) && x <= Math.round(w * 0.58) && y >= Math.round(h * 0.48) && y <= Math.round(h * 0.58)) {
+                            isProtected = true;
+                        }
+                        // Vanity countertop & drawers (banyo dolabı)
+                        else if (x >= Math.round(w * 0.30) && x <= Math.round(w * 0.70) && y >= Math.round(h * 0.54) && y <= Math.round(h * 0.73)) {
+                            isProtected = true;
+                        }
+                        // Left tall cabinet / towel
+                        else if (x < Math.round(w * 0.15) && y < floorY) {
+                            isProtected = true;
+                        }
                     }
                 }
 
