@@ -95,6 +95,14 @@ const nextConfig = {
         source: '/tiles-visualizer/',
         destination: '/tiles-visualizer/index.html',
       },
+      {
+        source: '/tile-engine',
+        destination: '/tile-engine/index.html',
+      },
+      {
+        source: '/tile-engine/',
+        destination: '/tile-engine/index.html',
+      },
     ];
   },
 

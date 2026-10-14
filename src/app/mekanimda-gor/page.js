@@ -13,13 +13,13 @@ function MekanimdaGorContent() {
   const tileParam = searchParams ? searchParams.get('tile') : null;
   const productParam = searchParams ? searchParams.get('product') : null;
 
-  const [visualizerSrc, setVisualizerSrc] = useState('/floor-tile-visualizer/');
+  const [visualizerSrc, setVisualizerSrc] = useState('/tile-engine/');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let url = '/floor-tile-visualizer/index.html';
+    let url = '/tile-engine/index.html';
     const params = new URLSearchParams();
-    params.set('v', '3.6.0');
+    params.set('v', '4.0.0');
 
     if (tileParam) {
       params.set('tile', tileParam);
@@ -40,11 +40,11 @@ function MekanimdaGorContent() {
             params.set('product', prod.name || slug);
           }
           const qs = params.toString();
-          setVisualizerSrc(qs ? `/floor-tile-visualizer/index.html?${qs}` : '/floor-tile-visualizer/index.html');
+          setVisualizerSrc(qs ? `/tile-engine/index.html?${qs}` : '/tile-engine/index.html');
           setLoading(false);
         })
         .catch(() => {
-          setVisualizerSrc('/floor-tile-visualizer/index.html?v=3.6.0');
+          setVisualizerSrc('/tile-engine/index.html?v=4.0.0');
           setLoading(false);
         });
       return;
@@ -86,9 +86,9 @@ function MekanimdaGorContent() {
             <Sparkles size={14} className="text-indigo-400" />
             <span>SERAMİKBAK AI STÜDYO</span>
           </span>
-          <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            SegFormer Canlı
+          <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-medium text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+            Tile Detection Engine
           </span>
         </div>
       </nav>

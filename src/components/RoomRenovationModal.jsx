@@ -35,7 +35,7 @@ export default function RoomRenovationModal({
   const textureUrl = resolveSafeTextureUrl(rawTexture);
 
   // Visualizer URL with params (explicit index.html ensures direct static serving without router rewrite issues)
-  const visualizerUrl = `/floor-tile-visualizer/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&scale=1.0&surface=floor&embed=1&v=3.6.0`;
+  const visualizerUrl = `/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}&scale=1.0&surface=floor&embed=1&v=4.0.0`;
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function RoomRenovationModal({
     };
     window.addEventListener('keydown', handleKeyDown);
 
-    // Listen for postMessage from embedded floor-tile-visualizer
+    // Listen for postMessage from embedded visualizer
     const handleMessage = (e) => {
       if (!e.data) return;
       if (e.data.type === 'CLOSE_VISUALIZER') {
@@ -103,8 +103,8 @@ export default function RoomRenovationModal({
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 flex items-center gap-1.5 truncate">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>SegFormer-B3 AI Görselleştirici Aktif</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                <span>Tile Detection &amp; Visualization Engine Aktif</span>
               </p>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function RoomRenovationModal({
           {/* Right: Actions */}
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             <a
-              href={`/floor-tile-visualizer/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}`}
+              href={`/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"

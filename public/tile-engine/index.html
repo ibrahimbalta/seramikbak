@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tile Detection and Visualization Engine</title>
+    <link rel="stylesheet" href="style.css?v=1.0.0" />
+</head>
+<body>
+    <div class="engine-layout">
+        <!-- Left Sidebar: Application Settings -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Application Settings</h2>
+                <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" title="Kapat">&times;</button>
+            </div>
+
+            <!-- Surface Type -->
+            <div class="setting-group">
+                <label class="setting-label">Surface Type</label>
+                <div class="surface-toggle">
+                    <button type="button" class="toggle-btn active" data-surface="floor" id="surf-floor-btn">Floor</button>
+                    <button type="button" class="toggle-btn" data-surface="wall" id="surf-wall-btn">Wall</button>
+                </div>
+            </div>
+
+            <!-- Layout Pattern -->
+            <div class="setting-group">
+                <label for="pattern-select" class="setting-label">Layout Pattern</label>
+                <select id="pattern-select" class="custom-select">
+                    <option value="brick">Classic Offset (1/3)</option>
+                    <option value="grid">Standard Grid</option>
+                    <option value="diagonal">Diagonal 45°</option>
+                </select>
+            </div>
+
+            <!-- Tile Size -->
+            <div class="setting-group">
+                <div class="setting-header-row">
+                    <label class="setting-label">Tile Size</label>
+                    <span class="setting-value" id="tile-size-val">60 cm × 120 cm</span>
+                </div>
+                <div class="dual-slider">
+                    <div class="slider-row">
+                        <span class="slider-sublabel">W:</span>
+                        <input type="range" id="tile-w-slider" min="20" max="180" step="5" value="60" />
+                        <span class="slider-num" id="tile-w-num">60 cm</span>
+                    </div>
+                    <div class="slider-row">
+                        <span class="slider-sublabel">H:</span>
+                        <input type="range" id="tile-h-slider" min="20" max="240" step="5" value="120" />
+                        <span class="slider-num" id="tile-h-num">120 cm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grout Width -->
+            <div class="setting-group">
+                <div class="setting-header-row">
+                    <label class="setting-label">Grout Width</label>
+                    <span class="setting-value" id="grout-val">3 mm</span>
+                </div>
+                <input type="range" id="grout-slider" min="1" max="10" step="1" value="3" />
+                <div class="slider-scale-row">
+                    <span>1 mm</span>
+                    <span>10 mm</span>
+                </div>
+            </div>
+
+            <!-- Device Selector -->
+            <div class="setting-group">
+                <label for="device-select" class="setting-label">Device Selector</label>
+                <select id="device-select" class="custom-select">
+                    <option value="webgl">WebGL GPU Accelerated</option>
+                    <option value="cpu">Local CPU Engine</option>
+                </select>
+            </div>
+
+            <!-- Sidebar Actions -->
+            <div class="sidebar-actions">
+                <button type="button" class="btn btn-secondary" id="reset-settings-btn">Reset</button>
+                <button type="button" class="btn btn-primary" id="apply-settings-btn">Apply Settings</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-title-row">
+                    <h1><span class="header-icon">🏠</span> Tile Detection and Visualization Engine</h1>
+                </div>
+                <p class="header-subtitle">Identify, select, and visualize floor and wall tiles in your space.</p>
+                <div class="steps-flow">
+                    <span class="step-circle active" id="badge-step-1">❶</span>
+                    <span class="step-arrow">→</span>
+                    <span class="step-circle" id="badge-step-2">❷</span>
+                    <span class="step-arrow">→</span>
+                    <span class="step-circle" id="badge-step-3">❸</span>
+                </div>
+            </header>
+
+            <!-- Top Grid: Step 1 (Tile) & Step 2 (Room) -->
+            <div class="cards-grid">
+                <!-- Step 1: Upload Tile -->
+                <div class="engine-card" id="card-step-1">
+                    <div class="card-header">
+                        <h3>Step 1: Upload Tile</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="image-preview-box" id="tile-preview-box">
+                            <img id="tile-img-preview" src="/textures/calacatta_gold.jpg" alt="Selected Tile Texture" />
+                        </div>
+                        <input type="file" id="tile-file-input" accept="image/*" style="display:none;" />
+                        <button type="button" class="btn btn-card-action" id="browse-tile-btn">Browse files</button>
+                        <div class="file-details-row">
+                            <span class="file-name" id="tile-file-name">volcano_anthracite.jpg</span>
+                            <span class="file-dims" id="tile-dims">600×1200px</span>
+                        </div>
+                        <div class="card-note" id="tile-details-note">Tile details: Volcano 60×120 Anthracite</div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Upload Room -->
+                <div class="engine-card" id="card-step-2">
+                    <div class="card-header">
+                        <h3>Step 2: Upload Room</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="preset-rooms-row">
+                            <span class="preset-label">Mekân:</span>
+                            <div class="preset-pills">
+                                <button type="button" class="preset-pill active" data-preset="/hero/easy_bathroom.jpg">🚿 Modern Banyo</button>
+                                <button type="button" class="preset-pill" data-preset="/hero/luxury_bathroom.png">🛁 Lüks Banyo</button>
+                                <button type="button" class="preset-pill" data-preset="/hero/modern_living.png">🛋️ Salon</button>
+                                <button type="button" class="preset-pill" data-preset="/hero/easy_kitchen.jpg">🍳 Mutfak</button>
+                            </div>
+                        </div>
+
+                        <div class="image-preview-box" id="room-preview-box">
+                            <img id="room-img-preview" src="/hero/easy_bathroom.jpg" alt="Selected Room Photo" />
+                        </div>
+                        <input type="file" id="room-file-input" accept="image/*" style="display:none;" />
+                        <div class="room-action-buttons">
+                            <button type="button" class="btn btn-card-action" id="browse-room-btn">Browse files</button>
+                            <button type="button" class="btn btn-blue" id="analyze-room-btn">Analyze Room</button>
+                        </div>
+                        <div class="file-details-row">
+                            <span class="file-name" id="room-file-name">modern_bathroom.jpg</span>
+                            <span class="file-dims" id="room-dims">1024×1024px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Masking Tool -->
+            <div class="engine-card masking-card" id="card-step-3">
+                <div class="card-header">
+                    <h3>Step 3: Masking Tool</h3>
+                    <div class="mask-legend">
+                        <span class="legend-dot purple"></span> <span class="legend-txt">Döşenecek Seramik Alanı</span>
+                    </div>
+                </div>
+                <div class="masking-card-content">
+                    <!-- Canvas Drawing Area -->
+                    <div class="canvas-viewport" id="canvas-viewport">
+                        <canvas id="mask-canvas"></canvas>
+                        <div class="brush-cursor" id="brush-cursor"></div>
+                    </div>
+
+                    <!-- Right Controls for Masking -->
+                    <div class="masking-controls-col">
+                        <!-- Brush Size -->
+                        <div class="mask-control-group">
+                            <div class="control-header-row">
+                                <label>Brush Size</label>
+                                <span id="brush-size-display">25px</span>
+                            </div>
+                            <input type="range" id="brush-size-slider" min="4" max="80" value="25" />
+                            <div class="slider-scale-row">
+                                <span>4px</span>
+                                <span>80px</span>
+                            </div>
+                        </div>
+
+                        <!-- Zoom -->
+                        <div class="mask-control-group">
+                            <div class="control-header-row">
+                                <label>Zoom</label>
+                                <span id="zoom-display">100%</span>
+                            </div>
+                            <input type="range" id="zoom-slider" min="50" max="250" step="5" value="100" />
+                            <div class="slider-scale-row">
+                                <span>50%</span>
+                                <span>250%</span>
+                            </div>
+                        </div>
+
+                        <!-- Opacity -->
+                        <div class="mask-control-group">
+                            <div class="control-header-row">
+                                <label>Mask Opacity</label>
+                                <span id="opacity-display">55%</span>
+                            </div>
+                            <input type="range" id="opacity-slider" min="10" max="95" step="5" value="55" />
+                            <div class="slider-scale-row">
+                                <span>10%</span>
+                                <span>95%</span>
+                            </div>
+                        </div>
+
+                        <!-- Mask Action Buttons -->
+                        <div class="mask-buttons-row">
+                            <button type="button" class="btn btn-outline" id="mask-undo-btn" title="Geri Al">↩ Undo</button>
+                            <button type="button" class="btn btn-outline" id="mask-redo-btn" title="Yinele">↪ Redo</button>
+                            <button type="button" class="btn btn-outline" id="mask-clear-btn" title="Temizle">🗑 Clear</button>
+                        </div>
+
+                        <!-- Big Generate Button -->
+                        <button type="button" class="btn btn-generate" id="generate-btn">
+                            <span class="btn-icon">🚀</span> Generate Visualization
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Visualization Result (Before / After Comparison) -->
+            <div class="engine-card result-card" id="card-step-4">
+                <div class="card-header result-card-header">
+                    <div>
+                        <h3>Step 4: Visualization Result</h3>
+                        <p class="result-subtitle">Kaydırıcıyı sağa-sola hareket ettirerek öncesi ve sonrasını karşılaştırın.</p>
+                    </div>
+                    <div class="result-actions">
+                        <button type="button" class="btn btn-secondary" id="request-quote-btn">📋 Fiyat Teklifi Al</button>
+                        <button type="button" class="btn btn-primary" id="download-result-btn">📥 Download PNG</button>
+                    </div>
+                </div>
+
+                <div class="result-card-body">
+                    <div class="before-after-container" id="before-after-container" style="--split: 50%;">
+                        <!-- Comparison Stage -->
+                        <div class="before-after-stage" id="comparison-stage">
+                            <!-- After Image (Result with tiles) -->
+                            <img id="result-img" class="stage-img stage-img--after" src="" alt="After - Tiled Room" />
+
+                            <!-- Before Image (Original room, clipped) -->
+                            <img id="original-img" class="stage-img stage-img--before" src="" alt="Before - Original Room" />
+
+                            <!-- Split Handle -->
+                            <div class="stage-handle" id="stage-handle">
+                                <div class="handle-line"></div>
+                                <div class="handle-pill">
+                                    <span>◀ ▶</span>
+                                </div>
+                            </div>
+
+                            <!-- White pill badges matching demo_floor_visual.png -->
+                            <div class="badge-before">BEFORE</div>
+                            <div class="badge-after">AFTER</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Tile Detection &amp; Visualization Engine çalışıyor…</div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js?v=1.0.0"></script>
+</body>
+</html>
