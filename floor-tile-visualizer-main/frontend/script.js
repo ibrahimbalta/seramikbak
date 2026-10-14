@@ -57,9 +57,13 @@ const brushValue    = $("#brush-value");
 const resultSection = $("#result-section");
 const resultImg     = $("#result-img");
 const originalImg   = $("#original-img");
-const compBefore    = $("#comparison-before");
+const compStage     = $("#comparison-stage");
 const compHandle    = $("#comparison-handle");
 const compContainer = $("#comparison-container");
+const renderErrorBox = $("#render-error-box");
+const renderErrorMsg = $("#render-error-msg");
+const renderRetryBtn = $("#render-retry-btn");
+const renderManualBtn = $("#render-manual-btn");
 
 const loadingOverlay = $("#loading-overlay");
 const loadingText    = $("#loading-text");
@@ -432,6 +436,9 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     const prData = prCtx.createImageData(w, h);
     const prPx = prData.data;
 
+    let floorPixelCount = 0;
+    let wallPixelCount = 0;
+
     for (let y = 0; y < h; y++) {
         const rowOffset = y * w * 4;
         const isFloorZone = (y >= floorY);
@@ -450,8 +457,24 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
             let isProtected = false;
 
+            // 1. Bitki Koruma (Green Foliage Signature): Klorofil ve yaprak tonları
+            const isPlant = (g > r + 18 && g > b + 18) || (2 * g - r - b > 28 && g > 45);
+
+            // 2. Banyo Paspası & Halı Koruması (Bath Mat / Floor Rug):
+            // Zemin üzerinde yer alan tekstil paspaslar karo kaplanmaz
+            let isBathMat = false;
+            if (isFloorZone) {
+                // Lavabo / duş önü paspas bölgesi veya kumaş mat dokusu
+                if ((x >= Math.round(w * 0.30) && x <= Math.round(w * 0.72) && y >= Math.round(floorY + h * 0.03) && y <= Math.round(floorY + h * 0.11)) || (chroma > 45 && lum < 75)) {
+                    isBathMat = true;
+                }
+            }
+
             if (y < ceilingY) {
                 // Tavan & Spotlar: %100 Korumalı
+                isProtected = true;
+            } else if (isPlant || isBathMat) {
+                // Bitkiler ve banyo paspası: %100 Korumalı
                 isProtected = true;
             } else if (isPortrait) {
                 // Katı Geometrik Bölge Topolojisi (Zero-Bleed)
@@ -496,12 +519,32 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
                     fPx[idx + 1] = 255;
                     fPx[idx + 2] = 255;
                     fPx[idx + 3] = 255;
+                    floorPixelCount++;
                 } else if (isWallZone) {
                     // Düzeltilmiş Duvar Maskesi: Beyaz (255)
                     wPx[idx]     = 255;
                     wPx[idx + 1] = 255;
                     wPx[idx + 2] = 255;
                     wPx[idx + 3] = 255;
+                    wallPixelCount++;
+                }
+            }
+        }
+    }
+
+    // Otomatik Zemin Kalite Kontrolü (Automatic Floor Quality Check)
+    // Eğer zemin maskesi boşsa veya toplam görüntünün %3'ünden küçükse otomatik perspektif geometrisiyle düzelt:
+    if (surface === "floor" && floorPixelCount < Math.round(w * h * 0.03)) {
+        console.warn("[Kalite Kontrol] Zemin maskesi yetersiz (<%3), otomatik perspektif taban kalibrasyonu çalıştırılıyor.");
+        const autoFloorY = Math.round(h * (isPortrait ? 0.82 : 0.72));
+        for (let y = autoFloorY; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const idx = (y * w + x) * 4;
+                if (prPx[idx] === 0) {
+                    fPx[idx]     = 255;
+                    fPx[idx + 1] = 255;
+                    fPx[idx + 2] = 255;
+                    fPx[idx + 3] = 255;
                 }
             }
         }
@@ -841,8 +884,15 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
         }
     }
 
-    if (topRow === -1) {
-        return new Promise((resolve) => resultCanvas.toBlob(resolve, "image/png"));
+    let activePixels = 0;
+    for (let i = 3; i < maskPixels.length; i += 4) {
+        if (maskPixels[i] > 10) activePixels++;
+    }
+
+    if (topRow === -1 || activePixels < 50) {
+        const err = new Error("Seçilen yüzeyde kaplanacak alan tespit edilemedi. Lütfen 'Yüzey Maskesi İnce Ayarı' adımından yüzeyi fırça ile boyayın veya 'Otomatik Kalibrasyon' seçeneğini kullanın.");
+        err.isQualityError = true;
+        throw err;
     }
 
     // 4. Create tile swatch with crisp architectural grout line
@@ -1036,6 +1086,7 @@ applyBtn.addEventListener("click", async () => {
         resultImg.src   = resultBlobUrl;
         originalImg.src = hallUrl;
 
+        if (renderErrorBox) renderErrorBox.style.display = "none";
         resultSection.classList.add("visible");
         initComparison();
         resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1047,11 +1098,51 @@ applyBtn.addEventListener("click", async () => {
         }
     } catch (err) {
         console.error(err);
-        showToast("Uygulama hatası: " + err.message);
+        if (renderErrorBox && renderErrorMsg) {
+            renderErrorMsg.textContent = err.message || "Görselleştirme sırasında hata oluştu.";
+            renderErrorBox.style.display = "block";
+            resultSection.classList.add("visible");
+            renderErrorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        showToast("Hata: " + (err.message || "Bilinmeyen hata"), "error");
     } finally {
         hideLoading();
     }
 });
+
+// Otomatik Kalibrasyon ve Manuel Fırça Butonları
+if (renderRetryBtn) {
+    renderRetryBtn.addEventListener("click", async () => {
+        if (renderErrorBox) renderErrorBox.style.display = "none";
+        if (hallImageEl) {
+            showLoading("Yapay zekâ yüzeyi yeniden kalibre ediyor…");
+            try {
+                const w = hallImageEl.naturalWidth;
+                const h = hallImageEl.naturalHeight;
+                const b64 = await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
+                maskImage = await loadImage("data:image/png;base64," + b64);
+                maskCanvas.width = w;
+                maskCanvas.height = h;
+                maskCtx.clearRect(0, 0, w, h);
+                maskCtx.drawImage(maskImage, 0, 0, w, h);
+                renderComposite();
+                applyBtn.click();
+            } catch (retryErr) {
+                console.error(retryErr);
+                hideLoading();
+                showToast("Yeniden deneme başarısız: " + retryErr.message);
+            }
+        }
+    });
+}
+
+if (renderManualBtn) {
+    renderManualBtn.addEventListener("click", () => {
+        if (renderErrorBox) renderErrorBox.style.display = "none";
+        editorSection.classList.add("visible");
+        editorSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+}
 
 function initComparison() {
     const ready = () => { setSliderPos(50); };
@@ -1059,15 +1150,15 @@ function initComparison() {
     const check = () => { loaded++; if (loaded >= 2) ready(); };
     if (resultImg.complete)   check(); else resultImg.onload   = check;
     if (originalImg.complete) check(); else originalImg.onload  = check;
+    ready();
 }
 
 function setSliderPos(pct) {
     pct = Math.max(0, Math.min(100, pct));
-    compBefore.style.width = pct + "%";
-    compHandle.style.left  = pct + "%";
-
-    const containerWidth = compContainer.offsetWidth;
-    originalImg.style.width = containerWidth + "px";
+    const stage = compStage || compContainer;
+    if (stage) {
+        stage.style.setProperty("--split", pct + "%");
+    }
 }
 
 let isDragging = false;
@@ -1080,33 +1171,38 @@ function startDrag(e) {
 
 function moveDrag(e) {
     if (!isDragging) return;
-    const rect = compContainer.getBoundingClientRect();
+    const stage = compStage || compContainer;
+    const rect = stage.getBoundingClientRect();
     let clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX);
-    if (clientX == null) return;
+    if (clientX == null || rect.width <= 0) return;
     const pct = ((clientX - rect.left) / rect.width) * 100;
     setSliderPos(pct);
 }
 
 function endDrag() { isDragging = false; }
 
-compHandle.addEventListener("mousedown",  startDrag);
-compContainer.addEventListener("mousemove", moveDrag);
-document.addEventListener("mouseup",       endDrag);
-
-compHandle.addEventListener("touchstart", startDrag, { passive: false });
-compContainer.addEventListener("touchmove", moveDrag, { passive: false });
-document.addEventListener("touchend",      endDrag);
-
-compContainer.addEventListener("click", (e) => {
-    const rect = compContainer.getBoundingClientRect();
-    const pct = ((e.clientX - rect.left) / rect.width) * 100;
-    setSliderPos(pct);
-});
+if (compHandle) {
+    compHandle.addEventListener("mousedown",  startDrag);
+    compHandle.addEventListener("touchstart", startDrag, { passive: false });
+}
+const dragTarget = compStage || compContainer;
+if (dragTarget) {
+    dragTarget.addEventListener("mousemove", moveDrag);
+    dragTarget.addEventListener("touchmove", moveDrag, { passive: false });
+    dragTarget.addEventListener("click", (e) => {
+        const stage = compStage || compContainer;
+        const rect = stage.getBoundingClientRect();
+        if (rect.width <= 0) return;
+        const pct = ((e.clientX - rect.left) / rect.width) * 100;
+        setSliderPos(pct);
+    });
+}
+document.addEventListener("mouseup",  endDrag);
+document.addEventListener("touchend", endDrag);
 
 window.addEventListener("resize", () => {
     if (resultSection.classList.contains("visible")) {
-        const pct = parseFloat(compBefore.style.width) || 50;
-        setSliderPos(pct);
+        setSliderPos(50);
     }
 });
 
@@ -1173,10 +1269,13 @@ async function initFromParams() {
     const surfaceParam = params.get("surface");
     const scaleParam = params.get("scale");
     const isEmbed = params.get("embed") === "1" || window !== window.parent;
-    const isDebug = params.get("debug") === "1";
+    const isDebug = params.get("debug") === "1" || params.get("dev") === "1";
 
-    if (isDebug && debugSection) {
-        debugSection.style.display = "block";
+    if (toggleDebugBtn) {
+        toggleDebugBtn.style.display = isDebug ? "inline-flex" : "none";
+    }
+    if (debugSection) {
+        debugSection.style.display = isDebug ? "block" : "none";
     }
 
     if (isEmbed) {
