@@ -2,53 +2,56 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Tile Detection and Visualization Engine</title>
-    <link rel="stylesheet" href="style.css?v=1.0.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Seramik Mekân Görselleştirici</title>
+    <link rel="stylesheet" href="style.css?v=2.0.0" />
 </head>
 <body>
     <div class="engine-layout">
-        <!-- Left Sidebar: Application Settings -->
-        <aside class="sidebar">
+        <!-- Mobile Sidebar Backdrop Overlay -->
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+        <!-- Left Sidebar: Application Settings (Desktop: Sticky, Mobile: Off-canvas Drawer) -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>Application Settings</h2>
-                <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" title="Kapat">&times;</button>
+                <h2>⚙️ Döşeme &amp; Ebat Ayarları</h2>
+                <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" title="Kapat" aria-label="Kapat">&times;</button>
             </div>
 
             <!-- Surface Type -->
             <div class="setting-group">
-                <label class="setting-label">Surface Type</label>
+                <label class="setting-label">Yüzey Tipi</label>
                 <div class="surface-toggle">
-                    <button type="button" class="toggle-btn active" data-surface="floor" id="surf-floor-btn">Floor</button>
-                    <button type="button" class="toggle-btn" data-surface="wall" id="surf-wall-btn">Wall</button>
-                    <button type="button" class="toggle-btn" data-surface="both" id="surf-both-btn" title="Hem Zemin Hem Duvar Birlikte">Floor &amp; Wall</button>
+                    <button type="button" class="toggle-btn active" data-surface="floor" id="surf-floor-btn">🪵 Zemin</button>
+                    <button type="button" class="toggle-btn" data-surface="wall" id="surf-wall-btn">🧱 Duvar</button>
+                    <button type="button" class="toggle-btn" data-surface="both" id="surf-both-btn" title="Hem Zemin Hem Duvar Birlikte">✨ İkisi</button>
                 </div>
             </div>
 
             <!-- Layout Pattern -->
             <div class="setting-group">
-                <label for="pattern-select" class="setting-label">Layout Pattern</label>
+                <label for="pattern-select" class="setting-label">Döşeme Şekli</label>
                 <select id="pattern-select" class="custom-select">
-                    <option value="brick">Classic Offset (1/3)</option>
-                    <option value="grid">Standard Grid</option>
-                    <option value="diagonal">Diagonal 45°</option>
+                    <option value="brick">Klasik Kaydırmalı (1/3)</option>
+                    <option value="grid">Standart Düz Izgara</option>
+                    <option value="diagonal">Çapraz 45° Döşeme</option>
                 </select>
             </div>
 
             <!-- Tile Size -->
             <div class="setting-group">
                 <div class="setting-header-row">
-                    <label class="setting-label">Tile Size</label>
+                    <label class="setting-label">Karo Ebadı</label>
                     <span class="setting-value" id="tile-size-val">60 cm × 120 cm</span>
                 </div>
                 <div class="dual-slider">
                     <div class="slider-row">
-                        <span class="slider-sublabel">W:</span>
+                        <span class="slider-sublabel">G:</span>
                         <input type="range" id="tile-w-slider" min="20" max="180" step="5" value="60" />
                         <span class="slider-num" id="tile-w-num">60 cm</span>
                     </div>
                     <div class="slider-row">
-                        <span class="slider-sublabel">H:</span>
+                        <span class="slider-sublabel">Y:</span>
                         <input type="range" id="tile-h-slider" min="20" max="240" step="5" value="120" />
                         <span class="slider-num" id="tile-h-num">120 cm</span>
                     </div>
@@ -58,7 +61,7 @@
             <!-- Grout Width -->
             <div class="setting-group">
                 <div class="setting-header-row">
-                    <label class="setting-label">Grout Width</label>
+                    <label class="setting-label">Derz Genişliği</label>
                     <span class="setting-value" id="grout-val">3 mm</span>
                 </div>
                 <input type="range" id="grout-slider" min="1" max="10" step="1" value="3" />
@@ -70,66 +73,96 @@
 
             <!-- Device Selector -->
             <div class="setting-group">
-                <label for="device-select" class="setting-label">Device Selector</label>
+                <label for="device-select" class="setting-label">İşlemci Motoru</label>
                 <select id="device-select" class="custom-select">
-                    <option value="webgl">WebGL GPU Accelerated</option>
-                    <option value="cpu">Local CPU Engine</option>
+                    <option value="webgl">WebGL GPU Hızlandırma</option>
+                    <option value="cpu">Yerel CPU Motoru</option>
                 </select>
             </div>
 
             <!-- Sidebar Actions -->
             <div class="sidebar-actions">
-                <button type="button" class="btn btn-secondary" id="reset-settings-btn">Reset</button>
-                <button type="button" class="btn btn-primary" id="apply-settings-btn">Apply Settings</button>
+                <button type="button" class="btn btn-secondary" id="reset-settings-btn">Sıfırla</button>
+                <button type="button" class="btn btn-primary" id="apply-settings-btn">Ayarları Uygula</button>
             </div>
         </aside>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <!-- App Header -->
+            <!-- App Header & Quick Mobile Toolbar -->
             <header class="app-header">
-                <div class="header-title-row">
-                    <h1><span class="header-icon">🏠</span> Tile Detection and Visualization Engine</h1>
+                <div class="header-main-row">
+                    <div class="header-title-row">
+                        <h1><span class="header-icon">✨</span> Seramik Mekân Görselleştirici</h1>
+                        <p class="header-subtitle">Seçtiğiniz seramiği odanızın zemin veya duvarında anında deneyin.</p>
+                    </div>
+
+                    <!-- Steps progress dots -->
+                    <div class="steps-flow">
+                        <span class="step-circle active" id="badge-step-1" title="Adım 1: Seramik">1</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-circle" id="badge-step-2" title="Adım 2: Mekân">2</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-circle" id="badge-step-3" title="Adım 3: Maske">3</span>
+                        <span class="step-arrow">→</span>
+                        <span class="step-circle" id="badge-step-4" title="Adım 4: Sonuç">4</span>
+                    </div>
                 </div>
-                <p class="header-subtitle">Identify, select, and visualize floor and wall tiles in your space.</p>
-                <div class="steps-flow">
-                    <span class="step-circle active" id="badge-step-1">❶</span>
-                    <span class="step-arrow">→</span>
-                    <span class="step-circle" id="badge-step-2">❷</span>
-                    <span class="step-arrow">→</span>
-                    <span class="step-circle" id="badge-step-3">❸</span>
+
+                <!-- Quick Mobile Control Bar (Shown on Mobile / Tablet) -->
+                <div class="mobile-action-bar">
+                    <button type="button" class="btn btn-mobile-settings" id="open-settings-btn">
+                        <span>⚙️</span> <span>Döşeme &amp; Ebat Ayarları</span>
+                    </button>
+                    <div class="quick-surface-switcher">
+                        <button type="button" class="quick-surf-btn active" data-surface="floor" id="quick-surf-floor">🪵 Zemin</button>
+                        <button type="button" class="quick-surf-btn" data-surface="wall" id="quick-surf-wall">🧱 Duvar</button>
+                        <button type="button" class="quick-surf-btn" data-surface="both" id="quick-surf-both">✨ İkisi</button>
+                    </div>
                 </div>
             </header>
 
-            <!-- Top Grid: Step 1 (Tile) & Step 2 (Room) -->
+            <!-- Top Grid: Step 1 (Tile) & Step 2 (Room) - Completely Symmetric & Orderly -->
             <div class="cards-grid">
                 <!-- Step 1: Upload Tile -->
                 <div class="engine-card" id="card-step-1">
                     <div class="card-header">
-                        <h3>Step 1: Upload Tile</h3>
+                        <div class="card-header-left">
+                            <span class="step-badge">Adım 1</span>
+                            <h3>Seramik Modeli</h3>
+                        </div>
+                        <span class="card-header-tag" id="tile-card-tag">60×120 cm</span>
                     </div>
                     <div class="card-body">
                         <div class="image-preview-box" id="tile-preview-box">
-                            <img id="tile-img-preview" src="/textures/calacatta_gold.jpg" alt="Selected Tile Texture" />
+                            <img id="tile-img-preview" src="/textures/calacatta_gold.jpg" alt="Seçili Seramik Dokusu" />
                         </div>
                         <input type="file" id="tile-file-input" accept="image/*" style="display:none;" />
-                        <button type="button" class="btn btn-card-action" id="browse-tile-btn">Browse files</button>
+                        <div class="card-actions-row">
+                            <button type="button" class="btn btn-card-action" id="browse-tile-btn">
+                                <span>📁</span> <span>Farklı Seramik Yükle</span>
+                            </button>
+                        </div>
                         <div class="file-details-row">
                             <span class="file-name" id="tile-file-name">volcano_anthracite.jpg</span>
                             <span class="file-dims" id="tile-dims">600×1200px</span>
                         </div>
-                        <div class="card-note" id="tile-details-note">Tile details: Volcano 60×120 Anthracite</div>
+                        <div class="card-note" id="tile-details-note">Volcano 60×120 Anthracite</div>
                     </div>
                 </div>
 
                 <!-- Step 2: Upload Room -->
                 <div class="engine-card" id="card-step-2">
                     <div class="card-header">
-                        <h3>Step 2: Upload Room</h3>
+                        <div class="card-header-left">
+                            <span class="step-badge">Adım 2</span>
+                            <h3>Mekân Seçimi</h3>
+                        </div>
+                        <span class="card-header-tag">Örnek Şablon / Kendi Odan</span>
                     </div>
                     <div class="card-body">
+                        <!-- Presets selector pills -->
                         <div class="preset-rooms-row">
-                            <span class="preset-label">Mekân:</span>
                             <div class="preset-pills">
                                 <button type="button" class="preset-pill active" data-preset="/hero/easy_bathroom.jpg">🚿 Modern Banyo</button>
                                 <button type="button" class="preset-pill" data-preset="/hero/luxury_bathroom.png">🛁 Lüks Banyo</button>
@@ -139,12 +172,16 @@
                         </div>
 
                         <div class="image-preview-box" id="room-preview-box">
-                            <img id="room-img-preview" src="/hero/easy_bathroom.jpg" alt="Selected Room Photo" />
+                            <img id="room-img-preview" src="/hero/easy_bathroom.jpg" alt="Seçili Mekân Fotoğrafı" />
                         </div>
                         <input type="file" id="room-file-input" accept="image/*" style="display:none;" />
-                        <div class="room-action-buttons">
-                            <button type="button" class="btn btn-card-action" id="browse-room-btn">Browse files</button>
-                            <button type="button" class="btn btn-blue" id="analyze-room-btn">Analyze Room</button>
+                        <div class="card-actions-row dual-actions">
+                            <button type="button" class="btn btn-card-action" id="browse-room-btn">
+                                <span>📷</span> <span>Odanı Yükle</span>
+                            </button>
+                            <button type="button" class="btn btn-blue" id="analyze-room-btn">
+                                <span>🔍</span> <span>Alanı Tara</span>
+                            </button>
                         </div>
                         <div class="file-details-row">
                             <span class="file-name" id="room-file-name">modern_bathroom.jpg</span>
@@ -154,22 +191,28 @@
                 </div>
             </div>
 
-            <!-- Step 3: Masking Tool -->
+            <!-- Step 3: Masking Tool (Drawing, Layer View & Generate) -->
             <div class="engine-card masking-card" id="card-step-3">
                 <div class="card-header">
-                    <h3>Step 3: Masking Tool</h3>
+                    <div class="card-header-left">
+                        <span class="step-badge">Adım 3</span>
+                        <h3>Yüzey &amp; Maske Düzenleme</h3>
+                    </div>
                     <div class="mask-legend">
-                        <span class="legend-dot purple"></span> <span class="legend-txt">Döşenecek Seramik Alanı</span>
+                        <span class="legend-dot purple"></span>
+                        <span class="legend-txt">Döşenecek Alan</span>
                     </div>
                 </div>
+
                 <!-- Layer View Selector (QA & Debug Inspection) -->
                 <div class="layer-selector-row">
                     <button type="button" class="layer-pill active" data-view="active" id="view-active-btn">🟣 Aktif Maske</button>
                     <button type="button" class="layer-pill" data-view="wall" id="view-wall-btn">🧱 Düzeltilmiş Duvar</button>
                     <button type="button" class="layer-pill" data-view="floor" id="view-floor-btn">🪵 Düzeltilmiş Zemin</button>
                     <button type="button" class="layer-pill" data-view="protected" id="view-protected-btn">🛡️ Korunan Nesneler</button>
-                    <button type="button" class="layer-pill" data-view="overlay" id="view-overlay-btn">🎯 Karar Destek (Overlay)</button>
+                    <button type="button" class="layer-pill" data-view="overlay" id="view-overlay-btn">🎯 Karar Destek</button>
                 </div>
+
                 <div class="masking-card-content">
                     <!-- Canvas Drawing Area -->
                     <div class="canvas-viewport" id="canvas-viewport">
@@ -179,55 +222,57 @@
 
                     <!-- Right Controls for Masking -->
                     <div class="masking-controls-col">
-                        <!-- Brush Size -->
-                        <div class="mask-control-group">
-                            <div class="control-header-row">
-                                <label>Brush Size</label>
-                                <span id="brush-size-display">25px</span>
+                        <div class="sliders-grid">
+                            <!-- Brush Size -->
+                            <div class="mask-control-group">
+                                <div class="control-header-row">
+                                    <label>Fırça Boyutu</label>
+                                    <span id="brush-size-display">25px</span>
+                                </div>
+                                <input type="range" id="brush-size-slider" min="4" max="80" value="25" />
+                                <div class="slider-scale-row">
+                                    <span>4px</span>
+                                    <span>80px</span>
+                                </div>
                             </div>
-                            <input type="range" id="brush-size-slider" min="4" max="80" value="25" />
-                            <div class="slider-scale-row">
-                                <span>4px</span>
-                                <span>80px</span>
-                            </div>
-                        </div>
 
-                        <!-- Zoom -->
-                        <div class="mask-control-group">
-                            <div class="control-header-row">
-                                <label>Zoom</label>
-                                <span id="zoom-display">100%</span>
+                            <!-- Zoom -->
+                            <div class="mask-control-group">
+                                <div class="control-header-row">
+                                    <label>Yakınlaş</label>
+                                    <span id="zoom-display">100%</span>
+                                </div>
+                                <input type="range" id="zoom-slider" min="50" max="250" step="5" value="100" />
+                                <div class="slider-scale-row">
+                                    <span>50%</span>
+                                    <span>250%</span>
+                                </div>
                             </div>
-                            <input type="range" id="zoom-slider" min="50" max="250" step="5" value="100" />
-                            <div class="slider-scale-row">
-                                <span>50%</span>
-                                <span>250%</span>
-                            </div>
-                        </div>
 
-                        <!-- Opacity -->
-                        <div class="mask-control-group">
-                            <div class="control-header-row">
-                                <label>Mask Opacity</label>
-                                <span id="opacity-display">55%</span>
-                            </div>
-                            <input type="range" id="opacity-slider" min="10" max="95" step="5" value="55" />
-                            <div class="slider-scale-row">
-                                <span>10%</span>
-                                <span>95%</span>
+                            <!-- Opacity -->
+                            <div class="mask-control-group">
+                                <div class="control-header-row">
+                                    <label>Maske Saydamlığı</label>
+                                    <span id="opacity-display">55%</span>
+                                </div>
+                                <input type="range" id="opacity-slider" min="10" max="95" step="5" value="55" />
+                                <div class="slider-scale-row">
+                                    <span>10%</span>
+                                    <span>95%</span>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Mask Action Buttons -->
                         <div class="mask-buttons-row">
-                            <button type="button" class="btn btn-outline" id="mask-undo-btn" title="Geri Al">↩ Undo</button>
-                            <button type="button" class="btn btn-outline" id="mask-redo-btn" title="Yinele">↪ Redo</button>
-                            <button type="button" class="btn btn-outline" id="mask-clear-btn" title="Temizle">🗑 Clear</button>
+                            <button type="button" class="btn btn-outline" id="mask-undo-btn" title="Geri Al">↩ Geri Al</button>
+                            <button type="button" class="btn btn-outline" id="mask-redo-btn" title="Yinele">↪ Yinele</button>
+                            <button type="button" class="btn btn-outline" id="mask-clear-btn" title="Temizle">🗑 Temizle</button>
                         </div>
 
                         <!-- Big Generate Button -->
                         <button type="button" class="btn btn-generate" id="generate-btn">
-                            <span class="btn-icon">🚀</span> Generate Visualization
+                            <span class="btn-icon">🚀</span> <span>Mekânda Görselleştir</span>
                         </button>
                     </div>
                 </div>
@@ -236,13 +281,16 @@
             <!-- Step 4: Visualization Result (Before / After Comparison) -->
             <div class="engine-card result-card" id="card-step-4">
                 <div class="card-header result-card-header">
-                    <div>
-                        <h3>Step 4: Visualization Result</h3>
-                        <p class="result-subtitle">Kaydırıcıyı sağa-sola hareket ettirerek öncesi ve sonrasını karşılaştırın.</p>
+                    <div class="card-header-left">
+                        <span class="step-badge step-badge-success">Adım 4</span>
+                        <div>
+                            <h3>Görselleştirme Sonucu</h3>
+                            <p class="result-subtitle">Kaydırıcıyı sağa-sola hareket ettirerek öncesi ve sonrasını karşılaştırın.</p>
+                        </div>
                     </div>
                     <div class="result-actions">
                         <button type="button" class="btn btn-secondary" id="request-quote-btn">📋 Fiyat Teklifi Al</button>
-                        <button type="button" class="btn btn-primary" id="download-result-btn">📥 Download PNG</button>
+                        <button type="button" class="btn btn-primary" id="download-result-btn">📥 PNG İndir</button>
                     </div>
                 </div>
 
@@ -265,8 +313,8 @@
                             </div>
 
                             <!-- White pill badges matching demo_floor_visual.png -->
-                            <div class="badge-before">BEFORE</div>
-                            <div class="badge-after">AFTER</div>
+                            <div class="badge-before">ÖNCESİ</div>
+                            <div class="badge-after">SONRASI</div>
                         </div>
                     </div>
                 </div>
@@ -283,6 +331,6 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
-    <script src="script.js?v=1.0.0"></script>
+    <script src="script.js?v=2.0.0"></script>
 </body>
 </html>

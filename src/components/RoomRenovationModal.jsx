@@ -74,43 +74,43 @@ export default function RoomRenovationModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-0 md:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-0 md:p-3 animate-in fade-in duration-200">
       <div 
         className={`relative flex flex-col bg-[#0b0f19] border border-white/10 text-white overflow-hidden shadow-2xl transition-all duration-300 ${
           isFullscreen 
-            ? 'w-full h-full rounded-none' 
-            : 'w-full h-full md:w-[96vw] md:h-[94vh] md:max-w-7xl md:rounded-2xl'
+            ? 'w-full h-full h-[100dvh] rounded-none' 
+            : 'w-full h-full h-[100dvh] md:w-[96vw] md:h-[94vh] md:max-w-7xl md:rounded-2xl'
         }`}
       >
         {/* Modal Header */}
-        <header className="flex items-center justify-between px-3.5 py-2.5 md:px-5 md:py-3 bg-[#0d1322] border-b border-white/10 shrink-0">
+        <header className="flex items-center justify-between px-3 py-2.5 md:px-5 md:py-3 bg-[#0d1322] border-b border-white/10 shrink-0 pt-[max(env(safe-area-inset-top),0.625rem)]">
           {/* Left: Product & Status */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+          <div className="flex items-center gap-2 md:gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400 shrink-0">
               <Sparkles size={16} />
             </div>
 
             <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm md:text-base font-bold text-white truncate">
+              <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
+                <span className="text-xs md:text-base font-bold text-white truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none">
                   {productName}
                 </span>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                <span className="text-[10px] md:text-[11px] font-semibold px-1.5 md:px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
                   {tileWidth}×{tileHeight} cm
                 </span>
                 <span className="hidden sm:inline-flex text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300">
                   {brandName}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 flex items-center gap-1.5 truncate">
+              <p className="text-[10px] md:text-[11px] text-slate-400 flex items-center gap-1.5 truncate">
                 <span className="inline-block w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                <span>Tile Detection &amp; Visualization Engine Aktif</span>
+                <span className="truncate">Yapay Zekâ Mekân Simülasyonu Aktif</span>
               </p>
             </div>
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+          <div className="flex items-center gap-1 md:gap-2 shrink-0">
             <a
               href={`/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}`}
               target="_blank"
@@ -125,8 +125,9 @@ export default function RoomRenovationModal({
             <button
               type="button"
               onClick={() => setIsFullscreen(prev => !prev)}
-              className="p-1.5 md:p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
               title={isFullscreen ? 'Pencere Modu' : 'Tam Ekran'}
+              aria-label="Tam Ekran Modu"
             >
               {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
             </button>
@@ -134,8 +135,9 @@ export default function RoomRenovationModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 md:p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+              className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
               title="Kapat (ESC)"
+              aria-label="Kapat"
             >
               <X size={18} />
             </button>

@@ -238,6 +238,10 @@
         tileWNum.textContent = `${w} cm`;
         tileHNum.textContent = `${h} cm`;
         tileSizeVal.textContent = `${w} cm × ${h} cm`;
+        const tileCardTag = $('#tile-card-tag');
+        if (tileCardTag) {
+            tileCardTag.textContent = `${w}×${h} cm`;
+        }
     }
 
     tileWSlider.addEventListener('input', updateTileSizeDisplay);
@@ -269,6 +273,14 @@
         surfFloorBtn.classList.toggle('active', surf === 'floor');
         surfWallBtn.classList.toggle('active', surf === 'wall');
         if (surfBothBtn) surfBothBtn.classList.toggle('active', surf === 'both');
+
+        const qFloor = $('#quick-surf-floor');
+        const qWall = $('#quick-surf-wall');
+        const qBoth = $('#quick-surf-both');
+        if (qFloor) qFloor.classList.toggle('active', surf === 'floor');
+        if (qWall) qWall.classList.toggle('active', surf === 'wall');
+        if (qBoth) qBoth.classList.toggle('active', surf === 'both');
+
         generateAutoMask();
         executeVisualization(true);
     }
@@ -278,6 +290,13 @@
     if (surfBothBtn) {
         surfBothBtn.addEventListener('click', () => switchSurface('both'));
     }
+
+    const qFloor = $('#quick-surf-floor');
+    const qWall = $('#quick-surf-wall');
+    const qBoth = $('#quick-surf-both');
+    if (qFloor) qFloor.addEventListener('click', () => switchSurface('floor'));
+    if (qWall) qWall.addEventListener('click', () => switchSurface('wall'));
+    if (qBoth) qBoth.addEventListener('click', () => switchSurface('both'));
 
     patternSelect.addEventListener('change', () => {
         executeVisualization(true);
@@ -764,7 +783,34 @@
         drawBrushStroke(pt, pt);
     });
 
+    // Mobile touch drawing support
+    canvasViewport.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches.length === 1) {
+            e.preventDefault();
+            isDrawing = true;
+            const pt = getCanvasCoordinates(e);
+            lastPoint = pt;
+            drawBrushStroke(pt, pt);
+        }
+    }, { passive: false });
+
+    canvasViewport.addEventListener('touchmove', (e) => {
+        if (!isDrawing || (e.touches && e.touches.length !== 1)) return;
+        e.preventDefault();
+        const pt = getCanvasCoordinates(e);
+        drawBrushStroke(lastPoint, pt);
+        lastPoint = pt;
+    }, { passive: false });
+
     window.addEventListener('mouseup', () => {
+        if (isDrawing) {
+            isDrawing = false;
+            lastPoint = null;
+            saveMaskState();
+        }
+    });
+
+    window.addEventListener('touchend', () => {
         if (isDrawing) {
             isDrawing = false;
             lastPoint = null;
@@ -1078,13 +1124,25 @@
         }
     });
 
-    // Close button for sidebar on mobile
-    const sidebarCloseBtn = $('#sidebar-close-btn');
-    if (sidebarCloseBtn) {
-        sidebarCloseBtn.addEventListener('click', () => {
-            $('.sidebar').style.display = 'none';
-        });
+    // Mobile Settings Drawer (Open / Close / Backdrop)
+    const sidebarEl = $('#sidebar');
+    const sidebarBackdropEl = $('#sidebar-backdrop');
+    const openSettingsBtnEl = $('#open-settings-btn');
+    const sidebarCloseBtnEl = $('#sidebar-close-btn');
+
+    function openMobileDrawer() {
+        if (sidebarEl) sidebarEl.classList.add('open');
+        if (sidebarBackdropEl) sidebarBackdropEl.classList.add('active');
     }
+
+    function closeMobileDrawer() {
+        if (sidebarEl) sidebarEl.classList.remove('open');
+        if (sidebarBackdropEl) sidebarBackdropEl.classList.remove('active');
+    }
+
+    if (openSettingsBtnEl) openSettingsBtnEl.addEventListener('click', openMobileDrawer);
+    if (sidebarCloseBtnEl) sidebarCloseBtnEl.addEventListener('click', closeMobileDrawer);
+    if (sidebarBackdropEl) sidebarBackdropEl.addEventListener('click', closeMobileDrawer);
 
     // URL Parameters Initialization
     async function initFromUrlParams() {
