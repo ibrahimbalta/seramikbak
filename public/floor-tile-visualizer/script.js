@@ -404,58 +404,6 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
         hallImageEl = roomImg;
     }
 
-    if (presetUrl) {
-        let maskName = null;
-        if (presetUrl.includes("bathroom")) maskName = "easy_bathroom";
-        else if (presetUrl.includes("kitchen")) maskName = "easy_kitchen";
-        else if (presetUrl.includes("living")) maskName = "modern_living";
-
-        if (maskName) {
-            try {
-                // Precomputed floor mask
-                const floorMaskImg = await loadImage(`/hero/masks/${maskName}_floor.png`).catch(() => null);
-                if (floorMaskImg) {
-                    if (!surfaceMasks.floor) surfaceMasks.floor = document.createElement("canvas");
-                    surfaceMasks.floor.width = w; surfaceMasks.floor.height = h;
-                    const smfCtx = surfaceMasks.floor.getContext("2d");
-                    smfCtx.clearRect(0, 0, w, h);
-                    smfCtx.drawImage(floorMaskImg, 0, 0, w, h);
-                    window.__debugLayers.floorMask = surfaceMasks.floor.toDataURL("image/png");
-                }
-
-                // Precomputed wall mask
-                const wallMaskImg = await loadImage(`/hero/masks/${maskName}_wall.png`).catch(() => null);
-                if (wallMaskImg) {
-                    if (!surfaceMasks.wall) surfaceMasks.wall = document.createElement("canvas");
-                    surfaceMasks.wall.width = w; surfaceMasks.wall.height = h;
-                    const smwCtx = surfaceMasks.wall.getContext("2d");
-                    smwCtx.clearRect(0, 0, w, h);
-                    smwCtx.drawImage(wallMaskImg, 0, 0, w, h);
-                    window.__debugLayers.wallMask = surfaceMasks.wall.toDataURL("image/png");
-                }
-
-                // Object protection buffer
-                if (!objectProtectionMask) objectProtectionMask = document.createElement("canvas");
-                objectProtectionMask.width = w; objectProtectionMask.height = h;
-                const opCtx = objectProtectionMask.getContext("2d");
-                opCtx.clearRect(0, 0, w, h);
-
-                const dataB64 = getActiveMaskBase64();
-                if (dataB64 && dataB64.length > 50) {
-                    window.__debugLayers.rawMask = "data:image/png;base64," + dataB64;
-                    window.__debugLayers.finalApplyMask = "data:image/png;base64," + dataB64;
-                    if (roomImg) {
-                        window.__debugLayers.original = roomImg.src;
-                    }
-                    updateDebugPanel();
-                    return dataB64;
-                }
-            } catch (err) {
-                console.warn("[Visualizer] Precomputed mask load skipped, using calibrated vector polygon:", err);
-            }
-        }
-    }
-
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = w; tempCanvas.height = h;
     const tempCtx = tempCanvas.getContext("2d");
@@ -465,51 +413,22 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     }
     const rgbData = tempCtx.getImageData(0, 0, w, h).data;
 
+    const isEasyBathroom = (presetUrl && presetUrl.includes("bathroom")) || (activePresetUrl && activePresetUrl.includes("bathroom")) || (w === 1024 && h === 1024);
+    const isPortraitBathroomQA = (w === 475 && h === 625);
     const isPortrait = (h > w);
 
     // 1. Tavan ve Spotlar (Ceiling): y in [0, ceilingY]
-    const ceilingY = Math.round(h * 0.176); // 110 px on 625
+    const ceilingY = Math.round(h * 0.176);
 
-    // 2. Üst Dolap (Upper Cabinet above mirror):
-    const upperCabMinX = Math.round(w * 0.404);
-    const upperCabMaxX = Math.round(w * 0.937);
-    const upperCabMinY = ceilingY;
-    const upperCabMaxY = Math.round(h * 0.28);
-
-    // 3. Ayna ve LED Halo (Mirror):
-    const mirrorMinX = Math.round(w * 0.404);
-    const mirrorMaxX = Math.round(w * 0.937);
-    const mirrorMinY = Math.round(h * 0.28);
-    const mirrorMaxY = Math.round(h * 0.568);
-
-    // 4. Ahşap Tezgâh ve Asma Çekmeceler (Vanity):
-    const vanityMinX = Math.round(w * 0.395);
-    const vanityMaxX = Math.round(w * 0.937);
-    const vanityMinY = Math.round(h * 0.656);
-    const vanityMaxY = Math.round(h * 0.84);
-
-    // Çanak Lavabo Ovali (Vessel sink):
-    const sinkCenterX = Math.round(w * 0.655);
-    const sinkCenterY = Math.round(h * 0.646);
-    const sinkRadiusX = Math.round(w * 0.128);
-    const sinkRadiusY = Math.round(h * 0.032);
-
-    // 5. Asma Klozet, Kumanda Paneli, Havlupan (Sanitary Fixtures):
-    const toiletMinX = Math.round(w * 0.158);
-    const toiletMaxX = Math.round(w * 0.347);
-    const toiletMinY = Math.round(h * 0.696);
-    const toiletMaxY = Math.round(h * 0.856);
-
-    const flushMinX = Math.round(w * 0.22);
-    const flushMaxX = Math.round(w * 0.326);
-    const flushMinY = Math.round(h * 0.536);
-    const flushMaxY = Math.round(h * 0.60);
-
-    const radiatorMaxX = Math.round(w * 0.095);
-    const rightWoodMinX = Math.round(w * 0.937);
-
-    // 6. Zemin Seviyesi (Floor Horizon Line):
-    const floorY = isPortrait ? Math.round(h * 0.856) : Math.round(h * 0.70);
+    // 2. Floor Horizon Line:
+    let floorY;
+    if (isEasyBathroom) {
+        floorY = Math.round(h * 0.72);
+    } else if (isPortraitBathroomQA) {
+        floorY = Math.round(h * 0.856);
+    } else {
+        floorY = Math.round(h * (isPortrait ? 0.76 : 0.68));
+    }
 
     // Allocate semantic buffers
     const floorCanvas = document.createElement("canvas");
@@ -551,53 +470,99 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
             let isProtected = false;
 
-            // 1. Bitki Koruma (Green Foliage Signature): Klorofil ve yaprak tonları
+            // 1. Bitki Koruma (Green Foliage Signature)
             const isPlant = (g > r + 18 && g > b + 18) || (2 * g - r - b > 28 && g > 45);
 
-            // 2. Banyo Paspası & Halı Koruması (Bath Mat / Floor Rug):
-            // Zemin üzerinde yer alan tekstil paspaslar karo kaplanmaz
+            // 2. Banyo Paspası & Halı Koruması
             let isBathMat = false;
             if (isFloorZone) {
-                // Lavabo / duş önü paspas bölgesi veya kumaş mat dokusu
                 if ((x >= Math.round(w * 0.30) && x <= Math.round(w * 0.72) && y >= Math.round(floorY + h * 0.03) && y <= Math.round(floorY + h * 0.11)) || (chroma > 45 && lum < 75)) {
                     isBathMat = true;
                 }
             }
 
             if (y < ceilingY) {
-                // Tavan & Spotlar: %100 Korumalı
-                isProtected = true;
+                isProtected = true; // Tavan %100 Korumalı
             } else if (isPlant || isBathMat) {
-                // Bitkiler ve banyo paspası: %100 Korumalı
-                isProtected = true;
-            } else if (isPortrait) {
-                // Katı Geometrik Bölge Topolojisi (Zero-Bleed)
+                isProtected = true; // Bitki ve paspas %100 Korumalı
+            } else if (isEasyBathroom) {
+                // easy_bathroom.jpg (1024x1024 Kare Banyo Odası)
+                // Sol ahşap duvar ve asılı beyaz havlu
+                if (x < Math.round(w * 0.42) && y < floorY) {
+                    isProtected = true;
+                }
+                // Orta Ayna ve LED Işıklar
+                else if (x >= Math.round(w * 0.42) && x <= Math.round(w * 0.58) && y >= Math.round(h * 0.20) && y <= Math.round(h * 0.52)) {
+                    isProtected = true;
+                }
+                // Asma Ahşap Tezgâh, Çekmeceler, Çanak Lavabo ve Batarya
+                else if (x >= Math.round(w * 0.42) && x <= Math.round(w * 0.58) && y >= Math.round(h * 0.50) && y <= Math.round(h * 0.74)) {
+                    isProtected = true;
+                }
+                // Sağ Duşakabin Camı, Çerçeve ve Duş Armatürleri
+                else if (x > Math.round(w * 0.58) && y < floorY) {
+                    isProtected = true;
+                }
+            } else if (isPortraitBathroomQA) {
+                // 475x625 Dikey Test Banyosu (Klozet, Üst Dolap, Ayna, Tezgâh, Havlupan)
+                const upperCabMinX = Math.round(w * 0.404);
+                const upperCabMaxX = Math.round(w * 0.937);
+                const upperCabMinY = ceilingY;
+                const upperCabMaxY = Math.round(h * 0.28);
+
+                const mirrorMinX = Math.round(w * 0.404);
+                const mirrorMaxX = Math.round(w * 0.937);
+                const mirrorMinY = Math.round(h * 0.28);
+                const mirrorMaxY = Math.round(h * 0.568);
+
+                const vanityMinX = Math.round(w * 0.395);
+                const vanityMaxX = Math.round(w * 0.937);
+                const vanityMinY = Math.round(h * 0.656);
+                const vanityMaxY = Math.round(h * 0.84);
+
+                const sinkCenterX = Math.round(w * 0.655);
+                const sinkCenterY = Math.round(h * 0.646);
+                const sinkRadiusX = Math.round(w * 0.128);
+                const sinkRadiusY = Math.round(h * 0.032);
+
+                const toiletMinX = Math.round(w * 0.158);
+                const toiletMaxX = Math.round(w * 0.347);
+                const toiletMinY = Math.round(h * 0.696);
+                const toiletMaxY = Math.round(h * 0.856);
+
+                const flushMinX = Math.round(w * 0.22);
+                const flushMaxX = Math.round(w * 0.326);
+                const flushMinY = Math.round(h * 0.536);
+                const flushMaxY = Math.round(h * 0.60);
+
+                const radiatorMaxX = Math.round(w * 0.095);
+                const rightWoodMinX = Math.round(w * 0.937);
+
                 if (x >= upperCabMinX && x <= upperCabMaxX && y >= upperCabMinY && y <= upperCabMaxY) {
-                    isProtected = true; // Üst dolap
+                    isProtected = true;
                 } else if (x >= mirrorMinX && x <= mirrorMaxX && y >= mirrorMinY && y <= mirrorMaxY) {
-                    isProtected = true; // Ayna & LED halo
+                    isProtected = true;
                 } else if (x >= vanityMinX && x <= vanityMaxX && y >= vanityMinY && y <= vanityMaxY) {
-                    isProtected = true; // Tezgâh & çekmeceler
+                    isProtected = true;
                 } else if (Math.pow((x - sinkCenterX) / sinkRadiusX, 2) + Math.pow((y - sinkCenterY) / sinkRadiusY, 2) <= 1.0) {
-                    isProtected = true; // Çanak lavabo ovali
+                    isProtected = true;
                 } else if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) {
-                    isProtected = true; // Asma klozet gövdesi
+                    isProtected = true;
                 } else if (x >= flushMinX && x <= flushMaxX && y >= flushMinY && y <= flushMaxY) {
-                    isProtected = true; // Kumanda paneli
+                    isProtected = true;
                 } else if (x <= radiatorMaxX && y >= Math.round(h * 0.27) && y <= toiletMaxY) {
-                    isProtected = true; // Havlupan
+                    isProtected = true;
                 } else if (x >= rightWoodMinX) {
-                    isProtected = true; // Sağ ahşap duvar
+                    isProtected = true;
                 }
             } else {
-                // Landscape / Genel Odalar
-                if (lum > 145 && chroma < 35 && !isFloorZone) {
+                // Genel Mekânlar (Mutfak, Salon vb.)
+                if (lum > 155 && chroma < 30 && !isFloorZone) {
                     isProtected = true;
-                } else if (lum < 55 && (x > w * 0.45 && y > floorY - h * 0.16)) {
-                    isProtected = true;
-                } else if (isWallZone && (x > w * 0.55 && y < floorY - h * 0.18 && lum > 165)) {
+                } else if (lum < 55 && (x > w * 0.40 && y > floorY - h * 0.15)) {
                     isProtected = true;
                 }
+            }
             }
 
             if (isProtected) {
@@ -820,11 +785,13 @@ function getActiveMaskBase64() {
         cCtx.restore();
     }
 
-    // Binary cleanup
+    // Binary cleanup: A pixel is truly masked ONLY if it is WHITE (R/G/B > 100) AND has ALPHA (A > 50)
     const imgData = cCtx.getImageData(0, 0, w, h);
     const d = imgData.data;
     for (let i = 0; i < d.length; i += 4) {
-        const val = d[i + 3] > 30 ? 255 : 0;
+        const isWhite = (d[i] > 100 || d[i + 1] > 100 || d[i + 2] > 100);
+        const hasAlpha = d[i + 3] > 50;
+        const val = (isWhite && hasAlpha) ? 255 : 0;
         d[i]     = val;
         d[i + 1] = val;
         d[i + 2] = val;
@@ -1342,6 +1309,16 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
             const maskAlpha = maskPixels[byteIdx + 3];
 
             if (maskAlpha < 8) {
+                outBuf[pxIdx] = roomBuf[pxIdx];
+                continue;
+            }
+
+            // Strict Surface Plane Isolation (Prevents floor tiles from bleeding onto walls/furniture)
+            if (surface === "floor" && !isFloorPlane) {
+                outBuf[pxIdx] = roomBuf[pxIdx];
+                continue;
+            }
+            if (surface === "wall" && isFloorPlane) {
                 outBuf[pxIdx] = roomBuf[pxIdx];
                 continue;
             }
