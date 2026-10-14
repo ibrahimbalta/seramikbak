@@ -955,11 +955,55 @@ input[type="range"]::-webkit-slider-thumb {
             </div>
         </div>
 
-        <div class="download-row">
+        <div class="download-row" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
             <button class="btn btn-primary" id="download-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Sonucu İndir (HD PNG)
             </button>
+            <button type="button" class="btn btn-secondary" id="toggle-debug-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#cbd5e1;font-size:12px;padding:8px 14px;border-radius:10px;">
+                🔍 AI Hata Ayıklama Katmanları (7 Çıktı)
+            </button>
+        </div>
+    </section>
+
+    <!-- Debug Inspector Panel (7 Separate Outputs Required for Auditing & QA) -->
+    <section class="debug-section card" id="debug-section" style="display:none;margin-top:1.5rem;border-color:rgba(99,102,241,0.4);background:#070b14;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:0.6rem;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="background:#6366f1;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;">DEBUG VIEW</span>
+                <span style="font-size:13px;font-weight:600;color:#f8fafc;">AI Segmentasyon &amp; Perspektif Katmanları</span>
+            </div>
+            <button type="button" id="close-debug-btn" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:16px;padding:4px 8px;">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">1. Orijinal Fotoğraf</div>
+                <img id="dbg-img-1" src="" alt="1. Orijinal" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">2. Ham Maske</div>
+                <img id="dbg-img-2" src="" alt="2. Ham Maske" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">3. Düzeltilmiş Duvar</div>
+                <img id="dbg-img-3" src="" alt="3. Duvar Maskesi" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">4. Düzeltilmiş Zemin</div>
+                <img id="dbg-img-4" src="" alt="4. Zemin Maskesi" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">5. Korunan Ön Plan</div>
+                <img id="dbg-img-5" src="" alt="5. Korunan Nesneler" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">6. Perspektif Doku</div>
+                <img id="dbg-img-6" src="" alt="6. Perspektif Doku" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:6px;">7. Son Kompozit</div>
+                <img id="dbg-img-7" src="" alt="7. Kompozit" style="width:100%;height:110px;object-fit:cover;border-radius:6px;background:#000;" />
+            </div>
         </div>
     </section>
 
@@ -1209,6 +1253,35 @@ brushSlider.addEventListener("input", () => {
     brushValue.textContent = brushSlider.value;
 });
 
+// Global debug store for the 7 QA layers
+window.__debugLayers = {
+    original: null,
+    rawMask: null,
+    wallMask: null,
+    floorMask: null,
+    protectedMask: null,
+    perspectiveTile: null,
+    compositeResult: null
+};
+
+function updateDebugPanel() {
+    const p1 = document.getElementById("dbg-img-1");
+    const p2 = document.getElementById("dbg-img-2");
+    const p3 = document.getElementById("dbg-img-3");
+    const p4 = document.getElementById("dbg-img-4");
+    const p5 = document.getElementById("dbg-img-5");
+    const p6 = document.getElementById("dbg-img-6");
+    const p7 = document.getElementById("dbg-img-7");
+
+    if (p1 && window.__debugLayers.original) p1.src = window.__debugLayers.original;
+    if (p2 && window.__debugLayers.rawMask) p2.src = window.__debugLayers.rawMask;
+    if (p3 && window.__debugLayers.wallMask) p3.src = window.__debugLayers.wallMask;
+    if (p4 && window.__debugLayers.floorMask) p4.src = window.__debugLayers.floorMask;
+    if (p5 && window.__debugLayers.protectedMask) p5.src = window.__debugLayers.protectedMask;
+    if (p6 && window.__debugLayers.perspectiveTile) p6.src = window.__debugLayers.perspectiveTile;
+    if (p7 && window.__debugLayers.compositeResult) p7.src = window.__debugLayers.compositeResult;
+}
+
 /**
  * Intelligent Surface Mask Generator
  * Calibrated architectural perspective mask with 100% fixture & vanity protection
@@ -1229,131 +1302,161 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
                 c.height = h;
                 const cx = c.getContext("2d");
                 cx.drawImage(maskImg, 0, 0, w, h);
-                return c.toDataURL("image/png").split(",")[1];
+                const dataUrl = c.toDataURL("image/png");
+                window.__debugLayers.rawMask = dataUrl;
+                updateDebugPanel();
+                return dataUrl.split(",")[1];
             } catch (err) {
                 console.warn("[Visualizer] Precomputed mask load skipped, using calibrated vector polygon:", err);
             }
         }
     }
 
-    // 2. High-precision vector polygon generator
-    const c = document.createElement("canvas");
-    c.width = w;
-    c.height = h;
-    const cx = c.getContext("2d");
-    cx.fillStyle = "#000000";
-    cx.fillRect(0, 0, w, h);
-    cx.fillStyle = "#ffffff";
+    // 2. High-precision Computer Vision Analysis for Custom Room Photos
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tempCtx = tempCanvas.getContext("2d");
+    if (roomImg) {
+        tempCtx.drawImage(roomImg, 0, 0, w, h);
+    }
+    const rgbData = tempCtx.getImageData(0, 0, w, h).data;
 
-    const isBathroom = presetUrl && presetUrl.includes("bathroom");
-    const isKitchen  = presetUrl && presetUrl.includes("kitchen");
-    const isLiving   = presetUrl && presetUrl.includes("living");
+    // A. Detect Ceiling Line (Tavan): Top 16-24%
+    const ceilingY = Math.round(h * 0.18);
 
-    if (isBathroom) {
-        // Bathroom: Floating vanity strictly at x: 30%-70%, y: 58%-68%
-        // Floor line begins at y=845 on left, transitioning to y=724 under vanity and into shower
-        if (surface === "floor" || surface === "both") {
-            cx.beginPath();
-            cx.moveTo(0, h * 0.825);
-            cx.lineTo(w * 0.044, h * 0.825);
-            cx.lineTo(w * 0.176, h * 0.707);
-            cx.lineTo(w, h * 0.707);
-            cx.lineTo(w, h);
-            cx.lineTo(0, h);
-            cx.closePath();
-            cx.fill();
+    // B. Detect Floor Horizon Line (Zemin Başlangıcı):
+    let floorY = Math.round(h * 0.70);
+    if (roomImg) {
+        let maxGrad = 0;
+        let bestFloorY = floorY;
+        for (let y = Math.round(h * 0.60); y < Math.round(h * 0.80); y += 4) {
+            let rowDiff = 0;
+            const r1 = y * w * 4;
+            const r2 = (y + 4) * w * 4;
+            for (let x = 0; x < w; x += 8) {
+                const lum1 = rgbData[r1 + x * 4] * 0.299 + rgbData[r1 + x * 4 + 1] * 0.587 + rgbData[r1 + x * 4 + 2] * 0.114;
+                const lum2 = rgbData[r2 + x * 4] * 0.299 + rgbData[r2 + x * 4 + 1] * 0.587 + rgbData[r2 + x * 4 + 2] * 0.114;
+                rowDiff += Math.abs(lum1 - lum2);
+            }
+            if (rowDiff > maxGrad) {
+                maxGrad = rowDiff;
+                bestFloorY = y;
+            }
         }
-        if (surface === "wall" || surface === "both") {
-            // Backsplash area (excluding mirror and vanity)
-            cx.fillRect(w * 0.298, h * 0.493, w * 0.391, h * 0.088);
-            // Shower wall (excluding ceiling)
-            cx.fillRect(w * 0.698, h * 0.039, w * 0.302, h * 0.668);
+        if (maxGrad > 60) {
+            floorY = Math.max(Math.round(h * 0.62), Math.min(Math.round(h * 0.76), bestFloorY));
         }
-    } else if (isKitchen) {
-        if (surface === "floor" || surface === "both") {
-            cx.beginPath();
-            cx.moveTo(0, h * 0.688);
-            cx.lineTo(w * 0.225, h * 0.688);
-            cx.lineTo(w * 0.342, h * 0.701);
-            cx.lineTo(w, h * 0.701);
-            cx.lineTo(w, h);
-            cx.lineTo(0, h);
-            cx.closePath();
-            cx.fill();
-        }
-        if (surface === "wall" || surface === "both") {
-            cx.fillRect(w * 0.254, h * 0.137, w * 0.479, h * 0.332);
-        }
-    } else if (isLiving) {
-        if (surface === "floor" || surface === "both") {
-            cx.beginPath();
-            cx.moveTo(0, h * 0.605);
-            cx.lineTo(w, h * 0.605);
-            cx.lineTo(w, h);
-            cx.lineTo(0, h);
-            cx.closePath();
-            cx.fill();
-        }
-        if (surface === "wall" || surface === "both") {
-            cx.fillRect(0, h * 0.078, w, h * 0.459);
-        }
-    } else {
-        // Custom user-uploaded room photo:
-        if (surface === "floor") {
-            // Perspective floor plane
-            cx.beginPath();
-            cx.moveTo(w * 0.05, h * 0.68);
-            cx.lineTo(w * 0.95, h * 0.68);
-            cx.lineTo(w, h);
-            cx.lineTo(0, h);
-            cx.closePath();
-            cx.fill();
-        } else if (surface === "wall") {
-            // Wall area down to floor line
-            cx.fillRect(0, 0, w, h * 0.72);
-        } else {
-            // Both: Complete seamless room coverage without artificial gaps
-            cx.fillRect(0, 0, w, h);
-        }
+    }
 
-        // Automatic Porcelain Sanitary Fixture Protection (Toilet bowl, bidet, sink)
-        if (roomImg) {
-            try {
-                const tempCanvas = document.createElement("canvas");
-                tempCanvas.width = w;
-                tempCanvas.height = h;
-                const tempCtx = tempCanvas.getContext("2d");
-                tempCtx.drawImage(roomImg, 0, 0, w, h);
-                const rgbData = tempCtx.getImageData(0, 0, w, h).data;
+    // Allocate 3 distinct semantic layer buffers
+    const floorCanvas = document.createElement("canvas");
+    floorCanvas.width = w; floorCanvas.height = h;
+    const fCtx = floorCanvas.getContext("2d");
+    const fData = fCtx.createImageData(w, h);
+    const fPx = fData.data;
 
-                const maskData = cx.getImageData(0, 0, w, h);
-                const maskPx = maskData.data;
+    const wallCanvas = document.createElement("canvas");
+    wallCanvas.width = w; wallCanvas.height = h;
+    const wCtx = wallCanvas.getContext("2d");
+    const wData = wCtx.createImageData(w, h);
+    const wPx = wData.data;
 
-                for (let i = 0; i < rgbData.length; i += 4) {
-                    if (maskPx[i] > 100) {
-                        const r = rgbData[i];
-                        const g = rgbData[i + 1];
-                        const b = rgbData[i + 2];
-                        
-                        // White porcelain fixture: high brightness, neutral chroma
-                        const isWhitePorcelain = (r > 185 && g > 185 && b > 185 &&
-                                                 Math.abs(r - g) < 22 && Math.abs(g - b) < 22 && Math.abs(r - b) < 22);
+    const protCanvas = document.createElement("canvas");
+    protCanvas.width = w; protCanvas.height = h;
+    const prCtx = protCanvas.getContext("2d");
+    const prData = prCtx.createImageData(w, h);
+    const prPx = prData.data;
 
-                        if (isWhitePorcelain) {
-                            maskPx[i] = 0;
-                            maskPx[i + 1] = 0;
-                            maskPx[i + 2] = 0;
-                        }
-                    }
+    for (let y = 0; y < h; y++) {
+        const rowOffset = y * w * 4;
+        const isCeiling = (y < ceilingY);
+        const isFloor = (y >= floorY);
+        const isWall = (y >= ceilingY && y < floorY);
+
+        for (let x = 0; x < w; x++) {
+            const idx = rowOffset + x * 4;
+            const r = rgbData[idx];
+            const g = rgbData[idx + 1];
+            const b = rgbData[idx + 2];
+
+            const lum = r * 0.299 + g * 0.587 + b * 0.114;
+            const maxVal = Math.max(r, g, b);
+            const minVal = Math.min(r, g, b);
+            const chroma = maxVal - minVal;
+
+            let isProtected = false;
+
+            // 1. Ceiling (Tavan) protection: 100% of ceiling zone is preserved
+            if (isCeiling) {
+                isProtected = true;
+            }
+            // 2. White Porcelain Sanitary Ware (Klozet, Bide, Lavabo)
+            else if (lum > 145 && chroma < 35) {
+                isProtected = true;
+            }
+            // 2b. Shaded porcelain contours (toilet/bidet bowl shadows)
+            else if (lum > 110 && chroma < 22 && (y > floorY - h * 0.26)) {
+                isProtected = true;
+            }
+            // 3. Vanity Cabinets & Countertops (dark furniture blocks under sink)
+            else if (lum < 55 && (x > w * 0.45 && y > floorY - h * 0.16)) {
+                isProtected = true;
+            }
+            // 4. Mirrors & Backlit Glass Niche (specular reflection, glass frames)
+            else if (isWall && ((x > w * 0.55 && y < floorY - h * 0.18 && lum > 165) || (x < w * 0.10 && chroma < 25))) {
+                isProtected = true;
+            }
+
+            if (isProtected) {
+                prPx[idx]     = 255;
+                prPx[idx + 1] = 255;
+                prPx[idx + 2] = 255;
+                prPx[idx + 3] = 255;
+            } else {
+                if (isFloor) {
+                    fPx[idx]     = 255;
+                    fPx[idx + 1] = 255;
+                    fPx[idx + 2] = 255;
+                    fPx[idx + 3] = 255;
+                } else if (isWall) {
+                    wPx[idx]     = 255;
+                    wPx[idx + 1] = 255;
+                    wPx[idx + 2] = 255;
+                    wPx[idx + 3] = 255;
                 }
-                cx.putImageData(maskData, 0, 0);
-            } catch (procErr) {
-                console.warn("[Visualizer] Fixture protection error:", procErr);
             }
         }
     }
 
-    return c.toDataURL("image/png").split(",")[1];
+    fCtx.putImageData(fData, 0, 0);
+    wCtx.putImageData(wData, 0, 0);
+    prCtx.putImageData(prData, 0, 0);
+
+    // Store in debug layers
+    window.__debugLayers.floorMask = floorCanvas.toDataURL("image/png");
+    window.__debugLayers.wallMask = wallCanvas.toDataURL("image/png");
+    window.__debugLayers.protectedMask = protCanvas.toDataURL("image/png");
+
+    // Target surface mask assembly
+    const outCanvas = document.createElement("canvas");
+    outCanvas.width = w; outCanvas.height = h;
+    const outCtx = outCanvas.getContext("2d");
+
+    if (surface === "floor") {
+        outCtx.drawImage(floorCanvas, 0, 0);
+    } else if (surface === "wall") {
+        outCtx.drawImage(wallCanvas, 0, 0);
+    } else { // "both"
+        outCtx.drawImage(wallCanvas, 0, 0);
+        outCtx.drawImage(floorCanvas, 0, 0);
+    }
+
+    const outDataUrl = outCanvas.toDataURL("image/png");
+    window.__debugLayers.rawMask = outDataUrl;
+    updateDebugPanel();
+
+    return outDataUrl.split(",")[1];
 }
 
 detectBtn.addEventListener("click", async () => {
@@ -1629,8 +1732,8 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
 
     // 4. Create tile swatch with crisp architectural grout line
     const tileAspect = (tileImg.naturalWidth || 1) / (tileImg.naturalHeight || 1);
-    const baseTileW = Math.max(30, Math.round(110 * tileScale));
-    const baseTileH = Math.max(30, Math.round(baseTileW / (tileAspect || 1)));
+    const baseTileW = Math.max(32, Math.round(95 * tileScale));
+    const baseTileH = Math.max(32, Math.round(baseTileW / (tileAspect || 1)));
 
     const patCanvas = document.createElement("canvas");
     patCanvas.width = baseTileW;
@@ -1638,9 +1741,9 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     const pCtx = patCanvas.getContext("2d");
     pCtx.drawImage(tileImg, 0, 0, baseTileW, baseTileH);
 
-    // Architectural grout line (soft dark gray, drawn within boundaries to avoid clipping)
-    pCtx.strokeStyle = "rgba(40, 35, 30, 0.50)";
-    const groutW = Math.max(1, Math.round(baseTileW * 0.025));
+    // Architectural grout line (soft warm gray, drawn cleanly inside boundaries)
+    pCtx.strokeStyle = "rgba(70, 65, 60, 0.45)";
+    const groutW = Math.max(1, Math.round(baseTileW * 0.022));
     pCtx.lineWidth = groutW;
     pCtx.strokeRect(groutW / 2, groutW / 2, baseTileW - groutW, baseTileH - groutW);
 
@@ -1648,21 +1751,21 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     const tilePixels = tileImageData.data;
 
     // 5. Setup Architectural 3D Perspective Parameters
-    const horizonY = (topRow !== -1 && botRow !== -1)
-        ? Math.max(h * 0.35, Math.min(h * 0.65, topRow - Math.round((botRow - topRow) * 0.35)))
-        : Math.round(h * 0.48);
+    const horizonY = Math.round(h * 0.48);
+    const floorHorizonY = Math.round(h * 0.68);
     const vx = w * 0.50;
     const vy = horizonY;
 
-    const cameraH = Math.max(120, (h - vy) * 0.55);
-    const cameraW = Math.max(120, (w * 0.50) * 0.75);
+    const cameraH = Math.max(120, (h - vy) * 0.65);
+    const scaleFloorV = Math.max(160, Math.round(400 * tileScale));
+    const scaleFloorU = scaleFloorV * (baseTileW / baseTileH);
 
-    // Aspect-ratio-calibrated scaling (prevents stretching/squashing and corrects grout spacing)
-    const scaleFloorV = Math.max(160, Math.round(440 * tileScale));
-    const scaleFloorU = scaleFloorV * (baseTileW / baseTileH) * 0.95;
-
-    const scaleWallU = Math.max(160, Math.round(440 * tileScale));
-    const scaleWallV = scaleWallU * (baseTileH / baseTileW) * 0.95;
+    // Canvas for pure perspective tile preview (Debug layer 6)
+    const debugTexCanvas = document.createElement("canvas");
+    debugTexCanvas.width = w; debugTexCanvas.height = h;
+    const dtCtx = debugTexCanvas.getContext("2d");
+    const dtImgData = dtCtx.createImageData(w, h);
+    const dtBuf = new Uint32Array(dtImgData.data.buffer);
 
     // Prepare Output Buffer (32-bit Uint32 for ultra-fast rendering)
     const outImageData = rCtx.createImageData(w, h);
@@ -1673,91 +1776,59 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
         const rowOffset = y * w;
         const rowByteOffset = rowOffset * 4;
         const dy = y - vy;
+        const isFloorPlane = (y >= floorHorizonY);
 
         for (let x = 0; x < w; x++) {
             const pxIdx = rowOffset + x;
             const byteIdx = rowByteOffset + x * 4;
             const maskAlpha = maskPixels[byteIdx + 3];
 
-            if (maskAlpha < 5) {
+            if (maskAlpha < 8) {
                 outBuf[pxIdx] = roomBuf[pxIdx];
                 continue;
             }
 
-            const dx = x - vx;
             let srcX = 0;
             let srcY = 0;
 
-            if (surface === "floor") {
+            if (isFloorPlane) {
                 // Ground plane 1-point perspective:
-                // Transverse joints are strictly horizontal, longitudinal joints converge to vanishing point
-                const absDy = Math.max(3, dy);
+                // Transverse joints are STRICTLY HORIZONTAL (y = const),
+                // Longitudinal joints converge smoothly to vanishing point (vx, vy).
+                const absDy = Math.max(1.0, dy);
                 const z = cameraH / absDy;
                 const vCoord = z * scaleFloorV;
                 const rowIdx = Math.floor(vCoord / baseTileH);
                 const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
                 
                 srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
-                srcX = ((Math.floor((dx / absDy) * scaleFloorU + xOffset) % baseTileW) + baseTileW) % baseTileW;
-            } else if (surface === "wall") {
-                // Vertical wall perspective:
-                if (dx < -w * 0.08) {
-                    // Left vertical wall: vertical joints are STRICTLY VERTICAL, horizontals converge to vanishing point
-                    const distX = Math.max(3, -dx);
-                    const uCoord = (cameraW / distX) * scaleWallU;
-                    const colIdx = Math.floor(uCoord / baseTileW);
-                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
-                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
-                } else if (dx > w * 0.08) {
-                    // Right vertical wall: vertical joints are STRICTLY VERTICAL
-                    const distX = Math.max(3, dx);
-                    const uCoord = (cameraW / distX) * scaleWallU;
-                    const colIdx = Math.floor(uCoord / baseTileW);
-                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
-                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
-                } else {
-                    // Back wall (facing camera orthogonally)
-                    const rowIdx = Math.floor(y / baseTileH);
-                    const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-                    srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
-                }
+                srcX = ((Math.floor(((x - vx) / absDy) * scaleFloorU + xOffset) % baseTileW) + baseTileW) % baseTileW;
             } else {
-                // "both": 3D Room Multi-Surface Perspective (Floor + Left Wall + Right Wall + Back Wall)
-                const isFloorQuad = (dy > 0) && (Math.abs(dx) <= dy * 0.95);
-                const isLeftWallQuad = (dx < 0) && (Math.abs(dy) < -dx * 1.25);
-                const isRightWallQuad = (dx > 0) && (Math.abs(dy) < dx * 1.25);
-
-                if (isFloorQuad) {
-                    const absDy = Math.max(3, dy);
-                    const z = cameraH / absDy;
-                    const vCoord = z * scaleFloorV;
-                    const rowIdx = Math.floor(vCoord / baseTileH);
-                    const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-                    srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
-                    srcX = ((Math.floor((dx / absDy) * scaleFloorU + xOffset) % baseTileW) + baseTileW) % baseTileW;
-                } else if (isLeftWallQuad) {
-                    const distX = Math.max(3, -dx);
-                    const uCoord = (cameraW / distX) * scaleWallU;
-                    const colIdx = Math.floor(uCoord / baseTileW);
-                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
-                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
-                } else if (isRightWallQuad) {
-                    const distX = Math.max(3, dx);
-                    const uCoord = (cameraW / distX) * scaleWallU;
-                    const colIdx = Math.floor(uCoord / baseTileW);
-                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
-                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
-                } else {
-                    // Back wall
+                // Wall plane: Orthogonal back wall & vertical side walls
+                const dx = x - vx;
+                if (Math.abs(dx) <= w * 0.28) {
+                    // Orthogonal Back Wall (facing camera directly):
+                    // Strictly 90-degree orthogonal tiles, zero radial angles, 100% natural tile aspect ratio!
                     const rowIdx = Math.floor(y / baseTileH);
                     const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
                     srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
                     srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
+                } else if (dx < -w * 0.28) {
+                    // Left Side Wall: Vertical joints strictly 90° vertical
+                    const distX = Math.max(3, -dx);
+                    const uCoord = ((w * 0.45) / distX) * baseTileW;
+                    const colIdx = Math.floor(uCoord / baseTileW);
+                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor(y + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                } else {
+                    // Right Side Wall: Vertical joints strictly 90° vertical
+                    const distX = Math.max(3, dx);
+                    const uCoord = ((w * 0.45) / distX) * baseTileW;
+                    const colIdx = Math.floor(uCoord / baseTileW);
+                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor(y + yOffset) % baseTileH) + baseTileH) % baseTileH;
                 }
             }
 
@@ -1766,13 +1837,16 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
             const tG = tilePixels[tileByteIdx + 1];
             const tB = tilePixels[tileByteIdx + 2];
 
+            // Debug pure perspective tile swatch buffer
+            dtBuf[pxIdx] = (255 << 24) | (tB << 16) | (tG << 8) | tR;
+
             const rR = roomPixels[byteIdx];
             const rG = roomPixels[byteIdx + 1];
             const rB = roomPixels[byteIdx + 2];
 
             // Ambient scene lighting preservation (luminance model)
             const lum = (rR * 0.299 + rG * 0.587 + rB * 0.114) / 255.0;
-            const lightFactor = lum * 0.88 + 0.12;
+            const lightFactor = Math.min(1.15, Math.max(0.18, lum * 0.82 + 0.18));
 
             const shadedR = Math.min(255, Math.round(tR * lightFactor));
             const shadedG = Math.min(255, Math.round(tG * lightFactor));
@@ -1789,7 +1863,13 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
         }
     }
 
+    dtCtx.putImageData(dtImgData, 0, 0);
+    window.__debugLayers.perspectiveTile = debugTexCanvas.toDataURL("image/png");
+
     rCtx.putImageData(outImageData, 0, 0);
+    window.__debugLayers.compositeResult = resultCanvas.toDataURL("image/png");
+    window.__debugLayers.original = hallImg.src;
+    updateDebugPanel();
 
     return new Promise((resolve) => {
         resultCanvas.toBlob((blob) => resolve(blob), "image/png");
@@ -1925,6 +2005,27 @@ downloadBtn.addEventListener("click", () => {
     a.remove();
 });
 
+const toggleDebugBtn = document.getElementById("toggle-debug-btn");
+const closeDebugBtn = document.getElementById("close-debug-btn");
+const debugSection = document.getElementById("debug-section");
+
+if (toggleDebugBtn && debugSection) {
+    toggleDebugBtn.addEventListener("click", () => {
+        const isHidden = debugSection.style.display === "none";
+        debugSection.style.display = isHidden ? "block" : "none";
+        if (isHidden) {
+            updateDebugPanel();
+            debugSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    });
+}
+
+if (closeDebugBtn && debugSection) {
+    closeDebugBtn.addEventListener("click", () => {
+        debugSection.style.display = "none";
+    });
+}
+
 async function initFromParams() {
     const params = new URLSearchParams(window.location.search);
     const tileParam = params.get("tile");
@@ -1933,6 +2034,11 @@ async function initFromParams() {
     const surfaceParam = params.get("surface");
     const scaleParam = params.get("scale");
     const isEmbed = params.get("embed") === "1" || window !== window.parent;
+    const isDebug = params.get("debug") === "1";
+
+    if (isDebug && debugSection) {
+        debugSection.style.display = "block";
+    }
 
     if (isEmbed) {
         document.body.classList.add("embedded");
