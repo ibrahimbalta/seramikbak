@@ -19,6 +19,7 @@ function MekanimdaGorContent() {
   useEffect(() => {
     let url = '/floor-tile-visualizer/index.html';
     const params = new URLSearchParams();
+    params.set('v', '3.1.0');
 
     if (tileParam) {
       params.set('tile', tileParam);
@@ -43,7 +44,7 @@ function MekanimdaGorContent() {
           setLoading(false);
         })
         .catch(() => {
-          setVisualizerSrc('/floor-tile-visualizer/index.html');
+          setVisualizerSrc('/floor-tile-visualizer/index.html?v=3.1.0');
           setLoading(false);
         });
       return;
