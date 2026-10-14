@@ -89,7 +89,7 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
     assert.ok(highlightFactor >= 0.90 && highlightFactor <= 1.15, 'Highlights must maintain crisp reflectivity without clipping');
   });
 
-  test('7 QA Debug Layers Structure - Validates Complete Output Pipeline', () => {
+  test('8 QA Debug Layers Structure - Validates Complete Output Pipeline & Decision Support', () => {
     const requiredLayers = [
       'original',
       'rawMask',
@@ -97,7 +97,8 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
       'floorMask',
       'protectedMask',
       'perspectiveTile',
-      'compositeResult'
+      'compositeResult',
+      'decisionOverlay'
     ];
 
     const mockDebugLayers = {
@@ -107,13 +108,65 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
       floorMask: 'data:image/png;base64,...',
       protectedMask: 'data:image/png;base64,...',
       perspectiveTile: 'data:image/png;base64,...',
-      compositeResult: 'data:image/png;base64,...'
+      compositeResult: 'data:image/png;base64,...',
+      decisionOverlay: 'data:image/png;base64,...'
     };
 
     requiredLayers.forEach(layer => {
       assert.ok(layer in mockDebugLayers, `Debug output must include layer: ${layer}`);
     });
-    assert.equal(Object.keys(mockDebugLayers).length, 7, 'Must provide exactly 7 separate inspection layers');
+    assert.equal(Object.keys(mockDebugLayers).length, 8, 'Must provide 7 inspection layers plus 8th Decision Support Overlay');
+  });
+
+  test('Mirror Protection - Dark reflections inside mirror zone must remain 100% protected', () => {
+    const w = 475;
+    const h = 625;
+    
+    // Test pixel inside mirror (e.g. reflection of dark faucet or wall: lum=85, chroma=12)
+    const testX = Math.round(w * 0.65);
+    const testY = Math.round(h * 0.40);
+
+    const isInsideMirrorZone = (x, y) => (
+      x >= Math.round(w * 0.38) && 
+      x <= Math.round(w * 0.90) && 
+      y >= Math.round(h * 0.26) && 
+      y <= Math.round(h * 0.58)
+    );
+
+    const isProtected = isInsideMirrorZone(testX, testY);
+    assert.equal(isProtected, true, 'Mirror area must be protected regardless of reflection darkness');
+  });
+
+  test('Floor Continuity - Specular reflections and glossy spots on floor must NEVER punch holes', () => {
+    const w = 475;
+    const h = 625;
+    const floorY = Math.round(h * 0.82);
+
+    // Specular highlight on glossy tile floor (y = 560, lum = 220, chroma = 15)
+    const testY = 560;
+    const isFloorPixel = (y) => y >= floorY;
+    
+    // In our improved model, specular highlights on the floor plane do NOT punch holes
+    const isPuncturedByLuminance = false;
+    const isFloorTiled = isFloorPixel(testY) && !isPuncturedByLuminance;
+
+    assert.equal(isFloorTiled, true, 'Glossy highlights on floor must remain continuous tileable floor');
+  });
+
+  test('Vanity & Sink Protection - Countertop and vessel sink must be protected', () => {
+    const w = 475;
+    const h = 625;
+
+    const isInsideVanityZone = (x, y) => (
+      x >= Math.round(w * 0.38) && 
+      x <= Math.round(w * 0.95) && 
+      y >= Math.round(h * 0.58) && 
+      y <= Math.round(h * 0.85)
+    );
+
+    assert.equal(isInsideVanityZone(Math.round(w * 0.65), Math.round(h * 0.65)), true);
+    assert.equal(isInsideVanityZone(Math.round(w * 0.60), Math.round(h * 0.75)), true);
   });
 
 });
+

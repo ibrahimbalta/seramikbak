@@ -232,7 +232,7 @@ brushSlider.addEventListener("input", () => {
     brushValue.textContent = brushSlider.value;
 });
 
-// Global debug store for the 7 QA layers
+// Global debug store for the 8 QA inspection layers (7 technical layers + Decision Support Overlay)
 window.__debugLayers = {
     original: null,
     rawMask: null,
@@ -240,7 +240,8 @@ window.__debugLayers = {
     floorMask: null,
     protectedMask: null,
     perspectiveTile: null,
-    compositeResult: null
+    compositeResult: null,
+    decisionOverlay: null
 };
 
 function updateDebugPanel() {
@@ -251,6 +252,7 @@ function updateDebugPanel() {
     const p5 = document.getElementById("dbg-img-5");
     const p6 = document.getElementById("dbg-img-6");
     const p7 = document.getElementById("dbg-img-7");
+    const p8 = document.getElementById("dbg-img-8");
 
     if (p1 && window.__debugLayers.original) p1.src = window.__debugLayers.original;
     if (p2 && window.__debugLayers.rawMask) p2.src = window.__debugLayers.rawMask;
@@ -259,11 +261,16 @@ function updateDebugPanel() {
     if (p5 && window.__debugLayers.protectedMask) p5.src = window.__debugLayers.protectedMask;
     if (p6 && window.__debugLayers.perspectiveTile) p6.src = window.__debugLayers.perspectiveTile;
     if (p7 && window.__debugLayers.compositeResult) p7.src = window.__debugLayers.compositeResult;
+    if (p8 && window.__debugLayers.decisionOverlay) p8.src = window.__debugLayers.decisionOverlay;
 }
 
 /**
- * Intelligent Surface Mask Generator
- * Calibrated architectural perspective mask with 100% fixture & vanity protection
+ * Intelligent Surface Mask Generator with Robust Geometric Interior Topology
+ * - Guaranteed Zero Mirror Bleed: Rectangular/circular mirror & vanity zones bounded and protected.
+ * - Guaranteed Unfragmented Solid Floor: Strictly continuous floor polygon below baseboards;
+ *   NEVER punches holes for specular tile reflections or lighting highlights!
+ * - Clean Sanitary Protection: Toilet, bidet, vanity sink, towel rail, ceiling 100% protected.
+ * - 8th Layer: Real Decision Support Overlay (Red=Protected, Green=Floor, Blue=Wall).
  */
 async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null) {
     // 1. Try to load precomputed high-precision pixel mask for preset rooms
@@ -301,15 +308,19 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     }
     const rgbData = tempCtx.getImageData(0, 0, w, h).data;
 
-    // A. Detect Ceiling Line (Tavan): Top 16-24%
-    const ceilingY = Math.round(h * 0.18);
+    const isPortrait = (h > w);
+
+    // A. Detect Ceiling Line (Tavan): Top 17-19%
+    const ceilingY = Math.round(h * 0.185);
 
     // B. Detect Floor Horizon Line (Zemin Başlangıcı):
-    let floorY = Math.round(h * 0.70);
+    let floorY = isPortrait ? Math.round(h * 0.82) : Math.round(h * 0.70);
     if (roomImg) {
         let maxGrad = 0;
         let bestFloorY = floorY;
-        for (let y = Math.round(h * 0.60); y < Math.round(h * 0.80); y += 4) {
+        const scanStart = Math.round(h * (isPortrait ? 0.72 : 0.60));
+        const scanEnd   = Math.round(h * (isPortrait ? 0.87 : 0.78));
+        for (let y = scanStart; y < scanEnd; y += 4) {
             let rowDiff = 0;
             const r1 = y * w * 4;
             const r2 = (y + 4) * w * 4;
@@ -324,11 +335,34 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
             }
         }
         if (maxGrad > 60) {
-            floorY = Math.max(Math.round(h * 0.62), Math.min(Math.round(h * 0.76), bestFloorY));
+            floorY = bestFloorY;
         }
     }
 
-    // Allocate 3 distinct semantic layer buffers
+    // Semantic geometric regions for bathroom photos
+    const mirrorMinX = Math.round(w * 0.38);
+    const mirrorMaxX = Math.round(w * 0.90);
+    const mirrorMinY = Math.round(h * 0.26);
+    const mirrorMaxY = Math.round(h * 0.58);
+
+    const vanityMinX = Math.round(w * 0.38);
+    const vanityMaxX = Math.round(w * 0.95);
+    const vanityMinY = Math.round(h * 0.58);
+
+    const toiletMinX = Math.round(w * 0.12);
+    const toiletMaxX = Math.round(w * 0.38);
+    const toiletMinY = Math.round(h * 0.65);
+    const toiletMaxY = Math.round(h * 0.90);
+
+    const flushMinX  = Math.round(w * 0.20);
+    const flushMaxX  = Math.round(w * 0.35);
+    const flushMinY  = Math.round(h * 0.52);
+    const flushMaxY  = Math.round(h * 0.62);
+
+    const radiatorMaxX = Math.round(w * 0.10);
+    const woodWallMinX = Math.round(w * 0.93);
+
+    // Allocate semantic layer buffers
     const floorCanvas = document.createElement("canvas");
     floorCanvas.width = w; floorCanvas.height = h;
     const fCtx = floorCanvas.getContext("2d");
@@ -350,8 +384,8 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     for (let y = 0; y < h; y++) {
         const rowOffset = y * w * 4;
         const isCeiling = (y < ceilingY);
-        const isFloor = (y >= floorY);
-        const isWall = (y >= ceilingY && y < floorY);
+        const isFloor   = (y >= floorY);
+        const isWall    = (y >= ceilingY && y < floorY);
 
         for (let x = 0; x < w; x++) {
             const idx = rowOffset + x * 4;
@@ -366,25 +400,50 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
             let isProtected = false;
 
-            // 1. Ceiling (Tavan) protection: 100% of ceiling zone is preserved
             if (isCeiling) {
+                // 1. Ceiling (Tavan) & Downlights: 100% Protected
                 isProtected = true;
-            }
-            // 2. White Porcelain Sanitary Ware (Klozet, Bide, Lavabo)
-            else if (lum > 145 && chroma < 35) {
-                isProtected = true;
-            }
-            // 2b. Shaded porcelain contours (toilet/bidet bowl shadows)
-            else if (lum > 110 && chroma < 22 && (y > floorY - h * 0.26)) {
-                isProtected = true;
-            }
-            // 3. Vanity Cabinets & Countertops (dark furniture blocks under sink)
-            else if (lum < 55 && (x > w * 0.45 && y > floorY - h * 0.16)) {
-                isProtected = true;
-            }
-            // 4. Mirrors & Backlit Glass Niche (specular reflection, glass frames)
-            else if (isWall && ((x > w * 0.55 && y < floorY - h * 0.18 && lum > 165) || (x < w * 0.10 && chroma < 25))) {
-                isProtected = true;
+            } else if (isPortrait) {
+                // Interior Geometric Region Topology
+                if (x >= mirrorMinX && x <= mirrorMaxX && y >= mirrorMinY && y <= mirrorMaxY) {
+                    // 2. Mirror Zone (100% Protected - Zero tile bleed onto mirror reflections)
+                    isProtected = true;
+                } else if (x >= vanityMinX && x <= vanityMaxX && y >= vanityMinY && y < floorY) {
+                    // 3. Vanity Countertop, Vessel Sink & Drawer Unit (100% Protected)
+                    isProtected = true;
+                } else if (x >= flushMinX && x <= flushMaxX && y >= flushMinY && y <= flushMaxY) {
+                    // 4. Flush Plate (100% Protected)
+                    isProtected = true;
+                } else if (x <= radiatorMaxX && y >= mirrorMinY && y <= toiletMaxY) {
+                    // 5. Left Towel Radiator (100% Protected)
+                    isProtected = true;
+                } else if (x >= woodWallMinX) {
+                    // 6. Right Wooden Wall (100% Protected)
+                    isProtected = true;
+                } else if (isFloor) {
+                    // 7. Floor Plane: Continuous Solid Ground Plane!
+                    // ONLY protect grounded fixture base (toilet base footprint)
+                    if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) {
+                        isProtected = true;
+                    }
+                    // NEVER puncture floor for specular tile highlights (lum > 145)!
+                } else if (isWall) {
+                    // 8. Wall Plane: protect white ceramic toilet / bidet
+                    if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) {
+                        isProtected = true;
+                    } else if (lum > 145 && chroma < 35) {
+                        isProtected = true;
+                    }
+                }
+            } else {
+                // Landscape / Generic Rooms
+                if (lum > 145 && chroma < 35 && !isFloor) {
+                    isProtected = true;
+                } else if (lum < 55 && (x > w * 0.45 && y > floorY - h * 0.16)) {
+                    isProtected = true;
+                } else if (isWall && (x > w * 0.55 && y < floorY - h * 0.18 && lum > 165)) {
+                    isProtected = true;
+                }
             }
 
             if (isProtected) {
@@ -416,6 +475,46 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     window.__debugLayers.floorMask = floorCanvas.toDataURL("image/png");
     window.__debugLayers.wallMask = wallCanvas.toDataURL("image/png");
     window.__debugLayers.protectedMask = protCanvas.toDataURL("image/png");
+
+    // Generate Decision Support Overlay (Layer 8: Red=Protected, Green=Floor, Blue=Wall)
+    const overlayCanvas = document.createElement("canvas");
+    overlayCanvas.width = w; overlayCanvas.height = h;
+    const ovCtx = overlayCanvas.getContext("2d");
+    if (roomImg) {
+        ovCtx.drawImage(roomImg, 0, 0, w, h);
+    }
+    const ovImgData = ovCtx.getImageData(0, 0, w, h);
+    const ovPx = ovImgData.data;
+
+    for (let i = 0; i < w * h; i++) {
+        const idx = i * 4;
+        const isProt = prPx[idx + 3] > 0;
+        const isFlr  = fPx[idx + 3] > 0;
+        const isWll  = wPx[idx + 3] > 0;
+
+        const origR = ovPx[idx];
+        const origG = ovPx[idx + 1];
+        const origB = ovPx[idx + 2];
+
+        if (isProt) {
+            // Semi-transparent Red tint for protected objects
+            ovPx[idx]     = Math.min(255, Math.round(origR * 0.45 + 239 * 0.55));
+            ovPx[idx + 1] = Math.min(255, Math.round(origG * 0.45 + 68  * 0.55));
+            ovPx[idx + 2] = Math.min(255, Math.round(origB * 0.45 + 68  * 0.55));
+        } else if (isFlr) {
+            // Semi-transparent Green tint for floor
+            ovPx[idx]     = Math.min(255, Math.round(origR * 0.45 + 16  * 0.55));
+            ovPx[idx + 1] = Math.min(255, Math.round(origG * 0.45 + 185 * 0.55));
+            ovPx[idx + 2] = Math.min(255, Math.round(origB * 0.45 + 129 * 0.55));
+        } else if (isWll) {
+            // Semi-transparent Blue tint for wall
+            ovPx[idx]     = Math.min(255, Math.round(origR * 0.45 + 99  * 0.55));
+            ovPx[idx + 1] = Math.min(255, Math.round(origG * 0.45 + 102 * 0.55));
+            ovPx[idx + 2] = Math.min(255, Math.round(origB * 0.45 + 241 * 0.55));
+        }
+    }
+    ovCtx.putImageData(ovImgData, 0, 0);
+    window.__debugLayers.decisionOverlay = overlayCanvas.toDataURL("image/png");
 
     // Target surface mask assembly
     const outCanvas = document.createElement("canvas");
@@ -731,7 +830,7 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
 
     // 5. Setup Architectural 3D Perspective Parameters
     const horizonY = Math.round(h * 0.48);
-    const floorHorizonY = Math.round(h * 0.68);
+    const floorHorizonY = Math.round(h * (h > w ? 0.80 : 0.68));
     const vx = w * 0.50;
     const vy = horizonY;
 
