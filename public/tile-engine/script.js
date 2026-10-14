@@ -81,6 +81,77 @@
 
     let tileImageEl = null;
     let roomImageEl = null;
+    let roomFgImageEl = null;
+
+    // Calibrated Room Geometries & Foreground Presets
+    const ROOM_PRESETS = {
+        'modern_living': {
+            floorY: 0.52,
+            ceilingY: 0.10,
+            horizonY: 0.46,
+            vanishingX: 0.50,
+            vanishingY: 0.46,
+            fgUrl: '/hero/modern_living_fg.png',
+            isBathroom: false
+        },
+        'luxury_bathroom': {
+            floorY: 0.68,
+            ceilingY: 0.15,
+            horizonY: 0.48,
+            vanishingX: 0.50,
+            vanishingY: 0.48,
+            fgUrl: '/hero/luxury_bathroom_fg.png',
+            isBathroom: true
+        },
+        'easy_kitchen': {
+            floorY: 0.57,
+            ceilingY: 0.15,
+            horizonY: 0.46,
+            vanishingX: 0.50,
+            vanishingY: 0.46,
+            fgUrl: '/hero/scandinavian_kitchen_fg.png',
+            isBathroom: false
+        },
+        'scandinavian_kitchen': {
+            floorY: 0.57,
+            ceilingY: 0.15,
+            horizonY: 0.46,
+            vanishingX: 0.50,
+            vanishingY: 0.46,
+            fgUrl: '/hero/scandinavian_kitchen_fg.png',
+            isBathroom: false
+        },
+        'easy_bathroom': {
+            floorY: 0.72,
+            ceilingY: 0.18,
+            horizonY: 0.48,
+            vanishingX: 0.50,
+            vanishingY: 0.48,
+            fgUrl: null,
+            isBathroom: true
+        }
+    };
+
+    function getRoomConfig(url, w, h) {
+        if (url) {
+            const cleanUrl = url.toLowerCase();
+            for (const [key, conf] of Object.entries(ROOM_PRESETS)) {
+                if (cleanUrl.includes(key)) {
+                    return conf;
+                }
+            }
+        }
+        const isPortrait = h > w;
+        return {
+            floorY: isPortrait ? 0.70 : 0.62,
+            ceilingY: 0.16,
+            horizonY: 0.48,
+            vanishingX: 0.50,
+            vanishingY: 0.48,
+            fgUrl: null,
+            isBathroom: Boolean(url && url.toLowerCase().includes('bathroom'))
+        };
+    }
 
     let maskCtx = maskCanvas.getContext('2d');
     let maskHistory = [];
@@ -263,6 +334,18 @@
             roomImageEl = await loadImage(url);
             roomDims.textContent = `${roomImageEl.naturalWidth}×${roomImageEl.naturalHeight}px`;
 
+            const conf = getRoomConfig(url, roomImageEl.naturalWidth, roomImageEl.naturalHeight);
+            if (conf.fgUrl) {
+                try {
+                    roomFgImageEl = await loadImage(conf.fgUrl);
+                } catch (e) {
+                    console.warn('FG layer not found, using algorithmic protection:', conf.fgUrl);
+                    roomFgImageEl = null;
+                }
+            } else {
+                roomFgImageEl = null;
+            }
+
             setupMaskCanvas(roomImageEl.naturalWidth, roomImageEl.naturalHeight);
             generateAutoMask();
         } catch (err) {
@@ -278,7 +361,7 @@
         historyIndex = -1;
     }
 
-    // Intelligent Mask Generation (Protecting fixtures, vanity, toilet, plants, ceiling)
+    // Intelligent Mask Generation (Unified perspective plane, protecting furniture & fixtures without artificial holes)
     function generateAutoMask() {
         if (!roomImageEl) return;
         const w = maskCanvas.width;
@@ -294,10 +377,20 @@
         tCtx.drawImage(roomImageEl, 0, 0, w, h);
         const rgbData = tCtx.getImageData(0, 0, w, h).data;
 
-        const isEasyBathroom = activeRoomUrl.includes('bathroom') || (w === 1024 && h === 1024);
-        const isPortrait = h > w;
-        const ceilingY = Math.round(h * 0.18);
-        const floorY = isEasyBathroom ? Math.round(h * 0.72) : Math.round(h * (isPortrait ? 0.76 : 0.68));
+        // Foreground layer pixels if available (sofa, rug, table, chairs, staircase)
+        let fgData = null;
+        if (roomFgImageEl) {
+            const fgCanvas = document.createElement('canvas');
+            fgCanvas.width = w;
+            fgCanvas.height = h;
+            const fgCtx = fgCanvas.getContext('2d');
+            fgCtx.drawImage(roomFgImageEl, 0, 0, w, h);
+            fgData = fgCtx.getImageData(0, 0, w, h).data;
+        }
+
+        const conf = getRoomConfig(activeRoomUrl, w, h);
+        const floorY = Math.round(h * conf.floorY);
+        const ceilingY = Math.round(h * conf.ceilingY);
 
         const maskImgData = maskCtx.createImageData(w, h);
         const mPx = maskImgData.data;
@@ -312,22 +405,26 @@
                 const r = rgbData[idx];
                 const g = rgbData[idx + 1];
                 const b = rgbData[idx + 2];
-                const lum = r * 0.299 + g * 0.587 + b * 0.114;
-                const chroma = Math.max(r, g, b) - Math.min(r, g, b);
 
                 let isProtected = false;
-                // Plant protection
-                if ((g > r + 18 && g > b + 18) || (2 * g - r - b > 28 && g > 45)) isProtected = true;
-                // Carpet/textile
-                if (isFloorZone && ((x >= w * 0.30 && x <= w * 0.72 && y >= floorY + h * 0.03 && y <= floorY + h * 0.11) || (chroma > 45 && lum < 75))) isProtected = true;
 
+                // 1. Precise foreground layer check (covers sofa, table, chairs, carpet without rectangular holes)
+                if (fgData && fgData[idx + 3] > 18) {
+                    isProtected = true;
+                }
+
+                // 2. Ceiling protection
                 if (y < ceilingY) isProtected = true;
 
-                // Bathroom fixtures protection
-                if (isEasyBathroom) {
+                // 3. Plant / Foliage protection (pure green chromaticity)
+                if ((g > r + 22 && g > b + 22) || (2 * g - r - b > 35 && g > 50)) {
+                    isProtected = true;
+                }
+
+                // 4. Specific bathroom vanity/cabinet protection when no separate fg file exists
+                if (conf.isBathroom && !roomFgImageEl) {
                     if (x < w * 0.42 && y < floorY) isProtected = true; // Wood cabinet
                     if (x >= w * 0.42 && x <= w * 0.58 && y >= h * 0.20 && y <= h * 0.74) isProtected = true; // Mirror & Vanity
-                    if (x > w * 0.78 && y >= floorY && y <= floorY + h * 0.16) isProtected = true; // Fixture zone
                 }
 
                 if (!isProtected) {
@@ -529,11 +626,11 @@
 
         const tilePx = pCtx.getImageData(0, 0, baseTileW, baseTileH).data;
 
-        // Perspective setup
-        const isEasyBathroom = activeRoomUrl.includes('bathroom') || (w === 1024 && h === 1024);
-        const horizonY = Math.round(h * 0.48);
-        const floorHorizonY = isEasyBathroom ? Math.round(h * 0.72) : Math.round(h * (h > w ? 0.76 : 0.68));
-        const vx = w * 0.50;
+        // Perspective setup - Unified geometry from calibrated room config
+        const conf = getRoomConfig(activeRoomUrl, w, h);
+        const horizonY = Math.round(h * conf.horizonY);
+        const floorHorizonY = Math.round(h * conf.floorY);
+        const vx = Math.round(w * conf.vanishingX);
         const vy = horizonY;
 
         const cameraH = Math.max(120, (h - vy) * 0.65);
@@ -633,6 +730,11 @@
         }
 
         rCtx.putImageData(outImgData, 0, 0);
+
+        // Overlay foreground layer if available for razor-sharp furniture/object edges
+        if (roomFgImageEl) {
+            rCtx.drawImage(roomFgImageEl, 0, 0, w, h);
+        }
 
         return new Promise((resolve) => {
             rCanvas.toBlob((blob) => resolve(blob), 'image/png');
