@@ -87,6 +87,14 @@ const nextConfig = {
         source: '/floor-tile-visualizer/',
         destination: '/floor-tile-visualizer/index.html',
       },
+      {
+        source: '/tiles-visualizer',
+        destination: '/tiles-visualizer/index.html',
+      },
+      {
+        source: '/tiles-visualizer/',
+        destination: '/tiles-visualizer/index.html',
+      },
     ];
   },
 
