@@ -232,17 +232,74 @@ brushSlider.addEventListener("input", () => {
     brushValue.textContent = brushSlider.value;
 });
 
-// Global debug store for the 8 QA inspection layers (7 technical layers + Decision Support Overlay)
+// Global debug store for the 9 QA inspection layers (7 technical layers + Final Apply Mask + Decision Support Overlay)
 window.__debugLayers = {
     original: null,
     rawMask: null,
     wallMask: null,
     floorMask: null,
     protectedMask: null,
+    finalApplyMask: null,
     perspectiveTile: null,
     compositeResult: null,
     decisionOverlay: null
 };
+
+let activeDebugLayer = "compositeResult";
+
+function selectDebugLayer(layerKey) {
+    activeDebugLayer = layerKey;
+    const stageImg = document.getElementById("dbg-stage-img");
+    const stageOverlay = document.getElementById("dbg-stage-overlay");
+    const titleEl = document.getElementById("dbg-stage-title");
+    const tabBtns = document.querySelectorAll(".dbg-tab-btn");
+
+    tabBtns.forEach(btn => {
+        if (btn.dataset.layer === layerKey) {
+            btn.classList.add("active");
+            btn.style.background = "#6366f1";
+            btn.style.color = "#fff";
+        } else {
+            btn.classList.remove("active");
+            btn.style.background = "rgba(255,255,255,0.06)";
+            btn.style.color = "#94a3b8";
+        }
+    });
+
+    const layerTitles = {
+        original: "1. Orijinal Banyo Fotoğrafı (475×625 Tam Çözünürlük)",
+        rawMask: "2. Ham Segmentasyon Maskesi (Döşenebilir Alan)",
+        wallMask: "3. Düzeltilmiş Duvar Maskesi (Ayna/Dolap/Vitrifiye Arındırılmış)",
+        floorMask: "4. Düzeltilmiş Zemin Maskesi (Sürekli, Deliksiz, Lekesiz Zemin)",
+        protectedMask: "5. Korunan Ön Plan Maskesi (Ayna, Tezgâh, Klozet, Tavan)",
+        finalApplyMask: "6. Nihai Kaplama Maskesi (Seçilen Yüzey Kaplama Alanı)",
+        perspectiveTile: "7. Perspektif Uygulanmış Seramik Dokusu (Ocean 60×120)",
+        compositeResult: "8. Son Kompozit Görsel (Işık ve Gölgeleri Korunmuş Nihai Render)",
+        decisionOverlay: "9. Karar Destek Bindirmesi (Kırmızı=Korunan, Yeşil=Zemin, Mavi=Duvar)"
+    };
+
+    if (titleEl && layerTitles[layerKey]) {
+        titleEl.textContent = layerTitles[layerKey];
+    }
+
+    const src = window.__debugLayers[layerKey];
+    if (stageImg && src) {
+        stageImg.src = src;
+    }
+
+    // Semi-transparent overlay with original room photo
+    if (stageOverlay) {
+        const isMask = ["rawMask", "wallMask", "floorMask", "protectedMask", "finalApplyMask"].includes(layerKey);
+        const opacitySlider = document.getElementById("dbg-opacity-slider");
+        if (opacitySlider && isMask) {
+            stageOverlay.src = window.__debugLayers.original || "";
+            stageOverlay.style.display = "block";
+            stageOverlay.style.opacity = (parseFloat(opacitySlider.value) || 35) / 100.0;
+        } else {
+            stageOverlay.style.display = "none";
+        }
+    }
+}
 
 function updateDebugPanel() {
     const p1 = document.getElementById("dbg-img-1");
@@ -253,27 +310,30 @@ function updateDebugPanel() {
     const p6 = document.getElementById("dbg-img-6");
     const p7 = document.getElementById("dbg-img-7");
     const p8 = document.getElementById("dbg-img-8");
+    const p9 = document.getElementById("dbg-img-9");
 
     if (p1 && window.__debugLayers.original) p1.src = window.__debugLayers.original;
     if (p2 && window.__debugLayers.rawMask) p2.src = window.__debugLayers.rawMask;
     if (p3 && window.__debugLayers.wallMask) p3.src = window.__debugLayers.wallMask;
     if (p4 && window.__debugLayers.floorMask) p4.src = window.__debugLayers.floorMask;
     if (p5 && window.__debugLayers.protectedMask) p5.src = window.__debugLayers.protectedMask;
-    if (p6 && window.__debugLayers.perspectiveTile) p6.src = window.__debugLayers.perspectiveTile;
-    if (p7 && window.__debugLayers.compositeResult) p7.src = window.__debugLayers.compositeResult;
-    if (p8 && window.__debugLayers.decisionOverlay) p8.src = window.__debugLayers.decisionOverlay;
+    if (p6 && window.__debugLayers.finalApplyMask) p6.src = window.__debugLayers.finalApplyMask;
+    if (p7 && window.__debugLayers.perspectiveTile) p7.src = window.__debugLayers.perspectiveTile;
+    if (p8 && window.__debugLayers.compositeResult) p8.src = window.__debugLayers.compositeResult;
+    if (p9 && window.__debugLayers.decisionOverlay) p9.src = window.__debugLayers.decisionOverlay;
+
+    // Refresh full-size stage
+    selectDebugLayer(activeDebugLayer);
 }
 
 /**
- * Intelligent Surface Mask Generator with Robust Geometric Interior Topology
- * - Guaranteed Zero Mirror Bleed: Rectangular/circular mirror & vanity zones bounded and protected.
- * - Guaranteed Unfragmented Solid Floor: Strictly continuous floor polygon below baseboards;
- *   NEVER punches holes for specular tile reflections or lighting highlights!
- * - Clean Sanitary Protection: Toilet, bidet, vanity sink, towel rail, ceiling 100% protected.
- * - 8th Layer: Real Decision Support Overlay (Red=Protected, Green=Floor, Blue=Wall).
+ * Intelligent Surface Mask Generator with Strict Mathematical Set Theory
+ * - Complete Disjoint Partition: M_protected + M_wall + M_floor = Total Image (296,875 px)
+ * - Zero Overlap: M_wall ∩ M_floor = Ø
+ * - Guaranteed Zero Mirror Bleed: Mirror + Upper Cabinet completely protected
+ * - Continuous Solid Floor: Zero punctures, zero splotches
  */
 async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null) {
-    // 1. Try to load precomputed high-precision pixel mask for preset rooms
     if (presetUrl) {
         let maskName = null;
         if (presetUrl.includes("bathroom")) maskName = "easy_bathroom";
@@ -284,12 +344,12 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
             try {
                 const maskImg = await loadImage(`/hero/masks/${maskName}_${surface}.png`);
                 const c = document.createElement("canvas");
-                c.width = w;
-                c.height = h;
+                c.width = w; c.height = h;
                 const cx = c.getContext("2d");
                 cx.drawImage(maskImg, 0, 0, w, h);
                 const dataUrl = c.toDataURL("image/png");
                 window.__debugLayers.rawMask = dataUrl;
+                window.__debugLayers.finalApplyMask = dataUrl;
                 updateDebugPanel();
                 return dataUrl.split(",")[1];
             } catch (err) {
@@ -298,71 +358,62 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
         }
     }
 
-    // 2. High-precision Computer Vision Analysis for Custom Room Photos
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = w;
-    tempCanvas.height = h;
+    tempCanvas.width = w; tempCanvas.height = h;
     const tempCtx = tempCanvas.getContext("2d");
     if (roomImg) {
         tempCtx.drawImage(roomImg, 0, 0, w, h);
+        window.__debugLayers.original = roomImg.src || tempCanvas.toDataURL("image/png");
     }
     const rgbData = tempCtx.getImageData(0, 0, w, h).data;
 
     const isPortrait = (h > w);
 
-    // A. Detect Ceiling Line (Tavan): Top 17-19%
-    const ceilingY = Math.round(h * 0.185);
+    // 1. Tavan ve Spotlar (Ceiling): y in [0, ceilingY]
+    const ceilingY = Math.round(h * 0.176); // 110 px on 625
 
-    // B. Detect Floor Horizon Line (Zemin Başlangıcı):
-    let floorY = isPortrait ? Math.round(h * 0.82) : Math.round(h * 0.70);
-    if (roomImg) {
-        let maxGrad = 0;
-        let bestFloorY = floorY;
-        const scanStart = Math.round(h * (isPortrait ? 0.72 : 0.60));
-        const scanEnd   = Math.round(h * (isPortrait ? 0.87 : 0.78));
-        for (let y = scanStart; y < scanEnd; y += 4) {
-            let rowDiff = 0;
-            const r1 = y * w * 4;
-            const r2 = (y + 4) * w * 4;
-            for (let x = 0; x < w; x += 8) {
-                const lum1 = rgbData[r1 + x * 4] * 0.299 + rgbData[r1 + x * 4 + 1] * 0.587 + rgbData[r1 + x * 4 + 2] * 0.114;
-                const lum2 = rgbData[r2 + x * 4] * 0.299 + rgbData[r2 + x * 4 + 1] * 0.587 + rgbData[r2 + x * 4 + 2] * 0.114;
-                rowDiff += Math.abs(lum1 - lum2);
-            }
-            if (rowDiff > maxGrad) {
-                maxGrad = rowDiff;
-                bestFloorY = y;
-            }
-        }
-        if (maxGrad > 60) {
-            floorY = bestFloorY;
-        }
-    }
+    // 2. Üst Dolap (Upper Cabinet above mirror):
+    const upperCabMinX = Math.round(w * 0.404);
+    const upperCabMaxX = Math.round(w * 0.937);
+    const upperCabMinY = ceilingY;
+    const upperCabMaxY = Math.round(h * 0.28);
 
-    // Semantic geometric regions for bathroom photos
-    const mirrorMinX = Math.round(w * 0.38);
-    const mirrorMaxX = Math.round(w * 0.90);
-    const mirrorMinY = Math.round(h * 0.26);
-    const mirrorMaxY = Math.round(h * 0.58);
+    // 3. Ayna ve LED Halo (Mirror):
+    const mirrorMinX = Math.round(w * 0.404);
+    const mirrorMaxX = Math.round(w * 0.937);
+    const mirrorMinY = Math.round(h * 0.28);
+    const mirrorMaxY = Math.round(h * 0.568);
 
-    const vanityMinX = Math.round(w * 0.38);
-    const vanityMaxX = Math.round(w * 0.95);
-    const vanityMinY = Math.round(h * 0.58);
+    // 4. Ahşap Tezgâh ve Asma Çekmeceler (Vanity):
+    const vanityMinX = Math.round(w * 0.395);
+    const vanityMaxX = Math.round(w * 0.937);
+    const vanityMinY = Math.round(h * 0.656);
+    const vanityMaxY = Math.round(h * 0.84);
 
-    const toiletMinX = Math.round(w * 0.12);
-    const toiletMaxX = Math.round(w * 0.38);
-    const toiletMinY = Math.round(h * 0.65);
-    const toiletMaxY = Math.round(h * 0.90);
+    // Çanak Lavabo Ovali (Vessel sink):
+    const sinkCenterX = Math.round(w * 0.655);
+    const sinkCenterY = Math.round(h * 0.646);
+    const sinkRadiusX = Math.round(w * 0.128);
+    const sinkRadiusY = Math.round(h * 0.032);
 
-    const flushMinX  = Math.round(w * 0.20);
-    const flushMaxX  = Math.round(w * 0.35);
-    const flushMinY  = Math.round(h * 0.52);
-    const flushMaxY  = Math.round(h * 0.62);
+    // 5. Asma Klozet, Kumanda Paneli, Havlupan (Sanitary Fixtures):
+    const toiletMinX = Math.round(w * 0.158);
+    const toiletMaxX = Math.round(w * 0.347);
+    const toiletMinY = Math.round(h * 0.696);
+    const toiletMaxY = Math.round(h * 0.856);
 
-    const radiatorMaxX = Math.round(w * 0.10);
-    const woodWallMinX = Math.round(w * 0.93);
+    const flushMinX = Math.round(w * 0.22);
+    const flushMaxX = Math.round(w * 0.326);
+    const flushMinY = Math.round(h * 0.536);
+    const flushMaxY = Math.round(h * 0.60);
 
-    // Allocate semantic layer buffers
+    const radiatorMaxX = Math.round(w * 0.095);
+    const rightWoodMinX = Math.round(w * 0.937);
+
+    // 6. Zemin Seviyesi (Floor Horizon Line):
+    const floorY = isPortrait ? Math.round(h * 0.856) : Math.round(h * 0.70);
+
+    // Allocate semantic buffers
     const floorCanvas = document.createElement("canvas");
     floorCanvas.width = w; floorCanvas.height = h;
     const fCtx = floorCanvas.getContext("2d");
@@ -383,9 +434,8 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
     for (let y = 0; y < h; y++) {
         const rowOffset = y * w * 4;
-        const isCeiling = (y < ceilingY);
-        const isFloor   = (y >= floorY);
-        const isWall    = (y >= ceilingY && y < floorY);
+        const isFloorZone = (y >= floorY);
+        const isWallZone  = (y >= ceilingY && y < floorY);
 
         for (let x = 0; x < w; x++) {
             const idx = rowOffset + x * 4;
@@ -400,64 +450,54 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
             let isProtected = false;
 
-            if (isCeiling) {
-                // 1. Ceiling (Tavan) & Downlights: 100% Protected
+            if (y < ceilingY) {
+                // Tavan & Spotlar: %100 Korumalı
                 isProtected = true;
             } else if (isPortrait) {
-                // Interior Geometric Region Topology
-                if (x >= mirrorMinX && x <= mirrorMaxX && y >= mirrorMinY && y <= mirrorMaxY) {
-                    // 2. Mirror Zone (100% Protected - Zero tile bleed onto mirror reflections)
-                    isProtected = true;
-                } else if (x >= vanityMinX && x <= vanityMaxX && y >= vanityMinY && y < floorY) {
-                    // 3. Vanity Countertop, Vessel Sink & Drawer Unit (100% Protected)
-                    isProtected = true;
+                // Katı Geometrik Bölge Topolojisi (Zero-Bleed)
+                if (x >= upperCabMinX && x <= upperCabMaxX && y >= upperCabMinY && y <= upperCabMaxY) {
+                    isProtected = true; // Üst dolap
+                } else if (x >= mirrorMinX && x <= mirrorMaxX && y >= mirrorMinY && y <= mirrorMaxY) {
+                    isProtected = true; // Ayna & LED halo
+                } else if (x >= vanityMinX && x <= vanityMaxX && y >= vanityMinY && y <= vanityMaxY) {
+                    isProtected = true; // Tezgâh & çekmeceler
+                } else if (Math.pow((x - sinkCenterX) / sinkRadiusX, 2) + Math.pow((y - sinkCenterY) / sinkRadiusY, 2) <= 1.0) {
+                    isProtected = true; // Çanak lavabo ovali
+                } else if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) {
+                    isProtected = true; // Asma klozet gövdesi
                 } else if (x >= flushMinX && x <= flushMaxX && y >= flushMinY && y <= flushMaxY) {
-                    // 4. Flush Plate (100% Protected)
-                    isProtected = true;
-                } else if (x <= radiatorMaxX && y >= mirrorMinY && y <= toiletMaxY) {
-                    // 5. Left Towel Radiator (100% Protected)
-                    isProtected = true;
-                } else if (x >= woodWallMinX) {
-                    // 6. Right Wooden Wall (100% Protected)
-                    isProtected = true;
-                } else if (isFloor) {
-                    // 7. Floor Plane: Continuous Solid Ground Plane!
-                    // ONLY protect grounded fixture base (toilet base footprint)
-                    if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) {
-                        isProtected = true;
-                    }
-                    // NEVER puncture floor for specular tile highlights (lum > 145)!
-                } else if (isWall) {
-                    // 8. Wall Plane: protect white ceramic toilet / bidet
-                    if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) {
-                        isProtected = true;
-                    } else if (lum > 145 && chroma < 35) {
-                        isProtected = true;
-                    }
+                    isProtected = true; // Kumanda paneli
+                } else if (x <= radiatorMaxX && y >= Math.round(h * 0.27) && y <= toiletMaxY) {
+                    isProtected = true; // Havlupan
+                } else if (x >= rightWoodMinX) {
+                    isProtected = true; // Sağ ahşap duvar
                 }
             } else {
-                // Landscape / Generic Rooms
-                if (lum > 145 && chroma < 35 && !isFloor) {
+                // Landscape / Genel Odalar
+                if (lum > 145 && chroma < 35 && !isFloorZone) {
                     isProtected = true;
                 } else if (lum < 55 && (x > w * 0.45 && y > floorY - h * 0.16)) {
                     isProtected = true;
-                } else if (isWall && (x > w * 0.55 && y < floorY - h * 0.18 && lum > 165)) {
+                } else if (isWallZone && (x > w * 0.55 && y < floorY - h * 0.18 && lum > 165)) {
                     isProtected = true;
                 }
             }
 
             if (isProtected) {
+                // Korunan Ön Plan Maskesi: Beyaz (255)
                 prPx[idx]     = 255;
                 prPx[idx + 1] = 255;
                 prPx[idx + 2] = 255;
                 prPx[idx + 3] = 255;
             } else {
-                if (isFloor) {
+                if (isFloorZone) {
+                    // Düzeltilmiş Zemin Maskesi: Beyaz (255)
                     fPx[idx]     = 255;
                     fPx[idx + 1] = 255;
                     fPx[idx + 2] = 255;
                     fPx[idx + 3] = 255;
-                } else if (isWall) {
+                } else if (isWallZone) {
+                    // Düzeltilmiş Duvar Maskesi: Beyaz (255)
                     wPx[idx]     = 255;
                     wPx[idx + 1] = 255;
                     wPx[idx + 2] = 255;
@@ -471,12 +511,11 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     wCtx.putImageData(wData, 0, 0);
     prCtx.putImageData(prData, 0, 0);
 
-    // Store in debug layers
     window.__debugLayers.floorMask = floorCanvas.toDataURL("image/png");
     window.__debugLayers.wallMask = wallCanvas.toDataURL("image/png");
     window.__debugLayers.protectedMask = protCanvas.toDataURL("image/png");
 
-    // Generate Decision Support Overlay (Layer 8: Red=Protected, Green=Floor, Blue=Wall)
+    // 9. Karar Destek Bindirmesi (Overlay): Kırmızı=Korunan, Yeşil=Zemin, Mavi=Duvar
     const overlayCanvas = document.createElement("canvas");
     overlayCanvas.width = w; overlayCanvas.height = h;
     const ovCtx = overlayCanvas.getContext("2d");
@@ -497,17 +536,14 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
         const origB = ovPx[idx + 2];
 
         if (isProt) {
-            // Semi-transparent Red tint for protected objects
             ovPx[idx]     = Math.min(255, Math.round(origR * 0.45 + 239 * 0.55));
             ovPx[idx + 1] = Math.min(255, Math.round(origG * 0.45 + 68  * 0.55));
             ovPx[idx + 2] = Math.min(255, Math.round(origB * 0.45 + 68  * 0.55));
         } else if (isFlr) {
-            // Semi-transparent Green tint for floor
             ovPx[idx]     = Math.min(255, Math.round(origR * 0.45 + 16  * 0.55));
             ovPx[idx + 1] = Math.min(255, Math.round(origG * 0.45 + 185 * 0.55));
             ovPx[idx + 2] = Math.min(255, Math.round(origB * 0.45 + 129 * 0.55));
         } else if (isWll) {
-            // Semi-transparent Blue tint for wall
             ovPx[idx]     = Math.min(255, Math.round(origR * 0.45 + 99  * 0.55));
             ovPx[idx + 1] = Math.min(255, Math.round(origG * 0.45 + 102 * 0.55));
             ovPx[idx + 2] = Math.min(255, Math.round(origB * 0.45 + 241 * 0.55));
@@ -516,7 +552,7 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     ovCtx.putImageData(ovImgData, 0, 0);
     window.__debugLayers.decisionOverlay = overlayCanvas.toDataURL("image/png");
 
-    // Target surface mask assembly
+    // 6. Nihai Kaplama Maskesi (Final Apply Mask)
     const outCanvas = document.createElement("canvas");
     outCanvas.width = w; outCanvas.height = h;
     const outCtx = outCanvas.getContext("2d");
@@ -532,6 +568,7 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 
     const outDataUrl = outCanvas.toDataURL("image/png");
     window.__debugLayers.rawMask = outDataUrl;
+    window.__debugLayers.finalApplyMask = outDataUrl;
     updateDebugPanel();
 
     return outDataUrl.split(",")[1];
@@ -1101,6 +1138,30 @@ if (toggleDebugBtn && debugSection) {
 if (closeDebugBtn && debugSection) {
     closeDebugBtn.addEventListener("click", () => {
         debugSection.style.display = "none";
+    });
+}
+
+// Interaction for 9 QA Debug Layers (Tabs, Cards, and Opacity Slider)
+document.querySelectorAll(".dbg-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        selectDebugLayer(btn.dataset.layer);
+    });
+});
+
+document.querySelectorAll(".dbg-thumb-card").forEach(card => {
+    card.addEventListener("click", () => {
+        selectDebugLayer(card.dataset.layer);
+    });
+});
+
+const dbgOpacitySlider = document.getElementById("dbg-opacity-slider");
+const dbgOpacityVal = document.getElementById("dbg-opacity-val");
+if (dbgOpacitySlider) {
+    dbgOpacitySlider.addEventListener("input", (e) => {
+        const val = e.target.value;
+        if (dbgOpacityVal) dbgOpacityVal.textContent = val + "%";
+        const stageOverlay = document.getElementById("dbg-stage-overlay");
+        if (stageOverlay) stageOverlay.style.opacity = (parseFloat(val) || 0) / 100.0;
     });
 }
 

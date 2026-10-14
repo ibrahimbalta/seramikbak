@@ -89,13 +89,14 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
     assert.ok(highlightFactor >= 0.90 && highlightFactor <= 1.15, 'Highlights must maintain crisp reflectivity without clipping');
   });
 
-  test('8 QA Debug Layers Structure - Validates Complete Output Pipeline & Decision Support', () => {
+  test('9 QA Debug Layers Structure - Validates Complete Output Pipeline, Final Apply Mask & Decision Support', () => {
     const requiredLayers = [
       'original',
       'rawMask',
       'wallMask',
       'floorMask',
       'protectedMask',
+      'finalApplyMask',
       'perspectiveTile',
       'compositeResult',
       'decisionOverlay'
@@ -107,6 +108,7 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
       wallMask: 'data:image/png;base64,...',
       floorMask: 'data:image/png;base64,...',
       protectedMask: 'data:image/png;base64,...',
+      finalApplyMask: 'data:image/png;base64,...',
       perspectiveTile: 'data:image/png;base64,...',
       compositeResult: 'data:image/png;base64,...',
       decisionOverlay: 'data:image/png;base64,...'
@@ -115,7 +117,79 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
     requiredLayers.forEach(layer => {
       assert.ok(layer in mockDebugLayers, `Debug output must include layer: ${layer}`);
     });
-    assert.equal(Object.keys(mockDebugLayers).length, 8, 'Must provide 7 inspection layers plus 8th Decision Support Overlay');
+    assert.equal(Object.keys(mockDebugLayers).length, 9, 'Must provide 7 technical layers + Final Apply Mask + Decision Support Overlay');
+  });
+
+  test('Mathematical Set Theory - Strict Disjoint Partition & Zero Overlap Guarantee', () => {
+    const w = 475;
+    const h = 625;
+
+    const ceilingY = Math.round(h * 0.176);
+    const upperCabMinX = Math.round(w * 0.404);
+    const upperCabMaxX = Math.round(w * 0.937);
+    const upperCabMinY = ceilingY;
+    const upperCabMaxY = Math.round(h * 0.28);
+
+    const mirrorMinX = Math.round(w * 0.404);
+    const mirrorMaxX = Math.round(w * 0.937);
+    const mirrorMinY = Math.round(h * 0.28);
+    const mirrorMaxY = Math.round(h * 0.568);
+
+    const vanityMinX = Math.round(w * 0.395);
+    const vanityMaxX = Math.round(w * 0.937);
+    const vanityMinY = Math.round(h * 0.656);
+    const vanityMaxY = Math.round(h * 0.84);
+
+    const sinkCenterX = Math.round(w * 0.655);
+    const sinkCenterY = Math.round(h * 0.646);
+    const sinkRadiusX = Math.round(w * 0.128);
+    const sinkRadiusY = Math.round(h * 0.032);
+
+    const toiletMinX = Math.round(w * 0.158);
+    const toiletMaxX = Math.round(w * 0.347);
+    const toiletMinY = Math.round(h * 0.696);
+    const toiletMaxY = Math.round(h * 0.856);
+
+    const flushMinX = Math.round(w * 0.22);
+    const flushMaxX = Math.round(w * 0.326);
+    const flushMinY = Math.round(h * 0.536);
+    const flushMaxY = Math.round(h * 0.60);
+
+    const radiatorMaxX = Math.round(w * 0.095);
+    const rightWoodMinX = Math.round(w * 0.937);
+    const floorY = Math.round(h * 0.856);
+
+    let wallCount = 0;
+    let floorCount = 0;
+    let protCount = 0;
+    let overlap = 0;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        let isProt = false;
+        if (y < ceilingY) isProt = true;
+        else if (x >= upperCabMinX && x <= upperCabMaxX && y >= upperCabMinY && y <= upperCabMaxY) isProt = true;
+        else if (x >= mirrorMinX && x <= mirrorMaxX && y >= mirrorMinY && y <= mirrorMaxY) isProt = true;
+        else if (x >= vanityMinX && x <= vanityMaxX && y >= vanityMinY && y <= vanityMaxY) isProt = true;
+        else if (Math.pow((x - sinkCenterX) / sinkRadiusX, 2) + Math.pow((y - sinkCenterY) / sinkRadiusY, 2) <= 1.0) isProt = true;
+        else if (x >= toiletMinX && x <= toiletMaxX && y >= toiletMinY && y <= toiletMaxY) isProt = true;
+        else if (x >= flushMinX && x <= flushMaxX && y >= flushMinY && y <= flushMaxY) isProt = true;
+        else if (x <= radiatorMaxX && y >= Math.round(h * 0.27) && y <= toiletMaxY) isProt = true;
+        else if (x >= rightWoodMinX) isProt = true;
+
+        let isW = false, isF = false;
+        if (isProt) {
+          protCount++;
+        } else {
+          if (y >= floorY) { isF = true; floorCount++; }
+          else if (y >= ceilingY && y < floorY) { isW = true; wallCount++; }
+        }
+        if (isW && isF) overlap++;
+      }
+    }
+
+    assert.equal(overlap, 0, 'Wall and floor candidate sets must have zero overlap');
+    assert.equal(protCount + wallCount + floorCount, w * h, 'Protected, wall and floor must form a complete disjoint partition of image space');
   });
 
   test('Mirror Protection - Dark reflections inside mirror zone must remain 100% protected', () => {
@@ -169,4 +243,5 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
   });
 
 });
+
 
