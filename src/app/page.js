@@ -66,7 +66,8 @@ import {
   Maximize2,
   Compass,
   Activity,
-  CheckCircle
+  CheckCircle,
+  Box
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
@@ -7097,27 +7098,45 @@ export default function Home() {
                 </div>
 
                 <div className="detail-primary-actions">
-                  {/* 1. Primary 3D Studio & Tasarım Action */}
-                  <button 
-                    onClick={() => {
-                      setShowDetailModal(false);
-                      setRenovationProduct(detailProduct);
-                      setShowRenovationModal(true);
-                    }}
-                    className="detail-action-btn btn-action-studio"
-                  >
-                    <div className="btn-icon-pulse">
-                      <Sparkles size={18} />
-                    </div>
-                    <div className="btn-text-group">
-                      <span className="btn-title">Mekânımda Gör & Dene</span>
-                      <span className="btn-subtext">SegFormer-B3 AI Mekân Simülasyonu</span>
-                    </div>
-                    <div className="btn-hero-tag">
-                      <span>AI DENEYİM</span>
-                      <ChevronRight size={13} />
-                    </div>
-                  </button>
+                  {/* Side-by-side Primary Actions: Mekânımda Gör & 3D Studio */}
+                  <div className="detail-hero-actions-grid">
+                    {/* 1. Mekânımda Gör & Dene */}
+                    <button 
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        setRenovationProduct(detailProduct);
+                        setShowRenovationModal(true);
+                      }}
+                      className="detail-action-btn btn-action-renovation"
+                      title="Kendi odanızda seramiği canlı deneyin"
+                    >
+                      <div className="btn-icon-pulse">
+                        <Sparkles size={16} />
+                      </div>
+                      <div className="btn-text-group">
+                        <span className="btn-title">Mekânımda Gör</span>
+                        <span className="btn-subtext">SegFormer-B3 AI</span>
+                      </div>
+                    </button>
+
+                    {/* 2. 3D Studio */}
+                    <button 
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        navigateTo3DStudio(detailProduct);
+                      }}
+                      className="detail-action-btn btn-action-studio-3d"
+                      title="3D İnteraktif Mekân Stüdyosunda Deneyin"
+                    >
+                      <div className="btn-icon-pulse studio-icon-pulse">
+                        <Box size={16} />
+                      </div>
+                      <div className="btn-text-group">
+                        <span className="btn-title">3D Studio</span>
+                        <span className="btn-subtext">İnteraktif Tasarım</span>
+                      </div>
+                    </button>
+                  </div>
 
                   {/* 2. Secondary 2-Column Action Grid */}
                   <div className="detail-secondary-actions-grid">
@@ -15582,26 +15601,37 @@ export default function Home() {
           width: 100%;
         }
 
-        /* 1. Primary 3D Studio Action Button */
-        .btn-action-studio {
+        /* 1. Primary Side-by-Side Hero Actions Grid */
+        .detail-hero-actions-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
           width: 100%;
-          padding: 13px 18px;
+        }
+
+        .btn-action-renovation, .btn-action-studio-3d {
+          width: 100%;
+          padding: 12px 14px;
           border-radius: 14px;
-          background: linear-gradient(135deg, #d4af37 0%, #c49926 50%, #ad8217 100%);
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          color: #090d16;
           cursor: pointer;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          box-shadow: 0 6px 22px -2px rgba(212, 175, 55, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+          gap: 10px;
           position: relative;
           overflow: hidden;
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          min-width: 0;
+          text-align: left;
         }
 
-        .btn-action-studio::before {
+        .btn-action-renovation {
+          background: linear-gradient(135deg, #d4af37 0%, #c49926 50%, #ad8217 100%);
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          color: #090d16;
+          box-shadow: 0 4px 18px -2px rgba(212, 175, 55, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-action-renovation::before, .btn-action-studio-3d::before {
           content: '';
           position: absolute;
           top: -50%;
@@ -15611,7 +15641,7 @@ export default function Home() {
           background: linear-gradient(
             45deg,
             transparent 45%,
-            rgba(255, 255, 255, 0.35) 50%,
+            rgba(255, 255, 255, 0.28) 50%,
             transparent 55%
           );
           transform: rotate(30deg);
@@ -15619,80 +15649,79 @@ export default function Home() {
           pointer-events: none;
         }
 
-        .btn-action-studio:hover::before {
+        .btn-action-renovation:hover::before, .btn-action-studio-3d:hover::before {
           transform: rotate(30deg) translate(30%, 30%);
         }
 
-        .btn-action-studio:hover {
+        .btn-action-renovation:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 28px -2px rgba(212, 175, 55, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+          box-shadow: 0 8px 24px -2px rgba(212, 175, 55, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.75);
           background: linear-gradient(135deg, #e4be42 0%, #d4a72e 50%, #b88a1b 100%);
         }
 
-        .btn-action-studio:active {
+        .btn-action-studio-3d {
+          background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+          border: 1px solid rgba(147, 197, 253, 0.4);
+          color: #ffffff;
+          box-shadow: 0 4px 18px -2px rgba(37, 99, 235, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-action-studio-3d:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px -2px rgba(59, 130, 246, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #1d4ed8 100%);
+        }
+
+        .btn-action-renovation:active, .btn-action-studio-3d:active {
           transform: translateY(0) scale(0.99);
         }
 
-        .btn-icon-pulse {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background: rgba(9, 13, 22, 0.14);
-          border: 1px solid rgba(9, 13, 22, 0.15);
-          color: #090d16;
-          flex-shrink: 0;
+        .studio-icon-pulse {
+          background: rgba(255, 255, 255, 0.18) !important;
+          border: 1px solid rgba(255, 255, 255, 0.28) !important;
+          color: #ffffff !important;
         }
 
-        .btn-text-group {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-          flex: 1;
-          min-width: 0;
-        }
-
-        .btn-action-studio .btn-title {
-          font-size: 0.92rem;
+        .btn-action-renovation .btn-title {
+          font-size: 0.88rem;
           font-weight: 800;
           letter-spacing: -0.01em;
           color: #090d16;
           line-height: 1.2;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        .btn-action-studio .btn-subtext {
-          font-size: 0.70rem;
+        .btn-action-renovation .btn-subtext {
+          font-size: 0.68rem;
           font-weight: 600;
-          color: rgba(9, 13, 22, 0.8);
-          margin-top: 2px;
+          color: rgba(9, 13, 22, 0.82);
+          margin-top: 1px;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        .btn-hero-tag {
-          font-size: 0.66rem;
+        .btn-action-studio-3d .btn-title {
+          font-size: 0.88rem;
           font-weight: 800;
-          letter-spacing: 0.04em;
-          padding: 6px 12px;
-          border-radius: 9999px;
-          background: #090d16;
-          color: #f5d77f;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          flex-shrink: 0;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          transition: all 0.2s ease;
+          letter-spacing: -0.01em;
+          color: #ffffff;
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        .btn-action-studio:hover .btn-hero-tag {
-          background: #000000;
-          color: #ffffff;
-          transform: translateX(2px);
+        .btn-action-studio-3d .btn-subtext {
+          font-size: 0.68rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.85);
+          margin-top: 1px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         /* 2. Secondary 2-Column Action Grid */
@@ -15704,18 +15733,28 @@ export default function Home() {
         }
 
         @media (max-width: 520px) {
+          .detail-hero-actions-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+          }
+          .btn-action-renovation, .btn-action-studio-3d {
+            padding: 10px 8px;
+            gap: 7px;
+            border-radius: 12px;
+          }
+          .btn-icon-pulse {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+          }
+          .btn-action-renovation .btn-title, .btn-action-studio-3d .btn-title {
+            font-size: 0.78rem;
+          }
+          .btn-action-renovation .btn-subtext, .btn-action-studio-3d .btn-subtext {
+            font-size: 0.60rem;
+          }
           .detail-secondary-actions-grid {
             grid-template-columns: 1fr;
-          }
-          .btn-action-studio {
-            padding: 11px 14px;
-          }
-          .btn-action-studio .btn-title {
-            font-size: 0.86rem;
-          }
-          .btn-hero-tag {
-            font-size: 0.60rem;
-            padding: 4px 8px;
           }
         }
 
