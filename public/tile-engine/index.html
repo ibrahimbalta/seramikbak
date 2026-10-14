@@ -162,6 +162,14 @@
                         <span class="legend-dot purple"></span> <span class="legend-txt">Döşenecek Seramik Alanı</span>
                     </div>
                 </div>
+                <!-- Layer View Selector (QA & Debug Inspection) -->
+                <div class="layer-selector-row">
+                    <button type="button" class="layer-pill active" data-view="active" id="view-active-btn">🟣 Aktif Maske</button>
+                    <button type="button" class="layer-pill" data-view="wall" id="view-wall-btn">🧱 Düzeltilmiş Duvar</button>
+                    <button type="button" class="layer-pill" data-view="floor" id="view-floor-btn">🪵 Düzeltilmiş Zemin</button>
+                    <button type="button" class="layer-pill" data-view="protected" id="view-protected-btn">🛡️ Korunan Nesneler</button>
+                    <button type="button" class="layer-pill" data-view="overlay" id="view-overlay-btn">🎯 Karar Destek (Overlay)</button>
+                </div>
                 <div class="masking-card-content">
                     <!-- Canvas Drawing Area -->
                     <div class="canvas-viewport" id="canvas-viewport">

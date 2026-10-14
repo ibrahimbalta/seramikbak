@@ -59,6 +59,9 @@
     const maskClearBtn    = $('#mask-clear-btn');
     const generateBtn     = $('#generate-btn');
 
+    // Layer View Buttons (QA & Inspection)
+    const layerViewPills  = $$('.layer-pill');
+
     // Step 4: Result / Before-After
     const comparisonStage = $('#comparison-stage');
     const resultImg       = $('#result-img');
@@ -127,7 +130,7 @@
             horizonY: 0.48,
             vanishingX: 0.50,
             vanishingY: 0.48,
-            fgUrl: null,
+            fgUrl: '/hero/easy_bathroom_fg.png',
             isBathroom: true
         }
     };
@@ -161,6 +164,17 @@
     let lastPoint = null;
 
     let resultBlobUrl = null;
+
+    // QA & Debug Layers (All 9 Layers)
+    window.__debugLayers = window.__debugLayers || {};
+    let currentLayerView = 'active'; // 'active' | 'wall' | 'floor' | 'protected' | 'overlay'
+    let cachedMasks = {
+        active: null,
+        wall: null,
+        floor: null,
+        protected: null,
+        overlay: null
+    };
 
     // Toast feedback
     function showToast(msg, type = 'info', duration = 3000) {
@@ -377,7 +391,7 @@
         tCtx.drawImage(roomImageEl, 0, 0, w, h);
         const rgbData = tCtx.getImageData(0, 0, w, h).data;
 
-        // Foreground layer pixels if available (sofa, rug, table, chairs, staircase)
+        // Foreground layer pixels if available (sofa, rug, table, chairs, shower glass, armatures, mirror, vanity)
         let fgData = null;
         if (roomFgImageEl) {
             const fgCanvas = document.createElement('canvas');
@@ -392,8 +406,18 @@
         const floorY = Math.round(h * conf.floorY);
         const ceilingY = Math.round(h * conf.ceilingY);
 
-        const maskImgData = maskCtx.createImageData(w, h);
-        const mPx = maskImgData.data;
+        // Independent Mask Buffers (Zero Overlap Disjoint Partition)
+        const activeImgData  = maskCtx.createImageData(w, h);
+        const wallImgData    = maskCtx.createImageData(w, h);
+        const floorImgData   = maskCtx.createImageData(w, h);
+        const protImgData    = maskCtx.createImageData(w, h);
+        const overlayImgData = maskCtx.createImageData(w, h);
+
+        const mPx  = activeImgData.data;
+        const wPx  = wallImgData.data;
+        const fPx  = floorImgData.data;
+        const prPx = protImgData.data;
+        const ovPx = overlayImgData.data;
 
         for (let y = 0; y < h; y++) {
             const rowOffset = y * w * 4;
@@ -408,7 +432,7 @@
 
                 let isProtected = false;
 
-                // 1. Precise foreground layer check (covers sofa, table, chairs, carpet without rectangular holes)
+                // 1. Precise foreground layer check (covers sofa, table, chairs, shower glass, armatures, mirror, vanity)
                 if (fgData && fgData[idx + 3] > 18) {
                     isProtected = true;
                 }
@@ -417,40 +441,140 @@
                 if (y < ceilingY) isProtected = true;
 
                 // 3. Plant / Foliage protection (pure green chromaticity)
-                if ((g > r + 22 && g > b + 22) || (2 * g - r - b > 35 && g > 50)) {
+                if ((g > r + 18 && g > b + 18) || (2 * g - r - b > 28 && g > 45)) {
                     isProtected = true;
                 }
 
-                // 4. Specific bathroom vanity/cabinet protection when no separate fg file exists
+                // 4. Fallback bathroom geometry when no separate fg file exists
                 if (conf.isBathroom && !roomFgImageEl) {
-                    if (x < w * 0.42 && y < floorY) isProtected = true; // Wood cabinet
-                    if (x >= w * 0.42 && x <= w * 0.58 && y >= h * 0.20 && y <= h * 0.74) isProtected = true; // Mirror & Vanity
+                    // Right Shower Glass, Frame & Shower Fixtures (armatürler)
+                    if (x > Math.round(w * 0.58) && y < floorY) {
+                        isProtected = true;
+                    }
+                    // Mirror (elliptical boundary)
+                    else if (Math.pow((x - w * 0.50) / (w * 0.125), 2) + Math.pow((y - h * 0.36) / (h * 0.165), 2) <= 1.0) {
+                        isProtected = true;
+                    }
+                    // Vessel Sink & Faucet
+                    else if (x >= Math.round(w * 0.43) && x <= Math.round(w * 0.57) && y >= Math.round(h * 0.49) && y <= Math.round(h * 0.59)) {
+                        isProtected = true;
+                    }
+                    // Vanity Countertop & Drawers
+                    else if (x >= Math.round(w * 0.36) && x <= Math.round(w * 0.64) && y >= Math.round(h * 0.58) && y <= Math.round(h * 0.73)) {
+                        isProtected = true;
+                    }
+                    // Left wood accent cabinet / towel
+                    else if (x < Math.round(w * 0.28) && y < floorY) {
+                        isProtected = true;
+                    }
                 }
 
-                if (!isProtected) {
-                    if (activeSurface === 'floor' && isFloorZone) {
+                if (isProtected) {
+                    // Protected Mask: White (255)
+                    prPx[idx]     = 255;
+                    prPx[idx + 1] = 255;
+                    prPx[idx + 2] = 255;
+                    prPx[idx + 3] = 255;
+
+                    // Decision Overlay: Red tint on room image
+                    ovPx[idx]     = Math.min(255, Math.round(r * 0.45 + 239 * 0.55));
+                    ovPx[idx + 1] = Math.min(255, Math.round(g * 0.45 + 68  * 0.55));
+                    ovPx[idx + 2] = Math.min(255, Math.round(b * 0.45 + 68  * 0.55));
+                    ovPx[idx + 3] = 255;
+                } else {
+                    if (isFloorZone) {
+                        // Floor Mask: White (255)
+                        fPx[idx]     = 255;
+                        fPx[idx + 1] = 255;
+                        fPx[idx + 2] = 255;
+                        fPx[idx + 3] = 255;
+
+                        // Decision Overlay: Green tint on room image
+                        ovPx[idx]     = Math.min(255, Math.round(r * 0.45 + 16  * 0.55));
+                        ovPx[idx + 1] = Math.min(255, Math.round(g * 0.45 + 185 * 0.55));
+                        ovPx[idx + 2] = Math.min(255, Math.round(b * 0.45 + 129 * 0.55));
+                        ovPx[idx + 3] = 255;
+                    } else if (isWallZone) {
+                        // Wall Mask: White (255)
+                        wPx[idx]     = 255;
+                        wPx[idx + 1] = 255;
+                        wPx[idx + 2] = 255;
+                        wPx[idx + 3] = 255;
+
+                        // Decision Overlay: Blue tint on room image
+                        ovPx[idx]     = Math.min(255, Math.round(r * 0.45 + 99  * 0.55));
+                        ovPx[idx + 1] = Math.min(255, Math.round(g * 0.45 + 102 * 0.55));
+                        ovPx[idx + 2] = Math.min(255, Math.round(b * 0.45 + 241 * 0.55));
+                        ovPx[idx + 3] = 255;
+                    }
+
+                    // Active Target Mask (Purple)
+                    const isTarget = (activeSurface === 'floor' && isFloorZone) ||
+                                     (activeSurface === 'wall' && isWallZone) ||
+                                     (activeSurface === 'both' && (isFloorZone || isWallZone));
+                    if (isTarget) {
                         mPx[idx]     = 168; // Purple R
                         mPx[idx + 1] = 85;  // Purple G
                         mPx[idx + 2] = 247; // Purple B
                         mPx[idx + 3] = 255; // Alpha
-                    } else if (activeSurface === 'wall' && isWallZone) {
-                        mPx[idx]     = 168;
-                        mPx[idx + 1] = 85;
-                        mPx[idx + 2] = 247;
-                        mPx[idx + 3] = 255;
-                    } else if (activeSurface === 'both' && (isFloorZone || isWallZone)) {
-                        mPx[idx]     = 168;
-                        mPx[idx + 1] = 85;
-                        mPx[idx + 2] = 247;
-                        mPx[idx + 3] = 255;
                     }
                 }
             }
         }
 
-        maskCtx.putImageData(maskImgData, 0, 0);
+        // Cache masks
+        cachedMasks.active = activeImgData;
+        cachedMasks.wall = wallImgData;
+        cachedMasks.floor = floorImgData;
+        cachedMasks.protected = protImgData;
+        cachedMasks.overlay = overlayImgData;
+
+        // Populate window.__debugLayers (All 9 Layers for QA verification)
+        const cHelper = (data) => {
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').putImageData(data, 0, 0);
+            return c.toDataURL('image/png');
+        };
+
+        window.__debugLayers.original = activeRoomUrl;
+        window.__debugLayers.rawMask = cHelper(activeImgData);
+        window.__debugLayers.wallMask = cHelper(wallImgData);
+        window.__debugLayers.floorMask = cHelper(floorImgData);
+        window.__debugLayers.protectedMask = cHelper(protImgData);
+        window.__debugLayers.finalApplyMask = cHelper(activeImgData);
+        window.__debugLayers.decisionOverlay = cHelper(overlayImgData);
+
+        renderCurrentLayerToCanvas();
         saveMaskState();
     }
+
+    // Render current active layer view to canvas
+    function renderCurrentLayerToCanvas() {
+        if (!maskCanvas.width) return;
+        const targetData = cachedMasks[currentLayerView] || cachedMasks.active;
+        if (targetData) {
+            maskCtx.putImageData(targetData, 0, 0);
+        }
+    }
+
+    // Layer View Selector Click Events
+    layerViewPills.forEach((pill) => {
+        pill.addEventListener('click', () => {
+            layerViewPills.forEach((p) => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentLayerView = pill.dataset.view || 'active';
+            renderCurrentLayerToCanvas();
+            const names = {
+                active: '🟣 Aktif Yüzey Maskesi',
+                wall: '🧱 Düzeltilmiş Duvar Maskesi',
+                floor: '🪵 Düzeltilmiş Zemin Maskesi',
+                protected: '🛡️ Korunan Nesneler Maskesi',
+                overlay: '🎯 Karar Destek Overlay (Kırmızı=Korunan, Yeşil=Zemin, Mavi=Duvar)'
+            };
+            showToast(names[currentLayerView] || 'Maske katmanı seçildi', 'info', 2000);
+        });
+    });
 
     // Mask State History (Undo / Redo)
     function saveMaskState() {
@@ -598,8 +722,13 @@
         const roomImgData = rCtx.getImageData(0, 0, w, h);
         const roomPx = roomImgData.data;
 
-        // Mask pixels
-        const maskImgData = maskCtx.getImageData(0, 0, w, h);
+        // Mask pixels - ALWAYS use the verified target surface mask (active mask or manual edits)
+        let maskImgData;
+        if (currentLayerView === 'active' || !cachedMasks.active) {
+            maskImgData = maskCtx.getImageData(0, 0, w, h);
+        } else {
+            maskImgData = cachedMasks.active;
+        }
         const maskPx = maskImgData.data;
 
         // Tile sizing from sliders
@@ -735,6 +864,9 @@
         if (roomFgImageEl) {
             rCtx.drawImage(roomFgImageEl, 0, 0, w, h);
         }
+
+        window.__debugLayers.perspectiveTile = patCanvas.toDataURL('image/png');
+        window.__debugLayers.compositeResult = rCanvas.toDataURL('image/png');
 
         return new Promise((resolve) => {
             rCanvas.toBlob((blob) => resolve(blob), 'image/png');
