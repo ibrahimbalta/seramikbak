@@ -43,6 +43,10 @@ surfaceBtns.forEach((btn) => {
         btn.classList.add("active");
         selectedSurface = btn.dataset.surface;
         updateSurfaceText();
+        if (editorSection && editorSection.classList.contains("visible") && hallImageEl) {
+            renderComposite();
+            checkMaskCollisionsAndCoverage();
+        }
     });
 });
 
@@ -51,6 +55,17 @@ const editorCanvas  = $("#editor-canvas");
 const toolPaint     = $("#tool-paint");
 const toolErase     = $("#tool-erase");
 const toolReset     = $("#tool-reset");
+const toolUndo      = $("#tool-undo");
+const toolRedo      = $("#tool-redo");
+const toolZoomIn    = $("#tool-zoom-in");
+const toolZoomOut   = $("#tool-zoom-out");
+const toolZoomReset = $("#tool-zoom-reset");
+const zoomLevelText = $("#zoom-level-text");
+
+const collisionBanner = $("#collision-alert-banner");
+const collisionText   = $("#collision-alert-text");
+const closeCollision  = $("#close-collision-alert");
+
 const brushSlider   = $("#brush-slider");
 const brushValue    = $("#brush-value");
 
@@ -78,8 +93,39 @@ let activePresetUrl = "/hero/easy_bathroom.jpg";
 let maskB64Original = null;
 let maskImage       = null;
 
+// Semantic Classes
+const SEMANTIC_CLASSES = {
+    WALL: 0,
+    FLOOR: 1,
+    FURNITURE: 2,
+    SINK: 3,
+    TOILET: 4,
+    MIRROR: 5,
+    SHOWER_GLASS: 6
+};
+
+// Independent Persistent Surface Mask Canvases
+const surfaceMasks = {
+    floor: null,
+    wall: null
+};
+let objectProtectionMask = null;
+
+// History Stack for Undo/Redo
+const historyStack = {
+    undo: [],
+    redo: []
+};
+const MAX_HISTORY = 20;
+
+// Interactive Zoom & Pan State
+let zoomLevel = 1.0;
+let panX = 0;
+let panY = 0;
+let isPanning = false;
+let panStart = { x: 0, y: 0, px: 0, py: 0 };
+
 const ctx = editorCanvas.getContext("2d");
-let maskCanvas, maskCtx;
 let colorCanvas, colorCtx;
 let hallImageEl = null;
 let brushMode  = "paint";
@@ -554,6 +600,25 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
     wCtx.putImageData(wData, 0, 0);
     prCtx.putImageData(prData, 0, 0);
 
+    // Bağımsız Yüzey Maskelerini Kalıcı Olarak Sakla
+    if (!surfaceMasks.floor) surfaceMasks.floor = document.createElement("canvas");
+    surfaceMasks.floor.width = w; surfaceMasks.floor.height = h;
+    const smfCtx = surfaceMasks.floor.getContext("2d");
+    smfCtx.clearRect(0, 0, w, h);
+    smfCtx.drawImage(floorCanvas, 0, 0);
+
+    if (!surfaceMasks.wall) surfaceMasks.wall = document.createElement("canvas");
+    surfaceMasks.wall.width = w; surfaceMasks.wall.height = h;
+    const smwCtx = surfaceMasks.wall.getContext("2d");
+    smwCtx.clearRect(0, 0, w, h);
+    smwCtx.drawImage(wallCanvas, 0, 0);
+
+    if (!objectProtectionMask) objectProtectionMask = document.createElement("canvas");
+    objectProtectionMask.width = w; objectProtectionMask.height = h;
+    const opCtx = objectProtectionMask.getContext("2d");
+    opCtx.clearRect(0, 0, w, h);
+    opCtx.drawImage(protCanvas, 0, 0);
+
     window.__debugLayers.floorMask = floorCanvas.toDataURL("image/png");
     window.__debugLayers.wallMask = wallCanvas.toDataURL("image/png");
     window.__debugLayers.protectedMask = protCanvas.toDataURL("image/png");
@@ -674,6 +739,96 @@ detectBtn.addEventListener("click", async () => {
     }
 });
 
+function getActiveMaskCanvas() {
+    if (selectedSurface === "wall") {
+        return surfaceMasks.wall;
+    } else {
+        return surfaceMasks.floor;
+    }
+}
+
+function getActiveMaskBase64() {
+    if (!hallImageEl) return "";
+    const w = hallImageEl.naturalWidth;
+    const h = hallImageEl.naturalHeight;
+    const combCanvas = document.createElement("canvas");
+    combCanvas.width = w;
+    combCanvas.height = h;
+    const cCtx = combCanvas.getContext("2d");
+
+    if (selectedSurface === "floor") {
+        if (surfaceMasks.floor) cCtx.drawImage(surfaceMasks.floor, 0, 0);
+    } else if (selectedSurface === "wall") {
+        if (surfaceMasks.wall) cCtx.drawImage(surfaceMasks.wall, 0, 0);
+    } else { // "both"
+        if (surfaceMasks.wall) cCtx.drawImage(surfaceMasks.wall, 0, 0);
+        if (surfaceMasks.floor) cCtx.drawImage(surfaceMasks.floor, 0, 0);
+    }
+
+    // Strict fixture and furniture collision protection
+    if (objectProtectionMask) {
+        cCtx.save();
+        cCtx.globalCompositeOperation = "destination-out";
+        cCtx.drawImage(objectProtectionMask, 0, 0);
+        cCtx.restore();
+    }
+
+    // Binary cleanup
+    const imgData = cCtx.getImageData(0, 0, w, h);
+    const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) {
+        const val = d[i + 3] > 30 ? 255 : 0;
+        d[i]     = val;
+        d[i + 1] = val;
+        d[i + 2] = val;
+        d[i + 3] = val;
+    }
+    cCtx.putImageData(imgData, 0, 0);
+
+    return combCanvas.toDataURL("image/png").split(",")[1];
+}
+
+function getMaskBase64() {
+    return getActiveMaskBase64();
+}
+
+function checkMaskCollisionsAndCoverage() {
+    if (!hallImageEl || !objectProtectionMask) return;
+    const w = hallImageEl.naturalWidth;
+    const h = hallImageEl.naturalHeight;
+
+    const activeCanvas = getActiveMaskCanvas();
+    if (!activeCanvas) return;
+
+    const actData = activeCanvas.getContext("2d").getImageData(0, 0, w, h).data;
+    const protData = objectProtectionMask.getContext("2d").getImageData(0, 0, w, h).data;
+
+    let activeCount = 0;
+    let collisionCount = 0;
+
+    for (let i = 0; i < actData.length; i += 4) {
+        const isAct = actData[i + 3] > 30;
+        const isProt = protData[i + 3] > 30;
+        if (isAct) activeCount++;
+        if (isAct && isProt) collisionCount++;
+    }
+
+    const totalPixels = w * h;
+    const coveragePct = (activeCount / totalPixels) * 100;
+
+    if (collisionBanner && collisionText) {
+        if (collisionCount > 30) {
+            collisionBanner.style.display = "flex";
+            collisionText.textContent = `🛡️ Mobilya / vitrifiye nesneleriyle çakışan ${collisionCount} piksel tespit edildi ve otomatik olarak kaplama dışı korundu.`;
+        } else if (coveragePct < 2.5) {
+            collisionBanner.style.display = "flex";
+            collisionText.textContent = `⚠️ Seçili yüzey alanı çok küçük (%${coveragePct.toFixed(1)}). Eksik seramik alanlarını boya fırçasıyla ekleyebilirsiniz.`;
+        } else {
+            collisionBanner.style.display = "none";
+        }
+    }
+}
+
 async function initEditor(imgW, imgH) {
     hallImageEl = await loadImage(hallUrl);
     const w = hallImageEl.naturalWidth;
@@ -682,13 +837,6 @@ async function initEditor(imgW, imgH) {
     editorCanvas.width  = w;
     editorCanvas.height = h;
 
-    if (!maskCanvas) {
-        maskCanvas = document.createElement("canvas");
-        maskCtx    = maskCanvas.getContext("2d");
-    }
-    maskCanvas.width  = w;
-    maskCanvas.height = h;
-
     if (!colorCanvas) {
         colorCanvas = document.createElement("canvas");
         colorCtx    = colorCanvas.getContext("2d");
@@ -696,11 +844,17 @@ async function initEditor(imgW, imgH) {
     colorCanvas.width  = w;
     colorCanvas.height = h;
 
-    maskImage = await loadImage("data:image/png;base64," + maskB64Original);
-    maskCtx.clearRect(0, 0, w, h);
-    maskCtx.drawImage(maskImage, 0, 0, w, h);
+    zoomLevel = 1.0;
+    panX = 0;
+    panY = 0;
+    updateZoomUI();
+
+    historyStack.undo = [];
+    historyStack.redo = [];
+    updateUndoRedoUI();
 
     renderComposite();
+    checkMaskCollisionsAndCoverage();
 }
 
 function loadImage(src) {
@@ -714,61 +868,211 @@ function loadImage(src) {
 }
 
 function renderComposite() {
+    if (!hallImageEl) return;
     const w = editorCanvas.width;
     const h = editorCanvas.height;
 
+    ctx.save();
     ctx.clearRect(0, 0, w, h);
+
+    // Apply zoom & pan transforms
+    ctx.translate(panX, panY);
+    ctx.scale(zoomLevel, zoomLevel);
+
+    // 1. Original Photo
     ctx.drawImage(hallImageEl, 0, 0, w, h);
 
-    colorCtx.clearRect(0, 0, w, h);
-    colorCtx.drawImage(maskCanvas, 0, 0);
-    colorCtx.globalCompositeOperation = "source-in";
-    colorCtx.fillStyle = "rgba(99, 102, 241, 1)";
-    colorCtx.fillRect(0, 0, w, h);
-    colorCtx.globalCompositeOperation = "source-over";
+    // 2. Floor Mask (Emerald Green: #10b981)
+    if (surfaceMasks.floor) {
+        colorCtx.clearRect(0, 0, w, h);
+        colorCtx.drawImage(surfaceMasks.floor, 0, 0);
+        colorCtx.globalCompositeOperation = "source-in";
+        colorCtx.fillStyle = (selectedSurface === "floor" || selectedSurface === "both") 
+            ? "rgba(16, 185, 129, 0.45)" 
+            : "rgba(16, 185, 129, 0.16)";
+        colorCtx.fillRect(0, 0, w, h);
+        colorCtx.globalCompositeOperation = "source-over";
+        ctx.drawImage(colorCanvas, 0, 0);
+    }
 
-    ctx.globalAlpha = 0.38;
-    ctx.drawImage(colorCanvas, 0, 0);
-    ctx.globalAlpha = 1.0;
+    // 3. Wall Mask (Sky Blue: #3b82f6)
+    if (surfaceMasks.wall) {
+        colorCtx.clearRect(0, 0, w, h);
+        colorCtx.drawImage(surfaceMasks.wall, 0, 0);
+        colorCtx.globalCompositeOperation = "source-in";
+        colorCtx.fillStyle = (selectedSurface === "wall" || selectedSurface === "both") 
+            ? "rgba(59, 130, 246, 0.45)" 
+            : "rgba(59, 130, 246, 0.16)";
+        colorCtx.fillRect(0, 0, w, h);
+        colorCtx.globalCompositeOperation = "source-over";
+        ctx.drawImage(colorCanvas, 0, 0);
+    }
+
+    // 4. Protected Objects (Coral Red: #ef4444)
+    if (objectProtectionMask) {
+        colorCtx.clearRect(0, 0, w, h);
+        colorCtx.drawImage(objectProtectionMask, 0, 0);
+        colorCtx.globalCompositeOperation = "source-in";
+        colorCtx.fillStyle = "rgba(239, 68, 68, 0.35)";
+        colorCtx.fillRect(0, 0, w, h);
+        colorCtx.globalCompositeOperation = "source-over";
+        ctx.drawImage(colorCanvas, 0, 0);
+    }
+
+    ctx.restore();
 }
 
 function canvasCoords(e) {
     const rect = editorCanvas.getBoundingClientRect();
-    const scaleX = editorCanvas.width  / rect.width;
-    const scaleY = editorCanvas.height / rect.height;
+    const canvasW = editorCanvas.width;
+    const canvasH = editorCanvas.height;
+    const canvasAspect = canvasW / canvasH;
+    const rectAspect = rect.width / rect.height;
 
-    let cx, cy;
-    if (e.touches && e.touches[0]) {
-        cx = (e.touches[0].clientX - rect.left) * scaleX;
-        cy = (e.touches[0].clientY - rect.top)  * scaleY;
+    let renderW, renderH, offsetX, offsetY;
+
+    if (rectAspect > canvasAspect) {
+        renderH = rect.height;
+        renderW = renderH * canvasAspect;
+        offsetX = (rect.width - renderW) / 2;
+        offsetY = 0;
     } else {
-        cx = (e.clientX - rect.left) * scaleX;
-        cy = (e.clientY - rect.top)  * scaleY;
+        renderW = rect.width;
+        renderH = renderW / canvasAspect;
+        offsetX = 0;
+        offsetY = (rect.height - renderH) / 2;
     }
-    return { x: cx, y: cy };
+
+    let clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX);
+    let clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY);
+
+    const normX = (clientX - rect.left - offsetX) / renderW;
+    const normY = (clientY - rect.top - offsetY) / renderH;
+
+    const unscaledX = normX * canvasW;
+    const unscaledY = normY * canvasH;
+
+    const finalX = (unscaledX - panX) / zoomLevel;
+    const finalY = (unscaledY - panY) / zoomLevel;
+
+    return {
+        x: Math.max(0, Math.min(canvasW, finalX)),
+        y: Math.max(0, Math.min(canvasH, finalY))
+    };
+}
+
+function updateUndoRedoUI() {
+    if (toolUndo) toolUndo.disabled = (historyStack.undo.length === 0);
+    if (toolRedo) toolRedo.disabled = (historyStack.redo.length === 0);
+}
+
+function saveHistoryState() {
+    const activeCanvas = getActiveMaskCanvas();
+    if (!activeCanvas) return;
+    const imgData = activeCanvas.getContext("2d").getImageData(0, 0, activeCanvas.width, activeCanvas.height);
+    historyStack.undo.push({
+        surface: selectedSurface,
+        data: imgData
+    });
+    if (historyStack.undo.length > MAX_HISTORY) {
+        historyStack.undo.shift();
+    }
+    historyStack.redo = [];
+    updateUndoRedoUI();
+}
+
+function undo() {
+    if (historyStack.undo.length === 0) return;
+    const activeCanvas = getActiveMaskCanvas();
+    if (!activeCanvas) return;
+    const currentData = activeCanvas.getContext("2d").getImageData(0, 0, activeCanvas.width, activeCanvas.height);
+    historyStack.redo.push({
+        surface: selectedSurface,
+        data: currentData
+    });
+    const last = historyStack.undo.pop();
+    activeCanvas.getContext("2d").putImageData(last.data, 0, 0);
+    renderComposite();
+    checkMaskCollisionsAndCoverage();
+    updateUndoRedoUI();
+}
+
+function redo() {
+    if (historyStack.redo.length === 0) return;
+    const activeCanvas = getActiveMaskCanvas();
+    if (!activeCanvas) return;
+    const currentData = activeCanvas.getContext("2d").getImageData(0, 0, activeCanvas.width, activeCanvas.height);
+    historyStack.undo.push({
+        surface: selectedSurface,
+        data: currentData
+    });
+    const next = historyStack.redo.pop();
+    activeCanvas.getContext("2d").putImageData(next.data, 0, 0);
+    renderComposite();
+    checkMaskCollisionsAndCoverage();
+    updateUndoRedoUI();
+}
+
+function updateZoomUI() {
+    if (zoomLevelText) {
+        zoomLevelText.textContent = Math.round(zoomLevel * 100) + "%";
+    }
+    if (toolZoomOut) {
+        toolZoomOut.disabled = (zoomLevel <= 1.0);
+    }
+    if (toolZoomIn) {
+        toolZoomIn.disabled = (zoomLevel >= 3.0);
+    }
+}
+
+function zoomIn() {
+    zoomLevel = Math.min(3.0, Math.round((zoomLevel + 0.5) * 10) / 10);
+    updateZoomUI();
+    renderComposite();
+}
+
+function zoomOut() {
+    zoomLevel = Math.max(1.0, Math.round((zoomLevel - 0.5) * 10) / 10);
+    if (zoomLevel === 1.0) {
+        panX = 0;
+        panY = 0;
+    }
+    updateZoomUI();
+    renderComposite();
+}
+
+function zoomReset() {
+    zoomLevel = 1.0;
+    panX = 0;
+    panY = 0;
+    updateZoomUI();
+    renderComposite();
 }
 
 function drawBrush(x, y) {
-    const r = parseInt(brushSlider.value, 10) *
-              (editorCanvas.width / editorCanvas.getBoundingClientRect().width);
+    const activeCanvas = getActiveMaskCanvas();
+    if (!activeCanvas) return;
+    const actCtx = activeCanvas.getContext("2d");
 
-    maskCtx.beginPath();
-    maskCtx.arc(x, y, r, 0, Math.PI * 2);
+    const r = parseInt(brushSlider.value, 10);
+
+    actCtx.beginPath();
+    actCtx.arc(x, y, r, 0, Math.PI * 2);
     if (brushMode === "paint") {
-        maskCtx.fillStyle = "#fff";
-        maskCtx.fill();
+        actCtx.fillStyle = "#fff";
+        actCtx.fill();
     } else {
-        maskCtx.save();
-        maskCtx.globalCompositeOperation = "destination-out";
-        maskCtx.fillStyle = "#fff";
-        maskCtx.fill();
-        maskCtx.restore();
+        actCtx.save();
+        actCtx.globalCompositeOperation = "destination-out";
+        actCtx.fillStyle = "#fff";
+        actCtx.fill();
+        actCtx.restore();
     }
 }
 
 function drawLine(from, to) {
     const dist = Math.hypot(to.x - from.x, to.y - from.y);
-    const steps = Math.max(1, Math.ceil(dist / 4));
+    const steps = Math.max(1, Math.ceil(dist / 3));
     for (let i = 0; i <= steps; i++) {
         const t = i / steps;
         drawBrush(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
@@ -776,7 +1080,14 @@ function drawLine(from, to) {
 }
 
 function onPointerDown(e) {
+    if (e.button === 1 || e.spaceKey) {
+        isPanning = true;
+        panStart = { x: e.clientX, y: e.clientY, px: panX, py: panY };
+        e.preventDefault();
+        return;
+    }
     e.preventDefault();
+    saveHistoryState();
     isDrawing = true;
     const pos = canvasCoords(e);
     drawBrush(pos.x, pos.y);
@@ -785,6 +1096,13 @@ function onPointerDown(e) {
 }
 
 function onPointerMove(e) {
+    if (isPanning) {
+        e.preventDefault();
+        panX = panStart.px + (e.clientX - panStart.x);
+        panY = panStart.py + (e.clientY - panStart.y);
+        renderComposite();
+        return;
+    }
     if (!isDrawing) return;
     e.preventDefault();
     const pos = canvasCoords(e);
@@ -795,7 +1113,9 @@ function onPointerMove(e) {
 
 function onPointerUp() {
     isDrawing = false;
+    isPanning = false;
     lastPos = null;
+    checkMaskCollisionsAndCoverage();
 }
 
 editorCanvas.addEventListener("mousedown",  onPointerDown);
@@ -807,42 +1127,49 @@ editorCanvas.addEventListener("touchstart", onPointerDown, { passive: false });
 editorCanvas.addEventListener("touchmove",  onPointerMove, { passive: false });
 editorCanvas.addEventListener("touchend",   onPointerUp);
 
+editorCanvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    if (e.deltaY < 0) zoomIn();
+    else zoomOut();
+}, { passive: false });
+
 toolPaint.addEventListener("click", () => { brushMode = "paint"; toolPaint.classList.add("active"); toolErase.classList.remove("active"); });
 toolErase.addEventListener("click", () => { brushMode = "erase"; toolErase.classList.add("active"); toolPaint.classList.remove("active"); });
 
-toolReset.addEventListener("click", () => {
-    if (!maskImage) return;
-    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-    maskCtx.drawImage(maskImage, 0, 0, maskCanvas.width, maskCanvas.height);
+if (toolUndo) toolUndo.addEventListener("click", undo);
+if (toolRedo) toolRedo.addEventListener("click", redo);
+if (toolZoomIn) toolZoomIn.addEventListener("click", zoomIn);
+if (toolZoomOut) toolZoomOut.addEventListener("click", zoomOut);
+if (toolZoomReset) toolZoomReset.addEventListener("click", zoomReset);
+if (closeCollision && collisionBanner) closeCollision.addEventListener("click", () => { collisionBanner.style.display = "none"; });
+
+toolReset.addEventListener("click", async () => {
+    if (!hallImageEl) return;
+    showLoading("Yapay zekâ başlangıç maskesine dönülüyor…");
+    saveHistoryState();
+    const w = hallImageEl.naturalWidth;
+    const h = hallImageEl.naturalHeight;
+    await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
+    hideLoading();
     renderComposite();
+    checkMaskCollisionsAndCoverage();
+    showToast("Maske başlangıç durumuna sıfırlandı.");
 });
 
-function getMaskBase64() {
-    const w = maskCanvas.width;
-    const h = maskCanvas.height;
-    const data = maskCtx.getImageData(0, 0, w, h);
-    const px = data.data;
-
-    const binCanvas = document.createElement("canvas");
-    binCanvas.width  = w;
-    binCanvas.height = h;
-    const binCtx = binCanvas.getContext("2d");
-    const binData = binCtx.createImageData(w, h);
-    const out = binData.data;
-
-    for (let i = 0; i < px.length; i += 4) {
-        const bright = (px[i] + px[i + 1] + px[i + 2]) / 3;
-        const isMasked = (px[i + 3] > 50 && bright > 50);
-        const val = isMasked ? 255 : 0;
-        out[i]     = val;
-        out[i + 1] = val;
-        out[i + 2] = val;
-        out[i + 3] = val; // Strictly transparent outside mask, opaque white inside
+window.addEventListener("keydown", (e) => {
+    if (!editorSection.classList.contains("visible") || e.target.tagName === "INPUT") return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        if (e.shiftKey) redo(); else undo();
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault();
+        redo();
+    } else if (e.key === "b" || e.key === "B") {
+        toolPaint.click();
+    } else if (e.key === "e" || e.key === "E") {
+        toolErase.click();
     }
-
-    binCtx.putImageData(binData, 0, 0);
-    return binCanvas.toDataURL("image/png").split(",")[1];
-}
+});
 
 /**
  * Intelligent Client-Side Texture Mapper with Realistic Perspective & Zero-Leak Masking

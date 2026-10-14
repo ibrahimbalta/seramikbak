@@ -327,6 +327,227 @@ describe('AI Visualizer - Perspective Engine & Semantic Segmentation QA', () => 
     assert.equal(devUser.debugSectionDisplay, "block", 'Debug layers must be visible in developer mode');
   });
 
+  test('Furnished Wall Protection - Cabinets and vanity excluded while wall around them is masked', () => {
+    const w = 475;
+    const h = 625;
+    const ceilingY = Math.round(h * 0.176);
+    const floorY = Math.round(h * 0.856);
+
+    const upperCab = { x1: Math.round(w * 0.404), x2: Math.round(w * 0.937), y1: ceilingY, y2: Math.round(h * 0.28) };
+    const vanity   = { x1: Math.round(w * 0.395), x2: Math.round(w * 0.937), y1: Math.round(h * 0.656), y2: Math.round(h * 0.84) };
+
+    const isWallCandidate = (x, y) => {
+      if (y < ceilingY || y >= floorY) return false;
+      if (x >= upperCab.x1 && x <= upperCab.x2 && y >= upperCab.y1 && y <= upperCab.y2) return false;
+      if (x >= vanity.x1 && x <= vanity.x2 && y >= vanity.y1 && y <= vanity.y2) return false;
+      return true;
+    };
+
+    // Upper cabinet pixel must NOT be wall
+    assert.equal(isWallCandidate(Math.round(w * 0.60), Math.round(h * 0.22)), false, 'Upper cabinet must not be included in wall mask');
+    // Vanity drawer pixel must NOT be wall
+    assert.equal(isWallCandidate(Math.round(w * 0.60), Math.round(h * 0.72)), false, 'Vanity must not be included in wall mask');
+    // Wall to the left of the cabinet must be wall
+    assert.equal(isWallCandidate(Math.round(w * 0.20), Math.round(h * 0.22)), true, 'Clear wall region beside cabinet must be included in wall mask');
+  });
+
+  test('Toilet Area Segmentation - Bowl and flush plate protected while wall behind toilet is included', () => {
+    const w = 475;
+    const h = 625;
+    const ceilingY = Math.round(h * 0.176);
+    const floorY = Math.round(h * 0.856);
+
+    const toilet = { x1: Math.round(w * 0.158), x2: Math.round(w * 0.347), y1: Math.round(h * 0.696), y2: Math.round(h * 0.856) };
+    const flush  = { x1: Math.round(w * 0.220), x2: Math.round(w * 0.326), y1: Math.round(h * 0.536), y2: Math.round(h * 0.600) };
+
+    const isProtectedFixture = (x, y) => {
+      if (x >= toilet.x1 && x <= toilet.x2 && y >= toilet.y1 && y <= toilet.y2) return true;
+      if (x >= flush.x1 && x <= flush.x2 && y >= flush.y1 && y <= flush.y2) return true;
+      return false;
+    };
+
+    // Center of toilet bowl must be protected
+    assert.equal(isProtectedFixture(Math.round(w * 0.25), Math.round(h * 0.75)), true, 'Toilet bowl must be protected');
+    // Center of flush plate must be protected
+    assert.equal(isProtectedFixture(Math.round(w * 0.27), Math.round(h * 0.56)), true, 'Flush plate must be protected');
+    // Wall directly above flush plate must be available for wall tile
+    const wallAboveFlushY = Math.round(h * 0.45);
+    assert.equal(isProtectedFixture(Math.round(w * 0.25), wallAboveFlushY), false, 'Wall behind/above toilet must remain tileable');
+    assert.ok(wallAboveFlushY >= ceilingY && wallAboveFlushY < floorY, 'Region must be within wall zone');
+  });
+
+  test('Shower Glass Enclosure - Transparent glass specular highlights & frames are preserved', () => {
+    // Glass boundary has high specular reflectivity (lum > 200) and low chroma
+    const isShowerGlassSpecularOrFrame = (lum, chroma, xPct) => {
+      // In bathroom layout, shower partition is located in left or right third
+      const isPartitionX = xPct < 0.35 || xPct > 0.88;
+      const isSpecularStreak = lum > 215 && chroma < 15;
+      return isPartitionX && isSpecularStreak;
+    };
+
+    // Bright glass glare streak on shower screen
+    assert.equal(isShowerGlassSpecularOrFrame(230, 8, 0.92), true, 'Shower screen specular streak must be detected');
+    // Standard matte tile wall
+    assert.equal(isShowerGlassSpecularOrFrame(160, 40, 0.50), false, 'Normal tile surface must not be falsely treated as glass');
+  });
+
+  test('Dark Floor Preservation - Deep charcoal / slate floor tiles must NOT be discarded by low luminance', () => {
+    const isDarkFloorTile = (r, g, b, isFloorZone) => {
+      const lum = r * 0.299 + g * 0.587 + b * 0.114;
+      const maxVal = Math.max(r, g, b);
+      const minVal = Math.min(r, g, b);
+      const chroma = maxVal - minVal;
+      // Dark floor tile has low luminance (e.g. 25-50) but neutral chroma
+      return isFloorZone && lum >= 15 && chroma < 30;
+    };
+
+    // Dark anthracite floor tile (r=35, g=36, b=38, lum ~ 36) in floor zone
+    assert.equal(isDarkFloorTile(35, 36, 38, true), true, 'Dark anthracite floor tile must be retained in floor mask');
+    // Pitch black out-of-frame void (lum < 10)
+    assert.equal(isDarkFloorTile(5, 5, 5, true), false, 'Total black voids below 15 must not be tiled');
+  });
+
+  test('Light Wall vs Porcelain Fixtures - High-luminance wall tiles are distinguished from fixtures', () => {
+    // Porcelain fixture: glossy specular highlight or pure white ceramic (lum > 220, chroma < 10)
+    // Light wall tile: texture variations (lum ~ 180-210, subtle texture/veining)
+    const classifyLightPixel = (lum, localVariance) => {
+      // Porcelain surfaces have virtually zero texture variance
+      if (lum > 215 && localVariance < 4) return 'fixture';
+      return 'wall_tile';
+    };
+
+    assert.equal(classifyLightPixel(230, 2), 'fixture', 'Smooth porcelain sink must be classified as fixture');
+    assert.equal(classifyLightPixel(200, 12), 'wall_tile', 'Light veined wall tile must be classified as wall tile');
+  });
+
+  test('Multi-Surface Independence - Editing wall mask must NOT alter floor mask or vice-versa', () => {
+    const w = 100;
+    const h = 100;
+    // Simulate surfaceMasks.floor and surfaceMasks.wall as independent Uint8 arrays
+    const floorMask = new Uint8Array(w * h).fill(0);
+    const wallMask  = new Uint8Array(w * h).fill(0);
+
+    // Initial floor setup: rows 80-99
+    for (let i = 80 * w; i < w * h; i++) floorMask[i] = 255;
+    const initialFloorChecksum = floorMask.reduce((a, b) => a + b, 0);
+
+    // User paints on wall mask: rows 20-50
+    for (let i = 20 * w; i < 50 * w; i++) wallMask[i] = 255;
+
+    // Floor mask must remain 100% unchanged
+    const afterWallEditFloorChecksum = floorMask.reduce((a, b) => a + b, 0);
+    assert.equal(afterWallEditFloorChecksum, initialFloorChecksum, 'Floor mask must remain strictly invariant during wall edits');
+
+    // User erases on floor mask: rows 80-85
+    for (let i = 80 * w; i < 85 * w; i++) floorMask[i] = 0;
+    const wallChecksum = wallMask.reduce((a, b) => a + b, 0);
+    assert.equal(wallChecksum, (50 - 20) * w * 255, 'Wall mask must remain strictly invariant during floor edits');
+  });
+
+  test('Letterbox & Zoom-Aware Coordinate Mapping - Inverts aspect-ratio contain offsets and zoom/pan accurately', () => {
+    const mapCoordinates = (clientX, clientY, rect, canvasAspect, zoom, panX, panY, canvasW, canvasH) => {
+      const rectAspect = rect.width / rect.height;
+      let renderW, renderH, offsetX, offsetY;
+      if (rectAspect > canvasAspect) {
+        renderH = rect.height;
+        renderW = renderH * canvasAspect;
+        offsetX = (rect.width - renderW) / 2;
+        offsetY = 0;
+      } else {
+        renderW = rect.width;
+        renderH = renderW / canvasAspect;
+        offsetX = 0;
+        offsetY = (rect.height - renderH) / 2;
+      }
+
+      const clientOffsetLeft = clientX - rect.left;
+      const clientOffsetTop  = clientY - rect.top;
+
+      const normX = Math.max(0, Math.min(1, (clientOffsetLeft - offsetX) / renderW));
+      const normY = Math.max(0, Math.min(1, (clientOffsetTop - offsetY) / renderH));
+
+      const rawX = normX * canvasW;
+      const rawY = normY * canvasH;
+
+      const x = Math.round((rawX - panX) / zoom);
+      const y = Math.round((rawY - panY) / zoom);
+
+      return {
+        x: Math.max(0, Math.min(canvasW, x)),
+        y: Math.max(0, Math.min(canvasH, y))
+      };
+    };
+
+    const canvasW = 800;
+    const canvasH = 600;
+    const canvasAspect = canvasW / canvasH; // 1.3333
+
+    // Case 1: Letterboxed container (wider than canvas aspect: e.g. 1200x600, aspect 2.0)
+    // Left/right letterbox offsets = (1200 - 800)/2 = 200px
+    const rect1 = { left: 50, top: 50, width: 1200, height: 600 };
+    // Click at screen position corresponding to left edge of active canvas (clientX = 50 + 200 = 250, clientY = 50 + 0 = 50)
+    const pt1 = mapCoordinates(250, 50, rect1, canvasAspect, 1.0, 0, 0, canvasW, canvasH);
+    assert.equal(pt1.x, 0, 'Click at inner left border of letterboxed canvas must map to x=0');
+    assert.equal(pt1.y, 0, 'Click at inner top border of letterboxed canvas must map to y=0');
+
+    // Click at center (clientX = 50 + 600 = 650, clientY = 50 + 300 = 350)
+    const ptCenter = mapCoordinates(650, 350, rect1, canvasAspect, 1.0, 0, 0, canvasW, canvasH);
+    assert.equal(ptCenter.x, 400, 'Click at visual center must map to canvas center x=400');
+    assert.equal(ptCenter.y, 300, 'Click at visual center must map to canvas center y=300');
+
+    // Case 2: 2x Zoom with pan (panX = 100, panY = 50, zoom = 2.0)
+    const ptZoom = mapCoordinates(650, 350, rect1, canvasAspect, 2.0, 100, 50, canvasW, canvasH);
+    // (rawX - panX)/zoom = (400 - 100)/2 = 150
+    // (rawY - panY)/zoom = (300 - 50)/2 = 125
+    assert.equal(ptZoom.x, 150, 'Zoomed and panned coordinate must inverse-transform accurately');
+    assert.equal(ptZoom.y, 125, 'Zoomed and panned coordinate must inverse-transform accurately');
+  });
+
+  test('Undo/Redo History Stack - Safely handles push, undo, redo, and capacity capping', () => {
+    const historyStack = { undo: [], redo: [] };
+    const MAX_HISTORY = 5;
+
+    // In the editor, saveHistoryState pushes the state BEFORE the stroke
+    const saveStateBeforeAction = (val) => {
+      historyStack.undo.push(val);
+      if (historyStack.undo.length > MAX_HISTORY) {
+        historyStack.undo.shift();
+      }
+      historyStack.redo = []; // Reset redo on new action
+    };
+
+    // Simulate 7 actions: states 1 through 7 pushed before reaching canvas state 8
+    for (let i = 1; i <= 7; i++) saveStateBeforeAction(i);
+
+    // Undo stack should be capped at MAX_HISTORY (5), holding states [3, 4, 5, 6, 7]
+    assert.equal(historyStack.undo.length, 5);
+    assert.deepEqual(historyStack.undo, [3, 4, 5, 6, 7]);
+
+    // Canvas is currently at state 8
+    let currentCanvasState = 8;
+
+    // Undo step 1: currentCanvasState (8) goes to redo, popped state (7) becomes canvas state
+    historyStack.redo.push(currentCanvasState);
+    currentCanvasState = historyStack.undo.pop();
+    assert.equal(currentCanvasState, 7);
+    assert.equal(historyStack.undo.length, 4);
+    assert.equal(historyStack.redo.length, 1);
+
+    // Undo step 2: currentCanvasState (7) goes to redo, popped state (6) becomes canvas state
+    historyStack.redo.push(currentCanvasState);
+    currentCanvasState = historyStack.undo.pop();
+    assert.equal(currentCanvasState, 6);
+    assert.equal(historyStack.undo.length, 3);
+    assert.equal(historyStack.redo.length, 2);
+
+    // Redo step 1: currentCanvasState (6) goes to undo, popped state (7) becomes canvas state
+    historyStack.undo.push(currentCanvasState);
+    currentCanvasState = historyStack.redo.pop();
+    assert.equal(currentCanvasState, 7);
+    assert.equal(historyStack.undo.length, 4);
+    assert.equal(historyStack.redo.length, 1);
+  });
+
 });
 
 

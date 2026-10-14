@@ -932,16 +932,52 @@ input[type="range"]::-webkit-slider-thumb {
             <span>Yüzey Maskesi İnce Ayarı</span>
         </div>
 
-        <div class="editor-toolbar card">
-            <button class="tool-btn active" id="tool-paint" data-mode="paint">🖌️ Boya</button>
-            <button class="tool-btn" id="tool-erase" data-mode="erase">🧹 Silgi</button>
-            <button class="tool-btn" id="tool-reset">↺ Sıfırla</button>
-
-            <div class="brush-group">
-                <label for="brush-slider">Fırça:</label>
-                <input type="range" id="brush-slider" min="5" max="80" value="25" />
-                <span class="scale-value" id="brush-value">25</span>
+        <div class="editor-toolbar card" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px;">
+            <!-- Çizim Modları -->
+            <div style="display:flex;align-items:center;gap:4px;">
+                <button type="button" class="tool-btn active" id="tool-paint" data-mode="paint" title="Yüzeye seramik alanı ekle (B)">🖌️ Boya</button>
+                <button type="button" class="tool-btn" id="tool-erase" data-mode="erase" title="Alanı sil / koru (E)">🧹 Silgi</button>
             </div>
+
+            <!-- Geçmiş (Undo / Redo) -->
+            <div style="display:flex;align-items:center;gap:4px;border-left:1px solid rgba(255,255,255,0.1);padding-left:8px;">
+                <button type="button" class="tool-btn" id="tool-undo" title="Geri Al (Ctrl+Z)" disabled>↩️ Geri Al</button>
+                <button type="button" class="tool-btn" id="tool-redo" title="Yinele (Ctrl+Y)" disabled>↪️ Yinele</button>
+            </div>
+
+            <!-- Yakınlaştırma (Zoom & Pan) -->
+            <div style="display:flex;align-items:center;gap:4px;border-left:1px solid rgba(255,255,255,0.1);padding-left:8px;">
+                <button type="button" class="tool-btn" id="tool-zoom-out" title="Uzaklaştır">🔍−</button>
+                <span id="zoom-level-text" style="font-size:11px;color:#94a3b8;min-width:36px;text-align:center;font-weight:600;">100%</span>
+                <button type="button" class="tool-btn" id="tool-zoom-in" title="Yakınlaştır">🔍+</button>
+                <button type="button" class="tool-btn" id="tool-zoom-reset" title="Yakınlaştırmayı Sıfırla">⛶</button>
+            </div>
+
+            <!-- Fırça Boyutu -->
+            <div class="brush-group" style="display:flex;align-items:center;gap:6px;border-left:1px solid rgba(255,255,255,0.1);padding-left:8px;">
+                <label for="brush-slider" style="font-size:11px;color:#94a3b8;">Fırça:</label>
+                <input type="range" id="brush-slider" min="5" max="90" value="25" style="width:75px;" />
+                <span class="scale-value" id="brush-value" style="font-size:11px;color:#e2e8f0;font-weight:600;">25px</span>
+            </div>
+
+            <!-- Yüzey & Katman Bilgisi -->
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+                <div id="mask-layer-legend" style="display:flex;align-items:center;gap:8px;font-size:11px;">
+                    <span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;"></span> Zemin</span>
+                    <span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;"></span> Duvar</span>
+                    <span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;"></span> Korunan Alanlar</span>
+                </div>
+                <button type="button" class="tool-btn" id="tool-reset" title="Yapay Zekâ Orijinal Maskesine Dön">↺ Sıfırla</button>
+            </div>
+        </div>
+
+        <!-- Nesne Çakışması & Düşük Güvenlik Bildirim Bandı -->
+        <div id="collision-alert-banner" class="card" style="display:none;margin-bottom:0.5rem;padding:6px 12px;background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.3);font-size:12px;color:#fde047;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span>🛡️</span>
+                <span id="collision-alert-text">Mobilya ve vitrifiye nesneleri korunmuştur.</span>
+            </div>
+            <button type="button" id="close-collision-alert" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;">✕</button>
         </div>
 
         <div class="card" style="padding:0;overflow:hidden">
