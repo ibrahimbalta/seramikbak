@@ -14,6 +14,7 @@
     // Sidebar
     const surfFloorBtn    = $('#surf-floor-btn');
     const surfWallBtn     = $('#surf-wall-btn');
+    const surfBothBtn     = $('#surf-both-btn');
     const patternSelect   = $('#pattern-select');
     const tileWSlider     = $('#tile-w-slider');
     const tileHSlider     = $('#tile-h-slider');
@@ -154,21 +155,20 @@
     });
 
     // Surface Switch
-    surfFloorBtn.addEventListener('click', () => {
-        surfFloorBtn.classList.add('active');
-        surfWallBtn.classList.remove('active');
-        activeSurface = 'floor';
+    function switchSurface(surf) {
+        activeSurface = surf;
+        surfFloorBtn.classList.toggle('active', surf === 'floor');
+        surfWallBtn.classList.toggle('active', surf === 'wall');
+        if (surfBothBtn) surfBothBtn.classList.toggle('active', surf === 'both');
         generateAutoMask();
         executeVisualization(true);
-    });
+    }
 
-    surfWallBtn.addEventListener('click', () => {
-        surfWallBtn.classList.add('active');
-        surfFloorBtn.classList.remove('active');
-        activeSurface = 'wall';
-        generateAutoMask();
-        executeVisualization(true);
-    });
+    surfFloorBtn.addEventListener('click', () => switchSurface('floor'));
+    surfWallBtn.addEventListener('click', () => switchSurface('wall'));
+    if (surfBothBtn) {
+        surfBothBtn.addEventListener('click', () => switchSurface('both'));
+    }
 
     patternSelect.addEventListener('change', () => {
         executeVisualization(true);
@@ -337,6 +337,11 @@
                         mPx[idx + 2] = 247; // Purple B
                         mPx[idx + 3] = 255; // Alpha
                     } else if (activeSurface === 'wall' && isWallZone) {
+                        mPx[idx]     = 168;
+                        mPx[idx + 1] = 85;
+                        mPx[idx + 2] = 247;
+                        mPx[idx + 3] = 255;
+                    } else if (activeSurface === 'both' && (isFloorZone || isWallZone)) {
                         mPx[idx]     = 168;
                         mPx[idx + 1] = 85;
                         mPx[idx + 2] = 247;
@@ -525,8 +530,9 @@
         const tilePx = pCtx.getImageData(0, 0, baseTileW, baseTileH).data;
 
         // Perspective setup
+        const isEasyBathroom = activeRoomUrl.includes('bathroom') || (w === 1024 && h === 1024);
         const horizonY = Math.round(h * 0.48);
-        const floorHorizonY = Math.round(h * (h > w ? 0.80 : 0.68));
+        const floorHorizonY = isEasyBathroom ? Math.round(h * 0.72) : Math.round(h * (h > w ? 0.76 : 0.68));
         const vx = w * 0.50;
         const vy = horizonY;
 
@@ -769,7 +775,9 @@
         updateTileSizeDisplay();
 
         if (surfaceParam === 'wall') {
-            surfWallBtn.click();
+            switchSurface('wall');
+        } else if (surfaceParam === 'both') {
+            switchSurface('both');
         }
 
         const initialTileUrl = tileParam || '/textures/calacatta_gold.jpg';
