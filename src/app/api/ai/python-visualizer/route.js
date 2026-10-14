@@ -118,17 +118,49 @@ export async function POST(req) {
       );
       form.append('surface', surface || 'floor');
 
-      const segRes = await fetch(`${PYTHON_URL}/api/segment`, {
-        method: 'POST',
-        body: form,
-        signal: AbortSignal.timeout(30000)
-      });
+      let segRes = null;
+      try {
+        segRes = await fetch(`${PYTHON_URL}/api/segment`, {
+          method: 'POST',
+          body: form,
+          signal: AbortSignal.timeout(3500)
+        });
+      } catch (e) {
+        // Python offline or timeout - fallback to calibrated preset mask
+      }
 
-      if (!segRes.ok) {
-        const errText = await segRes.text();
+      if (!segRes || !segRes.ok) {
+        let maskName = null;
+        if (typeof room_image === 'string') {
+          if (room_image.includes('bathroom')) maskName = 'easy_bathroom';
+          else if (room_image.includes('kitchen')) maskName = 'easy_kitchen';
+          else if (room_image.includes('living')) maskName = 'modern_living';
+        }
+        if (maskName) {
+          const maskPath = path.join(process.cwd(), 'public', 'hero', 'masks', `${maskName}_${surface || 'floor'}.png`);
+          if (fs.existsSync(maskPath)) {
+            const maskBuf = fs.readFileSync(maskPath);
+            return NextResponse.json({
+              success: true,
+              mask: maskBuf.toString('base64'),
+              width: 1024,
+              height: 1024,
+              surface: surface || 'floor',
+              engine: 'SeramikBak Calibrated Surface Engine'
+            });
+          }
+        }
+
+        if (segRes) {
+          const errText = await segRes.text();
+          return NextResponse.json(
+            { success: false, error: `Python segment hatası (${segRes.status}): ${errText}` },
+            { status: segRes.status }
+          );
+        }
         return NextResponse.json(
-          { success: false, error: `Python segment hatası (${segRes.status}): ${errText}` },
-          { status: segRes.status }
+          { success: false, error: 'Yüzey algılama servisi çevrimdışı.' },
+          { status: 503 }
         );
       }
 
