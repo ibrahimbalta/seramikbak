@@ -7100,7 +7100,7 @@ export default function Home() {
                 <div className="detail-primary-actions">
                   {/* Side-by-side Primary Actions: Mekânımda Gör & 3D Studio */}
                   <div className="detail-hero-actions-grid">
-                    {/* 1. Mekânımda Gör & Dene */}
+                    {/* 1. Mekânımda Gör */}
                     <button 
                       onClick={() => {
                         setShowDetailModal(false);
@@ -7108,15 +7108,10 @@ export default function Home() {
                         setShowRenovationModal(true);
                       }}
                       className="detail-action-btn btn-action-renovation"
-                      title="Kendi odanızda seramiği canlı deneyin"
+                      title="Mekânımda Gör"
                     >
-                      <div className="btn-icon-pulse">
-                        <Sparkles size={16} />
-                      </div>
-                      <div className="btn-text-group">
-                        <span className="btn-title">Mekânımda Gör</span>
-                        <span className="btn-subtext">SegFormer-B3 AI</span>
-                      </div>
+                      <Sparkles size={18} className="btn-hero-icon" />
+                      <span className="btn-hero-title">Mekânımda Gör</span>
                     </button>
 
                     {/* 2. 3D Studio */}
@@ -7126,15 +7121,10 @@ export default function Home() {
                         navigateTo3DStudio(detailProduct);
                       }}
                       className="detail-action-btn btn-action-studio-3d"
-                      title="3D İnteraktif Mekân Stüdyosunda Deneyin"
+                      title="3D Studio"
                     >
-                      <div className="btn-icon-pulse studio-icon-pulse">
-                        <Box size={16} />
-                      </div>
-                      <div className="btn-text-group">
-                        <span className="btn-title">3D Studio</span>
-                        <span className="btn-subtext">İnteraktif Tasarım</span>
-                      </div>
+                      <Box size={18} className="btn-hero-icon" />
+                      <span className="btn-hero-title">3D Studio</span>
                     </button>
                   </div>
 
@@ -15611,17 +15601,18 @@ export default function Home() {
 
         .btn-action-renovation, .btn-action-studio-3d {
           width: 100%;
-          padding: 12px 14px;
+          padding: 14px 16px;
           border-radius: 14px;
           cursor: pointer;
           display: flex;
           align-items: center;
-          gap: 10px;
+          justify-content: center;
+          gap: 8px;
           position: relative;
           overflow: hidden;
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
           min-width: 0;
-          text-align: left;
+          text-align: center;
         }
 
         .btn-action-renovation {
@@ -15676,52 +15667,50 @@ export default function Home() {
           transform: translateY(0) scale(0.99);
         }
 
-        .studio-icon-pulse {
-          background: rgba(255, 255, 255, 0.18) !important;
-          border: 1px solid rgba(255, 255, 255, 0.28) !important;
-          color: #ffffff !important;
+        .btn-hero-icon {
+          flex-shrink: 0;
         }
 
-        .btn-action-renovation .btn-title {
-          font-size: 0.88rem;
+        .btn-action-renovation .btn-hero-title {
+          font-size: 0.95rem;
           font-weight: 800;
           letter-spacing: -0.01em;
           color: #090d16;
-          line-height: 1.2;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
 
-        .btn-action-renovation .btn-subtext {
-          font-size: 0.68rem;
-          font-weight: 600;
-          color: rgba(9, 13, 22, 0.82);
-          margin-top: 1px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .btn-action-studio-3d .btn-title {
-          font-size: 0.88rem;
+        .btn-action-studio-3d .btn-hero-title {
+          font-size: 0.95rem;
           font-weight: 800;
           letter-spacing: -0.01em;
           color: #ffffff;
-          line-height: 1.2;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
 
-        .btn-action-studio-3d .btn-subtext {
-          font-size: 0.68rem;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.85);
-          margin-top: 1px;
+        /* Secondary actions styles & text groups */
+        .btn-text-group {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+          flex: 1;
+          min-width: 0;
+        }
+
+        .btn-action-dealer .btn-title, .btn-action-sample .btn-title {
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: #ffffff;
+          line-height: 1.2;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+        }
+
+        .btn-action-dealer .btn-subtext, .btn-action-sample .btn-subtext {
+          font-size: 0.68rem;
+          font-weight: 500;
+          color: #94a3b8;
+          margin-top: 2px;
+          white-space: nowrap;
         }
 
         /* 2. Secondary 2-Column Action Grid */
@@ -15738,20 +15727,12 @@ export default function Home() {
             gap: 8px;
           }
           .btn-action-renovation, .btn-action-studio-3d {
-            padding: 10px 8px;
-            gap: 7px;
+            padding: 12px 6px;
+            gap: 6px;
             border-radius: 12px;
           }
-          .btn-icon-pulse {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-          }
-          .btn-action-renovation .btn-title, .btn-action-studio-3d .btn-title {
-            font-size: 0.78rem;
-          }
-          .btn-action-renovation .btn-subtext, .btn-action-studio-3d .btn-subtext {
-            font-size: 0.60rem;
+          .btn-action-renovation .btn-hero-title, .btn-action-studio-3d .btn-hero-title {
+            font-size: 0.82rem;
           }
           .detail-secondary-actions-grid {
             grid-template-columns: 1fr;
