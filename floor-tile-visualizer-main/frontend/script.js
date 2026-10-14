@@ -239,7 +239,7 @@ brushSlider.addEventListener("input", () => {
  * Intelligent Surface Mask Generator
  * Calibrated architectural perspective mask with 100% fixture & vanity protection
  */
-async function generateIntelligentMask(w, h, surface, presetUrl) {
+async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null) {
     // 1. Try to load precomputed high-precision pixel mask for preset rooms
     if (presetUrl) {
         let maskName = null;
@@ -325,32 +325,57 @@ async function generateIntelligentMask(w, h, surface, presetUrl) {
         }
     } else {
         // Custom user-uploaded room photo:
-        // Floor starts safely at 68% height to protect tables, vanity, and furniture
         if (surface === "floor") {
+            // Perspective floor plane
             cx.beginPath();
-            cx.moveTo(w * 0.08, h * 0.68);
-            cx.lineTo(w * 0.92, h * 0.68);
+            cx.moveTo(w * 0.05, h * 0.68);
+            cx.lineTo(w * 0.95, h * 0.68);
             cx.lineTo(w, h);
             cx.lineTo(0, h);
             cx.closePath();
             cx.fill();
         } else if (surface === "wall") {
-            cx.beginPath();
-            cx.moveTo(0, 0);
-            cx.lineTo(w, 0);
-            cx.lineTo(w, h * 0.60);
-            cx.lineTo(0, h * 0.60);
-            cx.closePath();
-            cx.fill();
+            // Wall area down to floor line
+            cx.fillRect(0, 0, w, h * 0.72);
         } else {
-            cx.fillRect(0, 0, w, h * 0.55);
-            cx.beginPath();
-            cx.moveTo(w * 0.08, h * 0.68);
-            cx.lineTo(w * 0.92, h * 0.68);
-            cx.lineTo(w, h);
-            cx.lineTo(0, h);
-            cx.closePath();
-            cx.fill();
+            // Both: Complete seamless room coverage without artificial gaps
+            cx.fillRect(0, 0, w, h);
+        }
+
+        // Automatic Porcelain Sanitary Fixture Protection (Toilet bowl, bidet, sink)
+        if (roomImg) {
+            try {
+                const tempCanvas = document.createElement("canvas");
+                tempCanvas.width = w;
+                tempCanvas.height = h;
+                const tempCtx = tempCanvas.getContext("2d");
+                tempCtx.drawImage(roomImg, 0, 0, w, h);
+                const rgbData = tempCtx.getImageData(0, 0, w, h).data;
+
+                const maskData = cx.getImageData(0, 0, w, h);
+                const maskPx = maskData.data;
+
+                for (let i = 0; i < rgbData.length; i += 4) {
+                    if (maskPx[i] > 100) {
+                        const r = rgbData[i];
+                        const g = rgbData[i + 1];
+                        const b = rgbData[i + 2];
+                        
+                        // White porcelain fixture: high brightness, neutral chroma
+                        const isWhitePorcelain = (r > 185 && g > 185 && b > 185 &&
+                                                 Math.abs(r - g) < 22 && Math.abs(g - b) < 22 && Math.abs(r - b) < 22);
+
+                        if (isWhitePorcelain) {
+                            maskPx[i] = 0;
+                            maskPx[i + 1] = 0;
+                            maskPx[i + 2] = 0;
+                        }
+                    }
+                }
+                cx.putImageData(maskData, 0, 0);
+            } catch (procErr) {
+                console.warn("[Visualizer] Fixture protection error:", procErr);
+            }
         }
     }
 
@@ -393,7 +418,7 @@ detectBtn.addEventListener("click", async () => {
             const tempImg = await loadImage(hallUrl);
             imgW = tempImg.naturalWidth || 800;
             imgH = tempImg.naturalHeight || 600;
-            maskReceived = await generateIntelligentMask(imgW, imgH, selectedSurface, activePresetUrl);
+            maskReceived = await generateIntelligentMask(imgW, imgH, selectedSurface, activePresetUrl, tempImg);
         }
 
         maskB64Original = maskReceived;
