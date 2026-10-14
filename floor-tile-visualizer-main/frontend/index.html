@@ -1628,8 +1628,9 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     }
 
     // 4. Create tile swatch with crisp architectural grout line
+    const tileAspect = (tileImg.naturalWidth || 1) / (tileImg.naturalHeight || 1);
     const baseTileW = Math.max(30, Math.round(110 * tileScale));
-    const baseTileH = Math.max(30, Math.round(baseTileW * (tileImg.naturalHeight / (tileImg.naturalWidth || 1))));
+    const baseTileH = Math.max(30, Math.round(baseTileW / (tileAspect || 1)));
 
     const patCanvas = document.createElement("canvas");
     patCanvas.width = baseTileW;
@@ -1637,20 +1638,31 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     const pCtx = patCanvas.getContext("2d");
     pCtx.drawImage(tileImg, 0, 0, baseTileW, baseTileH);
 
-    // Architectural grout line (soft dark gray)
-    pCtx.strokeStyle = "rgba(45, 40, 35, 0.40)";
-    pCtx.lineWidth = Math.max(1, Math.round(baseTileW * 0.02));
-    pCtx.strokeRect(0, 0, baseTileW, baseTileH);
+    // Architectural grout line (soft dark gray, drawn within boundaries to avoid clipping)
+    pCtx.strokeStyle = "rgba(40, 35, 30, 0.50)";
+    const groutW = Math.max(1, Math.round(baseTileW * 0.025));
+    pCtx.lineWidth = groutW;
+    pCtx.strokeRect(groutW / 2, groutW / 2, baseTileW - groutW, baseTileH - groutW);
 
     const tileImageData = pCtx.getImageData(0, 0, baseTileW, baseTileH);
     const tilePixels = tileImageData.data;
 
-    // 5. Setup Perspective Parameters for Ground Floor Plane
-    // Optical horizon converges gracefully above top row
-    const horizon = Math.max(0, Math.round(topRow - (botRow - topRow) * 0.35));
-    const cameraH = Math.max(120, (botRow - horizon) * 0.52);
-    const scaleV = Math.max(180, Math.round(440 * tileScale));
-    const scaleU = (scaleV / cameraH) * 0.70;
+    // 5. Setup Architectural 3D Perspective Parameters
+    const horizonY = (topRow !== -1 && botRow !== -1)
+        ? Math.max(h * 0.35, Math.min(h * 0.65, topRow - Math.round((botRow - topRow) * 0.35)))
+        : Math.round(h * 0.48);
+    const vx = w * 0.50;
+    const vy = horizonY;
+
+    const cameraH = Math.max(120, (h - vy) * 0.55);
+    const cameraW = Math.max(120, (w * 0.50) * 0.75);
+
+    // Aspect-ratio-calibrated scaling (prevents stretching/squashing and corrects grout spacing)
+    const scaleFloorV = Math.max(160, Math.round(440 * tileScale));
+    const scaleFloorU = scaleFloorV * (baseTileW / baseTileH) * 0.95;
+
+    const scaleWallU = Math.max(160, Math.round(440 * tileScale));
+    const scaleWallV = scaleWallU * (baseTileH / baseTileW) * 0.95;
 
     // Prepare Output Buffer (32-bit Uint32 for ultra-fast rendering)
     const outImageData = rCtx.createImageData(w, h);
@@ -1660,24 +1672,7 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     for (let y = 0; y < h; y++) {
         const rowOffset = y * w;
         const rowByteOffset = rowOffset * 4;
-
-        // Perspective mapping parameters for this row
-        const isFloorRow = (surface === "floor") || (surface === "both" && y > horizon);
-        const dy = y - horizon;
-
-        let z = 0, vCoord = 0, srcY = 0, rowIdx = 0, xOffset = 0;
-        if (isFloorRow && dy > 0) {
-            z = cameraH / dy;
-            vCoord = z * scaleV;
-            srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
-            rowIdx = Math.floor(vCoord / baseTileH);
-            xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-        } else {
-            // Planar wall mapping
-            srcY = ((y % baseTileH) + baseTileH) % baseTileH;
-            rowIdx = Math.floor(y / baseTileH);
-            xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-        }
+        const dy = y - vy;
 
         for (let x = 0; x < w; x++) {
             const pxIdx = rowOffset + x;
@@ -1685,18 +1680,85 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
             const maskAlpha = maskPixels[byteIdx + 3];
 
             if (maskAlpha < 5) {
-                // Untouched original pixel
                 outBuf[pxIdx] = roomBuf[pxIdx];
                 continue;
             }
 
-            // Find texture coordinate (srcX, srcY)
+            const dx = x - vx;
             let srcX = 0;
-            if (isFloorRow && dy > 0) {
-                const dx = x - (w / 2);
-                srcX = ((Math.floor(dx * z * scaleU + xOffset) % baseTileW) + baseTileW) % baseTileW;
+            let srcY = 0;
+
+            if (surface === "floor") {
+                // Ground plane 1-point perspective:
+                // Transverse joints are strictly horizontal, longitudinal joints converge to vanishing point
+                const absDy = Math.max(3, dy);
+                const z = cameraH / absDy;
+                const vCoord = z * scaleFloorV;
+                const rowIdx = Math.floor(vCoord / baseTileH);
+                const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
+                
+                srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
+                srcX = ((Math.floor((dx / absDy) * scaleFloorU + xOffset) % baseTileW) + baseTileW) % baseTileW;
+            } else if (surface === "wall") {
+                // Vertical wall perspective:
+                if (dx < -w * 0.08) {
+                    // Left vertical wall: vertical joints are STRICTLY VERTICAL, horizontals converge to vanishing point
+                    const distX = Math.max(3, -dx);
+                    const uCoord = (cameraW / distX) * scaleWallU;
+                    const colIdx = Math.floor(uCoord / baseTileW);
+                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                } else if (dx > w * 0.08) {
+                    // Right vertical wall: vertical joints are STRICTLY VERTICAL
+                    const distX = Math.max(3, dx);
+                    const uCoord = (cameraW / distX) * scaleWallU;
+                    const colIdx = Math.floor(uCoord / baseTileW);
+                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                } else {
+                    // Back wall (facing camera orthogonally)
+                    const rowIdx = Math.floor(y / baseTileH);
+                    const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
+                    srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
+                }
             } else {
-                srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                // "both": 3D Room Multi-Surface Perspective (Floor + Left Wall + Right Wall + Back Wall)
+                const isFloorQuad = (dy > 0) && (Math.abs(dx) <= dy * 0.95);
+                const isLeftWallQuad = (dx < 0) && (Math.abs(dy) < -dx * 1.25);
+                const isRightWallQuad = (dx > 0) && (Math.abs(dy) < dx * 1.25);
+
+                if (isFloorQuad) {
+                    const absDy = Math.max(3, dy);
+                    const z = cameraH / absDy;
+                    const vCoord = z * scaleFloorV;
+                    const rowIdx = Math.floor(vCoord / baseTileH);
+                    const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
+                    srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
+                    srcX = ((Math.floor((dx / absDy) * scaleFloorU + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                } else if (isLeftWallQuad) {
+                    const distX = Math.max(3, -dx);
+                    const uCoord = (cameraW / distX) * scaleWallU;
+                    const colIdx = Math.floor(uCoord / baseTileW);
+                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                } else if (isRightWallQuad) {
+                    const distX = Math.max(3, dx);
+                    const uCoord = (cameraW / distX) * scaleWallU;
+                    const colIdx = Math.floor(uCoord / baseTileW);
+                    const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor((dy / distX) * scaleWallV + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                } else {
+                    // Back wall
+                    const rowIdx = Math.floor(y / baseTileH);
+                    const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
+                    srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
+                }
             }
 
             const tileByteIdx = (srcY * baseTileW + srcX) * 4;
