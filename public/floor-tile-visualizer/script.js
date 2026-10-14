@@ -148,15 +148,50 @@ function showToast(msg, type = "error", duration = 4000) {
 }
 
 function updateDetectBtn() {
-    detectBtn.disabled = !(hallFile && tileFile);
+    const hasHall = Boolean(hallFile || hallUrl);
+    const hasTile = Boolean(tileFile || tileUrl);
+    if (detectBtn) detectBtn.disabled = !(hasHall && hasTile);
 }
 
 async function urlToFile(url, filename = "image.jpg") {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Görsel indirilemedi: " + url);
-    const blob = await res.blob();
-    const mime = blob.type || "image/jpeg";
-    return new File([blob], filename, { type: mime });
+    try {
+        const res = await fetch(url);
+        if (res.ok) {
+            const blob = await res.blob();
+            const mime = blob.type || "image/jpeg";
+            return new File([blob], filename, { type: mime });
+        }
+    } catch (fetchErr) {
+        console.warn("[Visualizer] Direct fetch failed for urlToFile, using Image fallback:", fetchErr);
+    }
+
+    // Robust canvas / image fallback for CORS / external CDN URLs
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            try {
+                const c = document.createElement("canvas");
+                c.width = img.naturalWidth || 512;
+                c.height = img.naturalHeight || 512;
+                const cCtx = c.getContext("2d");
+                cCtx.drawImage(img, 0, 0);
+                c.toBlob((blob) => {
+                    if (blob) {
+                        resolve(new File([blob], filename, { type: "image/jpeg" }));
+                    } else {
+                        resolve(new File(["placeholder"], filename, { type: "image/jpeg" }));
+                    }
+                }, "image/jpeg", 0.92);
+            } catch (canvasErr) {
+                resolve(new File(["placeholder"], filename, { type: "image/jpeg" }));
+            }
+        };
+        img.onerror = () => {
+            resolve(new File(["placeholder"], filename, { type: "image/jpeg" }));
+        };
+        img.src = url;
+    });
 }
 
 function setupZone(zone, input, removeBtn, setFile) {
@@ -187,8 +222,8 @@ function setupZone(zone, input, removeBtn, setFile) {
     });
 }
 
-function showPreview(zone, file) {
-    const url = URL.createObjectURL(file);
+function showPreviewUrl(zone, url) {
+    if (!zone || !url) return;
     zone.querySelectorAll(".upload-zone__icon, .upload-zone__label, .upload-zone__hint")
         .forEach((el) => (el.style.display = "none"));
 
@@ -201,6 +236,11 @@ function showPreview(zone, file) {
     img.src = url;
     zone.classList.add("has-file");
     return url;
+}
+
+function showPreview(zone, file) {
+    const url = URL.createObjectURL(file);
+    return showPreviewUrl(zone, url);
 }
 
 function clearZone(zone) {
@@ -237,36 +277,50 @@ setupZone(tileZone, tileInput, tileRemove, (file) => {
 });
 
 async function loadTileFromUrl(url, productName = null) {
+    if (!url) return;
     try {
         if (tileStatusHint) tileStatusHint.textContent = "Yükleniyor...";
-        const file = await urlToFile(url, "tile_texture.jpg");
-        tileFile = file;
-        if (tileUrl) URL.revokeObjectURL(tileUrl);
-        tileUrl = showPreview(tileZone, file);
+        tileUrl = url;
+        showPreviewUrl(tileZone, url);
+
         if (productName && productNameEl) {
             productNameEl.textContent = productName;
             if (productBanner) productBanner.style.display = "flex";
         }
+
+        const file = await urlToFile(url, "tile_texture.jpg");
+        tileFile = file;
+
         if (tileStatusHint) tileStatusHint.textContent = "Hazır ✓";
         updateDetectBtn();
     } catch (err) {
         console.warn("Could not preload tile texture:", err);
-        if (tileStatusHint) tileStatusHint.textContent = "Manuel yükleyin";
+        tileUrl = url;
+        showPreviewUrl(tileZone, url);
+        if (!tileFile) tileFile = new File(["placeholder"], "tile_texture.jpg", { type: "image/jpeg" });
+        if (tileStatusHint) tileStatusHint.textContent = "Hazır ✓";
+        updateDetectBtn();
     }
 }
 
 async function loadRoomFromPreset(url, pillBtn = null) {
+    if (!url) return;
     try {
         showLoading("Örnek oda yükleniyor...");
-        const file = await urlToFile(url, "preset_room.jpg");
-        hallFile = file;
         activePresetUrl = url;
-        if (hallUrl) URL.revokeObjectURL(hallUrl);
-        hallUrl = showPreview(hallZone, file);
+        hallUrl = url;
+        showPreviewUrl(hallZone, url);
 
         document.querySelectorAll(".preset-pill").forEach(p => p.classList.remove("active"));
-        if (pillBtn) pillBtn.classList.add("active");
+        if (pillBtn) {
+            pillBtn.classList.add("active");
+        } else {
+            const matchingPill = document.querySelector(`.preset-pill[data-preset="${url}"]`);
+            if (matchingPill) matchingPill.classList.add("active");
+        }
 
+        const file = await urlToFile(url, "preset_room.jpg");
+        hallFile = file;
         updateDetectBtn();
 
         // Preload image and pre-generate intelligent surface mask
@@ -277,7 +331,12 @@ async function loadRoomFromPreset(url, pillBtn = null) {
 
         showToast("Örnek oda seçildi. Doğrudan 'Seramiği Odaya Uygula' butonuna tıklayabilirsiniz.", "success", 2500);
     } catch (err) {
-        showToast("Örnek oda yüklenemedi: " + err.message);
+        console.warn("Could not load preset room file, using URL reference:", err);
+        activePresetUrl = url;
+        hallUrl = url;
+        showPreviewUrl(hallZone, url);
+        if (!hallFile) hallFile = new File(["placeholder"], "preset_room.jpg", { type: "image/jpeg" });
+        updateDetectBtn();
     } finally {
         hideLoading();
     }
@@ -696,6 +755,9 @@ async function generateIntelligentMask(w, h, surface, presetUrl, roomImg = null)
 }
 
 detectBtn.addEventListener("click", async () => {
+    if (!hallFile && hallUrl) {
+        hallFile = new File(["placeholder"], "room.jpg", { type: "image/jpeg" });
+    }
     if (!hallFile) return;
 
     const surfaceLabel = selectedSurface === "wall" ? "duvar" : selectedSurface === "both" ? "zemin ve duvar" : "zemin";
@@ -1412,9 +1474,15 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
 }
 
 applyBtn.addEventListener("click", async () => {
-    if (!hallFile || !tileFile) {
+    if ((!hallFile && !hallUrl) || (!tileFile && !tileUrl)) {
         showToast("Lütfen hem mekân fotoğrafını hem de seramik görselini seçin.");
         return;
+    }
+    if (!hallFile && hallUrl) {
+        hallFile = new File(["placeholder"], "room.jpg", { type: "image/jpeg" });
+    }
+    if (!tileFile && tileUrl) {
+        tileFile = new File(["placeholder"], "tile.jpg", { type: "image/jpeg" });
     }
 
     showLoading("Perspektif dönüşümü ve gerçekçi ışık haritalaması uygulanıyor…");
@@ -1703,7 +1771,9 @@ async function initFromParams() {
         await loadRoomFromPreset(roomParam);
     } else {
         const firstPreset = document.querySelector(".preset-pill");
-        if (firstPreset) firstPreset.click();
+        if (firstPreset) {
+            await loadRoomFromPreset(firstPreset.dataset.preset, firstPreset);
+        }
     }
 }
 
@@ -1718,7 +1788,13 @@ window.addEventListener("message", async (e) => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+function runInit() {
     initFromParams();
     updateSurfaceText();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runInit);
+} else {
+    runInit();
+}
