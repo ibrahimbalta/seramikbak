@@ -51,8 +51,22 @@ def create_tiled_texture(
             strip = offset_strip if i % 2 else row_strip
             strips.append(strip[:, : target_w + stw, :])
         tiled = np.vstack(strips)
+    elif pattern == "diagonal":
+        center = (stw // 2, sth // 2)
+        M_rot = cv2.getRotationMatrix2D(center, 45, 1.0)
+        cos_a = abs(M_rot[0, 0])
+        sin_a = abs(M_rot[0, 1])
+        new_w = int(sth * sin_a + stw * cos_a)
+        new_h = int(sth * cos_a + stw * sin_a)
+        M_rot[0, 2] += (new_w - stw) / 2
+        M_rot[1, 2] += (new_h - sth) / 2
+        rot_tile = cv2.warpAffine(scaled, M_rot, (new_w, new_h), borderMode=cv2.BORDER_REFLECT)
+        d_cols = target_w // new_w + 3
+        d_rows = target_h // new_h + 3
+        tiled = np.tile(rot_tile, (d_rows, d_cols, 1))
     else:
-        raise ValueError(f"Unknown tiling pattern: {pattern!r}")
+        # Default fallback to grid
+        tiled = np.tile(scaled, (rows, cols, 1))
 
     return tiled[:target_h, :target_w].copy()
 

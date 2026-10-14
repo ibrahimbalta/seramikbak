@@ -47,6 +47,9 @@ surfaceBtns.forEach((btn) => {
             renderComposite();
             checkMaskCollisionsAndCoverage();
         }
+        if (resultSection && resultSection.classList.contains("visible") && hallUrl && tileUrl) {
+            executeApplyTile(true);
+        }
     });
 });
 
@@ -329,7 +332,10 @@ async function loadRoomFromPreset(url, pillBtn = null, silent = false) {
         const h = hallImageEl.naturalHeight;
         await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
 
-        if (!silent) showToast("Örnek oda seçildi. Doğrudan 'Seramiği Odaya Uygula' butonuna tıklayabilirsiniz.", "success", 2500);
+        if (!silent) {
+            showToast("Örnek oda seçildi, seramik uygulanıyor...", "info", 1500);
+            await executeApplyTile(false);
+        }
     } catch (err) {
         console.warn("Could not load preset room file, using URL reference:", err);
         activePresetUrl = url;
@@ -337,6 +343,9 @@ async function loadRoomFromPreset(url, pillBtn = null, silent = false) {
         showPreviewUrl(hallZone, url);
         if (!hallFile) hallFile = new File(["placeholder"], "preset_room.jpg", { type: "image/jpeg" });
         updateDetectBtn();
+        if (!silent) {
+            await executeApplyTile(false);
+        }
     } finally {
         if (!silent) hideLoading();
     }
@@ -345,12 +354,22 @@ async function loadRoomFromPreset(url, pillBtn = null, silent = false) {
 document.querySelectorAll(".preset-pill").forEach((btn) => {
     btn.addEventListener("click", () => {
         const presetUrl = btn.dataset.preset;
-        if (presetUrl) loadRoomFromPreset(presetUrl, btn);
+        if (presetUrl) loadRoomFromPreset(presetUrl, btn, false);
     });
 });
 
+if (patternSelect) {
+    patternSelect.addEventListener("change", () => {
+        if (hallUrl && tileUrl) executeApplyTile(false);
+    });
+}
+
 scaleSlider.addEventListener("input", () => {
     scaleValue.textContent = parseFloat(scaleSlider.value).toFixed(1) + "×";
+});
+
+scaleSlider.addEventListener("change", () => {
+    if (hallUrl && tileUrl) executeApplyTile(false);
 });
 
 brushSlider.addEventListener("input", () => {
@@ -1395,37 +1414,67 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
                 const absDy = Math.max(1.0, dy);
                 const z = cameraH / absDy;
                 const vCoord = z * scaleFloorV;
-                const rowIdx = Math.floor(vCoord / baseTileH);
-                const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-                
-                srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
-                srcX = ((Math.floor(((x - vx) / absDy) * scaleFloorU + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                const uCoord = ((x - vx) / absDy) * scaleFloorU;
+
+                if (pattern === "diagonal") {
+                    // 45-degree diamond pattern from Tile-Detection-and-Visualization-Engine-main
+                    const diagU = (uCoord + vCoord) * 0.70710678;
+                    const diagV = (vCoord - uCoord) * 0.70710678;
+                    srcX = ((Math.floor(diagU) % baseTileW) + baseTileW) % baseTileW;
+                    srcY = ((Math.floor(diagV) % baseTileH) + baseTileH) % baseTileH;
+                } else if (pattern === "brick") {
+                    const rowIdx = Math.floor(vCoord / baseTileH);
+                    const xOffset = (rowIdx % 2 !== 0) ? (baseTileW / 2) : 0;
+                    srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
+                    srcX = ((Math.floor(uCoord + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                } else {
+                    // Standard straight grid
+                    srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
+                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                }
             } else {
                 // Wall plane: Orthogonal back wall & vertical side walls
                 const dx = x - vx;
                 if (Math.abs(dx) <= w * 0.28) {
-                    // Orthogonal Back Wall (facing camera directly):
-                    // Strictly 90-degree orthogonal tiles, zero radial angles, 100% natural tile aspect ratio!
                     const rowIdx = Math.floor(y / baseTileH);
                     const xOffset = (pattern === "brick" && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-                    srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
+                    if (pattern === "diagonal") {
+                        const diagU = ((x + xOffset) + y) * 0.70710678;
+                        const diagV = (y - (x + xOffset)) * 0.70710678;
+                        srcX = ((Math.floor(diagU) % baseTileW) + baseTileW) % baseTileW;
+                        srcY = ((Math.floor(diagV) % baseTileH) + baseTileH) % baseTileH;
+                    } else {
+                        srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
+                        srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
+                    }
                 } else if (dx < -w * 0.28) {
-                    // Left Side Wall: Vertical joints strictly 90° vertical
                     const distX = Math.max(3, -dx);
                     const uCoord = ((w * 0.45) / distX) * baseTileW;
                     const colIdx = Math.floor(uCoord / baseTileW);
                     const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
-                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor(y + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                    if (pattern === "diagonal") {
+                        const diagU = (uCoord + (y + yOffset)) * 0.70710678;
+                        const diagV = ((y + yOffset) - uCoord) * 0.70710678;
+                        srcX = ((Math.floor(diagU) % baseTileW) + baseTileW) % baseTileW;
+                        srcY = ((Math.floor(diagV) % baseTileH) + baseTileH) % baseTileH;
+                    } else {
+                        srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                        srcY = ((Math.floor(y + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                    }
                 } else {
-                    // Right Side Wall: Vertical joints strictly 90° vertical
                     const distX = Math.max(3, dx);
                     const uCoord = ((w * 0.45) / distX) * baseTileW;
                     const colIdx = Math.floor(uCoord / baseTileW);
                     const yOffset = (pattern === "brick" && (colIdx % 2 !== 0)) ? (baseTileH / 2) : 0;
-                    srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    srcY = ((Math.floor(y + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                    if (pattern === "diagonal") {
+                        const diagU = (uCoord + (y + yOffset)) * 0.70710678;
+                        const diagV = ((y + yOffset) - uCoord) * 0.70710678;
+                        srcX = ((Math.floor(diagU) % baseTileW) + baseTileW) % baseTileW;
+                        srcY = ((Math.floor(diagV) % baseTileH) + baseTileH) % baseTileH;
+                    } else {
+                        srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
+                        srcY = ((Math.floor(y + yOffset) % baseTileH) + baseTileH) % baseTileH;
+                    }
                 }
             }
 
@@ -1441,9 +1490,16 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
             const rG = roomPixels[byteIdx + 1];
             const rB = roomPixels[byteIdx + 2];
 
+            // Natural perspective depth darkening from Tile-Detection-and-Visualization-Engine-main (realism.py)
+            let depthFactor = 1.0;
+            if (isFloorPlane) {
+                const depthDist = Math.max(0, 1.0 - (dy / Math.max(1, h - floorHorizonY)));
+                depthFactor = 1.0 - (depthDist * 0.12);
+            }
+
             // Ambient scene lighting preservation (luminance model)
             const lum = (rR * 0.299 + rG * 0.587 + rB * 0.114) / 255.0;
-            const lightFactor = Math.min(1.15, Math.max(0.18, lum * 0.82 + 0.18));
+            const lightFactor = Math.min(1.15, Math.max(0.18, (lum * 0.82 + 0.18) * depthFactor));
 
             const shadedR = Math.min(255, Math.round(tR * lightFactor));
             const shadedG = Math.min(255, Math.round(tG * lightFactor));
@@ -1473,9 +1529,9 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     });
 }
 
-applyBtn.addEventListener("click", async () => {
+async function executeApplyTile(silent = false) {
     if ((!hallFile && !hallUrl) || (!tileFile && !tileUrl)) {
-        showToast("Lütfen hem mekân fotoğrafını hem de seramik görselini seçin.");
+        if (!silent) showToast("Lütfen hem mekân fotoğrafını hem de seramik görselini seçin.");
         return;
     }
     if (!hallFile && hallUrl) {
@@ -1485,7 +1541,9 @@ applyBtn.addEventListener("click", async () => {
         tileFile = new File(["placeholder"], "tile.jpg", { type: "image/jpeg" });
     }
 
-    showLoading("Perspektif dönüşümü ve gerçekçi ışık haritalaması uygulanıyor…");
+    if (!silent) {
+        showLoading("Perspektif dönüşümü ve gerçekçi seramik döşemesi yapılıyor…");
+    }
 
     try {
         // Ensure hallImageEl is loaded
@@ -1514,8 +1572,8 @@ applyBtn.addEventListener("click", async () => {
             fd.append("hall_image",  hallFile);
             fd.append("tile_image",  tileFile);
             fd.append("mask",        maskB64);
-            fd.append("pattern",     patternSelect.value);
-            fd.append("tile_scale",  scaleSlider.value);
+            fd.append("pattern",     patternSelect ? patternSelect.value : "grid");
+            fd.append("tile_scale",  scaleSlider ? scaleSlider.value : "1.0");
             fd.append("surface",     selectedSurface);
 
             const res = await fetch("/api/apply", { method: "POST", body: fd });
@@ -1533,8 +1591,8 @@ applyBtn.addEventListener("click", async () => {
                 hallImageEl,
                 tileImgEl,
                 maskB64,
-                patternSelect.value,
-                parseFloat(scaleSlider.value) || 1.0,
+                patternSelect ? patternSelect.value : "grid",
+                parseFloat(scaleSlider ? scaleSlider.value : 1.0) || 1.0,
                 selectedSurface
             );
         }
@@ -1548,9 +1606,10 @@ applyBtn.addEventListener("click", async () => {
         if (renderErrorBox) renderErrorBox.style.display = "none";
         resultSection.classList.add("visible");
         initComparison();
-        resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
-
-        showToast("Seramik başarıyla uygulandı! Kaydırıcı ile karşılaştırabilirsiniz.", "success");
+        if (!silent) {
+            resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+            showToast("Seramik başarıyla uygulandı! Kaydırıcı ile karşılaştırabilirsiniz.", "success");
+        }
 
         if (window !== window.parent) {
             window.parent.postMessage({ type: "VISUALIZER_APPLIED", success: true }, "*");
@@ -1561,13 +1620,15 @@ applyBtn.addEventListener("click", async () => {
             renderErrorMsg.textContent = err.message || "Görselleştirme sırasında hata oluştu.";
             renderErrorBox.style.display = "block";
             resultSection.classList.add("visible");
-            renderErrorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (!silent) renderErrorBox.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-        showToast("Hata: " + (err.message || "Bilinmeyen hata"), "error");
+        if (!silent) showToast("Hata: " + (err.message || "Bilinmeyen hata"), "error");
     } finally {
-        hideLoading();
+        if (!silent) hideLoading();
     }
-});
+}
+
+applyBtn.addEventListener("click", () => executeApplyTile(false));
 
 // Otomatik Kalibrasyon ve Manuel Fırça Butonları
 if (renderRetryBtn) {
@@ -1775,6 +1836,13 @@ async function initFromParams() {
         loadRoomFromPreset(activeRoomUrl, defaultPill, true)
     ]);
     updateDetectBtn();
+
+    // Otomatik Seramik Döşeme ("seramikleri döşesin")
+    try {
+        await executeApplyTile(true);
+    } catch (e) {
+        console.warn("[Visualizer] Auto apply on load:", e);
+    }
 }
 
 window.addEventListener("message", async (e) => {

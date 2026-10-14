@@ -13,13 +13,13 @@ function MekanimdaGorContent() {
   const tileParam = searchParams ? searchParams.get('tile') : null;
   const productParam = searchParams ? searchParams.get('product') : null;
 
-  const [visualizerSrc, setVisualizerSrc] = useState('/tiles-visualizer/');
+  const [visualizerSrc, setVisualizerSrc] = useState('/floor-tile-visualizer/');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let url = '/tiles-visualizer/index.html';
+    let url = '/floor-tile-visualizer/index.html';
     const params = new URLSearchParams();
-    params.set('v', '3.3.0');
+    params.set('v', '3.6.0');
 
     if (tileParam) {
       params.set('tile', tileParam);
@@ -40,11 +40,11 @@ function MekanimdaGorContent() {
             params.set('product', prod.name || slug);
           }
           const qs = params.toString();
-          setVisualizerSrc(qs ? `/tiles-visualizer/index.html?${qs}` : '/tiles-visualizer/index.html');
+          setVisualizerSrc(qs ? `/floor-tile-visualizer/index.html?${qs}` : '/floor-tile-visualizer/index.html');
           setLoading(false);
         })
         .catch(() => {
-          setVisualizerSrc('/tiles-visualizer/index.html?v=3.3.0');
+          setVisualizerSrc('/floor-tile-visualizer/index.html?v=3.6.0');
           setLoading(false);
         });
       return;
