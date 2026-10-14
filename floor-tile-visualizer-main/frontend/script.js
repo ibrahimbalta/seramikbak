@@ -303,10 +303,10 @@ async function loadTileFromUrl(url, productName = null) {
     }
 }
 
-async function loadRoomFromPreset(url, pillBtn = null) {
+async function loadRoomFromPreset(url, pillBtn = null, silent = false) {
     if (!url) return;
     try {
-        showLoading("Örnek oda yükleniyor...");
+        if (!silent) showLoading("Örnek oda yükleniyor...");
         activePresetUrl = url;
         hallUrl = url;
         showPreviewUrl(hallZone, url);
@@ -329,7 +329,7 @@ async function loadRoomFromPreset(url, pillBtn = null) {
         const h = hallImageEl.naturalHeight;
         await generateIntelligentMask(w, h, selectedSurface, activePresetUrl, hallImageEl);
 
-        showToast("Örnek oda seçildi. Doğrudan 'Seramiği Odaya Uygula' butonuna tıklayabilirsiniz.", "success", 2500);
+        if (!silent) showToast("Örnek oda seçildi. Doğrudan 'Seramiği Odaya Uygula' butonuna tıklayabilirsiniz.", "success", 2500);
     } catch (err) {
         console.warn("Could not load preset room file, using URL reference:", err);
         activePresetUrl = url;
@@ -338,7 +338,7 @@ async function loadRoomFromPreset(url, pillBtn = null) {
         if (!hallFile) hallFile = new File(["placeholder"], "preset_room.jpg", { type: "image/jpeg" });
         updateDetectBtn();
     } finally {
-        hideLoading();
+        if (!silent) hideLoading();
     }
 }
 
@@ -1763,18 +1763,18 @@ async function initFromParams() {
         }
     }
 
-    if (tileParam) {
-        await loadTileFromUrl(tileParam, productParam);
-    }
+    const activeTileUrl = tileParam || "/textures/calacatta_gold.jpg";
+    const activeProductName = productParam || "Calacatta Gold 60x120";
+    const activeRoomUrl = roomParam || "/hero/easy_bathroom.jpg";
 
-    if (roomParam) {
-        await loadRoomFromPreset(roomParam);
-    } else {
-        const firstPreset = document.querySelector(".preset-pill");
-        if (firstPreset) {
-            await loadRoomFromPreset(firstPreset.dataset.preset, firstPreset);
-        }
-    }
+    const defaultPill = document.querySelector(`.preset-pill[data-preset="${activeRoomUrl}"]`) || document.querySelector(".preset-pill");
+
+    // Preload both tile and preset room in parallel without blocking each other
+    await Promise.allSettled([
+        loadTileFromUrl(activeTileUrl, activeProductName),
+        loadRoomFromPreset(activeRoomUrl, defaultPill, true)
+    ]);
+    updateDetectBtn();
 }
 
 window.addEventListener("message", async (e) => {

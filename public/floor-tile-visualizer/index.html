@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="SeramikBak AI Mekân ve Zemin Görselleştirici" />
     <title>SeramikBak — AI Mekân &amp; Zemin Görselleştirici</title>
-    <script>
-        if (window === window.top) {
-            window.location.replace("/mekanimda-gor" + window.location.search);
-        }
-    </script>
     <style>
 /* ================================================================
    SeramikBak Floor Tile Visualizer — Complete Self-Contained Styles
@@ -855,7 +850,8 @@ input[type="range"]::-webkit-slider-thumb {
                 <div class="room-presets-bar">
                     <span class="presets-label">Örnek Oda:</span>
                     <div class="presets-buttons">
-                        <button type="button" class="preset-pill" data-preset="/hero/easy_bathroom.jpg">🚿 Banyo</button>
+                        <button type="button" class="preset-pill active" data-preset="/hero/easy_bathroom.jpg">🚿 Modern Banyo</button>
+                        <button type="button" class="preset-pill" data-preset="/hero/luxury_bathroom.png">🛁 Lüks Banyo</button>
                         <button type="button" class="preset-pill" data-preset="/hero/easy_kitchen.jpg">🍳 Mutfak</button>
                         <button type="button" class="preset-pill" data-preset="/hero/modern_living.png">🛋️ Salon</button>
                     </div>
