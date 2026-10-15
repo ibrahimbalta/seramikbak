@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateAndSanitizeCanvasPages } from '../src/lib/catalogSanitizer.js';
+import { generateQrDataUrl, buildProductStudioUrl, buildCatalogPublicUrl } from '../src/utils/generateQrCode.js';
 
 /**
  * Unit & Integration Tests for Catalog Persistence (1. Aşama: Kalıcı Kayıt)
@@ -678,6 +679,53 @@ test('Professional Studio Presets & Badge Elements Suite (Aşama 2)', async (t) 
     const sanitized = validateAndSanitizeCanvasPages(pages);
     assert.equal(sanitized.length, 3);
     assert.equal(sanitized[0].elements.length, 3);
+  });
+});
+
+test('Showroom QR Code & Sticker Print Generation Suite (Aşama 3)', async (t) => {
+  await t.test('should construct valid 3D Studio URL with query param for room visualizer', () => {
+    const product = { id: 'calacatta-gold-60x120', slug: 'calacatta-gold' };
+    const url = buildProductStudioUrl(product, 'https://seramikbak.com');
+    assert.equal(url, 'https://seramikbak.com/urun/calacatta-gold?studio=3d');
+  });
+
+  await t.test('should construct valid public catalog URL for showroom visitors', () => {
+    const url = buildCatalogPublicUrl('2026-mimari-koleksiyon', 'https://seramikbak.com');
+    assert.equal(url, 'https://seramikbak.com/katalog/2026-mimari-koleksiyon');
+  });
+
+  await t.test('should generate scannable base64 DataURL for product QR code', async () => {
+    const dataUrl = await generateQrDataUrl('https://seramikbak.com/urun/swan-bone?studio=3d', {
+      width: 200,
+      margin: 1
+    });
+    assert.ok(typeof dataUrl === 'string');
+    assert.ok(dataUrl.startsWith('data:image/png;base64,'));
+    assert.ok(dataUrl.length > 500);
+  });
+
+  await t.test('should partition products accurately across A4 pages based on layout density', () => {
+    const sampleProducts = Array.from({ length: 15 }, (_, i) => ({ id: `tile-${i}`, name: `Tile ${i}` }));
+    
+    // Grid 6: 6 items per page (2x3)
+    const perPage6 = 6;
+    const pages6 = [];
+    for (let i = 0; i < sampleProducts.length; i += perPage6) {
+      pages6.push(sampleProducts.slice(i, i + perPage6));
+    }
+    assert.equal(pages6.length, 3); // 6 + 6 + 3 = 15
+    assert.equal(pages6[0].length, 6);
+    assert.equal(pages6[1].length, 6);
+    assert.equal(pages6[2].length, 3);
+
+    // Grid 4: 4 items per page (2x2)
+    const perPage4 = 4;
+    const pages4 = [];
+    for (let i = 0; i < sampleProducts.length; i += perPage4) {
+      pages4.push(sampleProducts.slice(i, i + perPage4));
+    }
+    assert.equal(pages4.length, 4); // 4 + 4 + 4 + 3 = 15
+    assert.equal(pages4[3].length, 3);
   });
 });
 

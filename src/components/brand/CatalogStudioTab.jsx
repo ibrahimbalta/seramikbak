@@ -49,6 +49,7 @@ import {
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
 import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
+import ShowroomQrStickerModal from './catalog/ShowroomQrStickerModal';
 
 export const TEMPLATES = [
   {
@@ -210,6 +211,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const [syncModalCatalog, setSyncModalCatalog] = useState(null);
   const [deleteConfirmCatalog, setDeleteConfirmCatalog] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [qrStickerModalData, setQrStickerModalData] = useState(null);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -365,6 +367,25 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       // ignore
     }
     return { items: [], sectionSettings: {}, collectionTag: '', customCanvasPages: [], versions: [], dataMode: 'live', isArchived: false };
+  };
+
+  // Resolves actual product items from a catalog for showroom printing and exports
+  const resolveCatalogProducts = (cat) => {
+    if (!cat) return [];
+    const meta = parseCatalogMeta(cat.productItems);
+    const resolved = [];
+    meta.items.forEach((item) => {
+      const p = availableProducts.find((ap) => ap.id === item.productId);
+      if (p) {
+        resolved.push(p);
+      } else if (item.snapshot) {
+        resolved.push({
+          id: item.productId,
+          ...item.snapshot
+        });
+      }
+    });
+    return resolved.length > 0 ? resolved : availableProducts;
   };
 
   // Detect product changes between snapshot stored in catalog and live DB product
@@ -1325,6 +1346,21 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     <option value="downloads_desc">En Çok İndirilen</option>
                     <option value="title_asc">Başlık (A - Z)</option>
                   </select>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQrStickerModalData({
+                        catalog: null,
+                        products: availableProducts
+                      });
+                    }}
+                    className="px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-amber-100/80 hover:from-amber-100 hover:to-amber-200/80 border border-amber-300/80 text-amber-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                    title="Tüm fabrika ürünlerinden anında A4 Showroom QR Etiketi üret"
+                  >
+                    <QrCode size={14} className="text-[#b4823c]" />
+                    <span className="hidden sm:inline">Showroom QR Etiketleri</span>
+                  </button>
                 </div>
               </div>
 
@@ -1465,6 +1501,18 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                                     </button>
                                     <button
                                       type="button"
+                                      onClick={() => {
+                                        setOpenMenuId(null);
+                                        const catProducts = resolveCatalogProducts(cat);
+                                        setQrStickerModalData({ catalog: cat, products: catProducts });
+                                      }}
+                                      className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold flex items-center gap-2 cursor-pointer"
+                                    >
+                                      <QrCode size={13} className="text-[#b4823c]" />
+                                      <span>Showroom QR & Pano Etiketleri</span>
+                                    </button>
+                                    <button
+                                      type="button"
                                       onClick={() => handleCopyLink(cat.publicSlug)}
                                       className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
                                     >
@@ -1550,6 +1598,18 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                             >
                               <Edit size={13} />
                               <span>Düzenle</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const catProducts = resolveCatalogProducts(cat);
+                                setQrStickerModalData({ catalog: cat, products: catProducts });
+                              }}
+                              className="py-2 px-2.5 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
+                              title="Showroom QR & Pano Etiketleri"
+                            >
+                              <QrCode size={13} className="text-[#b4823c]" />
                             </button>
 
                             <button
@@ -2434,6 +2494,24 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                           title="Filtreye uyan tüm ürünleri ekle"
                         >
                           Filtrelenenleri Seç ({filteredAvailableProducts.length})
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const selectedProds = availableProducts.filter((p) =>
+                              formData.selectedItems.some((item) => item.productId === p.id)
+                            );
+                            setQrStickerModalData({
+                              catalog: { title: formData.title || 'Yeni Katalog', publicSlug: '' },
+                              products: selectedProds.length > 0 ? selectedProds : filteredAvailableProducts
+                            });
+                          }}
+                          className="px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                          title="Seçili modeller için anında A4 Showroom QR Etiketi üret"
+                        >
+                          <QrCode size={13} className="text-[#b4823c]" />
+                          <span>Showroom QR Etiketi Al</span>
                         </button>
 
                         {/* Clear Selection */}
@@ -3558,6 +3636,17 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {/* ========================================================================= */}
       {/* MODAL: SMART PRODUCT UPDATE DIFF (AKILLI ÜRÜN GÜNCELLEME ONAYI)          */}
       {/* ========================================================================= */}
+      {qrStickerModalData && (
+        <ShowroomQrStickerModal
+          isOpen={Boolean(qrStickerModalData)}
+          onClose={() => setQrStickerModalData(null)}
+          catalog={qrStickerModalData.catalog}
+          products={qrStickerModalData.products}
+          brandName={brandInfo?.name || 'SeramikBak'}
+          brandLogo={brandInfo?.logoUrl || null}
+        />
+      )}
+
       {syncModalCatalog && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 max-w-xl w-full p-6 space-y-4 shadow-2xl">
