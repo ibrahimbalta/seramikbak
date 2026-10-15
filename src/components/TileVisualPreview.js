@@ -22,9 +22,26 @@ export default function TileVisualPreview({ style, color, finish, width, height,
     const s = (style || '').toLowerCase();
     const c = (color || '').toLowerCase();
     const n = (productName || '').toLowerCase();
+    const full = `${s} ${c} ${n}`;
 
-    if (s.includes('ahşap') || s.includes('wood') || n.includes('wood') || n.includes('oak')) {
-      return (c.includes('koyu') || n.includes('dark')) ? '/textures/teak_ahsap.jpg' : '/textures/natural_oak.jpg';
+    if (s.includes('ahşap') || s.includes('wood') || n.includes('wood') || n.includes('oak') || n.includes('sedir')) {
+      if (c.includes('gri') || n.includes('gri')) return '/textures/sedir_gri.jpg';
+      return (c.includes('koyu') || n.includes('dark') || n.includes('teak') || c.includes('ceviz')) ? '/textures/teak_ahsap.jpg' : '/textures/natural_oak.jpg';
+    }
+    if (n.includes('vista')) {
+      return (isDark || c.includes('antrasit')) ? '/textures/vista_antrasit.jpg' : '/textures/vista_bej.jpg';
+    }
+    if (n.includes('portland') && (isDark || c.includes('fume') || c.includes('antrasit'))) {
+      return '/textures/portland_fume.jpg';
+    }
+    if (n.includes('swan') || (isBeige && s.includes('mermer'))) {
+      return '/textures/swan_bone.jpg';
+    }
+    if (n.includes('pulpis')) {
+      return '/textures/pulpis_gri.jpg';
+    }
+    if (n.includes('trax') || n.includes('oxido')) {
+      return '/textures/trax_oxido.jpg';
     }
     if (s.includes('mermer') || s.includes('marble') || n.includes('calacatta') || n.includes('mermer')) {
       return (isDark || c.includes('antrasit')) ? '/textures/borneo_antrasit.jpg' : '/textures/calacatta_gold.jpg';
@@ -38,7 +55,7 @@ export default function TileVisualPreview({ style, color, finish, width, height,
     if (isBrown) {
       return '/textures/vista_bej.jpg';
     }
-    return '/textures/concrete_light_grey.jpg';
+    return '/textures/thor_gri.jpg';
   };
 
   const fallbackTexture = getMatchingFallbackTexture();

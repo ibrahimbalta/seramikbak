@@ -312,18 +312,108 @@ export async function POST(request) {
             parsed.rectified = true;
           }
 
-          // Resolve realistic high-res architectural tile texture
-          const str = `${parsed.style || ''} ${parsed.color || ''} ${parsed.name || ''}`.toLowerCase();
-          let textureFallback = '/textures/calacatta_gold.jpg';
-          if (str.includes('teak') || str.includes('ceviz') || str.includes('walnut')) textureFallback = '/textures/teak_ahsap.jpg';
-          else if (str.includes('ahşap') || str.includes('wood') || str.includes('oak') || str.includes('meşe') || str.includes('kayın')) textureFallback = '/textures/natural_oak.jpg';
-          else if (str.includes('beton') || str.includes('concrete') || str.includes('cement') || str.includes('loft') || str.includes('urban') || str.includes('infinity')) {
-            textureFallback = (str.includes('antrasit') || str.includes('koyu') || str.includes('black') || str.includes('siyah')) ? '/textures/loft_beton.jpg' : '/textures/concrete_light_grey.jpg';
+          // Resolve realistic high-res architectural tile texture matching brand collections and specs
+          const name = (parsed.name || '').toLowerCase();
+          const color = (parsed.color || '').toLowerCase();
+          const style = (parsed.style || '').toLowerCase();
+          const finish = (parsed.finish || '').toLowerCase();
+          const fullText = `${name} ${color} ${style} ${finish}`;
+
+          let textureFallback = '/textures/senzo_beyaz.jpg';
+
+          // 1. AHŞAP (Wood)
+          const isWood = style.includes('ahşap') || style.includes('wood') || 
+                         fullText.includes('sedir') || fullText.includes('taiga') || 
+                         fullText.includes('palmwood') || fullText.includes('teak') || 
+                         fullText.includes('ceviz') || fullText.includes('walnut') || 
+                         fullText.includes('meşe') || fullText.includes('oak') || 
+                         fullText.includes('akçaağaç') || fullText.includes('timber') || 
+                         fullText.includes('parquet');
+          if (isWood) {
+            if (fullText.includes('gri') || fullText.includes('grey') || fullText.includes('fume') || fullText.includes('füme')) textureFallback = '/textures/sedir_gri.jpg';
+            else if (fullText.includes('teak') || fullText.includes('ceviz') || fullText.includes('koyu') || fullText.includes('dark') || fullText.includes('walnut') || fullText.includes('kahve')) textureFallback = '/textures/teak_ahsap.jpg';
+            else if (fullText.includes('akçaağaç') || fullText.includes('sedir') || fullText.includes('çam') || fullText.includes('pine') || fullText.includes('blonde')) textureFallback = '/textures/sedir_akcaagac.jpg';
+            else textureFallback = '/textures/natural_oak.jpg';
           }
-          else if (str.includes('vista') || str.includes('bej') || str.includes('beige')) textureFallback = '/textures/vista_bej.jpg';
-          else if (str.includes('taş') || str.includes('stone') || str.includes('traverten') || str.includes('travertino') || str.includes('latte') || str.includes('krem')) textureFallback = '/textures/travertino_classico.jpg';
-          else if (str.includes('antrasit') || str.includes('siyah') || str.includes('nero') || str.includes('koyu') || str.includes('marquina') || str.includes('füme') || str.includes('dark') || str.includes('integra') || str.includes('leonardo antrasit')) {
-            textureFallback = '/textures/albatros_antrasit.jpg';
+          // 2. SPECIFIC NOTABLE COLLECTIONS
+          else if (fullText.includes('vista')) {
+            if (fullText.includes('antrasit') || fullText.includes('siyah') || fullText.includes('black') || fullText.includes('dark') || fullText.includes('fume') || fullText.includes('füme') || fullText.includes('koyu gri')) {
+              textureFallback = '/textures/vista_antrasit.jpg';
+            } else if (fullText.includes('gri') || fullText.includes('grey')) {
+              textureFallback = '/textures/thor_gri.jpg';
+            } else {
+              textureFallback = '/textures/vista_bej.jpg';
+            }
+          }
+          else if (fullText.includes('portland')) {
+            if (fullText.includes('fume') || fullText.includes('füme') || fullText.includes('antrasit') || fullText.includes('koyu') || fullText.includes('black')) {
+              textureFallback = '/textures/portland_fume.jpg';
+            } else if (fullText.includes('bej') || fullText.includes('bone') || fullText.includes('ivory')) {
+              textureFallback = '/textures/swan_bone.jpg';
+            } else {
+              textureFallback = '/textures/vintage_gri.jpg';
+            }
+          }
+          else if (fullText.includes('swan')) {
+            if (fullText.includes('antrasit') || fullText.includes('siyah') || fullText.includes('dark')) {
+              textureFallback = '/textures/albatros_antrasit.jpg';
+            } else if (fullText.includes('gri') || fullText.includes('grey')) {
+              textureFallback = '/textures/thor_gri.jpg';
+            } else {
+              textureFallback = '/textures/swan_bone.jpg';
+            }
+          }
+          else if (fullText.includes('pulpis')) {
+            textureFallback = (fullText.includes('bej') || fullText.includes('vizon')) ? '/textures/keops_bej.jpg' : '/textures/pulpis_gri.jpg';
+          }
+          else if (fullText.includes('trax') || fullText.includes('oxido') || fullText.includes('corten') || fullText.includes('pas') || fullText.includes('metal')) {
+            textureFallback = '/textures/trax_oxido.jpg';
+          }
+          else if (fullText.includes('magma') || fullText.includes('basalt') || fullText.includes('bazalt')) {
+            textureFallback = '/textures/magma_antrasit.jpg';
+          }
+          else if (fullText.includes('keops')) {
+            textureFallback = '/textures/keops_bej.jpg';
+          }
+          else if (fullText.includes('senzo') || fullText.includes('statu') || fullText.includes('bianco') || fullText.includes('carrara')) {
+            textureFallback = '/textures/senzo_beyaz.jpg';
+          }
+          else if (fullText.includes('calacatta')) {
+            textureFallback = '/textures/calacatta_gold.jpg';
+          }
+          else if (fullText.includes('vintage') || fullText.includes('ravel') || fullText.includes('indiana')) {
+            textureFallback = '/textures/vintage_gri.jpg';
+          }
+          else if (fullText.includes('infinity') || fullText.includes('beton') || fullText.includes('loft') || fullText.includes('urban') || fullText.includes('cement')) {
+            textureFallback = (fullText.includes('antrasit') || fullText.includes('siyah') || fullText.includes('koyu') || fullText.includes('füme') || fullText.includes('fume')) ? '/textures/loft_beton.jpg' : '/textures/concrete_light_grey.jpg';
+          }
+          else if (fullText.includes('traverten') || fullText.includes('travertine') || fullText.includes('jura') || fullText.includes('terra')) {
+            textureFallback = '/textures/travertino_classico.jpg';
+          }
+          // 3. COLOR & MATERIAL CATEGORIES
+          else if (fullText.includes('antrasit') || fullText.includes('siyah') || fullText.includes('nero') || fullText.includes('black') || fullText.includes('dark') || fullText.includes('füme') || fullText.includes('fume')) {
+            if (style.includes('taş') || fullText.includes('stone')) textureFallback = '/textures/magma_antrasit.jpg';
+            else if (fullText.includes('leonardo') || fullText.includes('albatros') || fullText.includes('atlantis')) textureFallback = '/textures/albatros_antrasit.jpg';
+            else textureFallback = '/textures/borneo_antrasit.jpg';
+          }
+          else if (fullText.includes('gri') || fullText.includes('grey') || fullText.includes('silver') || fullText.includes('açık gri') || fullText.includes('koyu gri')) {
+            if (fullText.includes('messina') || fullText.includes('padova') || fullText.includes('sierra')) textureFallback = '/textures/thor_gri.jpg';
+            else if (fullText.includes('valeria') || fullText.includes('adria') || fullText.includes('luton') || fullText.includes('bristol')) textureFallback = '/textures/vintage_gri.jpg';
+            else textureFallback = '/textures/thor_gri.jpg';
+          }
+          else if (fullText.includes('bej') || fullText.includes('beige') || fullText.includes('bone') || fullText.includes('vizon') || fullText.includes('krem') || fullText.includes('cream') || fullText.includes('latte') || fullText.includes('fildişi') || fullText.includes('marfil')) {
+            if (fullText.includes('bone') || fullText.includes('fildişi')) textureFallback = '/textures/swan_bone.jpg';
+            else if (fullText.includes('vizon') || fullText.includes('latte')) textureFallback = '/textures/keops_bej.jpg';
+            else textureFallback = '/textures/vista_bej.jpg';
+          }
+          else if (fullText.includes('beyaz') || fullText.includes('white') || fullText.includes('kristal') || fullText.includes('snow')) {
+            textureFallback = (fullText.includes('calacatta') || fullText.includes('gold')) ? '/textures/calacatta_gold.jpg' : '/textures/senzo_beyaz.jpg';
+          }
+          else if (style.includes('taş') || style.includes('stone')) {
+            textureFallback = '/textures/travertino_classico.jpg';
+          }
+          else if (style.includes('beton')) {
+            textureFallback = '/textures/concrete_light_grey.jpg';
           }
 
           parsed.imageUrl = textureFallback;

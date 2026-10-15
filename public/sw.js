@@ -1,6 +1,6 @@
 // SeramikBak Showroom Kiosk Service Worker
-// Version: 2.0.0
-const CACHE_NAME = 'seramikbak-kiosk-v2';
+// Version: 2.1.0
+const CACHE_NAME = 'seramikbak-kiosk-v2.1';
 const STATIC_ASSETS = [
   '/kiosk',
   '/',
@@ -15,11 +15,23 @@ const STATIC_ASSETS = [
   '/textures/natural_oak.jpg',
   '/textures/concrete_light_grey.jpg',
   '/textures/vista_bej.jpg',
+  '/textures/vista_antrasit.jpg',
   '/textures/albatros_antrasit.jpg',
   '/textures/loft_beton.jpg',
   '/textures/teak_ahsap.jpg',
   '/textures/travertino_classico.jpg',
-  '/textures/borneo_antrasit.jpg'
+  '/textures/borneo_antrasit.jpg',
+  '/textures/portland_fume.jpg',
+  '/textures/swan_bone.jpg',
+  '/textures/thor_gri.jpg',
+  '/textures/trax_oxido.jpg',
+  '/textures/sedir_akcaagac.jpg',
+  '/textures/sedir_gri.jpg',
+  '/textures/vintage_gri.jpg',
+  '/textures/pulpis_gri.jpg',
+  '/textures/senzo_beyaz.jpg',
+  '/textures/magma_antrasit.jpg',
+  '/textures/keops_bej.jpg'
 ];
 
 // Install Event: Pre-cache core Kiosk assets and textures
