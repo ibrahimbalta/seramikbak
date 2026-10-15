@@ -280,61 +280,83 @@ export default function MinimalCollectionTemplate({
     }
 
     // -----------------------------------------------------------------------
-    // 3. EDITORIAL: LARGE LIFESTYLE SPREAD
+    // 3. EDITORIAL: LARGE LIFESTYLE SPREAD (ARCHITECTURAL ATMOSPHERE)
     // -----------------------------------------------------------------------
     if (pageObj.type === 'editorial') {
       const prod = pageObj.product || safeProducts[0];
       return (
         <section
           key="editorial"
-          className="catalog-page relative bg-[#fcfbf9] text-neutral-900 p-8 sm:p-14 md:p-16 flex flex-col justify-between overflow-hidden select-none border border-neutral-200/60"
+          className="catalog-page relative bg-[#fcfbf9] text-neutral-900 p-8 sm:p-12 md:p-16 flex flex-col justify-between overflow-hidden select-none border border-neutral-200/60 shadow-xs"
         >
-          <div className="flex justify-between items-center border-b border-neutral-200/80 pb-5">
-            <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-neutral-500">
-              MİMARİ PERSPEKTİF
+          {/* Subtle Top Architectural Bar */}
+          <div className="flex justify-between items-center border-b border-neutral-200/80 pb-4">
+            <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-stone-500">
+              MİMARİ PERSPEKTİF &bull; DOĞAL IŞIK VE DOKU
             </span>
-            <span className="text-[10px] font-mono text-neutral-400">
-              {prod.name}
+            <span className="text-[10px] font-mono text-stone-400">
+              KÜNYE: {prod.name}
             </span>
           </div>
 
-          <div className="my-auto space-y-6">
-            <div className="w-full h-80 sm:h-96 rounded-xs overflow-hidden shadow-lg border border-neutral-200/70 relative">
+          <div className="my-auto space-y-6 py-2">
+            {/* Architectural Large Photography with Spatial Tags */}
+            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-neutral-200/80 bg-neutral-900 aspect-[16/10] group">
               <img
                 src={prod.imageUrl || '/renders/modern_living_natural_oak.jpg'}
                 alt={prod.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
                 onError={() => handleImgError(`ed-${prod.id}`)}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20 pointer-events-none" />
+
+              {/* Spatial Pin 1 */}
+              <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-neutral-900 text-[10px] font-mono font-bold flex items-center gap-1.5 shadow-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#78716c]" />
+                <span>[01] Zemin: {prod.width || 60}&times;{prod.height || 120} cm &bull; {prod.name}</span>
+              </div>
+
+              {/* Spatial Pin 2 */}
+              <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-white text-[10px] font-mono flex items-center gap-1.5 shadow-md">
+                <span>[02] Yüzey: Mat İpeksi &bull; Doğal Işık Kırılması</span>
+              </div>
             </div>
 
+            {/* Editorial Quote & Architectural Notes */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end pt-2">
-              <div className="md:col-span-8">
-                <blockquote className="text-base sm:text-xl font-serif italic text-neutral-800 leading-snug">
+              <div className="md:col-span-8 space-y-2">
+                <blockquote className="text-lg sm:text-2xl font-serif italic text-neutral-800 leading-snug">
                   &ldquo;Işığın yüzeyle kurduğu sessiz diyalog; mekanın hacmini genişleten doğal tonlar ve rafine dokularla buluşuyor.&rdquo;
                 </blockquote>
+                <p className="text-xs text-neutral-500 font-light">
+                  Doğal kil mineralleri ve düşük karbon ayak izli fırınlama teknolojisi ile üretilmiş monolitik porselen karo serisi.
+                </p>
               </div>
-              <div className="md:col-span-4 text-right">
+
+              <div className="md:col-span-4 text-right space-y-1 pl-4 md:border-l border-neutral-200">
                 <span className="text-[10px] font-mono text-stone-500 block uppercase tracking-wider">
-                  UYGULAMA ALANI
+                  UYGULAMA REFERANSI
                 </span>
-                <span className="text-xs font-serif font-medium text-neutral-800">
-                  Salon, Mutfak & Zemin Uygulamaları
+                <span className="text-xs font-serif font-medium text-neutral-800 block">
+                  Rezidans, Salon & Banyo Mekanları
+                </span>
+                <span className="text-[10px] font-mono text-stone-400 block">
+                  Yerden Isıtma Uyumlu &bull; Derz: 1.0 mm
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-neutral-200/80 flex justify-between items-center text-[10px] font-mono text-neutral-400">
-            <span>EDİTORYAL MİZANPAJ</span>
-            <span>{pageNum}</span>
+          <div className="pt-4 border-t border-neutral-200/80 flex justify-between items-center text-[10px] font-mono text-neutral-400">
+            <span>{brand.name || 'SERAMİKBAK'} &bull; JAPANDI & İSKANDİNAV MİZANPAJI</span>
+            <span>Sayfa {pageNum}</span>
           </div>
         </section>
       );
     }
 
     // -----------------------------------------------------------------------
-    // 4. PRODUCT DETAIL: ASYMMETRICAL MINIMAL SPEC
+    // 4. PRODUCT DETAIL: ASYMMETRICAL MINIMAL SPEC & MATERIAL SCIENCE
     // -----------------------------------------------------------------------
     if (pageObj.type === 'product-detail') {
       const prod = pageObj.product;
@@ -343,44 +365,79 @@ export default function MinimalCollectionTemplate({
       return (
         <section
           key={`prod-${prod.id || pageObj.index}`}
-          className="catalog-page relative bg-[#fcfbf9] text-neutral-900 p-8 sm:p-14 md:p-16 flex flex-col justify-between overflow-hidden select-none border border-neutral-200/60"
+          className="catalog-page relative bg-[#fcfbf9] text-neutral-900 p-8 sm:p-12 md:p-16 flex flex-col justify-between overflow-hidden select-none border border-neutral-200/60 shadow-xs"
         >
-          <div className="flex justify-between items-center border-b border-neutral-200/80 pb-5">
-            <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-neutral-500">
-              ÜRÜN DETAYI / {String(pageObj.index + 1).padStart(2, '0')}
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-neutral-200/80 pb-4">
+            <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-stone-500">
+              ÜRÜN ANATOMİSİ &bull; {String(pageObj.index + 1).padStart(2, '0')}
             </span>
-            <span className="text-[10px] font-mono text-stone-500">
+            <span className="text-[10px] font-mono text-stone-600 font-bold">
               {prod.sku || 'PORSELEN KARO'}
             </span>
           </div>
 
           <div className="my-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-4">
-            {/* Left: Tile Slab / Texture Representation */}
-            <div className="md:col-span-6 flex justify-center">
-              <div className="w-64 sm:w-72 h-80 sm:h-96 bg-white rounded-xs p-3 shadow-md border border-neutral-200/80 flex flex-col justify-between">
-                <div className="w-full h-full rounded-2xs overflow-hidden relative">
+            {/* Left: Tile Slab Showcase with 3D Depth & 1:1 Texture Callout */}
+            <div className="md:col-span-6 flex justify-center relative">
+              <div
+                className="w-64 sm:w-76 h-84 sm:h-100 bg-white rounded-xl p-3 shadow-xl border border-neutral-200/90 flex flex-col justify-between relative group"
+                style={{
+                  boxShadow: '12px 18px 35px rgba(0,0,0,0.08), 2px 4px 10px rgba(0,0,0,0.04)'
+                }}
+              >
+                <div className="w-full h-full rounded-lg overflow-hidden relative bg-neutral-100">
                   <img
                     src={prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
                     alt={prod.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700"
                     onError={() => handleImgError(`slab-${prod.id}`)}
                   />
+
+                  {/* 1:1 Surface Magnifier Floating Circle */}
+                  <div className="absolute top-4 right-4 w-16 h-16 rounded-full border-2 border-white shadow-xl overflow-hidden bg-white hidden sm:block">
+                    <img
+                      src={prod.textureUrl || prod.imageUrl || '/textures/calacatta_gold.jpg'}
+                      alt="1:1 Doku Zoom"
+                      className="w-full h-full object-cover scale-200"
+                    />
+                    <span className="absolute bottom-0 inset-x-0 text-center text-[7px] font-mono font-bold bg-black/70 text-white uppercase tracking-wider">
+                      1:1 DOKU
+                    </span>
+                  </div>
+
                   {prod.rectified && (
-                    <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-[9px] font-mono font-bold text-neutral-800 shadow-2xs">
-                      REKTİFİYE (REC)
+                    <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-xs text-[9px] font-mono font-bold text-neutral-800 shadow-sm border border-neutral-200">
+                      90&deg; LAZER REKTİFİYE
                     </span>
                   )}
                 </div>
+
+                {/* Direct 3D Studio Bridge */}
+                {mode !== 'print' && (
+                  <div className="pt-2 flex justify-center">
+                    <a
+                      href={`/urun/${prod.slug || prod.id}?studio=3d`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-900 hover:bg-stone-700 text-white text-[10px] font-bold shadow-xs transition"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span>3D Mekanda İncele</span>
+                      <ExternalLink size={10} />
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Right: Clean Minimal Specs & Typography */}
-            <div className="md:col-span-6 space-y-6">
+            <div className="md:col-span-6 space-y-5">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-500">
-                  {prod.finish || 'Porselen'} &bull; {prod.color || 'Nötr'}
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-500 block">
+                  {prod.finish || 'Mat Silk'} &bull; {prod.color || 'Nötr Kemik'}
                 </span>
-                <h3 className="text-2xl sm:text-3xl font-serif font-normal text-neutral-900 tracking-tight">
+                <h3 className="text-2xl sm:text-4xl font-serif font-light text-neutral-900 tracking-tight">
                   {prod.name}
                 </h3>
               </div>
@@ -391,64 +448,69 @@ export default function MinimalCollectionTemplate({
                 </p>
               )}
 
-              {/* Minimal Specs Grid */}
-              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-b border-neutral-200/80 py-4 text-xs">
+              {/* Minimal Specs Matrix */}
+              <div className="grid grid-cols-2 gap-3.5 pt-3 border-t border-b border-neutral-200/80 py-3.5 text-xs">
                 <div>
-                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Ebat</span>
-                  <span className="font-serif font-medium text-neutral-800">
-                    {prod.width && prod.height ? `${prod.width}×${prod.height} cm` : 'Standart'}
+                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Standart Ebat</span>
+                  <span className="font-serif font-medium text-neutral-800 text-sm">
+                    {prod.width && prod.height ? `${prod.width}×${prod.height} cm` : '60×120 cm'}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Kalınlık</span>
-                  <span className="font-serif font-medium text-neutral-800">
-                    {prod.thickness ? `${prod.thickness} mm` : '9 mm'}
+                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Plaka Kalınlığı</span>
+                  <span className="font-serif font-medium text-neutral-800 text-sm">
+                    {prod.thickness ? `${prod.thickness} mm` : '9.0 mm'}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Yüzey Bitişi</span>
-                  <span className="font-serif font-medium text-neutral-800">
-                    {prod.finish || 'Mat'}
+                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Yüzey & Işık</span>
+                  <span className="font-serif font-medium text-neutral-800 text-sm">
+                    {prod.finish || 'Mat İpeksi Sır'}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Kaymazlık</span>
-                  <span className="font-serif font-medium text-neutral-800">
-                    {prod.slipResistance || 'R9 / R10'}
+                  <span className="text-[10px] font-mono text-stone-400 block uppercase">Kaymazlık Normu</span>
+                  <span className="font-serif font-medium text-neutral-800 text-sm">
+                    {prod.slipResistance || 'DIN 51130 R10-A'}
                   </span>
                 </div>
               </div>
 
-              {/* Swatches */}
+              {/* Swatches & Tone-sur-tone Palette */}
               <div className="space-y-2">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
-                  Renk Tonu Alternatifleri
+                  UYUMLU TONLAR & RENK KARTELASI
                 </span>
                 <div className="flex items-center gap-3">
                   {swatches.map((sw, swIdx) => (
-                    <div key={swIdx} className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full border border-neutral-300 overflow-hidden shadow-2xs">
+                    <div key={swIdx} className="flex items-center gap-2 p-1 rounded-lg hover:bg-white/80 transition cursor-pointer">
+                      <div className="w-7 h-7 rounded-full border border-neutral-300 overflow-hidden shadow-2xs">
                         <img src={sw.texture} alt={sw.name} className="w-full h-full object-cover" />
                       </div>
-                      <span className="text-[10px] font-serif text-neutral-600">{sw.name}</span>
+                      <span className="text-[11px] font-serif text-neutral-700">{sw.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* Recommended Trims Note */}
+              <div className="p-2.5 rounded-lg bg-stone-100/70 border border-stone-200/80 text-[10px] font-mono text-stone-600 flex items-center justify-between">
+                <span>Önerilen Derz Dolgu: 130 Jasmine (1.0 mm)</span>
+                <span className="font-bold text-neutral-800">Süpürgelik: 8&times;60 cm</span>
+              </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-neutral-200/80 flex justify-between items-center text-[10px] font-mono text-neutral-400">
-            <span>{brand.name || 'SERAMİKBAK'}</span>
-            <span>{pageNum}</span>
+          <div className="pt-4 border-t border-neutral-200/80 flex justify-between items-center text-[10px] font-mono text-neutral-400">
+            <span>{brand.name || 'SERAMİKBAK'} &bull; JAPANDI & İSKANDİNAV KOLEKSİYONU</span>
+            <span>Sayfa {pageNum}</span>
           </div>
         </section>
       );
     }
-
     // -----------------------------------------------------------------------
     // 5. VARIANTS & TEXTURES
     // -----------------------------------------------------------------------

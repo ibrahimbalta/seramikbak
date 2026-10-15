@@ -325,7 +325,7 @@ export default function DecoExclusiveTemplate({
     }
 
     // -----------------------------------------------------------------------
-    // 3. PRODUCT SPREAD — LEFT PAGE: Full-Bleed 1:1 Room Photo (Bien Page 6 Left)
+    // 3. PRODUCT SPREAD — LEFT PAGE: Haute Couture Ambient Interior Staging
     // -----------------------------------------------------------------------
     if (pageObj.type === 'product_room') {
       const p = pageObj.product;
@@ -342,17 +342,71 @@ export default function DecoExclusiveTemplate({
             src={roomImg}
             alt={p.name}
             onError={() => handleImgError(`room-${p.id}`)}
-            className="w-full h-full object-cover object-center absolute inset-0 z-0"
+            className="w-full h-full object-cover object-center absolute inset-0 z-0 transition-transform duration-700 ease-out hover:scale-[1.02]"
           />
 
-          {/* Subtle bottom shadow vignette for typography contrast */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10 pointer-events-none" />
+          {/* Vignette Gradients */}
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/85 via-black/40 to-transparent z-10 pointer-events-none" />
 
-          {/* Bottom Left Corner Running Footer: Page Number & Collection Category */}
-          <div className="absolute bottom-6 sm:bottom-10 left-6 sm:left-10 z-20 flex items-center gap-4 text-xs font-medium tracking-[0.25em] text-white/90 drop-shadow">
-            <span className="font-bold text-sm sm:text-base font-mono">{pageNum}</span>
-            <span className="h-3 w-px bg-white/50" />
-            <span className="uppercase text-[11px] sm:text-xs">{collectionName}</span>
+          {/* Top Running Header */}
+          <div className="absolute top-6 sm:top-8 inset-x-6 sm:inset-x-10 z-20 flex justify-between items-center text-xs tracking-widest text-white/90">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="font-mono text-[10px] sm:text-xs uppercase font-bold drop-shadow">
+                HAUTE COUTURE ARCHITECTURAL INTERIOR
+              </span>
+            </div>
+            <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded text-[9px] sm:text-[10px] font-mono border border-white/20 uppercase tracking-widest">
+              3D RELIEF & DECOFON
+            </span>
+          </div>
+
+          {/* Architectural Spatial Pins */}
+          <div className="absolute top-[28%] left-[25%] z-20 group">
+            <div className="flex items-center gap-2 bg-neutral-950/80 backdrop-blur-md text-white text-[10px] font-mono px-3 py-1.5 rounded-full border border-amber-400/50 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+              <span>[01] 3D Rölyefli Vurgu Duvarı</span>
+            </div>
+          </div>
+
+          <div className="absolute top-[68%] left-[55%] z-20 group">
+            <div className="flex items-center gap-2 bg-neutral-950/80 backdrop-blur-md text-white text-[10px] font-mono px-3 py-1.5 rounded-full border border-white/30 shadow-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-white" />
+              <span>[02] Uyumlu Porselen Zemin (Full Lappato)</span>
+            </div>
+          </div>
+
+          {/* Floating Architectural Material Card & Footer */}
+          <div className="absolute bottom-6 sm:bottom-10 inset-x-6 sm:inset-x-10 z-20 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="bg-neutral-950/80 backdrop-blur-md p-4 rounded-xl border border-white/20 max-w-md shadow-xl">
+              <div className="flex items-center gap-2 text-amber-400 font-mono text-[10px] uppercase tracking-wider mb-1">
+                <span>{collectionName}</span>
+                <span>&bull;</span>
+                <span>Özel Tasarım Konsepti</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider mb-1.5 font-sans">
+                {p.name}
+              </h3>
+              <p className="text-xs text-neutral-300 font-light leading-relaxed mb-3">
+                {p.description || 'Dekofon rölyef yüzey teknolojisi ile mekanlara dinamik ışık ve gölge derinliği katan lüks seramik serisi.'}
+              </p>
+
+              {/* Material Harmony Chips */}
+              <div className="flex items-center gap-2 pt-2 border-t border-white/10 text-[9px] font-mono text-neutral-300">
+                <span className="text-neutral-400">Uyumlu Malzeme:</span>
+                <span className="px-2 py-0.5 rounded bg-white/10">Pirinç Metal Çıta</span>
+                <span className="px-2 py-0.5 rounded bg-white/10">Doğal Meşe</span>
+                <span className="px-2 py-0.5 rounded bg-white/10">Füme Cam</span>
+              </div>
+            </div>
+
+            {/* Running Page Num */}
+            <div className="flex items-center gap-3 text-xs font-mono font-bold tracking-widest text-white/90">
+              <span className="text-base text-amber-400">{pageNum}</span>
+              <span className="h-4 w-px bg-white/40" />
+              <span className="uppercase text-[11px]">{collectionName}</span>
+            </div>
           </div>
         </section>
       );
@@ -458,34 +512,47 @@ export default function DecoExclusiveTemplate({
             </div>
           </div>
 
-          {/* Bottom Right: Clean Spec Table & Page Number */}
-          <div className="flex justify-between items-end pt-4 border-t border-neutral-200">
-            {/* Left corner: Minimal collection note or description */}
-            <div className="max-w-[200px] text-[10px] text-neutral-400 italic hidden sm:block">
-              {p.description || 'Exclusive ceramic wall and floor concept.'}
+          {/* Bottom Section: Architectural Laying Schema, Spec Matrix & Running Number */}
+          <div className="pt-4 border-t border-neutral-200 grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+            {/* Left: Architectural Laying & Grout System Advice */}
+            <div className="sm:col-span-5 space-y-1.5 text-[10px] font-mono text-neutral-600">
+              <div className="flex items-center gap-1.5 text-neutral-900 font-bold uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 bg-neutral-900 rounded-full" />
+                <span>Modüler Döşeme & Derz Mimarisi</span>
+              </div>
+              <p className="text-neutral-500 leading-snug">
+                Düz duvar fonu ile %30 rölyef dekofon panelleri kombine edilerek ışık-gölge ritmi oluşturulabilir.
+              </p>
+              <div className="flex items-center gap-3 pt-1 text-[9px] text-neutral-500">
+                <span className="bg-neutral-100 px-2 py-0.5 rounded border border-neutral-300 text-neutral-800 font-bold">Derz: 1.0mm Lazer</span>
+                <span className="bg-neutral-100 px-2 py-0.5 rounded border border-neutral-300 text-neutral-800 font-bold">Harç: C2TE S1</span>
+              </div>
             </div>
 
-            {/* Right: Clean Spec Table */}
-            <div className="flex flex-col items-end">
-              <table className="text-[10px] sm:text-[11px] border-collapse text-left">
+            {/* Right: Clean Architectural Spec Table & Page Number */}
+            <div className="sm:col-span-7 flex flex-col items-end">
+              <table className="text-[10px] sm:text-[11px] border-collapse text-left w-full sm:w-auto">
                 <thead>
-                  <tr className="border-b border-neutral-900">
-                    <th className="font-extrabold uppercase tracking-wider text-neutral-900 pr-6 pb-1">SIZE</th>
-                    <th className="font-extrabold uppercase tracking-wider text-neutral-900 pr-6 pb-1">SURFACE</th>
-                    <th className="font-extrabold uppercase tracking-wider text-neutral-900 pb-1">TYPE</th>
+                  <tr className="border-b-2 border-neutral-900">
+                    <th className="font-black uppercase tracking-wider text-neutral-900 pr-5 pb-1 text-[10px]">FORMAT</th>
+                    <th className="font-black uppercase tracking-wider text-neutral-900 pr-5 pb-1 text-[10px]">YÜZEY</th>
+                    <th className="font-black uppercase tracking-wider text-neutral-900 pb-1 text-[10px]">STANDART</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-200 font-mono">
+                <tbody className="divide-y divide-neutral-200 font-mono text-[10px]">
                   {specs.map((row, sIdx) => (
                     <tr key={sIdx}>
-                      <td className="pr-6 py-1 text-neutral-700">{row.size}</td>
-                      <td className="pr-6 py-1 text-neutral-700">{row.surface}</td>
-                      <td className="py-1 text-neutral-700 font-sans">{row.type}</td>
+                      <td className="pr-5 py-1 text-neutral-800 font-bold">{row.size}</td>
+                      <td className="pr-5 py-1 text-neutral-700">{row.surface}</td>
+                      <td className="py-1 text-neutral-700 font-sans">{row.type} &bull; EN 14411</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <span className="text-[10px] font-mono text-neutral-400 mt-2 font-bold">{pageNum}</span>
+              <div className="w-full flex justify-between items-center mt-2 pt-1 border-t border-neutral-100 text-[10px] font-mono text-neutral-400">
+                <span className="text-[9px] uppercase tracking-widest text-neutral-500">Deco Exclusive Monograph</span>
+                <span className="font-bold text-neutral-900 font-mono text-xs">P. {pageNum}</span>
+              </div>
             </div>
           </div>
         </section>

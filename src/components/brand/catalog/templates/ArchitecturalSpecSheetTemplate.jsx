@@ -279,18 +279,45 @@ export default function ArchitecturalSpecSheetTemplate({
               
               {/* Left Column: Visual Staging & Isometric Drawing */}
               <div className="md:col-span-6 flex flex-col justify-between gap-3">
-                <div className="border-2 border-slate-300 rounded-xl overflow-hidden aspect-[16/11] bg-white relative flex items-center justify-center shadow-md">
+                <div className="border-2 border-slate-300 rounded-xl overflow-hidden aspect-[16/11] bg-white relative flex items-center justify-center shadow-md group">
                   <img
                     src={pImage}
                     alt={p.name}
                     onError={() => handleImgError(`prod-${p.id}`)}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-mono text-xs px-3 py-1 rounded shadow">
-                    EBAT: {dimensions}
+                  
+                  {/* Architectural Spatial Pins */}
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-slate-900/90 text-white font-mono text-xs px-2.5 py-1 rounded shadow">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    <span>EBAT: {dimensions}</span>
                   </div>
+
+                  <div className="absolute bottom-2.5 left-2.5 bg-slate-900/80 backdrop-blur-md text-white font-mono text-[9px] px-2 py-0.5 rounded border border-white/20 shadow">
+                    <span>Lazer Rektifiye: 0.5mm Derz</span>
+                  </div>
+
                   <div className="absolute bottom-2.5 right-2.5 bg-blue-600 text-white font-mono text-[10px] px-2.5 py-0.5 rounded font-bold shadow">
-                    GRUP BIA
+                    TS EN 14411 EK-G BIA
+                  </div>
+                </div>
+
+                {/* CAD Architectural Build-Up Cross Section Schema */}
+                <div className="p-2.5 bg-white border-2 border-slate-300 rounded-xl font-mono text-[9px] text-slate-700 shadow-xs">
+                  <div className="flex items-center justify-between font-bold text-slate-900 mb-1 border-b border-slate-200 pb-1">
+                    <span className="uppercase text-[9px] text-blue-700">Mimari Zemin Katmanlaşma Kesiti</span>
+                    <span className="text-[8px] text-slate-400">Detay 1:10</span>
+                  </div>
+                  <div className="flex items-center gap-1 overflow-x-auto py-1">
+                    <span className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300 flex-shrink-0">1. Betonarme</span>
+                    <span className="text-slate-400">&rarr;</span>
+                    <span className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300 flex-shrink-0">2. Şap</span>
+                    <span className="text-slate-400">&rarr;</span>
+                    <span className="bg-blue-50 text-blue-800 border border-blue-300 px-1.5 py-0.5 rounded flex-shrink-0 font-bold">3. C2TE S1 Harç</span>
+                    <span className="text-slate-400">&rarr;</span>
+                    <span className="bg-emerald-50 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded flex-shrink-0 font-bold">4. Porselen Karo</span>
+                    <span className="text-slate-400">&rarr;</span>
+                    <span className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300 flex-shrink-0">5. Epoksi Derz</span>
                   </div>
                 </div>
 

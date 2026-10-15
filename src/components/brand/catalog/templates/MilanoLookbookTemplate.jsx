@@ -347,137 +347,200 @@ export default function MilanoLookbookTemplate({
       const pAmbient = p.imageUrl || '/renders/modern_living_natural_oak.jpg';
       const mainDim = p.width && p.height ? `${p.width}x${p.height} cm` : '120x280 cm';
       const secDim = '60x120 cm';
+      const thirdDim = '120x120 cm';
 
       return (
         <section
           key={`prod-left-${p.id || pageObj.index}`}
-          className="catalog-page relative bg-white text-neutral-900 p-6 sm:p-12 md:p-14 flex flex-col justify-between overflow-hidden"
+          className="catalog-page relative bg-[#fdfdfd] text-neutral-900 p-6 sm:p-10 md:p-12 flex flex-col justify-between overflow-hidden border border-neutral-200/60 shadow-xs"
         >
-          <div>
-            {/* Top Collection Title in Bold Uppercase + Custom Badge / Price */}
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-5 sm:mb-6">
+          <div className="space-y-5">
+            {/* Top Architectural Header Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-200/80">
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold uppercase tracking-wider text-neutral-950">
+                <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/15 text-[#b4823c] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#b4823c]/30">
+                  MİMARİ MONOGRAF &bull; {String(pageObj.index + 1).padStart(2, '0')}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-neutral-950">
                   {p.name}
                 </h2>
+              </div>
+
+              <div className="flex items-center gap-3">
                 {p.badge && (
-                  <span className="px-2.5 py-1 rounded bg-neutral-900 text-amber-400 text-[10px] font-mono font-bold uppercase tracking-widest">
+                  <span className="px-2.5 py-1 rounded bg-neutral-900 text-amber-400 text-[10px] font-mono font-bold uppercase tracking-wider">
                     {p.badge}
                   </span>
                 )}
-              </div>
-              {catalog?.showPrices && (p.customPrice || p.price) && (
-                <span className="px-3 py-1 rounded-lg bg-amber-50 border border-amber-200 text-xs font-extrabold text-amber-900">
-                  {p.customPrice || p.price} {catalog?.sectionSettings?.prices?.currency || '₺'} / m²
+                {catalog?.showPrices && (p.customPrice || p.price) && (
+                  <span className="px-3 py-1 rounded-lg bg-amber-50 border border-amber-200 text-xs font-extrabold text-amber-900">
+                    {p.customPrice || p.price} {catalog?.sectionSettings?.prices?.currency || '₺'} / m²
+                  </span>
+                )}
+                <span className="text-[11px] font-mono text-neutral-400 hidden sm:inline">
+                  PORSELEN SLAB
                 </span>
-              )}
+              </div>
             </div>
 
-            {/* Ambient Interior Scene (16:9 Architectural Aspect Ratio) */}
-            <div className="w-full aspect-[16/9] overflow-hidden bg-neutral-100 border border-neutral-200 mb-6 sm:mb-8">
+            {/* Ambient Interior Scene with Architectural Spatial Pins */}
+            <div className="relative rounded-2xl overflow-hidden shadow-md border border-neutral-200/90 group bg-neutral-900 aspect-[16/9]">
               <img
                 src={pAmbient}
                 alt={`${p.name} Mekan`}
                 onError={() => handleImgError(`ambient-${p.id}`)}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+
+              {/* Architectural Spatial Pin 1 (Top Left) */}
+              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-mono flex items-center gap-1.5 shadow-md">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <span>[01] Zemin: {mainDim} &bull; {p.finish || 'Lappato'}</span>
+              </div>
+
+              {/* Architectural Spatial Pin 2 (Bottom Right) */}
+              <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-mono flex items-center gap-1.5 shadow-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>[02] Lazer Rektifiye (0.5 mm Derz)</span>
+              </div>
+
+              {/* Atmosphere Tag (Bottom Left) */}
+              <div className="absolute bottom-3 left-3 text-white text-[10px] font-mono tracking-wider opacity-90 hidden sm:block">
+                <span>DOĞAL IŞIK YANSIMASI &bull; SPATIAL MONOLITH</span>
+              </div>
             </div>
 
-            {/* Mid Section: Proportional Vector Wireframe Dimension Cards (Ebat Şemaları) */}
-            <div className="mb-6 sm:mb-8">
-              <div className="flex items-end gap-6 sm:gap-8">
-                {/* Primary Large Slab Outline (e.g. 120x280 cm) */}
+            {/* Middle Row: Proportional Vector Wireframes & Modular Layouts */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-neutral-50/80 p-3.5 rounded-xl border border-neutral-200/80">
+              {/* Left Column: Proportional Dimension Outlines */}
+              <div className="sm:col-span-7 flex items-end gap-5">
+                {/* 120x280 Slab */}
                 <div className="flex flex-col items-center">
                   <div
-                    className="border border-neutral-400 bg-white"
-                    style={{ width: '38px', height: '88px' }}
+                    className="border-2 border-neutral-800 bg-white rounded-2xs shadow-2xs relative flex flex-col justify-between p-0.5"
+                    style={{ width: '36px', height: '84px' }}
                     title={mainDim}
-                  />
-                  <span className="text-[10px] sm:text-[11px] font-serif text-neutral-700 mt-2 whitespace-nowrap">
+                  >
+                    <span className="text-[7px] font-mono font-bold text-center text-neutral-800">6mm</span>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-neutral-800 mt-1 whitespace-nowrap">
                     {mainDim}
                   </span>
+                  <span className="text-[8px] font-mono text-neutral-400">Dev Plaka</span>
                 </div>
 
-                {/* Secondary Standard Slab Outline (e.g. 60x120 cm) */}
+                {/* 120x120 Slab */}
                 <div className="flex flex-col items-center">
                   <div
-                    className="border border-neutral-400 bg-white"
-                    style={{ width: '26px', height: '52px' }}
-                    title={secDim}
-                  />
-                  <span className="text-[10px] sm:text-[11px] font-serif text-neutral-700 mt-2 whitespace-nowrap">
-                    {secDim}
+                    className="border border-neutral-500 bg-white rounded-2xs shadow-2xs relative flex flex-col justify-between p-0.5"
+                    style={{ width: '36px', height: '36px' }}
+                    title={thirdDim}
+                  >
+                    <span className="text-[7px] font-mono text-center text-neutral-600">9mm</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-neutral-700 mt-1 whitespace-nowrap">
+                    {thirdDim}
                   </span>
+                  <span className="text-[8px] font-mono text-neutral-400">Kare Zemin</span>
                 </div>
 
-                {/* Optional Bookmatch outline indicator */}
+                {/* 60x120 Standard Slab */}
+                <div className="flex flex-col items-center">
+                  <div
+                    className="border border-neutral-500 bg-white rounded-2xs shadow-2xs relative flex flex-col justify-between p-0.5"
+                    style={{ width: '22px', height: '44px' }}
+                    title={secDim}
+                  >
+                    <span className="text-[7px] font-mono text-center text-neutral-600">9mm</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-neutral-700 mt-1 whitespace-nowrap">
+                    {secDim}
+                  </span>
+                  <span className="text-[8px] font-mono text-neutral-400">Duvar & Zemin</span>
+                </div>
+
+                {/* Bookmatch Indicator */}
                 <div className="flex flex-col items-center">
                   <div className="flex gap-0.5">
-                    <div
-                      className="border border-neutral-300 bg-neutral-50/50"
-                      style={{ width: '19px', height: '44px' }}
-                      title="A"
-                    />
-                    <div
-                      className="border border-neutral-300 bg-neutral-50/50"
-                      style={{ width: '19px', height: '44px' }}
-                      title="B"
-                    />
+                    <div className="border border-amber-600/70 bg-amber-50/50 rounded-2xs" style={{ width: '16px', height: '38px' }} title="A" />
+                    <div className="border border-amber-600/70 bg-amber-50/50 rounded-2xs" style={{ width: '16px', height: '38px' }} title="B" />
                   </div>
-                  <span className="text-[9px] font-serif text-neutral-500 mt-2 whitespace-nowrap">
-                    Bookmatch A/B
+                  <span className="text-[10px] font-mono text-amber-800 mt-1 whitespace-nowrap font-bold">
+                    Bookmatch
+                  </span>
+                  <span className="text-[8px] font-mono text-amber-600">Kelebek Damar</span>
+                </div>
+              </div>
+
+              {/* Right Column: Modular Laying Schema Badges */}
+              <div className="sm:col-span-5 flex flex-col justify-center space-y-1.5 pl-0 sm:pl-3 sm:border-l border-neutral-200 text-[10px] font-mono">
+                <span className="font-bold text-neutral-800 uppercase tracking-wider">
+                  MİMARİ DÖŞEME ŞEMALARI
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded bg-white border border-neutral-200 text-neutral-700 font-semibold">
+                    1/3 Kayan Derz
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-white border border-neutral-200 text-neutral-700 font-semibold">
+                    Monolitik Düz
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold">
+                    Derz: 1.0 mm
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Section: Strict Technical Matrix Table */}
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left border-collapse border border-neutral-300 text-xs">
+            {/* Bottom Section: Architectural Spec Matrix Table */}
+            <div className="overflow-x-auto rounded-xl border border-neutral-200 bg-white shadow-2xs">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#eaedf1] text-neutral-800 font-sans font-bold text-[11px] sm:text-xs">
-                    <th className="py-2.5 px-3 border border-neutral-300">Kod</th>
-                    <th className="py-2.5 px-3 border border-neutral-300">Boyut (cm)</th>
-                    <th className="py-2.5 px-3 border border-neutral-300">Kalınlık</th>
-                    <th className="py-2.5 px-3 border border-neutral-300">Renk</th>
-                    <th className="py-2.5 px-3 border border-neutral-300 text-center">Parlak</th>
-                    <th className="py-2.5 px-3 border border-neutral-300 text-center">Rektifiye</th>
+                  <tr className="bg-neutral-100/90 text-neutral-800 font-mono text-[10px] uppercase border-b border-neutral-200">
+                    <th className="py-2 px-3">POZ KODU</th>
+                    <th className="py-2 px-3">EBAT (CM)</th>
+                    <th className="py-2 px-3">KALINLIK</th>
+                    <th className="py-2 px-3">YÜZEY BİTİŞİ</th>
+                    <th className="py-2 px-3">AŞINMA / KAYMA</th>
+                    <th className="py-2 px-3 text-right">REKTİFİYE</th>
                   </tr>
                 </thead>
-                <tbody className="text-neutral-700 font-sans">
-                  <tr className="border-b border-neutral-300 hover:bg-neutral-50/80">
-                    <td className="py-2.5 px-3 border border-neutral-300 font-mono text-[11px]">
-                      {p.sku || p.code || '55018167RP'}
+                <tbody className="divide-y divide-neutral-100 font-sans text-[11px] text-neutral-700">
+                  <tr className="hover:bg-amber-50/30 transition">
+                    <td className="py-2 px-3 font-mono font-bold text-neutral-900">{p.sku || p.code || '55018167RP'}</td>
+                    <td className="py-2 px-3 font-semibold">{p.width && p.height ? `${p.width}x${p.height}` : '120x280'}</td>
+                    <td className="py-2 px-3">{p.thickness ? `${p.thickness} mm` : '6 mm'}</td>
+                    <td className="py-2 px-3">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100/80 text-amber-900 font-bold text-[10px]">
+                        {p.finish || 'Parlak Full Lappato'}
+                      </span>
                     </td>
-                    <td className="py-2.5 px-3 border border-neutral-300">
-                      {p.width && p.height ? `${p.width}x${p.height}` : '120x280'}
-                    </td>
-                    <td className="py-2.5 px-3 border border-neutral-300">
-                      {p.thickness ? `${p.thickness} mm` : '6 mm'}
-                    </td>
-                    <td className="py-2.5 px-3 border border-neutral-300">
-                      {p.color || 'Doğal'}
-                    </td>
-                    <td className="py-2.5 px-3 border border-neutral-300 text-center">
-                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-neutral-900" />
-                    </td>
-                    <td className="py-2.5 px-3 border border-neutral-300 text-center">
-                      {p.rectified !== false ? 'Var' : 'Standart'}
-                    </td>
+                    <td className="py-2 px-3 font-mono font-semibold text-neutral-800">{p.peiRating ? `PEI ${p.peiRating}` : 'PEI IV'} &bull; {p.slipResistance || 'R10-A'}</td>
+                    <td className="py-2 px-3 text-right text-emerald-700 font-bold">&check; 90° Lazer</td>
                   </tr>
-
-                  {/* Secondary row for 60x120 dimension */}
-                  <tr className="border-b border-neutral-300 bg-neutral-50/40">
-                    <td className="py-2 px-3 border border-neutral-300 font-mono text-[11px]">
-                      {p.sku ? `${p.sku}-60` : '55018168RP'}
+                  <tr className="hover:bg-amber-50/30 transition bg-neutral-50/40">
+                    <td className="py-2 px-3 font-mono font-bold text-neutral-900">{p.sku ? `${p.sku}-120` : '55018168RP'}</td>
+                    <td className="py-2 px-3 font-semibold">120x120</td>
+                    <td className="py-2 px-3">9 mm</td>
+                    <td className="py-2 px-3">
+                      <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-800 font-bold text-[10px]">
+                        Mat İpeksi (Silk)
+                      </span>
                     </td>
-                    <td className="py-2 px-3 border border-neutral-300">60x120</td>
-                    <td className="py-2 px-3 border border-neutral-300">9 mm</td>
-                    <td className="py-2 px-3 border border-neutral-300">{p.color || 'Doğal'}</td>
-                    <td className="py-2 px-3 border border-neutral-300 text-center">
-                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-neutral-900" />
+                    <td className="py-2 px-3 font-mono font-semibold text-neutral-800">PEI IV &bull; R10-B</td>
+                    <td className="py-2 px-3 text-right text-emerald-700 font-bold">&check; 90° Lazer</td>
+                  </tr>
+                  <tr className="hover:bg-amber-50/30 transition">
+                    <td className="py-2 px-3 font-mono font-bold text-neutral-900">{p.sku ? `${p.sku}-60` : '55018169RP'}</td>
+                    <td className="py-2 px-3 font-semibold">60x120</td>
+                    <td className="py-2 px-3">9 mm</td>
+                    <td className="py-2 px-3">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100/80 text-amber-900 font-bold text-[10px]">
+                        Full Lappato
+                      </span>
                     </td>
-                    <td className="py-2 px-3 border border-neutral-300 text-center">Var</td>
+                    <td className="py-2 px-3 font-mono font-semibold text-neutral-800">PEI IV &bull; R9</td>
+                    <td className="py-2 px-3 text-right text-emerald-700 font-bold">&check; 90° Lazer</td>
                   </tr>
                 </tbody>
               </table>
@@ -485,17 +548,14 @@ export default function MilanoLookbookTemplate({
           </div>
 
           {/* Running Footer Page Number */}
-          <div className="pt-6 flex justify-between items-center text-[10px] font-mono text-neutral-400">
-            <span>{brand.name || 'SeramikBak'} &bull; {p.name}</span>
-            <span>{pageNum}</span>
+          <div className="pt-4 flex justify-between items-center text-[10px] font-mono text-neutral-400 border-t border-neutral-100">
+            <span>{brand.name || 'SeramikBak'} &bull; Mimari Monograf &bull; {p.name}</span>
+            <span>Sayfa {pageNum}</span>
           </div>
         </section>
       );
     }
 
-    // -----------------------------------------------------------------------
-    // 5. PRODUCT RIGHT PAGE — Full Slab Hero, Color Swatches & Rotated Margin (Page 7 & 91)
-    // -----------------------------------------------------------------------
     if (pageObj.type === 'product_right') {
       const p = pageObj.product;
       const slabTexture = p.textureUrl || p.imageUrl || '/textures/calacatta_gold.jpg';
@@ -504,16 +564,29 @@ export default function MilanoLookbookTemplate({
       return (
         <section
           key={`prod-right-${p.id || pageObj.index}`}
-          className="catalog-page relative bg-white text-neutral-900 p-6 sm:p-12 md:p-14 flex flex-col justify-between overflow-hidden"
+          className="catalog-page relative bg-[#fdfdfd] text-neutral-900 p-6 sm:p-10 md:p-12 flex flex-col justify-between overflow-hidden border border-neutral-200/60 shadow-xs"
         >
+          {/* Top Running Category Header */}
+          <div className="flex justify-between items-center pb-3 border-b border-neutral-200/80">
+            <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-neutral-500">
+              TAM BOY DİKEY SLAB &bull; MALZEME ANATOMİSİ
+            </span>
+            <span className="text-[10px] font-mono text-[#b4823c] font-bold">
+              120&times;280 CM MONOLİTİK PLAKA
+            </span>
+          </div>
+
           {/* Main Visual Arena: Swatches on Left, Slab in Center, Margin Info on Right */}
-          <div className="flex-1 flex items-stretch justify-between relative my-auto">
-            {/* Left Column: Stacked Square/Rectangular Color Variation Tiles (Page 91) */}
-            <div className="flex flex-col gap-6 justify-start pt-6 pr-4 sm:pr-8 z-10">
+          <div className="flex-1 flex items-center justify-between gap-4 my-auto py-2">
+            {/* Left Column: Stacked Color Variations & Grout Match */}
+            <div className="flex flex-col gap-4 justify-center pr-2 z-10 max-w-[130px]">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">
+                RENK SEÇENEKLERİ
+              </span>
               {variations.map((v, vIdx) => (
-                <div key={vIdx} className="flex flex-col items-center">
+                <div key={vIdx} className="space-y-1">
                   <div
-                    className="w-16 sm:w-20 aspect-[3/4] border border-neutral-300 overflow-hidden bg-neutral-100 shadow-xs"
+                    className="w-20 aspect-[3/4] rounded-lg border-2 border-neutral-200 overflow-hidden bg-neutral-100 shadow-sm hover:border-[#b4823c] transition-all cursor-pointer"
                     title={v.name}
                   >
                     <img
@@ -523,55 +596,102 @@ export default function MilanoLookbookTemplate({
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[10px] sm:text-[11px] font-sans text-neutral-700 font-medium mt-1.5">
+                  <span className="text-[10px] font-sans font-bold text-neutral-800 block truncate">
                     {v.name}
                   </span>
                 </div>
               ))}
+
+              {/* Complementary Grout Recommendation */}
+              <div className="pt-2 border-t border-neutral-200/80 space-y-1">
+                <span className="text-[9px] font-mono text-neutral-400 block uppercase">ÖNERİLEN DERZ</span>
+                <span className="text-[10px] font-sans font-bold text-neutral-800 block">
+                  130 Jasmine / Bej
+                </span>
+                <span className="text-[9px] font-mono text-neutral-500 block">Derz Aralığı: 1.0 mm</span>
+              </div>
             </div>
 
-            {/* Central Giant Vertical Slab Showcase (75-80% Page Height) */}
-            <div className="flex-1 flex justify-center items-center py-2 px-2 sm:px-6">
-              <div className="relative w-full max-w-[340px] sm:max-w-[420px] aspect-[1/2.3] overflow-hidden shadow-2xl border border-neutral-300 bg-neutral-100">
+            {/* Central Giant Vertical Slab Showcase with 3D Bevel & Magnifier */}
+            <div className="flex-1 flex justify-center items-center py-2 px-2 sm:px-6 relative">
+              <div
+                className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[1/2.35] rounded-lg overflow-hidden shadow-2xl border border-neutral-300 bg-neutral-900 group"
+                style={{
+                  boxShadow: '16px 24px 45px rgba(0,0,0,0.22), 4px 8px 16px rgba(0,0,0,0.1)'
+                }}
+              >
                 <img
                   src={slabTexture}
                   alt={`${p.name} Tam Plaka`}
                   onError={() => handleImgError(`slab-${p.id}`)}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 ring-1 ring-inset ring-black/5 pointer-events-none" />
+
+                {/* Light reflection gradient for high-gloss porcelain slab feel */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/20 pointer-events-none" />
+
+                {/* 1:1 Surface Magnifier Floating Circle */}
+                <div className="absolute top-6 right-4 w-18 h-18 rounded-full border-2 border-white/80 shadow-2xl overflow-hidden bg-neutral-100 hidden sm:block">
+                  <img
+                    src={slabTexture}
+                    alt="1:1 Doku Zoom"
+                    className="w-full h-full object-cover scale-200 contrast-110"
+                  />
+                  <div className="absolute inset-0 ring-1 ring-black/20 rounded-full pointer-events-none" />
+                  <span className="absolute bottom-1 inset-x-0 text-center text-[7px] font-mono font-bold bg-black/70 text-white uppercase tracking-wider">
+                    1:1 YÜZEY
+                  </span>
+                </div>
+
+                {/* Slab 3D Studio Bridge Button */}
                 {mode !== 'print' && (
                   <a
                     href={`/urun/${p.slug || p.id}?studio=3d`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-neutral-900/90 hover:bg-[#b4823c] text-white text-[10px] font-extrabold flex items-center gap-1.5 shadow-lg backdrop-blur-xs transition cursor-pointer z-20 group"
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-neutral-950/90 hover:bg-[#b4823c] text-white text-xs font-extrabold flex items-center gap-2 shadow-xl backdrop-blur-md transition-all cursor-pointer z-20 group"
                     title="Bu seramiği 3D Sanal Stüdyoda inceleyin"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                    <span>3D Mekanda Gör</span>
-                    <ExternalLink size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <span>Mekanında Canlı Gör</span>
+                    <ExternalLink size={12} className="group-hover:translate-x-0.5 transition-transform" />
                   </a>
                 )}
               </div>
             </div>
 
-            {/* Right Margin: Vertical Running Line with 90° Rotated Collection Name */}
-            <div className="flex flex-col justify-between items-center pl-3 sm:pl-6 border-l border-neutral-200">
+            {/* Right Margin: Technical Badges & Vertical Typography */}
+            <div className="flex flex-col justify-between items-center pl-2 sm:pl-4 border-l border-neutral-200/80 h-full py-4">
               {/* Top Rotated Collection Name */}
               <div
-                className="text-xs sm:text-sm font-sans font-bold uppercase tracking-[0.25em] text-neutral-900 select-none whitespace-nowrap"
+                className="text-xs sm:text-sm font-serif font-bold uppercase tracking-[0.25em] text-neutral-900 select-none whitespace-nowrap"
                 style={{
                   writingMode: 'vertical-rl',
                   transform: 'rotate(180deg)'
                 }}
               >
-                {p.name}
+                {p.name} &bull; 120&times;280 CM
+              </div>
+
+              {/* Material Quality Badges */}
+              <div className="space-y-3 py-4 text-center">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex flex-col items-center justify-center text-[8px] font-mono font-bold text-amber-900 shadow-2xs">
+                  <span>MOHS</span>
+                  <span className="text-[10px] font-extrabold">7</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col items-center justify-center text-[8px] font-mono font-bold text-emerald-900 shadow-2xs">
+                  <span>SU EMME</span>
+                  <span className="text-[9px] font-extrabold">&le;%0.05</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex flex-col items-center justify-center text-[8px] font-mono font-bold text-purple-900 shadow-2xs">
+                  <span>LEKE</span>
+                  <span className="text-[10px] font-extrabold">SNF 5</span>
+                </div>
               </div>
 
               {/* Bottom Rotated Collection Tag */}
               <div
-                className="text-[9px] sm:text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-neutral-400 select-none whitespace-nowrap mb-6"
+                className="text-[9px] font-mono uppercase tracking-[0.2em] text-neutral-400 select-none whitespace-nowrap"
                 style={{
                   writingMode: 'vertical-rl',
                   transform: 'rotate(180deg)'
@@ -582,22 +702,14 @@ export default function MilanoLookbookTemplate({
             </div>
           </div>
 
-          {/* Bottom Accent Bar & Running Footer */}
-          <div className="pt-4 flex justify-between items-end">
-            <span className="text-[10px] font-mono text-neutral-400">
-              {brand.name || 'SeramikBak'} &bull; {collectionTag}
-            </span>
-
-            <div className="flex items-center gap-4">
-              {/* Bottom architectural dark accent line */}
-              <div className="w-16 h-1 bg-neutral-900 rounded-none hidden sm:block" />
-              <span className="text-[10px] font-mono text-neutral-400">{pageNum}</span>
-            </div>
+          {/* Running Footer Page Number */}
+          <div className="pt-4 flex justify-between items-center text-[10px] font-mono text-neutral-400 border-t border-neutral-100">
+            <span>&copy; {new Date().getFullYear()} {brand.name || 'SeramikBak'} &bull; Lüks Porselen Plaka Serisi</span>
+            <span>Sayfa {pageNum}</span>
           </div>
         </section>
       );
     }
-
     // -----------------------------------------------------------------------
     // 6. TECHNICAL STANDARDS PAGE (TS EN 14411 BIA & BIM Matrix)
     // -----------------------------------------------------------------------

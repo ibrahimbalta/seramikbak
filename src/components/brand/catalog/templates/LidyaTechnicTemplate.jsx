@@ -548,14 +548,36 @@ export default function LidyaTechnicTemplate({
                   </span>
                 </div>
 
-                {/* Hero Texture Vignette */}
-                <div className="aspect-[4/3] rounded-lg overflow-hidden border border-neutral-300 bg-neutral-100 shadow-sm">
+                {/* Hero Texture Vignette with Architectural Spatial Pins */}
+                <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-neutral-300 bg-neutral-100 shadow-sm group">
                   <img
                     src={pImage}
                     alt={p.name}
                     onError={() => handleImgError(`prod-img-${p.id}`)}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
+
+                  {/* Spatial Application Pin */}
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-neutral-950/85 backdrop-blur-md text-white text-[9px] font-mono px-2.5 py-1 rounded shadow">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Ağır Yaya Trafiği (Fullbody Porselen)</span>
+                  </div>
+
+                  <div className="absolute top-2.5 right-2.5 bg-neutral-950/80 text-white text-[9px] font-mono px-2 py-0.5 rounded shadow">
+                    ISO 10545 Grup BIA
+                  </div>
+
+                  <div className="absolute bottom-2.5 left-2.5 bg-white/95 text-neutral-900 text-[9px] font-mono font-bold px-2 py-0.5 rounded shadow">
+                    Kaymazlık: R10A &bull; R11B &bull; R12V4
+                  </div>
+                </div>
+
+                {/* Heavy Traffic Commercial Application Badges */}
+                <div className="p-2 rounded-lg bg-neutral-100 border border-neutral-200 text-[9px] font-mono text-neutral-600 flex items-center justify-between">
+                  <span className="font-bold text-neutral-800">Uygulama Alanları:</span>
+                  <span className="bg-white px-1.5 py-0.5 rounded border border-neutral-300">AVM & Ticari</span>
+                  <span className="bg-white px-1.5 py-0.5 rounded border border-neutral-300">Metro / Havalimanı</span>
+                  <span className="bg-white px-1.5 py-0.5 rounded border border-neutral-300">Islak Hacim</span>
                 </div>
 
                 {/* Modular Shape Outline Cards (VitrA Page 28 Standard) */}

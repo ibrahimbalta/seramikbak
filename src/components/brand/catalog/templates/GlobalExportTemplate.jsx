@@ -10,7 +10,9 @@ import {
   Truck,
   Ship,
   FileCheck2,
-  Anchor
+  Anchor,
+  CheckCircle2,
+  Layers
 } from 'lucide-react';
 
 export default function GlobalExportTemplate({
@@ -20,19 +22,56 @@ export default function GlobalExportTemplate({
   activePageIndex = 0,
   viewFormat = 'single'
 }) {
-  const brand = catalog.brand || {};
-  const logo = catalog.customLogoUrl || brand.logoUrl;
+  const brand = catalog?.brand || {};
+  const logo = catalog?.customLogoUrl || brand.logoUrl;
   const [imgErrors, setImgErrors] = useState({});
 
   const handleImgError = (id) => {
     setImgErrors((prev) => ({ ...prev, [id]: true }));
   };
 
+  const safeProducts = products && products.length > 0 ? products : [
+    {
+      id: 'demo-exp-1',
+      name: 'Sahara Noir Laurent',
+      collection: 'Prestige Marble',
+      code: 'EXP-SHN-6012',
+      color: 'Nero Black & Gold',
+      finish: 'Polished Lappato',
+      width: 60,
+      height: 120,
+      thickness: '9.5',
+      rectified: true,
+      slipResistance: 'R10',
+      peiRating: '4',
+      imageUrl: '/renders/luxury_bathroom_calacatta_gold.jpg',
+      textureUrl: '/textures/calacatta_gold.jpg',
+      description: 'High-density glazed porcelain stoneware with laser rectified edges for international export.'
+    },
+    {
+      id: 'demo-exp-2',
+      name: 'Pietra Piasentina Grey',
+      collection: 'Architectural Stone',
+      code: 'EXP-PST-6060',
+      color: 'Basalt Grey',
+      finish: 'Matt Structured',
+      width: 60,
+      height: 60,
+      thickness: '10',
+      rectified: true,
+      slipResistance: 'R11B',
+      peiRating: '5',
+      imageUrl: '/renders/luxury_bathroom_loft_beton.jpg',
+      textureUrl: '/textures/loft_beton.jpg',
+      description: 'Heavy traffic architectural stone effect porcelain tile certified for commercial projects.'
+    }
+  ];
+
   const pages = [];
-  if (catalog.showCover) pages.push({ type: 'cover' });
-  if (catalog.showTOC && products.length > 0) pages.push({ type: 'toc' });
-  products.forEach((p, idx) => pages.push({ type: 'product', product: p, index: idx }));
-  if (catalog.showContactPage) pages.push({ type: 'contact' });
+  if (catalog?.showCover !== false) pages.push({ type: 'cover' });
+  if (catalog?.showTOC !== false && safeProducts.length > 0) pages.push({ type: 'toc' });
+  safeProducts.forEach((p, idx) => pages.push({ type: 'product', product: p, index: idx }));
+  if (catalog?.showContactPage !== false) pages.push({ type: 'contact' });
 
   const renderSinglePage = (pageObj, pageIndex) => {
     if (!pageObj) return null;
@@ -42,8 +81,8 @@ export default function GlobalExportTemplate({
     // -------------------------------------------------------------------------
     if (pageObj.type === 'cover') {
       const coverHero =
-        products[0]?.imageUrl ||
-        products[0]?.textureUrl ||
+        safeProducts[0]?.imageUrl ||
+        safeProducts[0]?.textureUrl ||
         '/renders/luxury_bathroom_calacatta_gold.jpg';
 
       return (
@@ -51,16 +90,16 @@ export default function GlobalExportTemplate({
           key="cover"
           className="catalog-page relative p-8 sm:p-14 text-white flex flex-col justify-between overflow-hidden"
           style={{
-            background: `radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.2) 0%, transparent 55%), linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%), url(${coverHero}) center/cover no-repeat`,
+            background: `radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.25) 0%, transparent 55%), linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%), url(${coverHero}) center/cover no-repeat`,
             backgroundColor: '#020617'
           }}
         >
-          {/* Subtle Technical Border */}
+          {/* Technical Border */}
           <div className="absolute inset-5 sm:inset-7 border border-sky-500/20 pointer-events-none rounded-xl" />
 
           <div className="relative z-10 flex items-center justify-between border-b border-slate-800 pb-5">
             <span className="text-2xl sm:text-3xl font-bold tracking-widest uppercase font-mono">
-              {brand.name}
+              {brand.name || 'SERAMİKBAK'}
             </span>
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-mono font-bold flex items-center gap-1.5">
@@ -75,9 +114,9 @@ export default function GlobalExportTemplate({
               INTERNATIONAL CERAMIC SPECIFICATION &bull; {new Date().getFullYear()}
             </p>
             <h1 className="text-4xl sm:text-6xl font-light tracking-tight text-white mb-5 font-sans leading-tight">
-              {catalog.coverTitle || catalog.title}
+              {catalog?.coverTitle || catalog?.title || 'Global Ceramic Export Catalogue'}
             </h1>
-            {catalog.coverSubtitle && (
+            {catalog?.coverSubtitle && (
               <p className="text-base sm:text-xl text-slate-300 font-light leading-relaxed mb-6 font-sans">
                 {catalog.coverSubtitle}
               </p>
@@ -100,7 +139,7 @@ export default function GlobalExportTemplate({
           </div>
 
           <div className="relative z-10 border-t border-slate-800 pt-4 flex justify-between text-xs text-slate-400 font-mono">
-            <span>{brand.name} International Export Division</span>
+            <span>{brand.name || 'SeramikBak'} International Export Division</span>
             <span className="text-sky-400">SeramikBak B2B Global Trade</span>
           </div>
         </section>
@@ -128,7 +167,7 @@ export default function GlobalExportTemplate({
                   PACKING LIST & LOGISTICS MATRIX
                 </h2>
                 <p className="text-xs text-slate-500 font-sans">
-                  {brand.name} Container Freight & Pallet Optimization
+                  {brand.name || 'SeramikBak'} Container Freight & Pallet Optimization
                 </p>
               </div>
               <span className="text-xs bg-sky-100 text-sky-900 px-3 py-1 rounded font-bold border border-sky-300">
@@ -150,7 +189,7 @@ export default function GlobalExportTemplate({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {products.map((p, idx) => {
+                  {safeProducts.map((p, idx) => {
                     const width = p.width || 60;
                     const height = p.height || 120;
                     const m2PerTile = (width * height) / 10000;
@@ -183,7 +222,7 @@ export default function GlobalExportTemplate({
           </div>
 
           <div className="border-t border-slate-300 pt-3 flex justify-between text-xs text-slate-500">
-            <span>{brand.name} Logistics & Packing Specification</span>
+            <span>{brand.name || 'SeramikBak'} International Logistics &bull; Euro-Pallet Standard (ISPM-15)</span>
             <span>Page 02</span>
           </div>
         </section>
@@ -191,7 +230,7 @@ export default function GlobalExportTemplate({
     }
 
     // -------------------------------------------------------------------------
-    // PRODUCT PAGE — B2B EXPORT SPECIFICATION SHEET
+    // PRODUCT SPECIFICATION & MARITIME FREIGHT SPREAD
     // -------------------------------------------------------------------------
     if (pageObj.type === 'product') {
       const p = pageObj.product;
@@ -222,7 +261,7 @@ export default function GlobalExportTemplate({
           {/* Header */}
           <div className="border-2 border-slate-900 bg-white p-3 rounded-xl flex items-center justify-between shadow-xs mb-3 font-mono">
             <div className="flex items-center gap-3">
-              <span className="font-bold text-sm tracking-wider">{brand.name}</span>
+              <span className="font-bold text-sm tracking-wider">{brand.name || 'SERAMİKBAK'}</span>
               <span className="text-slate-300">|</span>
               <span className="text-xs text-sky-700 font-bold uppercase">
                 B2B EXPORT SPECIFICATION
@@ -244,17 +283,26 @@ export default function GlobalExportTemplate({
                     src={pImage}
                     alt={p.name}
                     onError={() => handleImgError(`prod-${p.id}`)}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-mono text-xs px-2.5 py-1 rounded shadow">
-                    SIZE: {dimensions}
+                  
+                  {/* Spatial Tags */}
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-slate-900/90 text-white font-mono text-xs px-2.5 py-1 rounded shadow">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+                    <span>SIZE: {dimensions}</span>
                   </div>
+
+                  <div className="absolute bottom-2.5 left-2.5 bg-slate-900/80 backdrop-blur-md text-white font-mono text-[9px] px-2 py-0.5 rounded border border-white/20 shadow flex items-center gap-1">
+                    <CheckCircle2 size={10} className="text-sky-400" />
+                    <span>Laser Rectified 0.5mm Bevel</span>
+                  </div>
+
                   <div className="absolute bottom-2.5 right-2.5 bg-sky-600 text-white font-mono text-[10px] px-2.5 py-0.5 rounded font-bold shadow">
-                    EXPORT GRADE
+                    GROUP BIA &bull; E&le;0.1%
                   </div>
                 </div>
 
-                {/* Pallet Schematic Card */}
+                {/* Pallet & Container Freight Schema Card */}
                 <div className="p-3 bg-white border-2 border-slate-300 rounded-xl shadow-xs font-mono">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
                     <span className="flex items-center gap-1.5">
@@ -263,7 +311,7 @@ export default function GlobalExportTemplate({
                     </span>
                     <span className="text-[10px] text-slate-500">Euro-Pallet (80x120)</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-[10px] text-slate-600 border-t border-slate-200 pt-2">
+                  <div className="grid grid-cols-3 gap-2 text-[10px] text-slate-600 border-t border-slate-200 pt-2 mb-2">
                     <div>
                       <p className="text-slate-400">Box Contents</p>
                       <p className="font-bold text-slate-900">{pcsPerBox} pcs / {m2PerBox} m²</p>
@@ -275,6 +323,18 @@ export default function GlobalExportTemplate({
                     <div>
                       <p className="text-slate-400">Pallet Gross Wt.</p>
                       <p className="font-bold text-slate-900">~{palletWeightKg} kg</p>
+                    </div>
+                  </div>
+
+                  {/* 20ft / 40ft Container Loading Math */}
+                  <div className="p-2 rounded bg-slate-50 border border-slate-200 text-[9px] text-slate-600 flex justify-between items-center">
+                    <div>
+                      <span className="font-bold text-slate-900 block">20' FCL Max Load:</span>
+                      <span>24 Pallets &bull; ~1,105 m² &bull; ~24.8 T</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold text-slate-900 block">40' HC FCL Load:</span>
+                      <span>28 Pallets &bull; ~1,290 m² &bull; ~27.5 T</span>
                     </div>
                   </div>
                 </div>
@@ -330,7 +390,7 @@ export default function GlobalExportTemplate({
                 </div>
 
                 {/* 3D AR Simulator Action */}
-                {catalog.showQrCodes && (
+                {catalog?.showQrCodes !== false && (
                   <div className="p-2.5 rounded-xl bg-slate-900 text-white flex items-center gap-3">
                     {p.qrCodeUrl ? (
                       <img
@@ -340,7 +400,7 @@ export default function GlobalExportTemplate({
                       />
                     ) : (
                       <div className="w-13 h-13 rounded bg-white p-2 flex items-center justify-center flex-shrink-0 text-slate-900">
-                        <QrCode size={28} />
+                        <QrCode size={26} />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -348,7 +408,7 @@ export default function GlobalExportTemplate({
                         Interactive 3D / AR Digital Inspection
                       </p>
                       <p className="text-[10px] text-slate-300 leading-tight mt-0.5">
-                        Scan to inspect 3D slab reliefs and simulate in room environments.
+                        Scan or click to open interactive 3D digital slab inspection.
                       </p>
                       <a
                         href={p.tryInRoomUrl || p.productUrl || '#'}
@@ -356,7 +416,7 @@ export default function GlobalExportTemplate({
                         rel="noreferrer"
                         className="text-[10px] font-bold text-sky-400 hover:underline flex items-center gap-1 mt-0.5"
                       >
-                        <span>Open 3D Simulator</span>
+                        <span>Open 3D Viewer</span>
                         <ExternalLink size={10} />
                       </a>
                     </div>
@@ -369,7 +429,7 @@ export default function GlobalExportTemplate({
           {/* Running Footer */}
           <div className="border-t-2 border-slate-900 pt-2.5 flex justify-between items-center text-xs text-slate-600 font-mono">
             <span>
-              {brand.name} International Export &bull; Item: {p.code || `EXP-${index + 1}`}
+              {brand.name || 'SeramikBak'} Global Export &bull; Item Ref: {p.code || `EXP-${index + 1}`}
             </span>
             <span>Page {pageNum.toString().padStart(2, '0')}</span>
           </div>
@@ -378,7 +438,7 @@ export default function GlobalExportTemplate({
     }
 
     // -------------------------------------------------------------------------
-    // CONTACT
+    // CONTACT — INTERNATIONAL TRADE DESK
     // -------------------------------------------------------------------------
     if (pageObj.type === 'contact') {
       return (
@@ -387,7 +447,7 @@ export default function GlobalExportTemplate({
           className="catalog-page relative p-8 sm:p-14 bg-slate-950 text-white flex flex-col justify-between font-mono overflow-hidden"
         >
           <div className="border-b border-slate-800 pb-4 flex justify-between items-center">
-            <span className="text-xl font-bold tracking-wider">{brand.name}</span>
+            <span className="text-xl font-bold tracking-wider">{brand.name || 'SERAMİKBAK'}</span>
             <span className="text-xs text-sky-400">GLOBAL EXPORT DESK</span>
           </div>
 
@@ -400,13 +460,13 @@ export default function GlobalExportTemplate({
             </p>
 
             <div className="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-3 text-xs">
-              {catalog.contactAddress && (
+              {catalog?.contactAddress && (
                 <div className="flex gap-4">
                   <span className="w-20 text-slate-400">Address:</span>
                   <span className="text-white">{catalog.contactAddress}</span>
                 </div>
               )}
-              {catalog.contactPhone && (
+              {catalog?.contactPhone && (
                 <div className="flex gap-4">
                   <span className="w-20 text-slate-400">Telephone:</span>
                   <a href={`tel:${catalog.contactPhone}`} className="text-sky-400 font-bold">
@@ -414,7 +474,7 @@ export default function GlobalExportTemplate({
                   </a>
                 </div>
               )}
-              {catalog.contactEmail && (
+              {catalog?.contactEmail && (
                 <div className="flex gap-4">
                   <span className="w-20 text-slate-400">E-Mail:</span>
                   <a href={`mailto:${catalog.contactEmail}`} className="text-sky-400 font-bold">
@@ -426,7 +486,7 @@ export default function GlobalExportTemplate({
           </div>
 
           <div className="border-t border-slate-800 pt-4 flex justify-between text-xs text-slate-500">
-            <span>&copy; {new Date().getFullYear()} {brand.name} Export Division</span>
+            <span>&copy; {new Date().getFullYear()} {brand.name || 'SeramikBak'} Export Division</span>
             <span>SeramikBak Global B2B</span>
           </div>
         </section>
@@ -440,6 +500,34 @@ export default function GlobalExportTemplate({
     return (
       <div className="w-full flex justify-center">
         {renderSinglePage(pages[activePageIndex] || pages[0], activePageIndex)}
+      </div>
+    );
+  }
+
+  if (viewFormat === 'spread') {
+    if (activePageIndex === 0) {
+      return (
+        <div className="w-full flex justify-center">
+          {renderSinglePage(pages[0], 0)}
+        </div>
+      );
+    }
+
+    const leftIdx = activePageIndex % 2 === 1 ? activePageIndex : activePageIndex - 1;
+    const rightIdx = leftIdx + 1;
+
+    return (
+      <div className="w-full flex justify-center items-center gap-1 sm:gap-2">
+        <div className="w-1/2 flex justify-end">
+          {renderSinglePage(pages[leftIdx], leftIdx)}
+        </div>
+        <div className="w-1/2 flex justify-start">
+          {rightIdx < pages.length ? renderSinglePage(pages[rightIdx], rightIdx) : (
+            <div className="catalog-page bg-slate-900 text-slate-500 flex items-center justify-center text-xs font-mono">
+              [EMPTY PAGE / BACK COVER]
+            </div>
+          )}
+        </div>
       </div>
     );
   }
