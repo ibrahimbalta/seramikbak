@@ -1411,13 +1411,149 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-3.5">
+                  <div className={cardDisplayMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4' : 'space-y-3.5'}>
                     {filteredCatalogs.map((cat, idx) => {
                       const tplInfo = TEMPLATES.find((t) => t.id === cat.template) || TEMPLATES[0];
                       const coverImg = CARD_COVERS[idx % CARD_COVERS.length] || tplInfo.mockupImg;
                       const pageCount = getEstimatedPages(cat);
                       const outdatedChanges = detectOutdatedProducts(cat);
 
+                      if (cardDisplayMode === 'grid') {
+                        // ========= GRID CARD MODE =========
+                        return (
+                          <div
+                            key={cat.id}
+                            className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm hover:shadow-lg hover:border-amber-200/60 transition-all group overflow-hidden"
+                          >
+                            {/* Cover Image */}
+                            <div
+                              onClick={() => handleOpenPreview(cat)}
+                              className="w-full aspect-[16/10] overflow-hidden relative cursor-pointer"
+                            >
+                              <img
+                                src={coverImg}
+                                alt={cat.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                              {/* Status Badge on Image */}
+                              <div className="absolute top-2.5 left-2.5">
+                                {cat._isArchived ? (
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-neutral-800/80 text-neutral-200 backdrop-blur-sm">
+                                    Arşiv
+                                  </span>
+                                ) : cat.isPublished ? (
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600/90 text-white backdrop-blur-sm">
+                                    Yayında
+                                  </span>
+                                ) : (
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-neutral-700/80 text-neutral-200 backdrop-blur-sm">
+                                    Taslak
+                                  </span>
+                                )}
+                              </div>
+                              {outdatedChanges.length > 0 && (
+                                <div className="absolute top-2.5 right-2.5">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSyncModalCatalog({ catalog: cat, changes: outdatedChanges });
+                                    }}
+                                    className="px-2 py-0.5 rounded-full bg-amber-500 text-neutral-950 font-extrabold text-[9px] flex items-center gap-0.5 shadow"
+                                  >
+                                    <RefreshCw size={9} />
+                                    <span>Güncelleme</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Card Body */}
+                            <div className="p-3.5 space-y-2.5">
+                              <h3
+                                onClick={() => handleOpenPreview(cat)}
+                                className="text-sm font-extrabold text-neutral-900 hover:text-[#b4823c] truncate transition cursor-pointer"
+                              >
+                                {cat.title}
+                              </h3>
+                              <p className="text-[11px] text-neutral-500 font-medium truncate">
+                                {tplInfo.name} &bull; {cat.itemCount || 0} Ürün &bull; {pageCount} Sayfa
+                              </p>
+                              <div className="flex items-center gap-3 text-[10px] text-neutral-400">
+                                <span className="flex items-center gap-0.5">
+                                  <Eye size={11} /> {(cat.viewCount || 0).toLocaleString('tr-TR')}
+                                </span>
+                                <span className="flex items-center gap-0.5">
+                                  <Download size={11} /> {(cat.downloadCount || 0).toLocaleString('tr-TR')}
+                                </span>
+                                <span className="flex items-center gap-0.5">
+                                  <Calendar size={11} /> {new Date(cat.updatedAt || Date.now()).toLocaleDateString('tr-TR')}
+                                </span>
+                              </div>
+
+                              {/* Actions Row */}
+                              <div className="flex items-center gap-1.5 pt-1.5 border-t border-neutral-100">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenPreview(cat)}
+                                  className="flex-1 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 font-bold text-[11px] flex items-center justify-center gap-1 transition cursor-pointer"
+                                >
+                                  <Eye size={12} />
+                                  <span>Önizle</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleEdit(cat, false)}
+                                  className="flex-1 py-1.5 rounded-lg border border-amber-300 bg-amber-50/50 hover:bg-amber-100/70 text-amber-800 font-bold text-[11px] flex items-center justify-center gap-1 transition cursor-pointer"
+                                >
+                                  <Edit size={12} />
+                                  <span>Düzenle</span>
+                                </button>
+                                <div className="relative">
+                                  <button
+                                    type="button"
+                                    onClick={() => setOpenMenuId(openMenuId === cat.id ? null : cat.id)}
+                                    className="p-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 transition cursor-pointer"
+                                    title="Diğer İşlemler"
+                                  >
+                                    <MoreVertical size={14} />
+                                  </button>
+
+                                  {openMenuId === cat.id && (
+                                    <div className="absolute right-0 top-9 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-40 text-xs font-semibold text-neutral-700">
+                                      <button type="button" onClick={() => handleEdit(cat, true)} className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2 cursor-pointer">
+                                        <Wand2 size={13} /> <span>Gelişmiş Studio ile Aç</span>
+                                      </button>
+                                      <button type="button" onClick={() => { setOpenMenuId(null); const catProducts = resolveCatalogProducts(cat); setQrStickerModalData({ catalog: cat, products: catProducts }); }} className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold flex items-center gap-2 cursor-pointer">
+                                        <QrCode size={13} className="text-[#b4823c]" /> <span>Showroom QR & Pano Etiketleri</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleCopyLink(cat.publicSlug)} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                        <Share2 size={13} /> <span>Paylaşım Linkini Kopyala</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleDuplicate(cat)} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                        <Copy size={13} /> <span>Kataloğu Kopyala</span>
+                                      </button>
+                                      <button type="button" onClick={() => { setOpenMenuId(null); setVersionModalCatalog(cat); }} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                        <History size={13} /> <span>Sürüm Geçmişi</span>
+                                      </button>
+                                      <button type="button" onClick={() => handleToggleArchive(cat)} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                        <Archive size={13} /> <span>{cat._isArchived ? 'Arşivden Çıkar' : 'Arşivle'}</span>
+                                      </button>
+                                      <div className="my-1 border-t border-neutral-100" />
+                                      <button type="button" onClick={(e) => handleDelete(cat, e)} className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer">
+                                        <Trash2 size={13} /> <span>Kataloğu Sil</span>
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // ========= LIST ROW MODE =========
                       return (
                         <div
                           key={cat.id}
@@ -1532,69 +1668,27 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
                               {openMenuId === cat.id && (
                                 <div className="absolute right-0 top-10 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-40 text-xs font-semibold text-neutral-700">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleEdit(cat, true)}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Wand2 size={13} />
-                                    <span>Gelişmiş Studio ile Aç</span>
+                                  <button type="button" onClick={() => handleEdit(cat, true)} className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2 cursor-pointer">
+                                    <Wand2 size={13} /> <span>Gelişmiş Studio ile Aç</span>
                                   </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setOpenMenuId(null);
-                                      const catProducts = resolveCatalogProducts(cat);
-                                      setQrStickerModalData({ catalog: cat, products: catProducts });
-                                    }}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <QrCode size={13} className="text-[#b4823c]" />
-                                    <span>Showroom QR & Pano Etiketleri</span>
+                                  <button type="button" onClick={() => { setOpenMenuId(null); const catProducts = resolveCatalogProducts(cat); setQrStickerModalData({ catalog: cat, products: catProducts }); }} className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold flex items-center gap-2 cursor-pointer">
+                                    <QrCode size={13} className="text-[#b4823c]" /> <span>Showroom QR & Pano Etiketleri</span>
                                   </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCopyLink(cat.publicSlug)}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Share2 size={13} />
-                                    <span>Paylaşım Linkini Kopyala</span>
+                                  <button type="button" onClick={() => handleCopyLink(cat.publicSlug)} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                    <Share2 size={13} /> <span>Paylaşım Linkini Kopyala</span>
                                   </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDuplicate(cat)}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Copy size={13} />
-                                    <span>Kataloğu Kopyala</span>
+                                  <button type="button" onClick={() => handleDuplicate(cat)} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                    <Copy size={13} /> <span>Kataloğu Kopyala</span>
                                   </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setOpenMenuId(null);
-                                      setVersionModalCatalog(cat);
-                                    }}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <History size={13} />
-                                    <span>Sürüm Geçmişi</span>
+                                  <button type="button" onClick={() => { setOpenMenuId(null); setVersionModalCatalog(cat); }} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                    <History size={13} /> <span>Sürüm Geçmişi</span>
                                   </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleToggleArchive(cat)}
-                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Archive size={13} />
-                                    <span>{cat._isArchived ? 'Arşivden Çıkar' : 'Arşivle'}</span>
+                                  <button type="button" onClick={() => handleToggleArchive(cat)} className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer">
+                                    <Archive size={13} /> <span>{cat._isArchived ? 'Arşivden Çıkar' : 'Arşivle'}</span>
                                   </button>
                                   <div className="my-1 border-t border-neutral-100" />
-                                  <button
-                                    type="button"
-                                    onClick={(e) => handleDelete(cat, e)}
-                                    className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Trash2 size={13} />
-                                    <span>Kataloğu Sil</span>
+                                  <button type="button" onClick={(e) => handleDelete(cat, e)} className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer">
+                                    <Trash2 size={13} /> <span>Kataloğu Sil</span>
                                   </button>
                                 </div>
                               )}
