@@ -21,7 +21,6 @@ import {
   Mail,
   Send,
   MessageCircle,
-  Linkedin,
   RotateCcw,
   Building2,
   User,
@@ -37,6 +36,26 @@ import {
 import Link from 'next/link';
 import CatalogTemplateRenderer from '@/components/brand/catalog/templates/CatalogTemplateRenderer';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
+
+function LinkedInIcon({ size = 16, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
 
 export default function PublicCatalogViewerPage() {
   const params = useParams();
@@ -491,7 +510,7 @@ export default function PublicCatalogViewerPage() {
                   className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-neutral-200 hover:text-white transition cursor-pointer"
                 >
                   <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                    <Linkedin size={14} />
+                    <LinkedInIcon size={14} />
                   </div>
                   <span>LinkedIn'de Paylaş</span>
                 </button>
@@ -1222,7 +1241,7 @@ export default function PublicCatalogViewerPage() {
                   className="p-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 transition cursor-pointer"
                   title="LinkedIn'de Paylaş"
                 >
-                  <Linkedin size={16} />
+                  <LinkedInIcon size={16} />
                 </button>
                 <button
                   type="button"
