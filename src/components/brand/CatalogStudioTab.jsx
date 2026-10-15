@@ -59,6 +59,7 @@ import ShowroomQrStickerModal from './catalog/ShowroomQrStickerModal';
 import { generateQrDataUrl, buildCatalogPublicUrl } from '../../utils/generateQrCode';
 import { prepareAndPrintCatalog } from '../../utils/printCatalog';
 import { showToast } from '../ui/CatalogToast';
+import ConfirmModal from '../ui/ConfirmModal';
 
 import {
   CATALOG_DESIGN_FAMILIES,
@@ -585,7 +586,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       const res = await fetch(`/api/brand/catalogs/${cat.id}/duplicate`, { method: 'POST' });
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccessMsg('Katalog başarıyla kopyalandı.');
+        showToast('success', 'Katalog başarıyla kopyalandı.');
         loadCatalogs();
       } else {
         showToast('error', data.error || 'Kopyalama başarısız.');
@@ -613,7 +614,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         setCatalogs((prev) =>
           prev.map((c) => (c.id === cat.id ? { ...c, _isArchived: nextArchived, isPublished: nextArchived ? false : c.isPublished } : c))
         );
-        setSuccessMsg(nextArchived ? 'Katalog arşive taşındı.' : 'Katalog arşivden çıkarıldı.');
+        showToast('success', nextArchived ? 'Katalog arşive taşındı.' : 'Katalog arşivden çıkarıldı.');
       }
     } catch (e) {
       showToast('error', 'Arşivleme hatası: ' + e.message);
@@ -649,7 +650,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccessMsg('Katalog başarıyla silindi.');
+        showToast('success', 'Katalog başarıyla silindi.');
         setCatalogs((prev) => prev.filter((c) => c.id !== catId));
         setDeleteConfirmCatalog(null);
         if (activeCatalogId === catId || previewCatalog?.id === catId) {
@@ -661,10 +662,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
           loadCatalogs();
         }, 200);
       } else {
-        setErrorMsg(data.error || 'Silme işlemi başarısız.');
+        showToast('error', data.error || 'Silme işlemi başarısız.');
       }
     } catch (err) {
-      setErrorMsg('Silme hatası: ' + err.message);
+      showToast('error', 'Silme hatası: ' + err.message);
     } finally {
       setDeletingId(null);
     }
@@ -1387,9 +1388,45 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
                 {/* Catalog Items Display (Grid vs List) */}
                 {loading ? (
-                  <div className="bg-white rounded-2xl border border-neutral-200/80 py-20 flex flex-col items-center justify-center text-neutral-400">
-                    <Loader2 size={32} className="animate-spin text-[#b4823c] mb-2" />
-                    <p className="text-xs font-bold">Kataloglar yükleniyor...</p>
+                  <div className={cardDisplayMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4' : 'space-y-3.5'}>
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      cardDisplayMode === 'grid' ? (
+                        <div key={i} className="bg-white rounded-2xl border border-neutral-200/80 overflow-hidden animate-pulse">
+                          <div className="w-full aspect-[16/10] bg-neutral-200" />
+                          <div className="p-3.5 space-y-2.5">
+                            <div className="h-4 bg-neutral-200 rounded-lg w-3/4" />
+                            <div className="h-3 bg-neutral-100 rounded-lg w-1/2" />
+                            <div className="flex gap-2 pt-1.5">
+                              <div className="h-3 bg-neutral-100 rounded w-12" />
+                              <div className="h-3 bg-neutral-100 rounded w-10" />
+                              <div className="h-3 bg-neutral-100 rounded w-14" />
+                            </div>
+                            <div className="flex gap-1.5 pt-1.5 border-t border-neutral-100">
+                              <div className="flex-1 h-7 bg-neutral-100 rounded-lg" />
+                              <div className="flex-1 h-7 bg-amber-50 rounded-lg" />
+                              <div className="w-7 h-7 bg-neutral-100 rounded-lg" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div key={i} className="bg-white rounded-2xl border border-neutral-200/80 p-4 animate-pulse flex items-center gap-4">
+                          <div className="w-32 h-24 bg-neutral-200 rounded-xl flex-shrink-0" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 bg-neutral-200 rounded-lg w-2/3" />
+                            <div className="h-3 bg-neutral-100 rounded-lg w-1/2" />
+                            <div className="flex gap-3">
+                              <div className="h-3 bg-neutral-100 rounded w-16" />
+                              <div className="h-3 bg-neutral-100 rounded w-20" />
+                              <div className="h-3 bg-neutral-100 rounded w-14" />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 flex-shrink-0">
+                            <div className="w-20 h-8 bg-neutral-100 rounded-xl" />
+                            <div className="w-20 h-8 bg-amber-50 rounded-xl" />
+                          </div>
+                        </div>
+                      )
+                    ))}
                   </div>
                 ) : filteredCatalogs.length === 0 ? (
                   <div className="bg-gradient-to-b from-white to-stone-50/60 rounded-3xl border border-neutral-200/90 p-12 text-center shadow-sm">
@@ -3853,61 +3890,18 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {/* ========================================================================= */}
       {/* MODAL: DELETE CONFIRMATION (KATALOG SİLME ONAYI)                          */}
       {/* ========================================================================= */}
-      {deleteConfirmCatalog && (
-        <div className="fixed inset-0 z-50 bg-neutral-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
-          <div className="relative bg-white rounded-3xl border border-neutral-100 max-w-sm sm:max-w-md w-full p-6 sm:p-7 shadow-2xl text-center space-y-5">
-            <button
-              type="button"
-              onClick={() => setDeleteConfirmCatalog(null)}
-              disabled={Boolean(deletingId)}
-              className="absolute top-4 right-4 p-2 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition cursor-pointer"
-              title="Kapat"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100/80 flex items-center justify-center text-rose-600 shadow-xs">
-              <Trash2 size={24} strokeWidth={2} />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-lg font-bold text-neutral-900 tracking-tight">Kataloğu Sil</h3>
-              <p className="text-sm text-neutral-500 leading-relaxed max-w-xs mx-auto">
-                <span className="font-semibold text-neutral-800 break-words">"{deleteConfirmCatalog.title}"</span> adlı katalog kalıcı olarak silinecektir. Bu işlem geri alınamaz.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeleteConfirmCatalog(null)}
-                disabled={Boolean(deletingId)}
-                className="w-full py-2.5 px-4 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 active:scale-[0.98] text-sm font-semibold text-neutral-700 transition cursor-pointer disabled:opacity-50"
-              >
-                Vazgeç
-              </button>
-              <button
-                type="button"
-                onClick={() => executeDeleteCatalog(deleteConfirmCatalog)}
-                disabled={Boolean(deletingId)}
-                className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-rose-600/20 transition cursor-pointer disabled:opacity-50"
-              >
-                {deletingId ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    <span>Siliniyor...</span>
-                  </>
-                ) : (
-                  <>
-                    <Trash2 size={15} />
-                    <span>Sil</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={Boolean(deleteConfirmCatalog)}
+        onClose={() => setDeleteConfirmCatalog(null)}
+        onConfirm={() => executeDeleteCatalog(deleteConfirmCatalog)}
+        title="Kataloğu Silmek İstediğinize Emin misiniz?"
+        description={`"${deleteConfirmCatalog?.title || ''}" adlı katalog kalıcı olarak silinecektir. Bu işlem geri alınamaz.`}
+        confirmText={deletingId ? 'Siliniyor...' : 'Evet, Sil'}
+        cancelText="Vazgeç"
+        variant="danger"
+        icon={<Trash2 size={24} />}
+        loading={Boolean(deletingId)}
+      />
 
       {/* ========================================================================= */}
       {/* MODAL: VERSION HISTORY (SÜRÜM GEÇMİŞİ)                                    */}
