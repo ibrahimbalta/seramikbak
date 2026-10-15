@@ -200,6 +200,7 @@ export const viewport = {
 import { LanguageProvider } from "@/lib/languageContext";
 import CookieBanner from "@/components/CookieBanner";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import CatalogToast from "@/components/ui/CatalogToast";
 import Script from "next/script";
 
 export default function RootLayout({ children }) {
@@ -258,6 +259,7 @@ export default function RootLayout({ children }) {
           {children}
           <CookieBanner />
           <PWAInstallPrompt />
+          <CatalogToast />
         </LanguageProvider>
       </body>
     </html>

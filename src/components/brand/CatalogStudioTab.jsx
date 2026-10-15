@@ -57,6 +57,8 @@ import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
 import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
 import ShowroomQrStickerModal from './catalog/ShowroomQrStickerModal';
 import { generateQrDataUrl, buildCatalogPublicUrl } from '../../utils/generateQrCode';
+import { prepareAndPrintCatalog } from '../../utils/printCatalog';
+import { showToast } from '../ui/CatalogToast';
 
 import {
   CATALOG_DESIGN_FAMILIES,
@@ -208,6 +210,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const [step3PreviewTemplate, setStep3PreviewTemplate] = useState(null);
   const [step3PreviewPageIdx, setStep3PreviewPageIdx] = useState(0);
 
+  // Unsaved changes protection
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const formDataRef = React.useRef(null);
+
   // Active template object derived from formData.template
   const activeTemplateObj = useMemo(() => {
     return (
@@ -265,6 +271,32 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       setFilterTab('archived');
     }
   }, [externalSubSection]);
+
+  // Track unsaved changes in editor mode
+  useEffect(() => {
+    if (viewMode === 'editor') {
+      if (formDataRef.current === null) {
+        formDataRef.current = JSON.stringify(formData);
+      } else if (JSON.stringify(formData) !== formDataRef.current) {
+        setHasUnsavedChanges(true);
+      }
+    } else {
+      formDataRef.current = null;
+      setHasUnsavedChanges(false);
+    }
+  }, [formData, viewMode]);
+
+  // Protect against accidental page close with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges && viewMode === 'editor') {
+        e.preventDefault();
+        e.returnValue = 'Kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinize emin misiniz?';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, viewMode]);
 
   useEffect(() => {
     if (brandId) {
@@ -516,10 +548,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         setActiveStep(1);
         setViewMode('editor');
       } else {
-        alert(data.error || 'Katalog detayları açılamadı.');
+        showToast('error', data.error || 'Katalog detayları açılamadı.');
       }
     } catch (err) {
-      alert('Hata: ' + err.message);
+      showToast('error', 'Hata: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -537,10 +569,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         setPreviewProducts(data.catalog.products || []);
         setViewMode('preview-modal');
       } else {
-        alert(data.error || 'Önizleme yüklenemedi.');
+        showToast('error', data.error || 'Önizleme yüklenemedi.');
       }
     } catch (err) {
-      alert('Önizleme hatası: ' + err.message);
+      showToast('error', 'Önizleme hatası: ' + err.message);
     } finally {
       setPreviewLoading(false);
     }
@@ -556,10 +588,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         setSuccessMsg('Katalog başarıyla kopyalandı.');
         loadCatalogs();
       } else {
-        alert(data.error || 'Kopyalama başarısız.');
+        showToast('error', data.error || 'Kopyalama başarısız.');
       }
     } catch (err) {
-      alert('Hata: ' + err.message);
+      showToast('error', 'Hata: ' + err.message);
     }
   };
 
@@ -584,7 +616,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         setSuccessMsg(nextArchived ? 'Katalog arşive taşındı.' : 'Katalog arşivden çıkarıldı.');
       }
     } catch (e) {
-      alert('Arşivleme hatası: ' + e.message);
+      showToast('error', 'Arşivleme hatası: ' + e.message);
     }
   };
 
@@ -686,12 +718,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
   const handleSaveCatalog = async (publish = false) => {
     if (!formData.title.trim()) {
-      alert('Lütfen bir katalog başlığı girin.');
+      showToast('warning', 'Lütfen bir katalog başlığı girin.');
       return;
     }
     const hasCustomPages = Array.isArray(formData.customCanvasPages) && formData.customCanvasPages.length > 0;
     if (formData.selectedItems.length === 0 && !hasCustomPages) {
-      alert('Lütfen kataloğa en az 1 seramik ürün veya tuval sayfası ekleyin.');
+      showToast('warning', 'Lütfen kataloğa en az 1 seramik ürün veya tuval sayfası ekleyin.');
       return;
     }
 
@@ -766,14 +798,16 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccessMsg(publish ? 'Katalog başarıyla yayınlandı!' : 'Katalog taslak olarak kaydedildi.');
+        showToast('success', publish ? 'Katalog başarıyla yayınlandı!' : 'Katalog taslak olarak kaydedildi.');
+        setHasUnsavedChanges(false);
+        formDataRef.current = JSON.stringify(formData);
         setViewMode('list');
         loadCatalogs();
       } else {
-        alert(data.error || 'Kaydetme işlemi başarısız.');
+        showToast('error', data.error || 'Kaydetme işlemi başarısız.');
       }
     } catch (err) {
-      alert('Hata: ' + err.message);
+      showToast('error', 'Hata: ' + err.message);
     } finally {
       setSaving(false);
     }
@@ -782,12 +816,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const handleCopyLink = (slug) => {
     setOpenMenuId(null);
     if (!slug) {
-      alert('Bu katalog henüz yayınlanmadığı için genel paylaşım bağlantısı oluşturulmamış.');
+      showToast('warning', 'Bu katalog henüz yayınlanmadığı için genel paylaşım bağlantısı oluşturulmamış.');
       return;
     }
     const url = `${window.location.origin}/katalog/${slug}`;
     navigator.clipboard.writeText(url);
-    setSuccessMsg('Katalog paylaşım bağlantısı panoya kopyalandı: ' + url);
+    showToast('info', 'Katalog paylaşım bağlantısı panoya kopyalandı.');
   };
 
   // Filtered and Sorted Catalogs
@@ -1825,6 +1859,11 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
             {/* Right: Actions */}
             <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+              {/* Save status indicator */}
+              <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all duration-300 ${hasUnsavedChanges ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${hasUnsavedChanges ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                {hasUnsavedChanges ? 'Kaydedilmemiş değişiklikler' : 'Kaydedildi'}
+              </div>
               {activeCatalogId && (
                 <button
                   type="button"
@@ -3567,7 +3606,14 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         </button>
                         <button
                           type="button"
-                          onClick={() => window.print()}
+                          onClick={async () => {
+                            try {
+                              await prepareAndPrintCatalog({ stageId: 'step6-catalog-preview' });
+                            } catch (err) {
+                              // Fallback to window.print if prepareAndPrintCatalog fails
+                              window.print();
+                            }
+                          }}
                           className="px-4 py-2 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-800 flex items-center gap-1.5 cursor-pointer"
                         >
                           <Printer size={14} />
