@@ -1054,6 +1054,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const totalViews = catalogs.reduce((acc, c) => acc + (c.viewCount || 0), 0);
   const totalDownloads = catalogs.reduce((acc, c) => acc + (c.downloadCount || 0), 0);
   const publishedCount = catalogs.filter((c) => c.isPublished).length;
+  const draftCount = catalogs.filter((c) => !c.isPublished && !c._isArchived).length;
+  const archivedCount = catalogs.filter((c) => c._isArchived).length;
 
   return (
     <div className="w-full flex flex-col gap-5 font-sans text-neutral-900">
