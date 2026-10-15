@@ -10,6 +10,7 @@ import {
   Plus,
   Check,
   ArrowRight,
+  ArrowLeft,
   BookOpen,
   Clock,
   Compass,
@@ -353,12 +354,14 @@ export default function CatalogTemplateGallery({
   onSelectTemplate,
   onCreateCustom,
   availableProducts = [],
-  brandInfo = {}
+  brandInfo = {},
+  selectedTemplateId = null,
+  onBackToList = null
 }) {
   // Filters State
-  // Notice: 'Modern' is checked by default as seen in the user's reference image
+  // Default to showing all 24 templates immediately; users can narrow down by style or type
   const [selectedType, setSelectedType] = useState('all'); // 'all' | 'Klasik Katalog' | 'Lookbook' | 'Teknik Katalog' | 'Dijital Broşür'
-  const [selectedStyles, setSelectedStyles] = useState(['Modern']);
+  const [selectedStyles, setSelectedStyles] = useState([]);
   const [selectedPageRanges, setSelectedPageRanges] = useState([]);
   const [selectedColor, setSelectedColor] = useState(null);
 
@@ -447,6 +450,16 @@ export default function CatalogTemplateGallery({
       {/* 1. TOP HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
+          {onBackToList && (
+            <button
+              type="button"
+              onClick={onBackToList}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition mb-1.5 cursor-pointer group"
+            >
+              <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+              <span>← Kataloglarıma Dön</span>
+            </button>
+          )}
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Katalog Şablonları
           </h1>
@@ -774,13 +787,22 @@ export default function CatalogTemplateGallery({
             {filteredTemplates.map((item) => {
               const isFav = favorites[item.id];
               const isMenuOpen = activeMenuId === item.id;
+              const isSelected = selectedTemplateId && (
+                item.templateId === selectedTemplateId ||
+                item.id === selectedTemplateId ||
+                (selectedTemplateId === 'milano' && item.templateId === 'premium-mimari')
+              );
 
               return (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+                  className={`bg-white rounded-2xl border transition-all flex flex-col justify-between group overflow-hidden ${
+                    isSelected
+                      ? 'border-[#e07a2c] ring-2 ring-[#e07a2c]/20 shadow-md bg-orange-50/10'
+                      : 'border-slate-200/90 shadow-xs hover:shadow-md hover:border-slate-300'
+                  }`}
                 >
-                  {/* Card Thumbnail Stage with Top-Right Heart Icon */}
+                  {/* Card Thumbnail Stage with Top-Right Heart Icon & Selected Badge */}
                   <div className="relative aspect-[4/3] bg-neutral-100 overflow-hidden cursor-pointer">
                     <img
                       src={item.coverImg}
@@ -789,6 +811,14 @@ export default function CatalogTemplateGallery({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
 
+                    {/* Active Selection Badge */}
+                    {isSelected && (
+                      <span className="absolute top-2.5 left-2.5 bg-[#e07a2c] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-md shadow-sm flex items-center gap-1 z-10">
+                        <Check size={11} strokeWidth={3} />
+                        <span>Seçili</span>
+                      </span>
+                    )}
+
                     {/* Heart Favorite Button */}
                     <button
                       type="button"
@@ -796,7 +826,7 @@ export default function CatalogTemplateGallery({
                         e.stopPropagation();
                         toggleFavorite(item.id);
                       }}
-                      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/80 hover:bg-white text-slate-400 hover:text-rose-500 shadow-xs flex items-center justify-center transition cursor-pointer"
+                      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/85 hover:bg-white text-slate-400 hover:text-rose-500 shadow-xs flex items-center justify-center transition cursor-pointer z-10"
                     >
                       <Heart
                         size={14}
@@ -831,15 +861,32 @@ export default function CatalogTemplateGallery({
                       </span>
                     </div>
 
-                    {/* Action Row: Seç Button & Three Dots */}
+                    {/* Action Row: Seç Button, Önizle Button & Three Dots */}
                     <div className="pt-2 border-t border-slate-100 flex items-center justify-between relative">
-                      <button
-                        type="button"
-                        onClick={() => onSelectTemplate(item.templateId)}
-                        className="text-xs font-semibold px-3.5 py-1 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 transition cursor-pointer"
-                      >
-                        Seç
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onSelectTemplate(item.templateId)}
+                          className={`text-xs font-semibold px-3 py-1 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                            isSelected
+                              ? 'bg-[#e07a2c] text-white border-[#e07a2c] shadow-xs'
+                              : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          {isSelected && <Check size={11} strokeWidth={2.5} />}
+                          <span>{isSelected ? 'Seçili' : 'Seç'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setPreviewTemplate(item)}
+                          className="text-xs font-medium px-2 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition flex items-center gap-1 cursor-pointer"
+                          title="Şablonu Canlı Önizle"
+                        >
+                          <Eye size={12} />
+                          <span>Önizle</span>
+                        </button>
+                      </div>
 
                       {/* Three Dots Button & Dropdown */}
                       <div className="relative">

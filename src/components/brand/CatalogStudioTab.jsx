@@ -52,7 +52,7 @@ import {
   Zap
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
-import CatalogTemplateGallery from './catalog/CatalogTemplateGallery';
+import CatalogTemplateGallery, { CATALOG_TEMPLATES_DATA } from './catalog/CatalogTemplateGallery';
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
 import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
 import ShowroomQrStickerModal from './catalog/ShowroomQrStickerModal';
@@ -200,6 +200,42 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       searchQuery: gallerySearch
     });
   }, [galleryCategory, galleryStyle, gallerySearch]);
+
+  // Step 3 unified template picker state
+  const [step3Search, setStep3Search] = useState('');
+  const [step3Style, setStep3Style] = useState('all');
+  const [step3Type, setStep3Type] = useState('all');
+  const [step3PreviewTemplate, setStep3PreviewTemplate] = useState(null);
+  const [step3PreviewPageIdx, setStep3PreviewPageIdx] = useState(0);
+
+  // Active template object derived from formData.template
+  const activeTemplateObj = useMemo(() => {
+    return (
+      CATALOG_TEMPLATES_DATA.find(
+        (t) =>
+          formData.template === t.templateId ||
+          formData.template === t.id ||
+          (formData.template === 'milano' && t.templateId === 'premium-mimari')
+      ) || CATALOG_TEMPLATES_DATA[0]
+    );
+  }, [formData.template]);
+
+  // Step 3 filtered templates list matching the 24 gallery items
+  const step3FilteredTemplates = useMemo(() => {
+    return CATALOG_TEMPLATES_DATA.filter((item) => {
+      if (step3Style !== 'all' && item.style !== step3Style) return false;
+      if (step3Type !== 'all' && item.type !== step3Type) return false;
+      if (step3Search.trim()) {
+        const q = step3Search.toLowerCase().trim();
+        const matchName = item.name.toLowerCase().includes(q);
+        const matchDesc = item.description?.toLowerCase().includes(q);
+        const matchStyle = item.style?.toLowerCase().includes(q);
+        const matchType = item.type?.toLowerCase().includes(q);
+        if (!matchName && !matchDesc && !matchStyle && !matchType) return false;
+      }
+      return true;
+    });
+  }, [step3Search, step3Style, step3Type]);
 
     // Modal preview state
   const [previewCatalog, setPreviewCatalog] = useState(null);
@@ -1722,6 +1758,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
           onCreateCustom={() => handleStartNew('milano', 1)}
           availableProducts={availableProducts}
           brandInfo={brandInfo}
+          selectedTemplateId={formData?.template}
+          onBackToList={() => setViewMode('list')}
         />
       )}
 
@@ -2839,64 +2877,441 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   </div>
                 )}
 
-                {/* STEP 3: ŞABLON SEÇİMİ */}
+                {/* STEP 3: ŞABLON SEÇİMİ — MODERN & UNIFIED DESIGN */}
                 {activeStep === 3 && (
-                  <div className="space-y-6 max-w-5xl">
-                    <div className="border-b border-neutral-100 pb-4">
-                      <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
-                        <LayoutTemplate size={20} className="text-[#b4823c]" />
-                        <span>3. Profesyonel Tasarım Şablonu Seçin</span>
-                      </h3>
-                      <p className="text-xs text-neutral-500 mt-1">
-                        Birbirinden tamamen farklı mizanpaj ve sayfa mimarisine sahip kurumsal şablonlardan birini seçin.
-                      </p>
+                  <div className="space-y-6 max-w-6xl">
+                    {/* Header Banner */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-stone-50 via-amber-50/20 to-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/10 text-[#b4823c] font-mono text-[10px] font-bold uppercase tracking-wider">
+                            ADIM 3 / 6
+                          </span>
+                          <span className="text-xs font-mono text-neutral-400">• Tasarım Mimarisi</span>
+                        </div>
+                        <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-1 flex items-center gap-2">
+                          <LayoutTemplate size={18} className="text-[#b4823c]" />
+                          <span>Profesyonel Katalog Tasarım Şablonu Seçin</span>
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-0.5">
+                          Kataloğunuzun kapak, ürün yerleşimi, teknik şartname ve editoryal mizanpajını belirleyin. 'Şablonları Keşfet' kütüphanesindeki tüm tasarımlar burada mevcuttur.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStep3PreviewTemplate(activeTemplateObj);
+                            setStep3PreviewPageIdx(0);
+                          }}
+                          className="px-3.5 py-2 rounded-xl bg-white border border-neutral-200 hover:border-[#b4823c] text-neutral-800 text-xs font-bold flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition cursor-pointer"
+                        >
+                          <Eye size={14} className="text-[#b4823c]" />
+                          <span>Mevcut Şablonu Önizle</span>
+                        </button>
+                      </div>
                     </div>
 
+                    {/* AKTİF SEÇİLİ ŞABLON VURGUSU (HERO SUMMARY CARD) */}
+                    {activeTemplateObj && (
+                      <div className="p-4 sm:p-5 rounded-2xl bg-white border-2 border-[#e07a2c] ring-2 ring-[#e07a2c]/10 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-28 h-20 sm:w-36 sm:h-24 rounded-xl overflow-hidden bg-neutral-900 flex-shrink-0 border border-neutral-200">
+                            <img
+                              src={activeTemplateObj.coverImg}
+                              alt={activeTemplateObj.name}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-1.5">
+                              <span className="text-[9px] font-mono font-bold text-white uppercase bg-black/60 px-1.5 py-0.5 rounded">
+                                {activeTemplateObj.pageCount} Sayfa
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#e07a2c] text-white text-[10px] font-extrabold uppercase shadow-2xs">
+                                <Check size={11} strokeWidth={3} />
+                                <span>Aktif Seçili Şablon</span>
+                              </span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${activeTemplateObj.styleBadgeClass || 'bg-slate-100 text-slate-700 border-slate-200'}`}>
+                                {activeTemplateObj.style}
+                              </span>
+                              <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                                {activeTemplateObj.type}
+                              </span>
+                            </div>
+                            <h4 className="text-sm sm:text-base font-extrabold text-neutral-900">
+                              {activeTemplateObj.name}
+                            </h4>
+                            <p className="text-xs text-neutral-600 line-clamp-1 max-w-xl">
+                              {activeTemplateObj.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setStep3PreviewTemplate(activeTemplateObj);
+                              setStep3PreviewPageIdx(0);
+                            }}
+                            className="px-4 py-2 rounded-xl bg-[#e07a2c] hover:bg-[#cf6d22] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                          >
+                            <Eye size={14} />
+                            <span>Sayfaları İncele</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SEARCH & FILTER CONTROLS BAR */}
+                    <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-2xs space-y-3">
+                      {/* Top: Search and Counts */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="relative flex-1 max-w-md">
+                          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="text"
+                            value={step3Search}
+                            onChange={(e) => setStep3Search(e.target.value)}
+                            placeholder="Şablon ara... (örn: Mimari, Banyo, Mermer, Fuar)"
+                            className="w-full pl-9 pr-8 py-2 rounded-xl border border-neutral-200 bg-neutral-50/60 focus:bg-white focus:border-[#b4823c] text-xs font-medium text-neutral-800 placeholder-neutral-400 outline-none transition"
+                          />
+                          {step3Search && (
+                            <button
+                              type="button"
+                              onClick={() => setStep3Search('')}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs text-neutral-500 font-medium">
+                          <span>{step3FilteredTemplates.length} şablon gösteriliyor</span>
+                          {(step3Search || step3Style !== 'all' || step3Type !== 'all') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setStep3Search('');
+                                setStep3Style('all');
+                                setStep3Type('all');
+                              }}
+                              className="text-xs font-bold text-[#b4823c] hover:underline cursor-pointer ml-1"
+                            >
+                              Filtreleri Temizle
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Style Filter Pills */}
+                      <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-neutral-100">
+                        <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mr-1">
+                          Tarz:
+                        </span>
+                        {[
+                          { id: 'all', label: `Tümü (${CATALOG_TEMPLATES_DATA.length})` },
+                          { id: 'Modern', label: 'Modern' },
+                          { id: 'Minimal', label: 'Minimal' },
+                          { id: 'Premium', label: 'Premium' },
+                          { id: 'Doğal', label: 'Doğal' },
+                          { id: 'Teknik', label: 'Teknik' },
+                          { id: 'Klasik', label: 'Klasik' },
+                          { id: 'Endüstriyel', label: 'Endüstriyel' }
+                        ].map((pill) => {
+                          const isActive = step3Style === pill.id;
+                          return (
+                            <button
+                              key={pill.id}
+                              type="button"
+                              onClick={() => setStep3Style(pill.id)}
+                              className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                                isActive
+                                  ? 'bg-neutral-900 text-white shadow-2xs'
+                                  : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                              }`}
+                            >
+                              {pill.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Type Filter Pills */}
+                      <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                        <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider mr-1">
+                          Tür:
+                        </span>
+                        {[
+                          { id: 'all', label: 'Tüm Türler' },
+                          { id: 'Klasik Katalog', label: 'Klasik Katalog' },
+                          { id: 'Lookbook', label: 'Lookbook' },
+                          { id: 'Teknik Katalog', label: 'Teknik Katalog' },
+                          { id: 'Dijital Broşür', label: 'Dijital Broşür' }
+                        ].map((pill) => {
+                          const isActive = step3Type === pill.id;
+                          return (
+                            <button
+                              key={pill.id}
+                              type="button"
+                              onClick={() => setStep3Type(pill.id)}
+                              className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold transition cursor-pointer ${
+                                isActive
+                                  ? 'bg-[#b4823c] text-white'
+                                  : 'bg-neutral-100/80 text-neutral-500 hover:bg-neutral-200/80'
+                              }`}
+                            >
+                              {pill.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* TEMPLATES CARDS GRID */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {TEMPLATES.map((tpl) => {
-                        const isSelected = formData.template === tpl.id;
+                      {step3FilteredTemplates.map((tpl) => {
+                        const isSelected =
+                          formData.template === tpl.templateId ||
+                          formData.template === tpl.id ||
+                          (formData.template === 'milano' && tpl.templateId === 'premium-mimari');
+
                         return (
                           <div
                             key={tpl.id}
-                            onClick={() => setFormData({ ...formData, template: tpl.id })}
-                            className={`rounded-2xl border-2 cursor-pointer transition-all overflow-hidden flex flex-col justify-between ${
+                            className={`bg-white rounded-2xl border transition-all flex flex-col justify-between group overflow-hidden ${
                               isSelected
-                                ? 'border-[#b4823c] bg-amber-50/30 shadow-lg ring-2 ring-[#b4823c]/20'
-                                : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                                ? 'border-[#e07a2c] ring-2 ring-[#e07a2c]/20 shadow-md bg-orange-50/10'
+                                : 'border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300'
                             }`}
                           >
+                            {/* Card Thumbnail */}
                             <div
-                              className="h-32 w-full p-4 flex flex-col justify-between text-white relative"
-                              style={{
-                                background: `linear-gradient(135deg, rgba(9, 13, 22, 0.88) 0%, rgba(17, 24, 39, 0.72) 100%), url(${tpl.mockupImg}) center/cover no-repeat`
-                              }}
+                              onClick={() => setFormData({ ...formData, template: tpl.templateId })}
+                              className="relative aspect-[16/10] bg-neutral-100 overflow-hidden cursor-pointer"
                             >
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/50 uppercase text-amber-300">
-                                  {tpl.tag}
+                              <img
+                                src={tpl.coverImg}
+                                alt={tpl.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+
+                              {/* Active Selection Badge */}
+                              {isSelected && (
+                                <span className="absolute top-2.5 left-2.5 bg-[#e07a2c] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-md shadow-sm flex items-center gap-1 z-10">
+                                  <Check size={11} strokeWidth={3} />
+                                  <span>Seçili Şablon</span>
                                 </span>
-                                {isSelected && (
-                                  <span className="w-5 h-5 rounded-full bg-[#b4823c] text-white flex items-center justify-center font-bold text-xs shadow">
-                                    <Check size={12} />
-                                  </span>
-                                )}
+                              )}
+
+                              {/* Quick Hover Preview Pill */}
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                <span className="px-3 py-1.5 rounded-xl bg-white/95 text-neutral-900 text-xs font-bold flex items-center gap-1.5 shadow-lg">
+                                  <Eye size={13} className="text-[#e07a2c]" />
+                                  <span>Şablonu İncele</span>
+                                </span>
                               </div>
-                              <p className="text-base font-serif font-bold text-white">{tpl.name}</p>
                             </div>
 
-                            <div className="p-4 flex-1 flex flex-col justify-between">
-                              <p className="text-xs text-neutral-600 leading-relaxed mb-3">{tpl.desc}</p>
-                              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs font-bold">
-                                <span style={{ color: tpl.accent }}>
-                                  {isSelected ? '✓ Aktif Şablon' : 'Bu Şablonu Seç'}
-                                </span>
-                                <span className="text-neutral-400 font-normal">Baskı & Web</span>
+                            {/* Card Content */}
+                            <div className="p-4 space-y-2.5 flex-1 flex flex-col justify-between">
+                              <div>
+                                <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                                  <span
+                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                                      tpl.styleBadgeClass || 'bg-slate-100 text-slate-700 border-slate-200'
+                                    }`}
+                                  >
+                                    {tpl.style}
+                                  </span>
+                                  <span className="text-[10px] font-mono text-slate-500 px-2 py-0.5 rounded-md bg-slate-100">
+                                    {tpl.pageCount} sayfa
+                                  </span>
+                                  <span className="text-[10px] text-slate-400">
+                                    {tpl.type}
+                                  </span>
+                                </div>
+
+                                <h4
+                                  onClick={() => setFormData({ ...formData, template: tpl.templateId })}
+                                  className="text-sm font-bold text-slate-900 group-hover:text-[#e07a2c] transition-colors cursor-pointer"
+                                >
+                                  {tpl.name}
+                                </h4>
+
+                                <p className="text-xs text-neutral-500 mt-1 line-clamp-2 leading-relaxed">
+                                  {tpl.description}
+                                </p>
+                              </div>
+
+                              {/* Action Buttons Row */}
+                              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, template: tpl.templateId })}
+                                  className={`text-xs font-bold px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 flex-1 justify-center ${
+                                    isSelected
+                                      ? 'bg-[#e07a2c] text-white border-[#e07a2c] shadow-xs'
+                                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
+                                  }`}
+                                >
+                                  {isSelected && <Check size={12} strokeWidth={3} />}
+                                  <span>{isSelected ? '✓ Seçildi' : 'Bu Şablonu Seç'}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setStep3PreviewTemplate(tpl);
+                                    setStep3PreviewPageIdx(0);
+                                  }}
+                                  className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition flex items-center gap-1 cursor-pointer"
+                                  title="Canlı Önizleme"
+                                >
+                                  <Eye size={13} />
+                                  <span>Önizle</span>
+                                </button>
                               </div>
                             </div>
                           </div>
                         );
                       })}
                     </div>
+
+                    {/* Empty Filter State */}
+                    {step3FilteredTemplates.length === 0 && (
+                      <div className="p-12 text-center bg-white rounded-2xl border border-neutral-200 space-y-3">
+                        <p className="text-sm font-bold text-neutral-800">
+                          Aramanıza veya seçilen filtrelere uygun şablon bulunamadı.
+                        </p>
+                        <p className="text-xs text-neutral-500">
+                          Filtreleri temizleyerek tüm 24 profesyonel şablonu görüntüleyebilirsiniz.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStep3Search('');
+                            setStep3Style('all');
+                            setStep3Type('all');
+                          }}
+                          className="px-4 py-2 bg-neutral-900 text-white rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          Filtreleri Sıfırla
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Step 3 Live Walkthrough Preview Modal */}
+                    {step3PreviewTemplate && (
+                      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+                        <div className="bg-neutral-950 border border-white/20 rounded-2xl max-w-5xl w-full h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+                          {/* Modal Header */}
+                          <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-3">
+                              <span className="px-2.5 py-1 rounded bg-[#e07a2c] text-white text-[10px] font-bold uppercase">
+                                {step3PreviewTemplate.style}
+                              </span>
+                              <div>
+                                <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                                  <span>{step3PreviewTemplate.name}</span>
+                                  <span className="text-xs font-normal text-neutral-400">
+                                    ({step3PreviewTemplate.pageCount} sayfa &bull; {step3PreviewTemplate.type})
+                                  </span>
+                                </h3>
+                                <p className="text-xs text-neutral-400 mt-0.5 line-clamp-1">
+                                  {step3PreviewTemplate.description}
+                                </p>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setStep3PreviewTemplate(null)}
+                              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-neutral-300 hover:text-white transition cursor-pointer"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+
+                          {/* Modal Body */}
+                          <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex justify-center bg-neutral-900">
+                            <div className="w-full max-w-4xl">
+                              <CatalogTemplateRenderer
+                                catalog={{
+                                  title: formData.title || step3PreviewTemplate.name,
+                                  subtitle: formData.description || step3PreviewTemplate.description,
+                                  template: step3PreviewTemplate.templateId,
+                                  orientation: 'portrait',
+                                  showCover: true,
+                                  showTOC: true,
+                                  showSpecs: true,
+                                  showContactPage: true,
+                                  brand: brandInfo || { name: 'SeramikBak' }
+                                }}
+                                products={availableProducts.length > 0 ? availableProducts.slice(0, 4) : [
+                                  {
+                                    id: 'preview-1',
+                                    name: 'Amazonit Verde',
+                                    width: 120,
+                                    height: 280,
+                                    finish: 'Parlak Lappato',
+                                    color: 'Zümrüt Yeşili',
+                                    imageUrl: '/renders/modern_living_natural_oak.jpg'
+                                  },
+                                  {
+                                    id: 'preview-2',
+                                    name: 'Calacatta Gold',
+                                    width: 120,
+                                    height: 280,
+                                    finish: 'Parlak',
+                                    color: 'Beyaz / Altın',
+                                    imageUrl: '/renders/luxury_bathroom_calacatta_gold.jpg'
+                                  }
+                                ]}
+                                mode="preview"
+                                initialPage={step3PreviewPageIdx}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Modal Footer */}
+                          <div className="px-5 py-3.5 border-t border-white/10 bg-neutral-900/90 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div className="text-xs font-mono text-neutral-400">
+                              <span>Sayfalar arasında gezinebilir veya doğrudan bu şablonu seçebilirsiniz.</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setStep3PreviewTemplate(null)}
+                                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-neutral-300 transition"
+                              >
+                                Kapat
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, template: step3PreviewTemplate.templateId });
+                                  setStep3PreviewTemplate(null);
+                                }}
+                                className="px-5 py-2 rounded-xl bg-[#e07a2c] hover:bg-[#cf6d22] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition cursor-pointer"
+                              >
+                                <Check size={14} strokeWidth={2.5} />
+                                <span>Bu Şablonu Seç ve Uygula</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
