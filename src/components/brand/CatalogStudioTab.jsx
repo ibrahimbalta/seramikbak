@@ -44,12 +44,18 @@ import {
   LayoutTemplate,
   Wand2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Home,
+  Bell,
+  Calendar,
+  Upload,
+  Zap
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
 import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
 import ShowroomQrStickerModal from './catalog/ShowroomQrStickerModal';
+import { generateQrDataUrl, buildCatalogPublicUrl } from '../../utils/generateQrCode';
 
 export const TEMPLATES = [
   {
@@ -212,6 +218,26 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const [deleteConfirmCatalog, setDeleteConfirmCatalog] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [qrStickerModalData, setQrStickerModalData] = useState(null);
+  const [sidebarQrDataUrl, setSidebarQrDataUrl] = useState('');
+
+  // Generate live QR DataURL for the sidebar showcase card
+  useEffect(() => {
+    let isCancelled = false;
+    async function loadSidebarQr() {
+      try {
+        const slug = catalogs[0]?.publicSlug || 'genel-katalog';
+        const url = buildCatalogPublicUrl(slug);
+        const dataUrl = await generateQrDataUrl(url, { width: 140, margin: 1 });
+        if (!isCancelled && dataUrl) {
+          setSidebarQrDataUrl(dataUrl);
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
+    loadSidebarQr();
+    return () => { isCancelled = true; };
+  }, [catalogs]);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -1060,811 +1086,701 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {/* VIEW MODE 1: CATALOG STUDIO LANDING PAGE (EXACT VISUAL REFERENCE LAYOUT)  */}
       {/* ========================================================================= */}
       {viewMode === 'list' && (
-        <div className="space-y-5 pb-20">
-          {/* Top Breadcrumb Row */}
-          <div className="flex items-center justify-between text-xs text-neutral-500">
-            <div className="flex items-center gap-2">
-              <span className="hover:text-neutral-800 cursor-pointer">Marka Paneli</span>
+        <div className="space-y-6 pb-20">
+          {/* ========================================================================= */}
+          {/* A. TOP BREADCRUMB & BRAND/USER HEADER                                     */}
+          {/* ========================================================================= */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            {/* Breadcrumb Navigation */}
+            <div className="flex items-center gap-2 text-neutral-500 font-medium">
+              <Home size={15} className="text-neutral-500" />
+              <span className="hover:text-neutral-900 cursor-pointer">Marka Paneli</span>
               <ChevronRight size={13} className="text-neutral-400" />
-              <span className="font-bold text-neutral-800">Dijital Kataloglar</span>
+              <span className="font-bold text-neutral-900">Dijital Kataloglar</span>
             </div>
-            <div className="hidden sm:flex items-center gap-2 text-[11px] text-neutral-400">
-              <span>Aktif Marka:</span>
-              <strong className="text-neutral-700">{brandInfo?.name || 'Seramik Markası'}</strong>
+
+            {/* Brand Dropdown & User Indicator */}
+            <div className="flex items-center gap-3 self-end sm:self-auto">
+              {/* Brand Selector Pill */}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-2xs text-xs font-bold text-neutral-800">
+                {brandInfo?.logoUrl ? (
+                  <img src={brandInfo.logoUrl} alt={brandInfo.name} className="w-5 h-5 rounded-md object-contain" />
+                ) : (
+                  <div className="w-5 h-5 rounded-md bg-neutral-950 text-white flex items-center justify-center text-[10px] font-black uppercase">
+                    {(brandInfo?.name || 'B').slice(0, 2)}
+                  </div>
+                )}
+                <span>{brandInfo?.name || 'Bien Seramik'}</span>
+                <ChevronDown size={13} className="text-neutral-400 ml-1" />
+              </div>
+
+              {/* Notification Bell */}
+              <button
+                type="button"
+                className="relative p-2 rounded-full bg-white border border-neutral-200/90 shadow-2xs text-neutral-600 hover:text-neutral-900 transition cursor-pointer"
+                title="Bildirimler"
+              >
+                <Bell size={16} />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white" />
+              </button>
+
+              {/* User Avatar */}
+              <div className="w-8 h-8 rounded-full bg-neutral-200 border border-neutral-300 flex items-center justify-center text-xs font-black text-neutral-700 shadow-2xs">
+                {(brandInfo?.contactPerson || brandInfo?.name || 'İK')
+                  .split(' ')
+                  .map((w) => w[0])
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
             </div>
           </div>
 
-          {/* Main 2-Column Asymmetric Studio Layout (Left Content + Right Sticky Panel) */}
+          {/* ========================================================================= */}
+          {/* B & E. 2-COLUMN ASYMMETRIC STUDIO WORKSPACE (9 COLS MAIN + 3 COLS PANEL)  */}
+          {/* ========================================================================= */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             {/* ==================== LEFT MAIN COLUMN (9 COLS) ==================== */}
-            <div className="xl:col-span-9 space-y-5">
-              {/* 1. LUXURY EDITORIAL HERO SHOWCASE */}
-              <div className="relative rounded-lg bg-neutral-950 text-white overflow-hidden shadow-2xl border border-neutral-800 p-6 sm:p-8 md:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 group">
-                {/* Background Ambience Layers */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-1000"
-                  style={{ backgroundImage: 'url(/renders/luxury_bathroom_calacatta_gold.jpg)' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/85 to-transparent" />
-                <div className="absolute -top-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="xl:col-span-9 space-y-6">
+              {/* B. DUAL-ZONE LUXURY ARCHITECTURAL HERO BANNER */}
+              <div className="rounded-3xl border border-neutral-800 bg-[#0e1726] overflow-hidden shadow-xl flex flex-col md:flex-row relative">
+                {/* Left Visual Area (~38% width): Clean Luxury Bathroom Photography */}
+                <div className="md:w-[38%] relative min-h-[220px] md:min-h-[280px] overflow-hidden flex-shrink-0">
+                  <img
+                    src="/renders/luxury_bathroom_calacatta_gold.jpg"
+                    alt="Seramik Lookbook Studio"
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
 
-                {/* Left Hero Editorial Info */}
-                <div className="relative z-10 max-w-xl space-y-4">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                    <span className="text-[11px] font-mono tracking-[0.25em] font-extrabold text-amber-400 uppercase">
-                      CERAMIC STUDIO & LOOKBOOK SUITE
-                    </span>
-                    <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono text-neutral-300">
-                      B2B PLATFORM
+                {/* Right Content Area (~62% width): Charcoal with Golden Waves */}
+                <div className="md:w-[62%] p-6 sm:p-8 md:p-9 flex flex-col justify-center relative overflow-hidden bg-[#0e1726] text-white">
+                  {/* Elegant Golden Curve Background SVG */}
+                  <svg
+                    className="absolute right-0 top-0 bottom-0 h-full w-52 text-amber-500/10 pointer-events-none opacity-60"
+                    viewBox="0 0 200 400"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path d="M50,-50 C180,100 180,300 50,450" strokeWidth="2" />
+                    <path d="M90,-50 C220,100 220,300 90,450" strokeWidth="1.5" />
+                    <path d="M130,-50 C260,100 260,300 130,450" strokeWidth="1" />
+                  </svg>
+
+                  {/* Studio Badge */}
+                  <div className="relative z-10">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold tracking-wide">
+                      SeramikBak Dijital Studio
                     </span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-4xl font-serif font-bold text-white tracking-tight leading-tight">
-                    Dijital Mimari Kataloglar & Lookbook Oluşturucu
+                  {/* Main Title */}
+                  <h1 className="relative z-10 text-2xl sm:text-3xl font-extrabold text-white mt-3 mb-2 tracking-tight leading-tight">
+                    Dijital Mimari Kataloglar & Lookbook Studio
                   </h1>
 
-                  <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
-                    Fabrika ürün portföyünüzü Cersaie ve Milano matbaa standartlarında dijital yayınlara dönüştürün. Mimari şartnameler, QR kodlu mekan deneyimleri ve baskıya hazır PDF lookbooklar tek merkezde.
+                  {/* Subtitle */}
+                  <p className="relative z-10 text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-xl mb-4 font-normal">
+                    Ürün portföyünüzü interaktif dijital kataloglara ve profesyonel baskıya hazır PDF lookbook'lara dönüştürün.
                   </p>
 
-                  {/* 5 Feature Pills Row */}
-                  <div className="pt-2 flex flex-wrap items-center gap-2 sm:gap-2.5">
-                    {[
-                      { icon: BookOpen, label: '10 Editoryal Şablon' },
-                      { icon: Wand2, label: 'Gelişmiş Vektör Tuval' },
-                      { icon: Printer, label: 'Yüksek Çözünürlüklü PDF' },
-                      { icon: RefreshCw, label: 'Canlı Stok Senkronu' },
-                      { icon: Globe, label: '4 Dilde Yayın (TR/EN/DE/AR)' }
-                    ].map((pill, idx) => {
-                      const PillIcon = pill.icon;
-                      return (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-neutral-200 hover:bg-white/15 transition-all"
-                        >
-                          <PillIcon size={13} className="text-amber-400" />
-                          <span className="whitespace-nowrap">{pill.label}</span>
-                        </div>
-                      );
-                    })}
+                  {/* 3 Feature Pills */}
+                  <div className="relative z-10 flex flex-wrap items-center gap-2 mb-6">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-xs border border-white/15 text-xs text-neutral-200 font-semibold">
+                      <LayoutGrid size={13} className="text-amber-400" />
+                      <span>Editoryal Şablonlar</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-xs border border-white/15 text-xs text-neutral-200 font-semibold">
+                      <Wand2 size={13} className="text-amber-400" />
+                      <span>Vektör Tasarım Tuvali</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-xs border border-white/15 text-xs text-neutral-200 font-semibold">
+                      <Printer size={13} className="text-amber-400" />
+                      <span>Baskıya Hazır PDF</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Right Interactive Booklet Showcase */}
-                <div className="relative z-10 flex-shrink-0 w-full sm:w-auto flex justify-center">
-                  <div
-                    onClick={() => handleStartNew('milano', 1)}
-                    className="cursor-pointer bg-neutral-900/90 backdrop-blur-xl rounded-lg p-4 shadow-2xl border border-white/20 flex items-center gap-5 hover:border-amber-400/60 hover:scale-[1.02] transition-all max-w-sm group/card"
-                  >
-                    {/* Simulated 3D Book Cover */}
-                    <div
-                      className="w-28 h-40 rounded-md overflow-hidden relative shadow-2xl flex flex-col justify-between p-3.5 text-white flex-shrink-0 border border-white/20"
-                      style={{
-                        background:
-                          'linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.85) 100%), url(/renders/luxury_bathroom_calacatta_gold.jpg) center/cover no-repeat'
-                      }}
+                  {/* Action Buttons Row */}
+                  <div className="relative z-10 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleStartNew('milano', 1)}
+                      className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition cursor-pointer"
                     >
-                      <span className="text-[8px] font-mono tracking-widest text-amber-300 font-extrabold uppercase">
-                        2026 EDİTORYAL
-                      </span>
-                      <div>
-                        <div className="text-[11px] font-serif font-black uppercase tracking-wide text-white leading-tight">
-                          MILANO LOOKBOOK
-                        </div>
-                        <div className="text-[8px] font-mono text-neutral-400 mt-0.5">
-                          TS EN 14411
-                        </div>
-                      </div>
-                    </div>
+                      <Plus size={16} strokeWidth={2.5} />
+                      <span>+ Yeni Katalog Oluştur</span>
+                    </button>
 
-                    {/* CTA Info */}
-                    <div className="pr-1 space-y-2">
-                      <span className="inline-block px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 text-[10px] font-mono font-bold">
-                        HIZLI BAŞLAT
-                      </span>
-                      <h4 className="text-sm font-extrabold text-white leading-snug group-hover/card:text-amber-300 transition-colors">
-                        Yeni Katalog Tasarla
-                      </h4>
-                      <p className="text-[11px] text-neutral-400 leading-snug">
-                        Şablon seçin, ürünlerinizi ekleyin ve anında yayınlayın.
-                      </p>
-                      <div className="pt-1 flex items-center gap-1.5 text-xs font-bold text-amber-400">
-                        <span>Stüdyoyu Aç</span>
-                        <ChevronRight size={14} className="group-hover/card:translate-x-1 transition-transform" />
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('templates-gallery')}
+                      className="px-5 py-2.5 rounded-xl border border-white/30 hover:border-white/60 bg-white/5 hover:bg-white/10 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer"
+                    >
+                      <BookOpen size={15} />
+                      <span>Şablonları Keşfet</span>
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* 2. REFINED KPI METRICS BAR + PRIMARY ACTION */}
-              <div className="grid grid-cols-2 lg:grid-cols-12 gap-3.5 items-stretch">
-                {/* KPI 1: Toplam Katalog */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+              {/* C. 4 COMPACT KPI STAT CARDS */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Card 1: Toplam Katalog */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-500">Toplam Katalog</span>
-                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-[#b4823c] flex items-center justify-center">
-                      <BookOpen size={16} />
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                      <BookOpen size={18} />
                     </div>
                   </div>
-                  <div className="mt-4 flex items-baseline justify-between">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900">{catalogs.length}</span>
-                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Portföy
+                  <div className="mt-4">
+                    <span className="text-xs font-bold text-neutral-500 block">Toplam katalog</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 block mt-0.5">
+                      {catalogs.length}
                     </span>
                   </div>
                 </div>
 
-                {/* KPI 2: Toplam Görüntülenme */}
-                <div className="lg:col-span-3 bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                {/* Card 2: Görüntülenme */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-500">Katalog Etkileşimi</span>
-                    <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                      <Eye size={16} />
+                    <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                      <Eye size={18} />
                     </div>
+                    {/* Trendline Graphic (Amber wave) */}
+                    <svg viewBox="0 0 100 30" className="w-18 h-6 text-amber-500 stroke-current fill-none stroke-[2.5]" preserveAspectRatio="none">
+                      <path d="M0,24 Q30,22 55,14 T100,5" strokeLinecap="round" />
+                    </svg>
                   </div>
-                  <div className="mt-4 flex items-baseline justify-between">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900">
-                        {totalViews.toLocaleString('tr-TR')}
-                      </span>
-                      <span className="text-xs font-medium text-neutral-400">gösterim</span>
-                    </div>
-                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      +18%
+                  <div className="mt-4">
+                    <span className="text-xs font-bold text-neutral-500 block">Görüntülenme</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 block mt-0.5">
+                      {totalViews.toLocaleString('tr-TR')}
                     </span>
                   </div>
                 </div>
 
-                {/* KPI 3: Toplam PDF İndirme */}
-                <div className="lg:col-span-3 bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                {/* Card 3: PDF İndirme */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-500">Baskı & PDF İndirme</span>
-                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                      <Download size={16} />
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                      <Download size={18} />
                     </div>
+                    {/* Trendline Graphic (Emerald wave) */}
+                    <svg viewBox="0 0 100 30" className="w-18 h-6 text-emerald-500 stroke-current fill-none stroke-[2.5]" preserveAspectRatio="none">
+                      <path d="M0,26 Q35,24 60,16 T100,6" strokeLinecap="round" />
+                    </svg>
                   </div>
-                  <div className="mt-4 flex items-baseline justify-between">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900">
-                        {totalDownloads.toLocaleString('tr-TR')}
-                      </span>
-                      <span className="text-xs font-medium text-neutral-400">adet</span>
-                    </div>
-                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      +27%
+                  <div className="mt-4">
+                    <span className="text-xs font-bold text-neutral-500 block">PDF indirme</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 block mt-0.5">
+                      {totalDownloads.toLocaleString('tr-TR')}
                     </span>
                   </div>
                 </div>
 
-                {/* KPI 4: Aktif Web Yayını */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                {/* Card 4: Yayında */}
+                <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-500">Yayında Olan</span>
-                    <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                      <Globe size={16} />
+                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                      <Globe size={18} />
                     </div>
+                    {/* Trendline Graphic (Purple wave) */}
+                    <svg viewBox="0 0 100 30" className="w-18 h-6 text-purple-500 stroke-current fill-none stroke-[2.5]" preserveAspectRatio="none">
+                      <path d="M0,25 Q40,23 65,13 T100,7" strokeLinecap="round" />
+                    </svg>
                   </div>
-                  <div className="mt-4 flex items-baseline justify-between">
-                    <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900">{publishedCount}</span>
-                    <span className="text-[11px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
-                      Canlı Web
+                  <div className="mt-4">
+                    <span className="text-xs font-bold text-neutral-500 block">Yayında</span>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 block mt-0.5">
+                      {publishedCount}
                     </span>
                   </div>
-                </div>
-
-                {/* Primary Action Button: + Yeni Katalog Oluştur */}
-                <div className="col-span-2 lg:col-span-2 flex items-stretch">
-                  <button
-                    type="button"
-                    onClick={() => handleStartNew('milano', 1)}
-                    className="w-full rounded-2xl bg-gradient-to-br from-[#b4823c] to-amber-700 hover:from-[#9f7131] hover:to-amber-800 text-white font-extrabold text-xs sm:text-sm px-4 py-4 shadow-md hover:shadow-lg transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Plus size={18} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform" />
-                      <span>Yeni Katalog</span>
-                    </div>
-                    <span className="text-[10px] text-amber-200 font-normal tracking-wide">
-                      Stüdyoyu Başlat
-                    </span>
-                  </button>
                 </div>
               </div>
 
-              {/* 3. LUXURY SEARCH & FILTER CONTROL BAR */}
-              <div className="bg-white rounded-2xl border border-neutral-200/90 p-3.5 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-                {/* Search Input + Status Pills */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
-                  <div className="relative flex-1 max-w-md">
+              {/* D. KATALOG YÖNETİMİ ALANI (KATALOGLARIM) */}
+              <div className="space-y-4">
+                {/* Header Row: Title + Search Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900">Kataloglarım</h2>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Oluşturduğunuz katalogları yönetin, düzenleyin ve paylaşın.
+                    </p>
+                  </div>
+
+                  {/* Search Input (Pill Shaped) */}
+                  <div className="relative min-w-[240px] sm:min-w-[320px]">
                     <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Katalog adı, seri veya koleksiyon ara..."
-                      className="w-full pl-9 pr-4 py-2.5 bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 focus:border-[#b4823c] rounded-xl text-xs font-semibold text-neutral-900 outline-none transition-all"
+                      placeholder="Katalog adı veya koleksiyon ara..."
+                      className="w-full pl-9 pr-4 py-2 rounded-full border border-neutral-200 bg-white focus:border-amber-500 text-xs font-medium text-neutral-800 placeholder-neutral-400 outline-none shadow-2xs transition"
                     />
                   </div>
+                </div>
 
-                  {/* Filter Status Pills */}
-                  <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-xl border border-neutral-200/50">
+                {/* Filter Pills + Sort & View Controls Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                  {/* Left Filter Tabs */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {[
-                      { id: 'all', label: 'Tüm Kataloglar' },
-                      { id: 'published', label: 'Yayınlananlar' },
-                      { id: 'draft', label: 'Taslaklar' },
-                      { id: 'archived', label: 'Arşiv' }
+                      { id: 'all', label: `Tümü (${catalogs.length})` },
+                      { id: 'published', label: `Yayında (${publishedCount})` },
+                      { id: 'draft', label: `Taslaklar (${draftCount})` },
+                      { id: 'archived', label: `Arşiv (${archivedCount})` }
                     ].map((tab) => (
                       <button
                         key={tab.id}
                         type="button"
                         onClick={() => setFilterTab(tab.id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                           filterTab === tab.id
-                            ? 'bg-white text-neutral-900 shadow-xs'
-                            : 'text-neutral-500 hover:text-neutral-900'
+                            ? 'bg-[#b4823c] text-white shadow-xs'
+                            : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                         }`}
                       >
                         {tab.label}
                       </button>
                     ))}
                   </div>
-                </div>
 
-                {/* View Mode & Sort Dropdown */}
-                <div className="flex items-center justify-between sm:justify-end gap-2.5">
-                  <div className="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200/50">
-                    <button
-                      type="button"
-                      onClick={() => setCardDisplayMode('grid')}
-                      className={`p-2 rounded-lg transition-all cursor-pointer ${
-                        cardDisplayMode === 'grid' ? 'bg-white text-neutral-900 shadow-xs' : 'text-neutral-400'
-                      }`}
-                      title="Kart Izgarası"
+                  {/* Right Controls: Sort & Grid/List View */}
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="px-3 py-1.5 bg-white border border-neutral-200 rounded-xl text-xs font-bold text-neutral-700 outline-none transition cursor-pointer shadow-2xs"
                     >
-                      <LayoutGrid size={15} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCardDisplayMode('list')}
-                      className={`p-2 rounded-lg transition-all cursor-pointer ${
-                        cardDisplayMode === 'list' ? 'bg-white text-neutral-900 shadow-xs' : 'text-neutral-400'
-                      }`}
-                      title="Katalog Listesi"
-                    >
-                      <List size={15} />
-                    </button>
-                  </div>
+                      <option value="updated_desc">Son güncellenen</option>
+                      <option value="views_desc">En çok görüntülenen</option>
+                      <option value="downloads_desc">En çok indirilen</option>
+                      <option value="title_asc">Başlık (A - Z)</option>
+                    </select>
 
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="px-3.5 py-2.5 bg-neutral-50 hover:bg-white border border-neutral-200 focus:border-[#b4823c] rounded-xl text-xs font-bold text-neutral-700 outline-none transition-all cursor-pointer"
-                  >
-                    <option value="updated_desc">En Son Düzenlenen</option>
-                    <option value="views_desc">En Çok Görüntülenen</option>
-                    <option value="downloads_desc">En Çok İndirilen</option>
-                    <option value="title_asc">Başlık (A - Z)</option>
-                  </select>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setQrStickerModalData({
-                        catalog: null,
-                        products: availableProducts
-                      });
-                    }}
-                    className="px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-amber-100/80 hover:from-amber-100 hover:to-amber-200/80 border border-amber-300/80 text-amber-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
-                    title="Tüm fabrika ürünlerinden anında A4 Showroom QR Etiketi üret"
-                  >
-                    <QrCode size={14} className="text-[#b4823c]" />
-                    <span className="hidden sm:inline">Showroom QR Etiketleri</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 4. REFINED EMPTY STATE OR CARDS */}
-              {loading ? (
-                <div className="bg-white rounded-2xl border border-neutral-200/80 py-20 flex flex-col items-center justify-center text-neutral-400">
-                  <Loader2 size={32} className="animate-spin text-[#b4823c] mb-2" />
-                  <p className="text-xs font-bold">Kataloglar yükleniyor...</p>
-                </div>
-              ) : filteredCatalogs.length === 0 ? (
-                <div className="bg-gradient-to-b from-white to-stone-50/60 rounded-3xl border border-neutral-200/90 p-12 text-center shadow-sm">
-                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-[#b4823c] border border-amber-500/20 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <BookOpen size={28} />
-                  </div>
-                  <h3 className="text-lg font-serif font-bold text-neutral-900 mb-1.5">
-                    Henüz Hazırlanmış Katalog Bulunmuyor
-                  </h3>
-                  <p className="text-xs text-neutral-500 max-w-md mx-auto mb-6 leading-relaxed">
-                    Fabrika ürünlerinizden dilediklerinizi seçin; hazır editoryal şablonlarımızla dakikalar içinde profesyonel bir dijital katalog oluşturun.
-                  </p>
-                  <button
-                    onClick={() => handleStartNew('milano', 1)}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#b4823c] to-amber-700 hover:from-[#9f7131] hover:to-amber-800 text-white font-extrabold text-xs inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
-                  >
-                    <Plus size={16} strokeWidth={2.5} />
-                    <span>İlk Kataloğunuzu Oluşturun</span>
-                  </button>
-                </div>
-              ) : cardDisplayMode === 'grid' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {filteredCatalogs.map((cat, idx) => {
-                    const tplInfo = TEMPLATES.find((t) => t.id === cat.template) || TEMPLATES[0];
-                    const coverImg = CARD_COVERS[idx % CARD_COVERS.length] || tplInfo.mockupImg;
-                    const pageCount = getEstimatedPages(cat);
-                    const outdatedChanges = detectOutdatedProducts(cat);
-
-                    return (
-                      <div
-                        key={cat.id}
-                        className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs hover:shadow-md hover:border-amber-300/80 transition-all flex flex-col justify-between group relative"
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setCardDisplayMode('grid')}
+                        className={`p-1.5 rounded-xl transition cursor-pointer ${
+                          cardDisplayMode === 'grid'
+                            ? 'bg-[#b4823c] text-white shadow-2xs'
+                            : 'border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50'
+                        }`}
+                        title="Izgara Görünümü"
                       >
-                        {/* Top Cover Visual */}
+                        <LayoutGrid size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCardDisplayMode('list')}
+                        className={`p-1.5 rounded-xl transition cursor-pointer ${
+                          cardDisplayMode === 'list'
+                            ? 'bg-[#b4823c] text-white shadow-2xs'
+                            : 'border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50'
+                        }`}
+                        title="Liste Görünümü"
+                      >
+                        <List size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Catalog Items Display (Grid vs List) */}
+                {loading ? (
+                  <div className="bg-white rounded-2xl border border-neutral-200/80 py-20 flex flex-col items-center justify-center text-neutral-400">
+                    <Loader2 size={32} className="animate-spin text-[#b4823c] mb-2" />
+                    <p className="text-xs font-bold">Kataloglar yükleniyor...</p>
+                  </div>
+                ) : filteredCatalogs.length === 0 ? (
+                  <div className="bg-gradient-to-b from-white to-stone-50/60 rounded-3xl border border-neutral-200/90 p-12 text-center shadow-sm">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-[#b4823c] border border-amber-500/20 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                      <BookOpen size={28} />
+                    </div>
+                    <h3 className="text-lg font-serif font-bold text-neutral-900 mb-1.5">
+                      Henüz Hazırlanmış Katalog Bulunmuyor
+                    </h3>
+                    <p className="text-xs text-neutral-500 max-w-md mx-auto mb-6 leading-relaxed">
+                      Fabrika ürünlerinizden dilediklerinizi seçin; hazır editoryal şablonlarımızla dakikalar içinde profesyonel bir dijital katalog oluşturun.
+                    </p>
+                    <button
+                      onClick={() => handleStartNew('milano', 1)}
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#b4823c] to-amber-700 hover:from-[#9f7131] hover:to-amber-800 text-white font-extrabold text-xs inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    >
+                      <Plus size={16} strokeWidth={2.5} />
+                      <span>İlk Kataloğunuzu Oluşturun</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3.5">
+                    {filteredCatalogs.map((cat, idx) => {
+                      const tplInfo = TEMPLATES.find((t) => t.id === cat.template) || TEMPLATES[0];
+                      const coverImg = CARD_COVERS[idx % CARD_COVERS.length] || tplInfo.mockupImg;
+                      const pageCount = getEstimatedPages(cat);
+                      const outdatedChanges = detectOutdatedProducts(cat);
+
+                      return (
                         <div
-                          onClick={() => handleOpenPreview(cat)}
-                          className="relative h-44 w-full cursor-pointer rounded-t-2xl overflow-hidden p-4 flex flex-col justify-between text-white"
-                          style={{
-                            background: `linear-gradient(180deg, rgba(15,23,42,0.55) 0%, rgba(15,23,42,0.2) 45%, rgba(15,23,42,0.85) 100%), url(${coverImg}) center/cover no-repeat`,
-                            backgroundColor: '#18181b'
-                          }}
+                          key={cat.id}
+                          className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                         >
-                          {/* Top Right Status Pill Badge (Exact match to reference image) */}
-                          <div className="flex items-center justify-between z-10">
-                            {outdatedChanges.length > 0 ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSyncModalCatalog({ catalog: cat, changes: outdatedChanges });
-                                }}
-                                className="px-2 py-0.5 rounded-full bg-amber-500 text-neutral-950 font-extrabold text-[10px] flex items-center gap-1 shadow"
-                                title="Ürün güncellemesi mevcut"
-                              >
-                                <RefreshCw size={10} />
-                                <span>Güncelleme Var</span>
-                              </button>
-                            ) : (
-                              <span />
-                            )}
+                          {/* Left: Thumbnail & Catalog Details */}
+                          <div className="flex items-center gap-4 min-w-0 flex-1">
+                            <div
+                              onClick={() => handleOpenPreview(cat)}
+                              className="w-32 h-24 sm:w-36 sm:h-26 rounded-xl overflow-hidden border border-neutral-200 flex-shrink-0 cursor-pointer relative shadow-2xs group"
+                            >
+                              <img
+                                src={coverImg}
+                                alt={cat.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
+                            </div>
 
-                            {cat._isArchived ? (
-                              <span className="px-2.5 py-1 rounded-full bg-neutral-700/90 backdrop-blur-xs text-white text-[10px] font-bold flex items-center gap-1">
-                                <span>Arşiv</span>
-                              </span>
-                            ) : cat.isPublished ? (
-                              <span className="px-2.5 py-1 rounded-full bg-emerald-600/95 backdrop-blur-xs text-white text-[10px] font-bold flex items-center gap-1 shadow-xs">
-                                <CheckCircle2 size={11} />
-                                <span>Yayınlandı</span>
-                              </span>
-                            ) : (
-                              <span className="px-2.5 py-1 rounded-full bg-sky-600/95 backdrop-blur-xs text-white text-[10px] font-bold flex items-center gap-1 shadow-xs">
-                                <Clock size={11} />
-                                <span>Taslak</span>
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Cover Overlay Typography */}
-                          <div className="z-10 my-auto">
-                            <p className="text-xs font-serif tracking-wider uppercase text-white/95 font-bold line-clamp-2 drop-shadow">
-                              {cat.coverTitle || cat.title}
-                            </p>
-                            <span className="text-[9px] font-mono uppercase tracking-widest text-amber-200/90 block mt-0.5">
-                              {tplInfo.name}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Card Body: Title, Subtitle, Stats & Actions */}
-                        <div className="p-4 flex-1 flex flex-col justify-between bg-white rounded-b-2xl">
-                          <div>
-                            <div className="flex items-start justify-between gap-2">
-                              <h3
-                                onClick={() => handleOpenPreview(cat)}
-                                className="text-sm font-extrabold text-neutral-900 hover:text-[#b4823c] cursor-pointer truncate"
-                                title={cat.title}
-                              >
-                                {cat.title}
-                              </h3>
-
-                              {/* Quick Delete + 3-Dots Context Menu */}
-                              <div className="flex items-center gap-0.5 relative">
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleDelete(cat, e)}
-                                  className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition cursor-pointer"
-                                  title="Kataloğu Sil"
+                            <div className="min-w-0 flex-1">
+                              {/* Title & Status Badge */}
+                              <div className="flex items-center gap-2.5 flex-wrap">
+                                <h3
+                                  onClick={() => handleOpenPreview(cat)}
+                                  className="text-base font-extrabold text-neutral-900 hover:text-[#b4823c] truncate transition cursor-pointer"
                                 >
-                                  <Trash2 size={14} />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setOpenMenuId(openMenuId === cat.id ? null : cat.id)}
-                                  className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
-                                  title="Diğer İşlemler"
-                                >
-                                  <MoreVertical size={15} />
-                                </button>
+                                  {cat.title}
+                                </h3>
+                                {cat._isArchived ? (
+                                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-neutral-200 text-neutral-700">
+                                    Arşiv
+                                  </span>
+                                ) : cat.isPublished ? (
+                                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                                    Yayında
+                                  </span>
+                                ) : (
+                                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-neutral-100 text-neutral-600">
+                                    Taslak
+                                  </span>
+                                )}
 
-                                {openMenuId === cat.id && (
-                                  <div className="absolute right-0 top-8 w-48 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-40 text-xs font-semibold text-neutral-700">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleEdit(cat, true)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <Wand2 size={13} />
-                                      <span>Gelişmiş Studio ile Aç</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setOpenMenuId(null);
-                                        const catProducts = resolveCatalogProducts(cat);
-                                        setQrStickerModalData({ catalog: cat, products: catProducts });
-                                      }}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <QrCode size={13} className="text-[#b4823c]" />
-                                      <span>Showroom QR & Pano Etiketleri</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleCopyLink(cat.publicSlug)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <Share2 size={13} />
-                                      <span>Paylaşım Linkini Kopyala</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDuplicate(cat)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <Copy size={13} />
-                                      <span>Kataloğu Kopyala</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setOpenMenuId(null);
-                                        setVersionModalCatalog(cat);
-                                      }}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <History size={13} />
-                                      <span>Sürüm Geçmişi</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleToggleArchive(cat)}
-                                      className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <Archive size={13} />
-                                      <span>{cat._isArchived ? 'Arşivden Çıkar' : 'Arşivle'}</span>
-                                    </button>
-                                    <div className="my-1 border-t border-neutral-100" />
-                                    <button
-                                      type="button"
-                                      onClick={(e) => handleDelete(cat, e)}
-                                      className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
-                                    >
-                                      <Trash2 size={13} />
-                                      <span>Kataloğu Sil</span>
-                                    </button>
-                                  </div>
+                                {outdatedChanges.length > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSyncModalCatalog({ catalog: cat, changes: outdatedChanges });
+                                    }}
+                                    className="px-2 py-0.5 rounded-full bg-amber-500 text-neutral-950 font-extrabold text-[10px] flex items-center gap-1 shadow"
+                                    title="Ürün güncellemesi mevcut"
+                                  >
+                                    <RefreshCw size={10} />
+                                    <span>Güncelleme Var</span>
+                                  </button>
                                 )}
                               </div>
-                            </div>
 
-                            <p className="text-xs text-neutral-500 mt-0.5 truncate">
-                              {cat.itemCount || 0} koleksiyon ürünü • {pageCount} sayfa
-                            </p>
+                              {/* Template & Specs */}
+                              <p className="text-xs text-neutral-500 font-medium mt-1 truncate">
+                                {tplInfo.name} &bull; {cat.itemCount || 0} Ürün &bull; {pageCount} Sayfa
+                              </p>
 
-                            {/* Metrics Row: Views, Downloads, Date */}
-                            <div className="flex items-center justify-between text-[11px] text-neutral-500 mt-3 pt-2.5 border-t border-neutral-100">
-                              <span className="flex items-center gap-1" title="Görüntülenme">
-                                <Eye size={12} className="text-neutral-400" />
-                                <span>{(cat.viewCount || 0).toLocaleString('tr-TR')}</span>
-                              </span>
-                              <span className="flex items-center gap-1" title="PDF İndirme">
-                                <Download size={12} className="text-neutral-400" />
-                                <span>{(cat.downloadCount || 0).toLocaleString('tr-TR')}</span>
-                              </span>
-                              <span className="text-[10px] text-neutral-400 font-mono">
-                                {new Date(cat.updatedAt || Date.now()).toLocaleDateString('tr-TR')}
-                              </span>
+                              {/* Date & Analytics Row */}
+                              <div className="flex items-center gap-4 text-xs text-neutral-400 mt-2 flex-wrap">
+                                <span className="flex items-center gap-1">
+                                  <Calendar size={13} className="text-neutral-400" />
+                                  <span>{new Date(cat.updatedAt || Date.now()).toLocaleDateString('tr-TR')}</span>
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Eye size={13} className="text-neutral-400" />
+                                  <span>{(cat.viewCount || 0).toLocaleString('tr-TR')} görüntülenme</span>
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Download size={13} className="text-neutral-400" />
+                                  <span>{(cat.downloadCount || 0).toLocaleString('tr-TR')} indirme</span>
+                                </span>
+                              </div>
                             </div>
                           </div>
 
-                          {/* Bottom Action Buttons: [ Önizle ] [ Düzenle ] [ Sil ] */}
-                          <div className="flex items-center gap-1.5 mt-3.5 pt-1">
+                          {/* Right: Action Buttons Group */}
+                          <div className="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
                             <button
                               type="button"
                               onClick={() => handleOpenPreview(cat)}
-                              className="flex-1 py-2 px-2.5 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
+                              className="px-4 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
                             >
-                              <Eye size={13} />
+                              <Eye size={14} />
                               <span>Önizle</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => handleEdit(cat, false)}
-                              className="flex-1 py-2 px-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs transition cursor-pointer"
+                              className="px-4 py-2 rounded-xl border border-amber-300 bg-amber-50/50 hover:bg-amber-100/70 text-amber-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
                             >
-                              <Edit size={13} />
+                              <Edit size={14} className="text-[#b4823c]" />
                               <span>Düzenle</span>
                             </button>
 
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const catProducts = resolveCatalogProducts(cat);
-                                setQrStickerModalData({ catalog: cat, products: catProducts });
-                              }}
-                              className="py-2 px-2.5 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
-                              title="Showroom QR & Pano Etiketleri"
-                            >
-                              <QrCode size={13} className="text-[#b4823c]" />
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={(e) => handleDelete(cat, e)}
-                              className="py-2 px-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer"
-                              title="Kataloğu Sil"
-                            >
-                              <Trash2 size={13} />
-                              <span>Sil</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                /* List View Mode */
-                <div className="bg-white rounded-2xl border border-neutral-200/90 overflow-hidden divide-y divide-neutral-100">
-                  {filteredCatalogs.map((cat, idx) => {
-                    const tplInfo = TEMPLATES.find((t) => t.id === cat.template) || TEMPLATES[0];
-                    const coverImg = CARD_COVERS[idx % CARD_COVERS.length] || tplInfo.mockupImg;
-                    return (
-                      <div
-                        key={cat.id}
-                        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-neutral-50/70 transition"
-                      >
-                        <div className="flex items-center gap-3.5 min-w-0">
-                          <img
-                            src={coverImg}
-                            alt={cat.title}
-                            className="w-14 h-16 rounded-xl object-cover border border-neutral-200 flex-shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-extrabold text-neutral-900 truncate">{cat.title}</h4>
-                              <span
-                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                  cat.isPublished ? 'bg-emerald-100 text-emerald-800' : 'bg-sky-100 text-sky-800'
-                                }`}
+                            {/* 3-Dots Dropdown Trigger */}
+                            <div className="relative">
+                              <button
+                                type="button"
+                                onClick={() => setOpenMenuId(openMenuId === cat.id ? null : cat.id)}
+                                className="p-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 transition cursor-pointer"
+                                title="Diğer İşlemler"
                               >
-                                {cat.isPublished ? 'Yayınlandı' : 'Taslak'}
-                              </span>
-                            </div>
-                            <p className="text-xs text-neutral-500 mt-0.5">
-                              {tplInfo.name} • {cat.itemCount || 0} Ürün • {getEstimatedPages(cat)} Sayfa
-                            </p>
-                            <div className="flex items-center gap-4 text-[11px] text-neutral-400 mt-1">
-                              <span>{cat.viewCount || 0} görüntülenme</span>
-                              <span>{cat.downloadCount || 0} indirme</span>
-                              <span>{new Date(cat.updatedAt || Date.now()).toLocaleDateString('tr-TR')}</span>
+                                <MoreVertical size={16} />
+                              </button>
+
+                              {openMenuId === cat.id && (
+                                <div className="absolute right-0 top-10 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-1.5 z-40 text-xs font-semibold text-neutral-700">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEdit(cat, true)}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-[#b4823c] flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Wand2 size={13} />
+                                    <span>Gelişmiş Studio ile Aç</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      const catProducts = resolveCatalogProducts(cat);
+                                      setQrStickerModalData({ catalog: cat, products: catProducts });
+                                    }}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <QrCode size={13} className="text-[#b4823c]" />
+                                    <span>Showroom QR & Pano Etiketleri</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopyLink(cat.publicSlug)}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Share2 size={13} />
+                                    <span>Paylaşım Linkini Kopyala</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDuplicate(cat)}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Copy size={13} />
+                                    <span>Kataloğu Kopyala</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenMenuId(null);
+                                      setVersionModalCatalog(cat);
+                                    }}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <History size={13} />
+                                    <span>Sürüm Geçmişi</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleArchive(cat)}
+                                    className="w-full px-3.5 py-2 text-left hover:bg-neutral-50 flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Archive size={13} />
+                                    <span>{cat._isArchived ? 'Arşivden Çıkar' : 'Arşivle'}</span>
+                                  </button>
+                                  <div className="my-1 border-t border-neutral-100" />
+                                  <button
+                                    type="button"
+                                    onClick={(e) => handleDelete(cat, e)}
+                                    className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <Trash2 size={13} />
+                                    <span>Kataloğu Sil</span>
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenPreview(cat)}
-                            className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-100 text-xs font-bold text-neutral-700 flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <Eye size={13} />
-                            <span>Önizle</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(cat, false)}
-                            className="px-3.5 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <Edit size={13} />
-                            <span>Düzenle</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => handleDelete(cat, e)}
-                            className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                            title="Kataloğu Sil"
-                          >
-                            <Trash2 size={13} />
-                            <span>Sil</span>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* ==================== RIGHT SIDEBAR COLUMN (3 COLS) ==================== */}
-            <div className="xl:col-span-3 space-y-5">
-              {/* 1. Hızlı İşlemler Card (High-Tech Quick Studio Tools) */}
-              <div className="bg-white rounded-lg border border-neutral-200/90 p-5 shadow-xs space-y-4">
-                <div className="flex items-center justify-between pb-1 border-b border-neutral-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-md bg-amber-50 text-[#b4823c] flex items-center justify-center font-bold">
-                      <Sparkles size={14} />
-                    </div>
-                    <h3 className="text-sm font-extrabold text-neutral-900">Stüdyo Kısayolları</h3>
-                  </div>
-                  <span className="text-[10px] font-mono font-bold text-neutral-400">4 MODÜL</span>
+            <div className="xl:col-span-3 space-y-6">
+              {/* Card 1: Hızlı Başlangıç */}
+              <div className="bg-white rounded-2xl border border-neutral-200/90 p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 pb-1 border-b border-neutral-100">
+                  <Zap size={18} className="text-amber-500 fill-amber-500" />
+                  <h3 className="text-base font-extrabold text-neutral-900">Hızlı Başlangıç</h3>
                 </div>
 
-                <div className="space-y-2.5">
-                  <button
-                    type="button"
-                    onClick={() => handleStartNew('milano', 1)}
-                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
-                  >
-                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
-                      <Plus size={16} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
-                        Yeni Katalog Tasarla
-                      </p>
-                      <p className="text-[11px] text-neutral-500">6 adımlı kolay yayın sihirbazı</p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleStartNew('milano', 2)}
-                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
-                  >
-                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
-                      <Layers size={16} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
-                        Ürün & Koleksiyon Seç
-                      </p>
-                      <p className="text-[11px] text-neutral-500">Fabrika stok karolarını bağla</p>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
+                <div className="space-y-3.5">
+                  {/* Step 1 */}
+                  <div
                     onClick={() => setViewMode('templates-gallery')}
-                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-neutral-50 transition cursor-pointer group"
                   >
-                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
-                      <LayoutTemplate size={16} />
+                    <div className="w-6 h-6 rounded-full border border-amber-400 text-amber-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-2">
+                      1
                     </div>
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
-                        Editoryal Şablon Galerisi
+                    <div className="w-10 h-10 rounded-xl bg-[#fbf6ee] text-amber-800 border border-amber-100 flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                      <LayoutTemplate size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
+                        Şablon seç
+                      </h4>
+                      <p className="text-[11px] text-neutral-500 leading-snug mt-0.5">
+                        Profesyonel şablonlarımızdan size uygun olanı seçin.
                       </p>
-                      <p className="text-[11px] text-neutral-500">{TEMPLATES.length} adet Milano & Cersaie mizanpajı</p>
                     </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleStartNew('milano', 4)}
-                    className="w-full p-3 rounded-md border border-neutral-200/80 hover:border-[#b4823c] bg-neutral-50/60 hover:bg-amber-50/30 flex items-center gap-3.5 text-left transition-all group cursor-pointer"
-                  >
-                    <div className="w-9 h-9 rounded-md bg-amber-500/10 border border-amber-500/20 text-[#b4823c] flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
-                      <Settings size={16} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
-                        Kurumsal Brand Kit
-                      </p>
-                      <p className="text-[11px] text-neutral-500">Logo, kurumsal renk & iletişim</p>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* 2. Son Aktiviteler Card */}
-              <div className="bg-white rounded-lg border border-neutral-200/90 p-5 shadow-xs space-y-4">
-                <div className="flex items-center justify-between pb-1 border-b border-neutral-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-md bg-neutral-100 text-neutral-700 flex items-center justify-center">
-                      <Clock size={14} />
-                    </div>
-                    <h3 className="text-sm font-extrabold text-neutral-900">Son Aktiviteler</h3>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setFilterTab('all')}
-                    className="text-[11px] font-bold text-[#b4823c] hover:underline cursor-pointer"
-                  >
-                    Tümü
-                  </button>
-                </div>
 
-                <div className="space-y-3">
-                  {recentActivities.map((act) => (
-                    <div key={act.id} className="flex items-start gap-3 group">
-                      <div
-                        className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs ${
-                          act.type === 'published'
-                            ? 'bg-amber-50 text-[#b4823c]'
-                            : act.type === 'draft'
-                            ? 'bg-sky-50 text-sky-600'
-                            : act.type === 'product'
-                            ? 'bg-emerald-50 text-emerald-600'
-                            : 'bg-rose-50 text-rose-600'
-                        }`}
-                      >
-                        {act.type === 'published' && <BookOpen size={13} />}
-                        {act.type === 'draft' && <FileText size={13} />}
-                        {act.type === 'product' && <RefreshCw size={13} />}
-                        {act.type === 'pdf' && <Download size={13} />}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-neutral-800 leading-snug group-hover:text-neutral-950">
-                          {act.title}
-                        </p>
-                        <p className="text-[11px] text-neutral-500 truncate">{act.subtitle}</p>
-                        <span className="text-[10px] text-neutral-400 font-mono mt-0.5 block">{act.time}</span>
-                      </div>
+                  {/* Step 2 */}
+                  <div
+                    onClick={() => handleStartNew('milano', 2)}
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-neutral-50 transition cursor-pointer group"
+                  >
+                    <div className="w-6 h-6 rounded-full border border-amber-400 text-amber-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-2">
+                      2
                     </div>
-                  ))}
+                    <div className="w-10 h-10 rounded-xl bg-[#fbf6ee] text-amber-800 border border-amber-100 flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                      <Box size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
+                        Ürünleri ekle
+                      </h4>
+                      <p className="text-[11px] text-neutral-500 leading-snug mt-0.5">
+                        Koleksiyonlarınızdan ürünleri kataloğunuza dahil edin.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div
+                    onClick={() => {
+                      const targetCat = catalogs[0];
+                      if (targetCat) {
+                        const catProducts = resolveCatalogProducts(targetCat);
+                        setQrStickerModalData({ catalog: targetCat, products: catProducts });
+                      } else {
+                        handleStartNew('milano', 1);
+                      }
+                    }}
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-neutral-50 transition cursor-pointer group"
+                  >
+                    <div className="w-6 h-6 rounded-full border border-amber-400 text-amber-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-2">
+                      3
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-[#fbf6ee] text-amber-800 border border-amber-100 flex items-center justify-center flex-shrink-0 group-hover:bg-[#b4823c] group-hover:text-white transition-colors">
+                      <Upload size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-extrabold text-neutral-900 group-hover:text-[#b4823c] transition-colors">
+                        Yayınla ve paylaş
+                      </h4>
+                      <p className="text-[11px] text-neutral-500 leading-snug mt-0.5">
+                        Kataloğunuzu yayınlayın, QR kod ve link ile paylaşın.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* 3. Luxury Discovery Promo Card */}
-              <div
-                className="rounded-lg p-6 sm:p-7 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[220px] group border border-neutral-800"
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(24,24,27,0.9) 60%, rgba(180,130,60,0.5) 100%), url(/renders/luxury_bathroom_albatros_antrasit.jpg) center/cover no-repeat'
-                }}
-              >
-                <div className="space-y-2.5 z-10 max-w-[240px]">
-                  <span className="text-[9px] font-mono tracking-widest uppercase text-amber-300 font-bold block">
-                    SERAMİKBAK PRO SUITE
-                  </span>
-                  <h4 className="text-base font-serif font-bold text-white leading-snug">
-                    Dijital Kataloğun Gücünü Keşfedin
-                  </h4>
-                  <p className="text-[11px] text-neutral-300 leading-relaxed font-light">
-                    Mimari projeler, bayi teşhirleri ve global ihracat fuarları için interaktif lookbooklar oluşturun.
-                  </p>
+              {/* Card 2: Kataloğunu paylaş */}
+              <div className="bg-gradient-to-b from-white via-amber-50/20 to-orange-50/40 rounded-2xl border border-neutral-200/90 p-5 shadow-sm space-y-4 relative overflow-hidden">
+                {/* Decorative Warm Radial Glow */}
+                <div className="absolute top-0 right-0 w-36 h-36 bg-amber-200/30 rounded-full blur-2xl pointer-events-none" />
+
+                {/* 3D Realistic Catalog Cover Mockup */}
+                <div className="relative z-10 flex justify-center py-2">
+                  <div
+                    className="w-44 h-56 rounded-md shadow-2xl relative overflow-hidden border border-neutral-300 bg-neutral-900 flex flex-col justify-between p-3.5 text-white transform -rotate-2 hover:rotate-0 transition-transform duration-300"
+                    style={{
+                      boxShadow: '10px 18px 30px rgba(0,0,0,0.22), 2px 4px 8px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {/* Background Cover Image */}
+                    <div
+                      className="absolute inset-0 bg-cover bg-center opacity-80"
+                      style={{
+                        backgroundImage: `url(${catalogs[0]?.coverImageUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'})`
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-neutral-950/70" />
+
+                    {/* Book Spine Shadow on Left */}
+                    <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/40 to-transparent" />
+
+                    {/* Cover Top Text */}
+                    <div className="relative z-10">
+                      <h4 className="text-[12px] font-serif font-black tracking-widest uppercase text-white">
+                        {brandInfo?.name || 'BIEN SERAMİK'}
+                      </h4>
+                      <span className="text-[8px] font-mono tracking-wider text-amber-300 block uppercase">
+                        MİMARİ KATALOG
+                      </span>
+                    </div>
+
+                    {/* Cover Bottom Text */}
+                    <div className="relative z-10">
+                      <div className="text-[10px] font-sans font-bold text-white line-clamp-1">
+                        {catalogs[0]?.title || '2026 Genel Koleksiyon'}
+                      </div>
+                      <div className="text-[8px] text-neutral-300">
+                        {catalogs[0]?.itemCount || 26} Ürün &bull; {getEstimatedPages(catalogs[0]) || 31} Sayfa
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="pt-5 z-10">
-                  <button
-                    type="button"
-                    onClick={() => handleStartNew('milano', 1)}
-                    className="px-4 py-2.5 rounded-md bg-gradient-to-r from-[#b4823c] to-amber-600 hover:from-[#9f7131] hover:to-amber-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-md hover:shadow-lg transition cursor-pointer"
-                  >
-                    <span>Stüdyo Rehberi</span>
-                    <ArrowRight size={13} />
-                  </button>
+                {/* Text & Button Area */}
+                <div className="relative z-10 space-y-2">
+                  <h4 className="text-base font-extrabold text-neutral-900">Kataloğunu paylaş</h4>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    Kataloğunuza özel QR kod ile müşterilerinizle kolayca paylaşın.
+                  </p>
+
+                  <div className="pt-2 flex items-center gap-3">
+                    {/* Scannable QR code preview */}
+                    <div className="w-16 h-16 rounded-xl bg-white border border-neutral-300 p-1 flex-shrink-0 shadow-2xs flex items-center justify-center">
+                      {sidebarQrDataUrl ? (
+                        <img src={sidebarQrDataUrl} alt="Katalog QR" className="w-full h-full object-contain" />
+                      ) : (
+                        <QrCode size={36} className="text-neutral-800" />
+                      )}
+                    </div>
+
+                    {/* Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const targetCat = catalogs[0];
+                        const catProducts = resolveCatalogProducts(targetCat);
+                        setQrStickerModalData({
+                          catalog: targetCat || null,
+                          products: catProducts
+                        });
+                      }}
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
+                    >
+                      <QrCode size={14} />
+                      <span>QR etiketlerini oluştur</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      )}
 
       {/* ========================================================================= */}
       {/* VIEW MODE: TEMPLATE GALLERY (ŞABLON GALERİSİ)                             */}
