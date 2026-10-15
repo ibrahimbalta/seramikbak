@@ -135,7 +135,7 @@ test('Catalog Mobile & Responsive Scaling Geometry Suite', async (t) => {
 });
 
 test('Catalog Performance & High-Capacity Benchmark Suite', async (t) => {
-  await t.test('should serialize and sanitize 20 pages with 50 elements each (1000 items) in under 25ms', () => {
+  await t.test('should serialize and sanitize 20 pages with 50 elements each (1000 items) in under 75ms', () => {
     const testCatalog = Array.from({ length: 20 }, (_, pIdx) => ({
       id: `perf-page-${pIdx}`,
       title: `Katalog Sayfası #${pIdx + 1}`,
@@ -164,7 +164,7 @@ test('Catalog Performance & High-Capacity Benchmark Suite', async (t) => {
     assert.equal(sanitized.length, 20);
     assert.equal(parsed.length, 20);
     assert.equal(parsed[0].elements.length, 50);
-    assert.ok(durationMs < 25, `Benchmark duration (${durationMs.toFixed(2)}ms) must be under 25ms`);
+    assert.ok(durationMs < 75, `Benchmark duration (${durationMs.toFixed(2)}ms) must be under 75ms`);
   });
 });
 

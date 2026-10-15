@@ -20,21 +20,39 @@ export default function ArchitecturalSpecSheetTemplate({
   products = [],
   mode = 'preview',
   activePageIndex = 0,
-  viewFormat = 'single'
+  viewFormat = 'single',
+  onSelectPage
 }) {
-  const brand = catalog.brand || {};
-  const logo = catalog.customLogoUrl || brand.logoUrl;
+  const brand = catalog?.brand || {};
+  const logo = catalog?.customLogoUrl || brand.logoUrl;
   const [imgErrors, setImgErrors] = useState({});
 
   const handleImgError = (id) => {
     setImgErrors((prev) => ({ ...prev, [id]: true }));
   };
 
+  const safeProducts = products && products.length > 0 ? products : [
+    {
+      id: 'spec-demo-1',
+      name: 'Loft Beton Gri',
+      code: 'SB-LT60120',
+      width: 60,
+      height: 120,
+      finish: 'Mat R10',
+      slipResistance: 'R10',
+      peiRating: '4',
+      thickness: '10',
+      rectified: true,
+      imageUrl: '/renders/luxury_bathroom_loft_beton.jpg',
+      description: 'Endüstriyel brüt beton dokusu ve yüksek kırılma mukavemetiyle ticari mekanlar için tasarlanmış porselen karo.'
+    }
+  ];
+
   const pages = [];
-  if (catalog.showCover) pages.push({ type: 'cover' });
-  if (catalog.showTOC && products.length > 0) pages.push({ type: 'toc' });
-  products.forEach((p, idx) => pages.push({ type: 'product', product: p, index: idx }));
-  if (catalog.showContactPage) pages.push({ type: 'contact' });
+  if (catalog?.showCover !== false) pages.push({ type: 'cover' });
+  if (catalog?.showTOC !== false) pages.push({ type: 'toc' });
+  safeProducts.forEach((p, idx) => pages.push({ type: 'product', product: p, index: idx }));
+  if (catalog?.showContactPage !== false) pages.push({ type: 'contact' });
 
   const renderSinglePage = (pageObj, pageIndex) => {
     if (!pageObj) return null;
@@ -490,6 +508,31 @@ export default function ArchitecturalSpecSheetTemplate({
     return (
       <div className="w-full flex justify-center">
         {renderSinglePage(pages[activePageIndex] || pages[0], activePageIndex)}
+      </div>
+    );
+  }
+
+  if (viewFormat === 'spread') {
+    const isCover = activePageIndex === 0;
+    if (isCover) {
+      return (
+        <div className="w-full flex justify-center">
+          {renderSinglePage(pages[0], 0)}
+        </div>
+      );
+    }
+
+    const leftIdx = activePageIndex % 2 === 1 ? activePageIndex : activePageIndex - 1;
+    const rightIdx = leftIdx + 1;
+
+    return (
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-6">
+        <div className="w-full md:w-1/2 flex justify-end">
+          {renderSinglePage(pages[leftIdx], leftIdx)}
+        </div>
+        <div className="w-full md:w-1/2 flex justify-start">
+          {rightIdx < pages.length && renderSinglePage(pages[rightIdx], rightIdx)}
+        </div>
       </div>
     );
   }

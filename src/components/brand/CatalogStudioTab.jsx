@@ -57,108 +57,15 @@ import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEd
 import ShowroomQrStickerModal from './catalog/ShowroomQrStickerModal';
 import { generateQrDataUrl, buildCatalogPublicUrl } from '../../utils/generateQrCode';
 
-export const TEMPLATES = [
-  {
-    id: 'milano',
-    name: 'Milano Lookbook',
-    badge: '120×280 & Dev Ebat Matbaa Baskısı',
-    desc: 'İtalyan Cersaie ve Milano matbaa standardında 2 sayfalı mimari monograf mizanpajı: Sol sayfada yaşam alanı uygulaması ve teknik şartname matrisi; sağ sayfada tam boy dikey plaka ve varyasyonlar.',
-    accent: '#b4823c',
-    icon: Sparkles,
-    tag: 'Mimarlar & Tasarımcılar',
-    mockupImg: '/renders/modern_living_natural_oak.jpg'
-  },
-  {
-    id: 'deco',
-    name: 'Deco Exclusive',
-    badge: 'Bien Kare Monograf & Dekofon',
-    desc: 'Bien Seramik Exclusive dergi standardında kare (1:1) editoryal katalog: Sol sayfada tam boy mekan fotoğrafı, sağ sayfada geniş harf aralıklı koleksiyon başlığı, kare REC/M yüzey rozetleri ve dekofon karolar.',
-    accent: '#0f172a',
-    icon: LayoutTemplate,
-    tag: 'Exclusive & Lüks Konsept',
-    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg'
-  },
-  {
-    id: 'lidya',
-    name: 'Lidya Pro Technic',
-    badge: 'Mimari Modüler & Şartname',
-    desc: 'Mimari şartname ve teknik matris standardında modüler seramik kataloğu: Renk mühendisliği (Colour engineering), RAL renk paletleri, tel kafes modüler formlar ve R9-R12 kaymazlık matrisleri.',
-    accent: '#059669',
-    icon: Palette,
-    tag: 'Mimari Projeler & Şartname',
-    mockupImg: '/renders/luxury_bathroom_albatros_antrasit.jpg'
-  },
-  {
-    id: 'spec-sheet',
-    name: 'Architectural Spec Sheet',
-    badge: 'TS EN 14411 & BIM',
-    desc: 'Mimarlar, mühendisler ve kamu ihale dosyaları için CAD/BIM standartlarında teknik matris. TS EN 14411 uygunluğu, PEI aşınma, R kaymazlık, kutu/palet metrajı.',
-    accent: '#0284c7',
-    icon: Layers,
-    tag: 'İhale & Şartname',
-    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg'
-  },
-  {
-    id: 'showroom',
-    name: 'Showroom & Collection',
-    badge: 'Perakende & Bayi Satış',
-    desc: 'Bayi teşhirleri ve mağaza satış ekipleri için yan yana ürün kartları, önerilen mekan etiketleri (Banyo, Mutfak, Salon), derz eşleştirmeleri ve perakende liste etiketleri.',
-    accent: '#d97706',
-    icon: Building,
-    tag: 'Mağaza & Müşteri',
-    mockupImg: '/renders/luxury_bathroom_albatros_antrasit.jpg'
-  },
-  {
-    id: 'global-export',
-    name: 'Global Export & B2B',
-    badge: 'Konteyner & Lojistik',
-    desc: 'Yurtdışı distribütörler ve ihracat fuarları için çok dilli (EN/DE/AR) format. 20ft/40ft konteyner yükleme kapasiteleri, GTİP / HS Kodu (6907), CE / ISO sertifikaları.',
-    accent: '#2563eb',
-    icon: Globe,
-    tag: 'Global İhracat',
-    mockupImg: '/renders/luxury_bathroom_natural_oak.jpg'
-  },
-  {
-    id: 'verona',
-    name: 'Verona Natural Stone & Marble',
-    badge: 'Bookmatch & Damar Eşleme',
-    desc: 'İtalyan Verona ocakları kalitesinde lüks doğal taş lookbook: Simetrik bookmatch kelebek damar takibi, altın parıltılı lüks iç mekanlar, honlu/cilalı yüzey karşılaştırmaları.',
-    accent: '#c59b27',
-    icon: Sparkles,
-    tag: 'İtalyan Mermer & Rezidans',
-    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg'
-  },
-  {
-    id: 'nordic',
-    name: 'Nordic Concrete & Industrial Loft',
-    badge: 'Çimento & Terrazzo Monograf',
-    desc: 'Modern endüstriyel mimari için minimalist brüt beton serisi: Geniş antrasit/gri spektrumlar, çimento ve mikro-terrazzo dokuları ile çağdaş kentsel mekan tasarım rehberi.',
-    accent: '#475569',
-    icon: Layers,
-    tag: 'Brüt Beton & Loft Mimari',
-    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg'
-  },
-  {
-    id: 'artisan',
-    name: 'Artisan Boutique & Mediterranean Zellige',
-    badge: 'Rölyef & Parlak Sır Koleksiyonu',
-    desc: 'Geleneksel Akdeniz zellige ve butik seramik sanatı: Parlak dalgalı sırlar, canlı kobalt & adaçayı tonları, balıksırtı/altıgen dizilimler ve otel/kafe butik mizanpajı.',
-    accent: '#0d9488',
-    icon: Palette,
-    tag: 'Akdeniz Çini & Butik Karo',
-    mockupImg: '/renders/modern_living_natural_oak.jpg'
-  },
-  {
-    id: 'outdoor',
-    name: 'Outdoor 20mm & Landscape Architecture',
-    badge: 'R11-C Kaymazlık & Kuru Montaj',
-    desc: 'Bahçe, teras, havuz kenarları için 20 mm ekstra mukavemetli porselen plaka şartnamesi: Yükseltilmiş döşeme ayakları, çim/çakıl üzeri kuru montaj şeması ve don dayanımı.',
-    accent: '#15803d',
-    icon: Building,
-    tag: '2 cm Kalın Dış Mekan & Teras',
-    mockupImg: '/renders/luxury_bathroom_natural_oak.jpg'
-  }
-];
+import {
+  CATALOG_DESIGN_FAMILIES,
+  CATALOG_CATEGORIES,
+  CATALOG_STYLES,
+  filterTemplates,
+  getTemplateConfig
+} from './catalog/templates/registry';
+
+export const TEMPLATES = CATALOG_DESIGN_FAMILIES;
 
 const COLOR_PRESETS = [
   { name: 'Milano Gold', hex: '#b4823c' },
@@ -278,7 +185,22 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     publicSlug: ''
   });
 
-  // Modal preview state
+  // Template gallery filters & interactive preview modal states
+  const [galleryCategory, setGalleryCategory] = useState('all');
+  const [galleryStyle, setGalleryStyle] = useState('all');
+  const [gallerySearch, setGallerySearch] = useState('');
+  const [galleryPreviewTemplate, setGalleryPreviewTemplate] = useState(null);
+  const [galleryPreviewPageIdx, setGalleryPreviewPageIdx] = useState(0);
+
+  const filteredTemplates = useMemo(() => {
+    return filterTemplates({
+      category: galleryCategory,
+      style: galleryStyle,
+      searchQuery: gallerySearch
+    });
+  }, [galleryCategory, galleryStyle, gallerySearch]);
+
+    // Modal preview state
   const [previewCatalog, setPreviewCatalog] = useState(null);
   const [previewProducts, setPreviewProducts] = useState([]);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -1794,60 +1716,336 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {/* VIEW MODE: TEMPLATE GALLERY (ŞABLON GALERİSİ)                             */}
       {/* ========================================================================= */}
       {viewMode === 'templates-gallery' && (
-        <div className="space-y-5 pb-16">
-          <div className="bg-white rounded-2xl border border-neutral-200 p-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setViewMode('list')}
-                className="p-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700"
-              >
-                <ArrowLeft size={16} />
-              </button>
-              <div>
-                <h2 className="text-lg font-extrabold text-neutral-900">Profesyonel Katalog Şablonları</h2>
-                <p className="text-xs text-neutral-500">
-                  Koleksiyonunuza uygun şablonu seçerek hemen kataloğunuzu oluşturmaya başlayın.
-                </p>
+        <div className="space-y-6 pb-20">
+          {/* Header Banner & Breadcrumb */}
+          <div className="bg-white rounded-2xl border border-neutral-200/90 p-5 shadow-sm space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className="p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition cursor-pointer"
+                  title="Katalog Listesine Dön"
+                >
+                  <ArrowLeft size={16} />
+                </button>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-md bg-[#b4823c]/10 text-[#b4823c] font-mono text-[10px] font-bold uppercase tracking-wider">
+                      12 KURUMSAL MİZANPAJ
+                    </span>
+                    <span className="text-xs font-mono text-neutral-400">&bull; Şablon Kütüphanesi</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 mt-1">
+                    Profesyonel Katalog ve Lookbook Şablonları
+                  </h2>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    İtalyan monograflardan teknik şartname paftalarına ve ihracat kataloglarına kadar amacınıza uygun şablonu seçin.
+                  </p>
+                </div>
+              </div>
+
+              {/* Search Box */}
+              <div className="relative min-w-[260px] sm:min-w-[320px]">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <input
+                  type="text"
+                  value={gallerySearch}
+                  onChange={(e) => setGallerySearch(e.target.value)}
+                  placeholder="Şablon adı, stil veya hedef kitle ara..."
+                  className="w-full pl-9 pr-4 py-2.5 rounded-full border border-neutral-200 bg-neutral-50/60 focus:bg-white focus:border-[#b4823c] text-xs font-medium text-neutral-800 placeholder-neutral-400 outline-none shadow-2xs transition"
+                />
+              </div>
+            </div>
+
+            {/* Filter Pills (Categories & Styles) */}
+            <div className="space-y-2.5 pt-2 border-t border-neutral-100">
+              {/* Category Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-mono uppercase text-neutral-400 mr-2 flex items-center gap-1">
+                  <Filter size={12} /> Kategori:
+                </span>
+                {CATALOG_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setGalleryCategory(cat.id)}
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                      galleryCategory === cat.id
+                        ? 'bg-[#0f172a] text-white shadow-xs'
+                        : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Style Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-mono uppercase text-neutral-400 mr-2 flex items-center gap-1">
+                  <Palette size={12} /> Stil:
+                </span>
+                {CATALOG_STYLES.map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => setGalleryStyle(st.id)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                      galleryStyle === st.id
+                        ? 'bg-[#b4823c] text-white shadow-xs'
+                        : 'bg-neutral-100/80 text-neutral-500 hover:bg-neutral-200/80'
+                    }`}
+                  >
+                    {st.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {TEMPLATES.map((tpl) => (
+          {/* Templates Grid (12 Design Families) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTemplates.map((tpl) => (
               <div
                 key={tpl.id}
-                className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-2xs hover:shadow-lg transition flex flex-col justify-between"
+                className="bg-white rounded-2xl border border-neutral-200/90 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
               >
+                {/* Card Top: Mockup Image with Gradient Overlay & Badges */}
                 <div
-                  className="h-48 p-5 flex flex-col justify-between text-white relative"
+                  className="h-52 w-full p-4 flex flex-col justify-between text-white relative overflow-hidden"
                   style={{
-                    background: `linear-gradient(180deg, rgba(15,23,42,0.7) 0%, rgba(15,23,42,0.85) 100%), url(${tpl.mockupImg}) center/cover no-repeat`
+                    background: `linear-gradient(180deg, rgba(15,23,42,0.65) 0%, rgba(15,23,42,0.92) 100%), url(${tpl.mockupImg || '/renders/modern_living_natural_oak.jpg'}) center/cover no-repeat`
                   }}
                 >
-                  <span className="self-start px-2.5 py-1 rounded-md bg-black/50 backdrop-blur-xs text-[10px] font-mono font-bold text-amber-300 uppercase">
-                    {tpl.badge}
-                  </span>
-                  <div>
-                    <h3 className="text-xl font-serif font-bold">{tpl.name}</h3>
-                    <span className="text-xs text-neutral-300">{tpl.tag}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-xs text-[10px] font-mono font-bold text-amber-300 uppercase tracking-wider border border-white/10">
+                      {tpl.badge}
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-white/15 backdrop-blur-xs text-[9px] font-mono text-neutral-200">
+                      {tpl.aspect}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-amber-300/90 block">
+                      {tpl.tag}
+                    </span>
+                    <h3 className="text-xl font-serif font-bold text-white group-hover:text-amber-300 transition-colors">
+                      {tpl.name}
+                    </h3>
+                    <p className="text-[11px] text-neutral-300 line-clamp-1">
+                      Hedef: {tpl.targetAudience}
+                    </p>
                   </div>
                 </div>
 
+                {/* Card Body: Description & Supported Page Layouts */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <p className="text-xs text-neutral-600 leading-relaxed">{tpl.desc}</p>
-                  <button
-                    type="button"
-                    onClick={() => handleStartNew(tpl.id, 1)}
-                    className="w-full py-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer"
-                  >
-                    <span>Bu Şablonla Katalog Oluştur</span>
-                    <ArrowRight size={14} />
-                  </button>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    {tpl.description}
+                  </p>
+
+                  {/* Supported Pages Chips */}
+                  {Array.isArray(tpl.supportedPages) && tpl.supportedPages.length > 0 && (
+                    <div className="space-y-1.5 pt-2 border-t border-neutral-100">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">
+                        Desteklenen Sayfa Tipleri ({tpl.supportedPages.length}):
+                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {tpl.supportedPages.slice(0, 5).map((pg, pIdx) => (
+                          <span
+                            key={pIdx}
+                            className="px-2 py-0.5 rounded bg-neutral-100 text-[10px] font-medium text-neutral-600"
+                            title={pg.desc}
+                          >
+                            {pg.label}
+                          </span>
+                        ))}
+                        {tpl.supportedPages.length > 5 && (
+                          <span className="px-1.5 py-0.5 rounded bg-amber-50 text-[10px] font-mono font-bold text-amber-700">
+                            +{tpl.supportedPages.length - 5}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Card Actions: Önizle & Bu Şablonu Kullan */}
+                  <div className="pt-3 border-t border-neutral-100 flex items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGalleryPreviewTemplate(tpl);
+                        setGalleryPreviewPageIdx(0);
+                      }}
+                      className="px-3.5 py-2.5 rounded-xl border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Eye size={14} className="text-neutral-500" />
+                      <span>Önizle</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleStartNew(tpl.id, 1)}
+                      className="flex-1 py-2.5 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
+                    >
+                      <span>Bu Şablonu Kullan</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {filteredTemplates.length === 0 && (
+            <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center space-y-3">
+              <Layers size={36} className="text-neutral-400 mx-auto" />
+              <h3 className="text-base font-bold text-neutral-800">Aramanıza uygun şablon bulunamadı</h3>
+              <p className="text-xs text-neutral-500 max-w-sm mx-auto">
+                Lütfen arama teriminizi değiştirin veya filtreleri temizleyin.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setGalleryCategory('all');
+                  setGalleryStyle('all');
+                  setGallerySearch('');
+                }}
+                className="px-4 py-2 rounded-xl bg-neutral-900 text-white text-xs font-bold"
+              >
+                Filtreleri Temizle
+              </button>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* INTERACTIVE FULL-PAGE TEMPLATE WALKTHROUGH MODAL                          */}
+          {/* ========================================================================= */}
+          {galleryPreviewTemplate && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 no-print">
+              <div className="bg-neutral-950 rounded-2xl sm:rounded-3xl border border-white/10 w-full max-w-5xl h-[92vh] flex flex-col overflow-hidden text-white shadow-2xl">
+                {/* Modal Top Header */}
+                <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-neutral-900/80">
+                  <div className="flex items-center gap-3">
+                    <span className="px-2.5 py-1 rounded-md bg-[#b4823c]/20 text-[#b4823c] font-mono text-[10px] font-bold uppercase border border-[#b4823c]/40">
+                      {galleryPreviewTemplate.badge}
+                    </span>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-serif font-bold text-white flex items-center gap-2">
+                        {galleryPreviewTemplate.name}
+                        <span className="text-xs font-mono font-normal text-neutral-400">
+                          ({galleryPreviewTemplate.aspect})
+                        </span>
+                      </h3>
+                      <p className="text-xs text-neutral-400 line-clamp-1">
+                        {galleryPreviewTemplate.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setGalleryPreviewTemplate(null)}
+                    className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-neutral-300 hover:text-white transition cursor-pointer"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Modal Main Viewport: Live Template Rendering */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex justify-center bg-neutral-900">
+                  <div className="w-full max-w-4xl">
+                    <CatalogTemplateRenderer
+                      catalog={{
+                        title: galleryPreviewTemplate.name,
+                        subtitle: galleryPreviewTemplate.description,
+                        template: galleryPreviewTemplate.id,
+                        orientation: galleryPreviewTemplate.orientation || 'portrait',
+                        showCover: true,
+                        showTOC: true,
+                        showSpecs: true,
+                        showContactPage: true,
+                        brand: brandInfo || { name: 'Bien Seramik' }
+                      }}
+                      products={availableProducts.length > 0 ? availableProducts.slice(0, 4) : [
+                        {
+                          id: 'preview-1',
+                          name: 'Amazonit Verde',
+                          width: 120,
+                          height: 280,
+                          finish: 'Parlak Lappato',
+                          color: 'Zümrüt Yeşili',
+                          imageUrl: '/renders/modern_living_natural_oak.jpg'
+                        },
+                        {
+                          id: 'preview-2',
+                          name: 'Calacatta Gold',
+                          width: 120,
+                          height: 280,
+                          finish: 'Parlak',
+                          color: 'Beyaz / Altın',
+                          imageUrl: '/renders/luxury_bathroom_calacatta_gold.jpg'
+                        }
+                      ]}
+                      mode="preview"
+                      initialPage={galleryPreviewPageIdx}
+                    />
+                  </div>
+                </div>
+
+                {/* Modal Bottom Bar: Supported Pages Thumbnails & CTA */}
+                <div className="px-5 py-3.5 border-t border-white/10 bg-neutral-900/90 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  {/* Page Type Chips */}
+                  <div className="flex items-center gap-2 overflow-x-auto max-w-full py-1">
+                    <span className="text-[10px] font-mono text-neutral-400 uppercase mr-1">
+                      Sayfalar:
+                    </span>
+                    {Array.isArray(galleryPreviewTemplate.supportedPages) &&
+                      galleryPreviewTemplate.supportedPages.map((pg, pIdx) => (
+                        <button
+                          key={pIdx}
+                          type="button"
+                          onClick={() => setGalleryPreviewPageIdx(pIdx)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                            galleryPreviewPageIdx === pIdx
+                              ? 'bg-[#b4823c] text-white font-bold'
+                              : 'bg-white/10 text-neutral-300 hover:bg-white/20'
+                          }`}
+                        >
+                          {pg.label}
+                        </button>
+                      ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setGalleryPreviewTemplate(null)}
+                      className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-neutral-300 transition"
+                    >
+                      Kapat
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const tplId = galleryPreviewTemplate.id;
+                        setGalleryPreviewTemplate(null);
+                        handleStartNew(tplId, 1);
+                      }}
+                      className="px-5 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition cursor-pointer"
+                    >
+                      <span>Bu Şablonla Başla</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

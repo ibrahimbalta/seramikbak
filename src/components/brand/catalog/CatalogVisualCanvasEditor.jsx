@@ -52,9 +52,42 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
-// ANA KATALOG ŞABLONLARI (10 ADET KURUMSAL MATBAA ŞABLONU)
+// ANA KATALOG ŞABLONLARI (12 ADET KURUMSAL MATBAA ŞABLONU)
 // ============================================================================
 export const CATALOG_MASTER_TEMPLATES = [
+  {
+    id: 'premium-mimari',
+    name: 'Premium Mimari Lookbook',
+    badge: '120×280 & Dev Ebat Matbaa Baskısı',
+    tag: 'MİMARLAR & TASARIMCILAR',
+    desc: 'İtalyan Cersaie ve Milano matbaa standardında 2 sayfalı mimari monograf mizanpajı: Sol sayfada yaşam alanı uygulaması ve teknik şartname matrisi; sağ sayfada tam boy dikey plaka ve varyasyonlar.',
+    accent: '#b4823c',
+    mockupImg: '/renders/modern_living_natural_oak.jpg',
+    bgColor: '#18181b',
+    format: 'A4 Dikey Çift Sayfa'
+  },
+  {
+    id: 'minimal-koleksiyon',
+    name: 'Minimal Koleksiyon Kataloğu',
+    badge: 'Japandi & İskandinav Estetiği',
+    tag: 'MINIMAL WHITE-SPACE',
+    desc: 'Yüksek oranda negatif boşluk, zarif tipografi ve asimetrik grid dengesiyle sakin, zamansız bir estetik sunan minimalist karo kataloğu.',
+    accent: '#78716c',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    bgColor: '#fcfbf9',
+    format: 'A4 Dikey Asimetrik Grid'
+  },
+  {
+    id: 'teknik-urun',
+    name: 'Teknik Ürün Kataloğu',
+    badge: 'TS EN 14411 & BIM Standartları',
+    tag: 'CAD / BIM / İHALE',
+    desc: 'Resmi ihaleler, mimari şartnameler ve mühendislik dosyaları için modüler teknik matris formatı. PEI aşınma, R9-R13 kaymazlık ve lojistik tabloları.',
+    accent: '#0284c7',
+    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg',
+    bgColor: '#ffffff',
+    format: 'A4 Dikey / Yatay CAD Formatı'
+  },
   {
     id: 'milano',
     name: 'Milano Lookbook',

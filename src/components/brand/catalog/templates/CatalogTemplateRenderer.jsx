@@ -13,6 +13,7 @@ import {
   Loader2
 } from 'lucide-react';
 import MilanoLookbookTemplate from './MilanoLookbookTemplate';
+import MinimalCollectionTemplate from './MinimalCollectionTemplate';
 import ArchitecturalSpecSheetTemplate from './ArchitecturalSpecSheetTemplate';
 import ShowroomCollectionTemplate from './ShowroomCollectionTemplate';
 import GlobalExportTemplate from './GlobalExportTemplate';
@@ -141,19 +142,34 @@ export default function CatalogTemplateRenderer({
 
     switch (template) {
       case 'spec-sheet':
+      case 'teknik-urun':
       case 'nordic':
         return <ArchitecturalSpecSheetTemplate {...props} />;
+      case 'minimal-koleksiyon':
+      case 'minimal-editorial':
+      case 'nordic-minimal':
+        return <MinimalCollectionTemplate {...props} />;
       case 'showroom':
+      case 'fuar-bayi':
         return <ShowroomCollectionTemplate {...props} />;
       case 'global-export':
+      case 'modern-ihracat':
         return <GlobalExportTemplate {...props} />;
       case 'lidya':
+      case 'endustriyel-ticari':
       case 'outdoor':
         return <LidyaTechnicTemplate {...props} />;
       case 'deco':
+      case 'dijital-brosur':
       case 'artisan':
         return <DecoExclusiveTemplate {...props} />;
       case 'verona':
+      case 'dogal-tas-mermer':
+      case 'banyo-mutfak':
+      case 'mimar-sunum':
+      case 'renk-ebat-rehberi':
+      case 'yeni-lansman':
+      case 'premium-mimari':
       case 'milano':
       default:
         return <MilanoLookbookTemplate {...props} />;
