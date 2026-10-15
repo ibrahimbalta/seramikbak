@@ -1781,6 +1781,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             </div>
           </div>
         </div>
+      )}
 
       {/* ========================================================================= */}
       {/* VIEW MODE: TEMPLATE GALLERY (ŞABLON GALERİSİ)                             */}
