@@ -1035,9 +1035,10 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
   // Calculate estimated page count for card display
   const getEstimatedPages = (cat) => {
-    const count = cat.itemCount || 6;
-    if (cat.template === 'milano' || cat.template === 'deco') return count * 2 + 4;
-    if (cat.template === 'lidya') return count + 5;
+    if (!cat) return 24;
+    const count = cat?.itemCount || 6;
+    if (cat?.template === 'milano' || cat?.template === 'deco') return count * 2 + 4;
+    if (cat?.template === 'lidya') return count + 5;
     return count + 3;
   };
 
@@ -1766,11 +1767,15 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                       type="button"
                       onClick={() => {
                         const targetCat = catalogs[0];
-                        const catProducts = resolveCatalogProducts(targetCat);
-                        setQrStickerModalData({
-                          catalog: targetCat || null,
-                          products: catProducts
-                        });
+                        if (targetCat) {
+                          const catProducts = resolveCatalogProducts(targetCat);
+                          setQrStickerModalData({
+                            catalog: targetCat,
+                            products: catProducts
+                          });
+                        } else {
+                          handleStartNew('milano', 1);
+                        }
                       }}
                       className="flex-1 py-2.5 px-3 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
                     >
