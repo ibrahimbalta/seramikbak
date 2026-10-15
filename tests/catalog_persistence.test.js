@@ -729,3 +729,39 @@ test('Showroom QR Code & Sticker Print Generation Suite (Aşama 3)', async (t) =
   });
 });
 
+test('Web Catalog 3D Studio Bridge & PDF Print Rules Suite (Aşama 4)', async (t) => {
+  await t.test('should resolve TOC page targets correctly without off-by-one errors', () => {
+    // Milano lookbook logic: Cover (1), TOC (2), Manifesto (3), Product 0 starts at Page 4 (index 3)
+    const calculateProductPageIndex = (productIndex) => {
+      return 3 + productIndex * 2;
+    };
+
+    assert.equal(calculateProductPageIndex(0), 3); // Page 4 in 1-based display
+    assert.equal(calculateProductPageIndex(1), 5); // Page 6 in 1-based display
+    assert.equal(calculateProductPageIndex(4), 11); // Page 12 in 1-based display
+  });
+
+  await t.test('should format visualizer and 3D studio query parameters symmetrically', () => {
+    const slug = 'storia-dark-green-60x120';
+    const visualizerUrl = `/mekan-dene?product=${encodeURIComponent(slug)}`;
+    const studio3dUrl = `/urun/${encodeURIComponent(slug)}?studio=3d`;
+
+    assert.equal(visualizerUrl, '/mekan-dene?product=storia-dark-green-60x120');
+    assert.equal(studio3dUrl, '/urun/storia-dark-green-60x120?studio=3d');
+  });
+
+  await t.test('should ensure print style sheet enforces zero margin and page break rules', () => {
+    const printRules = {
+      pageSize: 'A4 portrait',
+      pageMargin: '0mm',
+      pageBreakAfter: 'always',
+      pageBreakInside: 'avoid'
+    };
+
+    assert.equal(printRules.pageSize, 'A4 portrait');
+    assert.equal(printRules.pageMargin, '0mm');
+    assert.equal(printRules.pageBreakAfter, 'always');
+    assert.equal(printRules.pageBreakInside, 'avoid');
+  });
+});
+

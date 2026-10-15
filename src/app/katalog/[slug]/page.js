@@ -239,20 +239,28 @@ export default function PublicCatalogViewerPage() {
                   </div>
 
                   {p.slug && (
-                    <div className="flex flex-col gap-1 flex-shrink-0">
+                    <div className="flex flex-col gap-1.5 flex-shrink-0">
                       <Link
                         href={`/urun/${p.slug}`}
-                        className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-[10px] flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-[10px] flex items-center justify-center gap-1"
                       >
                         <span>Detay</span>
                         <ExternalLink size={10} />
                       </Link>
-                      <Link
-                        href={`/mekan-dene?product=${p.slug}`}
-                        className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-amber-300 text-[9px] font-semibold text-center"
-                      >
-                        Mekânda Gör
-                      </Link>
+                      <div className="flex items-center gap-1">
+                        <Link
+                          href={`/mekan-dene?product=${p.slug}`}
+                          className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-amber-300 text-[9px] font-semibold text-center whitespace-nowrap"
+                        >
+                          Mekânda Gör
+                        </Link>
+                        <Link
+                          href={`/urun/${p.slug}?studio=3d`}
+                          className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[9px] font-bold text-center whitespace-nowrap border border-amber-500/30"
+                        >
+                          3D Studio
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -132,7 +132,11 @@ export default function CatalogTemplateRenderer({
       products,
       mode,
       activePageIndex: currentPage,
-      viewFormat
+      viewFormat,
+      onSelectPage: (idx) => {
+        setCurrentPage(idx);
+        if (viewFormat === 'spread') setViewFormat('single');
+      }
     };
 
     switch (template) {

@@ -18,7 +18,8 @@ export default function MilanoLookbookTemplate({
   products = [],
   mode = 'preview',
   activePageIndex = 0,
-  viewFormat = 'single'
+  viewFormat = 'single',
+  onSelectPage
 }) {
   const brand = catalog?.brand || {};
   const logo = catalog?.customLogoUrl || brand.logoUrl;
@@ -221,48 +222,64 @@ export default function MilanoLookbookTemplate({
               {safeProducts.map((p, idx) => {
                 // Page calculation: Cover=1, TOC=2, Manifesto=3, Product idx starts at 4 + idx*2
                 const pStartPage = (4 + idx * 2).toString().padStart(2, '0');
+                const targetIdx = 3 + idx * 2;
                 return (
-                  <div
+                  <button
                     key={p.id || idx}
-                    className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 group"
+                    type="button"
+                    onClick={() => mode !== 'print' && onSelectPage?.(targetIdx)}
+                    className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 group text-left w-full cursor-pointer hover:border-amber-400 transition"
+                    title={mode !== 'print' ? `${p.name} sayfasına git` : undefined}
                   >
-                    <span className="font-sans font-medium text-neutral-800 group-hover:text-neutral-950 transition">
+                    <span className="font-sans font-medium text-neutral-800 group-hover:text-[#b4823c] transition truncate pr-2">
                       {p.name}
                     </span>
-                    <span className="font-mono text-neutral-500 text-xs tracking-wider">
+                    <span className="font-mono text-neutral-500 text-xs tracking-wider group-hover:text-[#b4823c] transition flex-shrink-0">
                       {pStartPage}
                     </span>
-                  </div>
+                  </button>
                 );
               })}
 
               {/* Extra Core Sections */}
-              <div className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5">
-                <span className="font-sans font-medium text-neutral-800">
+              <button
+                type="button"
+                onClick={() => mode !== 'print' && onSelectPage?.(3 + safeProducts.length * 2)}
+                className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 group text-left w-full cursor-pointer hover:border-amber-400 transition"
+              >
+                <span className="font-sans font-medium text-neutral-800 group-hover:text-[#b4823c] transition">
                   Teknik Özellikler & Standartlar
                 </span>
-                <span className="font-mono text-neutral-500 text-xs tracking-wider">
+                <span className="font-mono text-neutral-500 text-xs tracking-wider group-hover:text-[#b4823c] transition">
                   {(4 + safeProducts.length * 2).toString().padStart(2, '0')}
                 </span>
-              </div>
+              </button>
 
-              <div className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5">
-                <span className="font-sans font-medium text-neutral-800">
+              <button
+                type="button"
+                onClick={() => mode !== 'print' && onSelectPage?.(4 + safeProducts.length * 2)}
+                className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 group text-left w-full cursor-pointer hover:border-amber-400 transition"
+              >
+                <span className="font-sans font-medium text-neutral-800 group-hover:text-[#b4823c] transition">
                   Kullanım Alanları & Mimari Çözümler
                 </span>
-                <span className="font-mono text-neutral-500 text-xs tracking-wider">
+                <span className="font-mono text-neutral-500 text-xs tracking-wider group-hover:text-[#b4823c] transition">
                   {(5 + safeProducts.length * 2).toString().padStart(2, '0')}
                 </span>
-              </div>
+              </button>
 
-              <div className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5">
-                <span className="font-sans font-medium text-neutral-800">
+              <button
+                type="button"
+                onClick={() => mode !== 'print' && onSelectPage?.(5 + safeProducts.length * 2)}
+                className="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 group text-left w-full cursor-pointer hover:border-amber-400 transition"
+              >
+                <span className="font-sans font-medium text-neutral-800 group-hover:text-[#b4823c] transition">
                   İletişim & Showroom
                 </span>
-                <span className="font-mono text-neutral-500 text-xs tracking-wider">
+                <span className="font-mono text-neutral-500 text-xs tracking-wider group-hover:text-[#b4823c] transition">
                   {(6 + safeProducts.length * 2).toString().padStart(2, '0')}
                 </span>
-              </div>
+              </button>
             </div>
           </div>
 
@@ -523,6 +540,19 @@ export default function MilanoLookbookTemplate({
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-black/5 pointer-events-none" />
+                {mode !== 'print' && (
+                  <a
+                    href={`/urun/${p.slug || p.id}?studio=3d`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-neutral-900/90 hover:bg-[#b4823c] text-white text-[10px] font-extrabold flex items-center gap-1.5 shadow-lg backdrop-blur-xs transition cursor-pointer z-20 group"
+                    title="Bu seramiği 3D Sanal Stüdyoda inceleyin"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                    <span>3D Mekanda Gör</span>
+                    <ExternalLink size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                  </a>
+                )}
               </div>
             </div>
 
