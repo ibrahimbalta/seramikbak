@@ -42,7 +42,9 @@ import {
   Archive,
   Clock,
   LayoutTemplate,
-  Wand2
+  Wand2,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
@@ -189,6 +191,14 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const [productsLoading, setProductsLoading] = useState(false);
   const [productSearch, setProductSearch] = useState('');
   const [productCategoryFilter, setProductCategoryFilter] = useState('all');
+  const [productSeriesFilter, setProductSeriesFilter] = useState('all');
+  const [productDimensionFilter, setProductDimensionFilter] = useState('all');
+  const [productColorFilter, setProductColorFilter] = useState('all');
+  const [productFinishFilter, setProductFinishFilter] = useState('all');
+  const [productGroupingMode, setProductGroupingMode] = useState('grid'); // 'grid' | 'series'
+  const [productPage, setProductPage] = useState(1);
+  const [productPageSize, setProductPageSize] = useState(24);
+  const [expandedSeries, setExpandedSeries] = useState({});
 
   // Active Catalog Editor State
   const [activeCatalogId, setActiveCatalogId] = useState(null);
@@ -803,20 +813,122 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     return list;
   }, [catalogs, filterTab, searchQuery, sortBy]);
 
-  const productCategories = ['all', ...new Set(availableProducts.map((p) => p.style).filter(Boolean))];
-
-  const filteredAvailableProducts = availableProducts.filter((p) => {
-    if (productCategoryFilter !== 'all' && p.style !== productCategoryFilter) return false;
-    if (productSearch.trim()) {
-      const q = productSearch.toLowerCase();
-      return (
-        p.name.toLowerCase().includes(q) ||
-        (p.code && p.code.toLowerCase().includes(q)) ||
-        (p.color && p.color.toLowerCase().includes(q))
-      );
+  // Derive clean series/collection name from product title or series field
+  const getProductSeries = (p) => {
+    if (!p) return 'Diğer';
+    if (p.series) return p.series;
+    const cleanName = (p.name || '').replace(/^(NG Kütahya|VitrA|Bien|Qua|Ege Seramik|Graniser|Seramiksan)\s+/i, '');
+    const firstWord = cleanName.split(' ')[0] || '';
+    if (firstWord && firstWord.length > 2 && !firstWord.match(/^\d+x\d+$/i)) {
+      return firstWord;
     }
-    return true;
-  });
+    return 'Diğer';
+  };
+
+  const productCategories = useMemo(() => ['all', ...new Set(availableProducts.map((p) => p.style).filter(Boolean))], [availableProducts]);
+
+  const productSeriesList = useMemo(() => {
+    const counts = {};
+    availableProducts.forEach((p) => {
+      const s = getProductSeries(p);
+      counts[s] = (counts[s] || 0) + 1;
+    });
+    const sorted = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    return ['all', ...sorted];
+  }, [availableProducts]);
+
+  const productDimensionsList = useMemo(() => {
+    const counts = {};
+    availableProducts.forEach((p) => {
+      if (p.width && p.height) {
+        const d = `${p.width}x${p.height}`;
+        counts[d] = (counts[d] || 0) + 1;
+      }
+    });
+    const sorted = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    return ['all', ...sorted];
+  }, [availableProducts]);
+
+  const productColorsList = useMemo(() => {
+    const counts = {};
+    availableProducts.forEach((p) => {
+      if (p.color) {
+        counts[p.color] = (counts[p.color] || 0) + 1;
+      }
+    });
+    const sorted = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    return ['all', ...sorted];
+  }, [availableProducts]);
+
+  const productFinishesList = useMemo(() => {
+    const counts = {};
+    availableProducts.forEach((p) => {
+      if (p.finish) {
+        counts[p.finish] = (counts[p.finish] || 0) + 1;
+      }
+    });
+    const sorted = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    return ['all', ...sorted];
+  }, [availableProducts]);
+
+  const filteredAvailableProducts = useMemo(() => {
+    return availableProducts.filter((p) => {
+      if (productCategoryFilter !== 'all' && p.style !== productCategoryFilter) return false;
+      if (productSeriesFilter !== 'all' && getProductSeries(p) !== productSeriesFilter) return false;
+      if (productDimensionFilter !== 'all' && `${p.width}x${p.height}` !== productDimensionFilter) return false;
+      if (productColorFilter !== 'all' && p.color !== productColorFilter) return false;
+      if (productFinishFilter !== 'all' && p.finish !== productFinishFilter) return false;
+      if (productSearch.trim()) {
+        const q = productSearch.toLowerCase();
+        return (
+          p.name.toLowerCase().includes(q) ||
+          (p.code && p.code.toLowerCase().includes(q)) ||
+          (p.color && p.color.toLowerCase().includes(q)) ||
+          (p.style && p.style.toLowerCase().includes(q)) ||
+          (`${p.width}x${p.height}`.includes(q))
+        );
+      }
+      return true;
+    });
+  }, [availableProducts, productCategoryFilter, productSeriesFilter, productDimensionFilter, productColorFilter, productFinishFilter, productSearch]);
+
+  // Series Grouped Structure for Tiles Catalogue pattern
+  const groupedBySeries = useMemo(() => {
+    const map = new Map();
+    filteredAvailableProducts.forEach((p) => {
+      const series = getProductSeries(p);
+      if (!map.has(series)) {
+        map.set(series, {
+          name: series,
+          style: p.style,
+          sampleImg: p.imageUrl || p.textureUrl,
+          items: []
+        });
+      }
+      map.get(series).items.push(p);
+    });
+    return Array.from(map.values()).sort((a, b) => b.items.length - a.items.length);
+  }, [filteredAvailableProducts]);
+
+  // Pagination for Grid View
+  const totalProductPages = Math.max(1, Math.ceil(filteredAvailableProducts.length / productPageSize));
+  const paginatedProducts = useMemo(() => {
+    const start = (productPage - 1) * productPageSize;
+    return filteredAvailableProducts.slice(start, start + productPageSize);
+  }, [filteredAvailableProducts, productPage, productPageSize]);
+
+  // Selected series summary
+  const selectedSeriesSummary = useMemo(() => {
+    const counts = {};
+    formData.selectedItems.forEach((item) => {
+      const prod = availableProducts.find((p) => p.id === item.productId);
+      if (prod) {
+        const s = getProductSeries(prod);
+        counts[s] = (counts[s] || 0) + 1;
+      }
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [formData.selectedItems, availableProducts]);
 
   // Dynamic Recent Activities derived from real catalogs & brand products
   const recentActivities = useMemo(() => {
@@ -2256,113 +2368,523 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   </div>
                 )}
 
-                {/* STEP 2: ÜRÜN SEÇİMİ & SIRALAMA */}
+                {/* STEP 2: AKILLI ÜRÜN & VARYANT YÖNETİMİ */}
                 {activeStep === 2 && (
-                  <div className="space-y-6">
-                    <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-5">
+                    {/* Header: Title, Action Bar & View Mode Toggle */}
+                    <div className="border-b border-neutral-100 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                       <div>
                         <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
                           <Layers size={20} className="text-[#b4823c]" />
-                          <span>2. Ürün ve Koleksiyon Seçimi</span>
+                          <span>2. Akıllı Ürün & Koleksiyon Seçimi</span>
                         </h3>
                         <p className="text-xs text-neutral-500 mt-1">
-                          Markanıza ait gerçek ürünleri arayın, filtreleyin, seçin ve katalog sayfa sırasını belirleyin.
+                          Koleksiyon, ebat ve yüzey varyantlarını tek tıkla gruplayın veya tekil karoları arayıp seçin.
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* View Mode Toggle: Grid vs Series Groups */}
+                        <div className="inline-flex rounded-xl border border-neutral-200 bg-neutral-100 p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => setProductGroupingMode('grid')}
+                            className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                              productGroupingMode === 'grid'
+                                ? 'bg-white text-neutral-900 shadow-2xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                            title="Tekil Karo Kartları"
+                          >
+                            <LayoutGrid size={13} />
+                            <span>Kart Görünümü</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setProductGroupingMode('series')}
+                            className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                              productGroupingMode === 'series'
+                                ? 'bg-white text-neutral-900 shadow-2xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                            title="Koleksiyon ve Ebat Grupları"
+                          >
+                            <Box size={13} />
+                            <span>Seri / Varyant Grupları</span>
+                          </button>
+                        </div>
+
+                        {/* Batch Action: Select All Filtered */}
                         <button
                           type="button"
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              selectedItems: filteredAvailableProducts.map((p) => ({
-                                productId: p.id,
-                                customNote: '',
-                                usageArea: p.style || 'İç Mekân'
-                              }))
-                            }))
-                          }
-                          className="px-3 py-1.5 rounded-lg border border-neutral-200 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                          onClick={() => {
+                            const newSelected = [...formData.selectedItems];
+                            filteredAvailableProducts.forEach((p) => {
+                              if (!newSelected.some((i) => i.productId === p.id)) {
+                                newSelected.push({
+                                  productId: p.id,
+                                  customNote: '',
+                                  usageArea: p.style || 'İç Mekân'
+                                });
+                              }
+                            });
+                            setFormData((prev) => ({ ...prev, selectedItems: newSelected }));
+                          }}
+                          className="px-3 py-1.5 rounded-lg border border-neutral-200 text-xs font-bold text-neutral-700 hover:bg-neutral-50 transition"
+                          title="Filtreye uyan tüm ürünleri ekle"
                         >
-                          Tümünü Seç
+                          Filtrelenenleri Seç ({filteredAvailableProducts.length})
                         </button>
-                        <span className="text-xs font-bold px-3.5 py-1.5 bg-amber-100 text-amber-900 rounded-full border border-amber-200">
+
+                        {/* Clear Selection */}
+                        {formData.selectedItems.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData((prev) => ({ ...prev, selectedItems: [] }))}
+                            className="px-3 py-1.5 rounded-lg border border-rose-200 text-xs font-bold text-rose-600 hover:bg-rose-50 transition"
+                          >
+                            Temizle
+                          </button>
+                        )}
+
+                        <span className="text-xs font-bold px-3.5 py-1.5 bg-amber-100 text-amber-900 rounded-full border border-amber-200 shadow-2xs">
                           {formData.selectedItems.length} Ürün Seçildi
                         </span>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="relative">
-                        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
-                        <input
-                          type="text"
-                          value={productSearch}
-                          onChange={(e) => setProductSearch(e.target.value)}
-                          placeholder="Ürün adı, kodu veya rengi ile ara..."
-                          className="w-full pl-9 pr-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium"
-                        />
+                    {/* Multi-Criteria Filter Bar */}
+                    <div className="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-200/80 space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                        {/* Search Input */}
+                        <div className="relative">
+                          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                          <input
+                            type="text"
+                            value={productSearch}
+                            onChange={(e) => {
+                              setProductSearch(e.target.value);
+                              setProductPage(1);
+                            }}
+                            placeholder="Ürün adı, SKU kodu, ebat veya renk..."
+                            className="w-full pl-8 pr-3 py-2 bg-white border border-neutral-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#b4823c] focus:border-transparent transition"
+                          />
+                        </div>
+
+                        {/* Series / Collection Dropdown */}
+                        <select
+                          value={productSeriesFilter}
+                          onChange={(e) => {
+                            setProductSeriesFilter(e.target.value);
+                            setProductPage(1);
+                          }}
+                          className="px-3 py-2 bg-white border border-neutral-200 rounded-xl text-xs font-medium text-neutral-800"
+                        >
+                          <option value="all">Tüm Koleksiyonlar & Seriler ({productSeriesList.length - 1})</option>
+                          {productSeriesList
+                            .filter((s) => s !== 'all')
+                            .map((s) => (
+                              <option key={s} value={s}>
+                                {s} Serisi
+                              </option>
+                            ))}
+                        </select>
+
+                        {/* Dimensions Dropdown */}
+                        <select
+                          value={productDimensionFilter}
+                          onChange={(e) => {
+                            setProductDimensionFilter(e.target.value);
+                            setProductPage(1);
+                          }}
+                          className="px-3 py-2 bg-white border border-neutral-200 rounded-xl text-xs font-medium text-neutral-800"
+                        >
+                          <option value="all">Tüm Ebatlar & Ölçüler ({productDimensionsList.length - 1})</option>
+                          {productDimensionsList
+                            .filter((d) => d !== 'all')
+                            .map((d) => (
+                              <option key={d} value={d}>
+                                {d} cm
+                              </option>
+                            ))}
+                        </select>
                       </div>
 
-                      <select
-                        value={productCategoryFilter}
-                        onChange={(e) => setProductCategoryFilter(e.target.value)}
-                        className="px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium"
-                      >
-                        <option value="all">Tüm Koleksiyonlar ({availableProducts.length})</option>
-                        {productCategories
-                          .filter((c) => c !== 'all')
-                          .map((cat) => (
-                            <option key={cat} value={cat}>
-                              {cat}
-                            </option>
-                          ))}
-                      </select>
+                      {/* Secondary Filters row */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                        {/* Color Dropdown */}
+                        <select
+                          value={productColorFilter}
+                          onChange={(e) => {
+                            setProductColorFilter(e.target.value);
+                            setProductPage(1);
+                          }}
+                          className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs font-medium text-neutral-700"
+                        >
+                          <option value="all">Tüm Renkler ({productColorsList.length - 1})</option>
+                          {productColorsList
+                            .filter((c) => c !== 'all')
+                            .map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                        </select>
+
+                        {/* Surface / Finish Dropdown */}
+                        <select
+                          value={productFinishFilter}
+                          onChange={(e) => {
+                            setProductFinishFilter(e.target.value);
+                            setProductPage(1);
+                          }}
+                          className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs font-medium text-neutral-700"
+                        >
+                          <option value="all">Tüm Yüzeyler ({productFinishesList.length - 1})</option>
+                          {productFinishesList
+                            .filter((f) => f !== 'all')
+                            .map((f) => (
+                              <option key={f} value={f}>
+                                {f}
+                              </option>
+                            ))}
+                        </select>
+
+                        {/* Style / Material Dropdown */}
+                        <select
+                          value={productCategoryFilter}
+                          onChange={(e) => {
+                            setProductCategoryFilter(e.target.value);
+                            setProductPage(1);
+                          }}
+                          className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs font-medium text-neutral-700"
+                        >
+                          <option value="all">Tüm Tarzlar ({productCategories.length - 1})</option>
+                          {productCategories
+                            .filter((c) => c !== 'all')
+                            .map((cat) => (
+                              <option key={cat} value={cat}>
+                                {cat}
+                              </option>
+                            ))}
+                        </select>
+
+                        {/* Reset Filters button */}
+                        {(productSearch || productSeriesFilter !== 'all' || productDimensionFilter !== 'all' || productColorFilter !== 'all' || productFinishFilter !== 'all' || productCategoryFilter !== 'all') ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProductSearch('');
+                              setProductSeriesFilter('all');
+                              setProductDimensionFilter('all');
+                              setProductColorFilter('all');
+                              setProductFinishFilter('all');
+                              setProductCategoryFilter('all');
+                              setProductPage(1);
+                            }}
+                            className="px-3 py-1.5 bg-neutral-200/80 hover:bg-neutral-300 text-neutral-700 rounded-lg text-xs font-bold transition text-center"
+                          >
+                            Filtreleri Sıfırla
+                          </button>
+                        ) : (
+                          <div className="flex items-center justify-end text-[11px] text-neutral-500 font-medium px-2">
+                            {filteredAvailableProducts.length} ürün listeleniyor
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 max-h-80 overflow-y-auto">
+                    {/* Selected Series Chips Summary */}
+                    {selectedSeriesSummary.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5 p-2 bg-amber-50/60 rounded-xl border border-amber-200/60">
+                        <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider mr-1">
+                          Seçili Seriler:
+                        </span>
+                        {selectedSeriesSummary.map(([series, count]) => (
+                          <span
+                            key={series}
+                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white border border-amber-300 text-amber-900 shadow-2xs"
+                          >
+                            <span>{series}</span>
+                            <span className="font-mono bg-amber-100 text-amber-900 rounded-full px-1.5 py-0.2 text-[10px] font-bold">
+                              {count}
+                            </span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* CONTENT AREA: Mode A (Grid) or Mode B (Series Groups) */}
+                    <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50/70 min-h-[320px]">
                       {productsLoading ? (
-                        <div className="py-12 text-center text-neutral-500">
-                          <Loader2 size={24} className="animate-spin text-[#b4823c] mx-auto mb-2" />
-                          <p className="text-xs font-bold">Ürünler yükleniyor...</p>
+                        <div className="py-16 text-center text-neutral-500">
+                          <Loader2 size={26} className="animate-spin text-[#b4823c] mx-auto mb-2" />
+                          <p className="text-xs font-bold">Marka ürünleri yükleniyor...</p>
                         </div>
                       ) : filteredAvailableProducts.length === 0 ? (
-                        <div className="py-12 text-center text-neutral-500 text-xs">Eşleşen ürün bulunamadı.</div>
-                      ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                          {filteredAvailableProducts.map((p) => {
-                            const isSelected = formData.selectedItems.some((i) => i.productId === p.id);
-                            return (
-                              <div
-                                key={p.id}
-                                onClick={() => handleToggleProduct(p)}
-                                className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
-                                  isSelected
-                                    ? 'border-[#b4823c] bg-amber-50/60 shadow-2xs'
-                                    : 'border-neutral-200 bg-white hover:border-neutral-300'
-                                }`}
+                        <div className="py-16 text-center text-neutral-500">
+                          <AlertCircle size={28} className="mx-auto mb-2 text-neutral-400" />
+                          <p className="text-xs font-bold">Filtre kriterlerine uygun ürün bulunamadı.</p>
+                          <p className="text-[11px] text-neutral-400 mt-1">Lütfen arama terimini veya filtre seçimlerini temizleyin.</p>
+                        </div>
+                      ) : productGroupingMode === 'grid' ? (
+                        /* MODE A: PAGINATED GRID VIEW */
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {paginatedProducts.map((p) => {
+                              const isSelected = formData.selectedItems.some((i) => i.productId === p.id);
+                              return (
+                                <div
+                                  key={p.id}
+                                  onClick={() => handleToggleProduct(p)}
+                                  className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between group hover:shadow-md ${
+                                    isSelected
+                                      ? 'border-[#b4823c] bg-amber-50/70 shadow-2xs'
+                                      : 'border-neutral-200 bg-white hover:border-neutral-300'
+                                  }`}
+                                >
+                                  <div className="aspect-square rounded-lg bg-neutral-100 overflow-hidden mb-2 relative">
+                                    <img
+                                      src={p.imageUrl || p.textureUrl || '/placeholder.png'}
+                                      alt={p.name}
+                                      loading="lazy"
+                                      decoding="async"
+                                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                                    />
+                                    {isSelected ? (
+                                      <div className="absolute top-1.5 right-1.5 bg-[#b4823c] text-white font-bold rounded-full p-1 shadow">
+                                        <Check size={12} />
+                                      </div>
+                                    ) : (
+                                      <div className="absolute top-1.5 right-1.5 bg-black/40 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition">
+                                        <Plus size={12} />
+                                      </div>
+                                    )}
+                                    {p.style && (
+                                      <span className="absolute bottom-1.5 left-1.5 bg-neutral-900/80 backdrop-blur-xs text-white text-[9px] font-semibold px-1.5 py-0.5 rounded">
+                                        {p.style}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-bold text-neutral-800 truncate" title={p.name}>{p.name}</p>
+                                    <div className="flex items-center justify-between text-[10px] text-neutral-500 font-mono mt-0.5">
+                                      <span>{p.width && p.height ? `${p.width}×${p.height} cm` : ''}</span>
+                                      <span className="truncate max-w-[60px] text-neutral-400">{p.finish || ''}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Pagination Controls */}
+                          <div className="pt-3 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 text-xs text-neutral-600">
+                              <span>Sayfa Başına:</span>
+                              <select
+                                value={productPageSize}
+                                onChange={(e) => {
+                                  setProductPageSize(Number(e.target.value));
+                                  setProductPage(1);
+                                }}
+                                className="px-2 py-1 bg-white border border-neutral-300 rounded-lg text-xs font-bold"
                               >
-                                <div className="aspect-square rounded-lg bg-neutral-100 overflow-hidden mb-2 relative">
-                                  <img
-                                    src={p.imageUrl || p.textureUrl || '/placeholder.png'}
-                                    alt={p.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                  {isSelected && (
-                                    <div className="absolute top-1.5 right-1.5 bg-[#b4823c] text-white font-bold rounded-full p-1 shadow">
-                                      <Check size={12} />
+                                <option value={24}>24</option>
+                                <option value={48}>48</option>
+                                <option value={96}>96</option>
+                              </select>
+                              <span className="text-neutral-400">|</span>
+                              <span className="font-medium">
+                                Toplam <strong>{filteredAvailableProducts.length}</strong> ürün ({totalProductPages} sayfa)
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                disabled={productPage <= 1}
+                                onClick={() => setProductPage((prev) => Math.max(1, prev - 1))}
+                                className="px-3 py-1.5 rounded-lg border border-neutral-200 bg-white text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                              >
+                                Önceki
+                              </button>
+                              <span className="text-xs font-bold px-3 py-1 bg-neutral-200/70 rounded-lg text-neutral-800">
+                                {productPage} / {totalProductPages}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={productPage >= totalProductPages}
+                                onClick={() => setProductPage((prev) => Math.min(totalProductPages, prev + 1))}
+                                className="px-3 py-1.5 rounded-lg border border-neutral-200 bg-white text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                              >
+                                Sonraki
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        /* MODE B: SERIES & VARIANT GROUPED VIEW (TILES CATALOGUE PATTERN) */
+                        <div className="space-y-3">
+                          <p className="text-xs text-neutral-500 font-medium mb-2">
+                            Aynı koleksiyona ait farklı ebat, kalınlık ve yüzey varyantlarını bir arada görüntüleyin. Tüm seriyi tek tıkla kataloğa ekleyebilir veya varyant bazında seçim yapabilirsiniz:
+                          </p>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                            {groupedBySeries.map((seriesGroup) => {
+                              const seriesItems = seriesGroup.items;
+                              const selectedCountInSeries = seriesItems.filter((p) =>
+                                formData.selectedItems.some((i) => i.productId === p.id)
+                              ).length;
+                              const isAllSelected = selectedCountInSeries === seriesItems.length && seriesItems.length > 0;
+                              const isExpanded = Boolean(expandedSeries[seriesGroup.name]);
+
+                              // Distinct sizes in this series
+                              const distinctSizes = Array.from(
+                                new Set(seriesItems.map((p) => (p.width && p.height ? `${p.width}×${p.height}` : null)).filter(Boolean))
+                              );
+
+                              return (
+                                <div
+                                  key={seriesGroup.name}
+                                  className={`rounded-2xl border transition-all bg-white overflow-hidden ${
+                                    selectedCountInSeries > 0
+                                      ? 'border-[#b4823c] ring-1 ring-[#b4823c]/20'
+                                      : 'border-neutral-200 hover:border-neutral-300'
+                                  }`}
+                                >
+                                  {/* Series Card Header */}
+                                  <div className="p-3.5 flex items-start justify-between gap-3 bg-neutral-50/50">
+                                    <div className="flex items-center gap-3">
+                                      <img
+                                        src={seriesGroup.sampleImg || '/placeholder.png'}
+                                        alt={seriesGroup.name}
+                                        loading="lazy"
+                                        className="w-13 h-13 rounded-xl object-cover border border-neutral-200 flex-shrink-0 shadow-2xs"
+                                      />
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <h4 className="text-sm font-extrabold text-neutral-900">
+                                            {seriesGroup.name} Serisi
+                                          </h4>
+                                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 text-neutral-700">
+                                            {seriesItems.length} Varyant
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-neutral-500 font-medium mt-0.5">
+                                          {seriesGroup.style || 'Seramik Karo'}
+                                        </p>
+                                        {/* Distinct Size Badges */}
+                                        <div className="flex flex-wrap gap-1 mt-1.5">
+                                          {distinctSizes.map((sz) => (
+                                            <span
+                                              key={sz}
+                                              className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white border border-neutral-300 text-neutral-700"
+                                            >
+                                              {sz} cm
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Action buttons */}
+                                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                                      {isAllSelected ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const itemIds = new Set(seriesItems.map((p) => p.id));
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              selectedItems: prev.selectedItems.filter((i) => !itemIds.has(i.productId))
+                                            }));
+                                          }}
+                                          className="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition"
+                                        >
+                                          Seriyi Çıkar
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const newSelected = [...formData.selectedItems];
+                                            seriesItems.forEach((p) => {
+                                              if (!newSelected.some((i) => i.productId === p.id)) {
+                                                newSelected.push({
+                                                  productId: p.id,
+                                                  customNote: '',
+                                                  usageArea: p.style || 'İç Mekân'
+                                                });
+                                              }
+                                            });
+                                            setFormData((prev) => ({ ...prev, selectedItems: newSelected }));
+                                          }}
+                                          className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition shadow-2xs"
+                                        >
+                                          Tüm Seriyi Ekle (+{seriesItems.length - selectedCountInSeries})
+                                        </button>
+                                      )}
+
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setExpandedSeries((prev) => ({
+                                            ...prev,
+                                            [seriesGroup.name]: !prev[seriesGroup.name]
+                                          }))
+                                        }
+                                        className="text-[11px] font-bold text-neutral-600 hover:text-neutral-900 flex items-center gap-1 transition"
+                                      >
+                                        <span>{isExpanded ? 'Gizle' : 'Varyantları Gör'}</span>
+                                        {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* Accordion: Individual Variants in Series */}
+                                  {isExpanded && (
+                                    <div className="p-3 border-t border-neutral-100 bg-neutral-50/40 divide-y divide-neutral-100 max-h-56 overflow-y-auto">
+                                      {seriesItems.map((p) => {
+                                        const isVariantSelected = formData.selectedItems.some((i) => i.productId === p.id);
+                                        return (
+                                          <div
+                                            key={p.id}
+                                            onClick={() => handleToggleProduct(p)}
+                                            className="py-2 flex items-center justify-between cursor-pointer hover:bg-neutral-100/60 px-2 rounded-lg transition"
+                                          >
+                                            <div className="flex items-center gap-2.5">
+                                              <input
+                                                type="checkbox"
+                                                checked={isVariantSelected}
+                                                readOnly
+                                                className="rounded border-neutral-300 text-[#b4823c] focus:ring-[#b4823c]"
+                                              />
+                                              <div>
+                                                <p className="text-xs font-bold text-neutral-800">{p.name}</p>
+                                                <p className="text-[10px] text-neutral-500 font-mono">
+                                                  {p.width && p.height ? `${p.width}×${p.height} cm` : ''} • {p.finish || 'Standart'} • {p.color || ''}
+                                                </p>
+                                              </div>
+                                            </div>
+                                            <span
+                                              className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                                                isVariantSelected
+                                                  ? 'bg-amber-100 text-amber-900'
+                                                  : 'bg-neutral-200/70 text-neutral-600'
+                                              }`}
+                                            >
+                                              {isVariantSelected ? 'Seçildi' : 'Seç'}
+                                            </span>
+                                          </div>
+                                        );
+                                      })}
                                     </div>
                                   )}
                                 </div>
-                                <div>
-                                  <p className="text-xs font-bold text-neutral-800 truncate">{p.name}</p>
-                                  <p className="text-[10px] text-neutral-500 font-mono mt-0.5">
-                                    {p.width && p.height ? `${p.width}x${p.height} cm` : p.finish || ''}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>

@@ -518,3 +518,91 @@ test('Catalog Studio Pro - Stage 4 Professional Tools, Rotation, Multi-Select & 
   });
 });
 
+test('Smart Product & Variant Grouping Suite (Aşama 1)', async (t) => {
+  const getProductSeries = (p) => {
+    if (!p) return 'Diğer';
+    if (p.series) return p.series;
+    const cleanName = (p.name || '').replace(/^(NG Kütahya|VitrA|Bien|Qua|Ege Seramik|Graniser|Seramiksan)\s+/i, '');
+    const firstWord = cleanName.split(' ')[0] || '';
+    if (firstWord && firstWord.length > 2 && !firstWord.match(/^\d+x\d+$/i)) {
+      return firstWord;
+    }
+    return 'Diğer';
+  };
+
+  const sampleProducts = [
+    { id: 'p1', name: 'NG Kütahya Vista Antrasit 60x120', width: 60, height: 120, color: 'Antrasit', finish: 'Mat', style: 'Taş' },
+    { id: 'p2', name: 'NG Kütahya Vista Bej 60x60', width: 60, height: 60, color: 'Bej', finish: 'Lappato', style: 'Taş' },
+    { id: 'p3', name: 'NG Kütahya Vista Duvar Füme 30x60', width: 30, height: 60, color: 'Füme', finish: 'Mat', style: 'Taş' },
+    { id: 'p4', name: 'NG Kütahya Portland Veincut 60x120', width: 60, height: 120, color: 'Füme', finish: 'Parlak', style: 'Mermer' },
+    { id: 'p5', name: 'NG Kütahya Swan Bone 60x120', width: 60, height: 120, color: 'Bone', finish: 'Mat', style: 'Mermer' }
+  ];
+
+  await t.test('should accurately extract series name without brand prefix', () => {
+    assert.equal(getProductSeries(sampleProducts[0]), 'Vista');
+    assert.equal(getProductSeries(sampleProducts[1]), 'Vista');
+    assert.equal(getProductSeries(sampleProducts[3]), 'Portland');
+    assert.equal(getProductSeries(sampleProducts[4]), 'Swan');
+    assert.equal(getProductSeries({ name: '60x120 Karo' }), 'Diğer');
+  });
+
+  await t.test('should aggregate multi-size ceramic variants under series groups', () => {
+    const map = new Map();
+    sampleProducts.forEach((p) => {
+      const series = getProductSeries(p);
+      if (!map.has(series)) {
+        map.set(series, { name: series, items: [] });
+      }
+      map.get(series).items.push(p);
+    });
+
+    const groups = Array.from(map.values());
+    assert.equal(groups.length, 3); // Vista, Portland, Swan
+
+    const vistaGroup = groups.find((g) => g.name === 'Vista');
+    assert.ok(vistaGroup);
+    assert.equal(vistaGroup.items.length, 3); // 60x120, 60x60, 30x60
+  });
+
+  await t.test('should correctly filter products by dimension, finish and color', () => {
+    const filterProducts = (list, { dimension = 'all', finish = 'all', color = 'all', search = '' }) => {
+      return list.filter((p) => {
+        if (dimension !== 'all' && `${p.width}x${p.height}` !== dimension) return false;
+        if (finish !== 'all' && p.finish !== finish) return false;
+        if (color !== 'all' && p.color !== color) return false;
+        if (search) {
+          const q = search.toLowerCase();
+          return p.name.toLowerCase().includes(q) || (p.color && p.color.toLowerCase().includes(q));
+        }
+        return true;
+      });
+    };
+
+    // Filter by dimension 60x120
+    const dim60120 = filterProducts(sampleProducts, { dimension: '60x120' });
+    assert.equal(dim60120.length, 3); // p1, p4, p5
+
+    // Filter by finish Mat
+    const matOnly = filterProducts(sampleProducts, { finish: 'Mat' });
+    assert.equal(matOnly.length, 3); // p1, p3, p5
+
+    // Combined filter: 60x120 AND Mat
+    const combined = filterProducts(sampleProducts, { dimension: '60x120', finish: 'Mat' });
+    assert.equal(combined.length, 2); // p1, p5
+  });
+
+  await t.test('should paginate large catalogs cleanly without dropping records', () => {
+    const largeList = Array.from({ length: 95 }, (_, i) => ({ id: `tile-${i}`, name: `Tile ${i}` }));
+    const pageSize = 24;
+    const totalPages = Math.ceil(largeList.length / pageSize); // 4 pages
+
+    assert.equal(totalPages, 4);
+
+    const page1 = largeList.slice(0, 24);
+    const page4 = largeList.slice(72, 95);
+
+    assert.equal(page1.length, 24);
+    assert.equal(page4.length, 23);
+  });
+});
+
