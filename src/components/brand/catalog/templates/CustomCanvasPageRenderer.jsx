@@ -82,6 +82,7 @@ const SingleCanvasPage = memo(function SingleCanvasPage({ page, scale = 1, isPri
                     fontFamily: el.fontFamily || 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                     color: el.color || '#0f172a',
                     backgroundColor: el.bgColor || 'transparent',
+                    borderRadius: el.borderRadius ? `${el.borderRadius}px` : undefined,
                     textAlign: el.align || 'left',
                     letterSpacing: el.letterSpacing || 'normal',
                     textTransform: el.textTransform || 'none',

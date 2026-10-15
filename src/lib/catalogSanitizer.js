@@ -97,6 +97,7 @@ export function sanitizeCanvasElements(elements) {
       safeEl.fontFamily = typeof el.fontFamily === 'string' ? el.fontFamily.slice(0, 80) : 'Inter, sans-serif';
       safeEl.color = typeof el.color === 'string' ? el.color.slice(0, 30) : '#0f172a';
       safeEl.bgColor = typeof el.bgColor === 'string' ? el.bgColor.slice(0, 30) : 'transparent';
+      safeEl.borderRadius = Math.round(sanitizeNumber(el.borderRadius, 0, 0, 500));
       safeEl.align = ['left', 'center', 'right', 'justify'].includes(el.align) ? el.align : 'left';
       safeEl.letterSpacing = typeof el.letterSpacing === 'string' ? el.letterSpacing.slice(0, 20) : 'normal';
       safeEl.textTransform = ['uppercase', 'lowercase', 'capitalize', 'none'].includes(el.textTransform)

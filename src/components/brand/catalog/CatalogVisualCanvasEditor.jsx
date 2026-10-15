@@ -824,6 +824,431 @@ export const PRESET_TEMPLATES = [
         locked: false
       }
     ]
+  },
+  {
+    id: 'divider-chapter',
+    name: '9. Bölüm Ayırıcı & Koleksiyon Kapağı',
+    badge: 'Bölüm Ayırıcı',
+    category: 'divider',
+    desc: 'Koyu mimari zemin, dev monografik bölüm numarası (01), altın ayraç ve koleksiyon kategori manifestosu.',
+    bgColor: '#0f172a',
+    elements: [
+      {
+        id: 'el-div1',
+        type: 'text',
+        x: 50,
+        y: 120,
+        width: 495,
+        height: 110,
+        content: '01',
+        fontSize: 90,
+        fontWeight: '900',
+        fontFamily: 'Playfair Display, serif',
+        color: '#b4823c',
+        align: 'left',
+        letterSpacing: '-0.05em',
+        locked: false
+      },
+      {
+        id: 'el-div2',
+        type: 'text',
+        x: 50,
+        y: 240,
+        width: 495,
+        height: 60,
+        content: 'PORSELEN DEV PLAKALAR VE MERMER SERİLERİ',
+        fontSize: 26,
+        fontWeight: '900',
+        color: '#ffffff',
+        align: 'left',
+        letterSpacing: '0.04em',
+        locked: false
+      },
+      {
+        id: 'el-div3',
+        type: 'line',
+        x: 50,
+        y: 315,
+        width: 140,
+        height: 3,
+        color: '#b4823c',
+        locked: false
+      },
+      {
+        id: 'el-div4',
+        type: 'text',
+        x: 50,
+        y: 345,
+        width: 440,
+        height: 120,
+        content: 'Modern mimarinin sınırlarını zorlayan 120×280 cm ve 160×320 cm porselen levhalar. Derz geçişlerini minimuma indiren kusursuz mermer damar sürekliliği ve lüks yaşam alanları için bookmatch simetri uygulamaları.',
+        fontSize: 13,
+        fontWeight: '400',
+        lineHeight: 1.7,
+        color: '#94a3b8',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-div5',
+        type: 'image',
+        x: 50,
+        y: 490,
+        width: 495,
+        height: 250,
+        src: '/renders/luxury_bathroom_calacatta_gold.jpg',
+        borderRadius: 4,
+        locked: false
+      },
+      {
+        id: 'el-div6',
+        type: 'text',
+        x: 50,
+        y: 760,
+        width: 495,
+        height: 25,
+        content: 'TS EN 14411 BIa • DEV PLAKA TEKNOLOJİSİ • REKTİFİYELİ KENAR',
+        fontSize: 10,
+        fontWeight: '700',
+        letterSpacing: '0.18em',
+        color: '#b4823c',
+        align: 'left',
+        locked: false
+      }
+    ]
+  },
+  {
+    id: 'clickable-toc',
+    name: '10. İçindekiler & Koleksiyon Fihristi',
+    badge: 'Fihrist (TOC)',
+    category: 'toc',
+    desc: 'Koleksiyonların sayfa numaraları, QR yönlendirmesi ve editoryal dizin tablosu.',
+    bgColor: '#ffffff',
+    elements: [
+      {
+        id: 'el-toc1',
+        type: 'text',
+        x: 50,
+        y: 50,
+        width: 495,
+        height: 25,
+        content: 'SERAMİKBAK • ARCHITECTURAL INDEX',
+        fontSize: 11,
+        fontWeight: '800',
+        letterSpacing: '0.25em',
+        color: '#b4823c',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-toc2',
+        type: 'text',
+        x: 50,
+        y: 80,
+        width: 495,
+        height: 40,
+        content: 'İÇİNDEKİLER VE KOLEKSİYON DİZİNİ',
+        fontSize: 24,
+        fontWeight: '900',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-toc3',
+        type: 'line',
+        x: 50,
+        y: 125,
+        width: 495,
+        height: 1,
+        color: '#e2e8f0',
+        locked: false
+      },
+      {
+        id: 'el-toc4',
+        type: 'box',
+        x: 50,
+        y: 145,
+        width: 495,
+        height: 520,
+        color: '#f8fafc',
+        borderColor: '#e2e8f0',
+        borderRadius: 8,
+        locked: false
+      },
+      {
+        id: 'el-toc5',
+        type: 'text',
+        x: 75,
+        y: 170,
+        width: 445,
+        height: 470,
+        content: '01. MONOGRAFİK GİRİŞ & MİMARİ VİZYON ............................ Sayfa 02\n\n02. CALACATTA & BOOKMATCH DEV PLAKALAR (120×280) ......... Sayfa 04\n\n03. DOĞAL MERMER DOKULU PORSELEN SERİLERİ ................. Sayfa 08\n\n04. BRÜT BETON & ENDÜSTRİYEL LOFT MİMARİ .................... Sayfa 14\n\n05. DOĞAL MEŞE VE AHŞAP PORSELEN PARKE ..................... Sayfa 20\n\n06. 20 MM DIŞ MEKAN, TERAS & PEYZAJ ÇÖZÜMLERİ ............ Sayfa 26\n\n07. BUTİK AKDENİZ ÇİNİ & ZELLIGE PARLAK SIRLAR .............. Sayfa 32\n\n08. TEKNİK ŞARTNAME & TS EN 14411 MATRİSİ .................... Sayfa 38\n\n09. SHOWROOM TEŞHİR STANDLARI & QR ETİKETLERİ .............. Sayfa 44\n\n10. İLETİŞİM, FABRİKA & B2B İHRACAT DİREKTÖRLÜĞÜ ......... Sayfa 50',
+        fontSize: 12,
+        fontWeight: '700',
+        lineHeight: 1.9,
+        color: '#1e293b',
+        fontFamily: 'monospace',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-toc6',
+        type: 'text',
+        x: 50,
+        y: 690,
+        width: 495,
+        height: 60,
+        content: 'NOT: Web kataloğunda içindekiler maddelerine tıklayarak doğrudan ilgili sayfaya gidebilir, ürün QR kodlarını akıllı telefonunuzla taratarak 3D mekânda canlı inceleyebilirsiniz.',
+        fontSize: 10,
+        fontWeight: '500',
+        lineHeight: 1.6,
+        color: '#64748b',
+        align: 'left',
+        locked: false
+      }
+    ]
+  },
+  {
+    id: 'showroom-display-panel',
+    name: '11. Showroom & Panel Teşhir Baskısı',
+    badge: 'Panel Baskı',
+    category: 'panel',
+    desc: 'Mağaza teşhir panoları ve fuar standları için 4\'lü karo kompozisyonu, teknik etiketler ve QR kod.',
+    bgColor: '#ffffff',
+    elements: [
+      {
+        id: 'el-pnl1',
+        type: 'text',
+        x: 50,
+        y: 40,
+        width: 360,
+        height: 25,
+        content: 'SHOWROOM DISPLAY & EXHIBITION PANEL',
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: '0.2em',
+        color: '#b4823c',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-pnl2',
+        type: 'text',
+        x: 50,
+        y: 65,
+        width: 360,
+        height: 35,
+        content: 'MİMARİ TEŞHİR VE MATRİS STANDI',
+        fontSize: 20,
+        fontWeight: '900',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-pnl3',
+        type: 'qr',
+        x: 435,
+        y: 35,
+        width: 110,
+        height: 110,
+        qrUrl: 'https://seramikbak.com/katalog',
+        locked: false
+      },
+      {
+        id: 'el-pnl4',
+        type: 'image',
+        x: 50,
+        y: 115,
+        width: 235,
+        height: 290,
+        src: '/renders/luxury_bathroom_calacatta_gold.jpg',
+        borderRadius: 4,
+        locked: false
+      },
+      {
+        id: 'el-pnl5',
+        type: 'image',
+        x: 310,
+        y: 115,
+        width: 235,
+        height: 290,
+        src: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+        borderRadius: 4,
+        locked: false
+      },
+      {
+        id: 'el-pnl6',
+        type: 'image',
+        x: 50,
+        y: 420,
+        width: 235,
+        height: 240,
+        src: '/renders/modern_living_natural_oak.jpg',
+        borderRadius: 4,
+        locked: false
+      },
+      {
+        id: 'el-pnl7',
+        type: 'image',
+        x: 310,
+        y: 420,
+        width: 235,
+        height: 240,
+        src: '/renders/luxury_bathroom_loft_beton.jpg',
+        borderRadius: 4,
+        locked: false
+      },
+      {
+        id: 'el-pnl8',
+        type: 'box',
+        x: 50,
+        y: 675,
+        width: 495,
+        height: 100,
+        color: '#f8fafc',
+        borderColor: '#cbd5e1',
+        borderRadius: 6,
+        locked: false
+      },
+      {
+        id: 'el-pnl9',
+        type: 'text',
+        x: 65,
+        y: 688,
+        width: 465,
+        height: 75,
+        content: 'BAYİ TEŞHİR TALİMATI:\nPanoda sergilenen karolar 60×120 cm ve 120×280 cm boyutlarındadır. Müşterileriniz sağ üstteki QR kodu akıllı telefon kamerası ile okutarak doğrudan bu serilerin canlı 3D sanal showroom görünümüne ulaşabilir.',
+        fontSize: 10,
+        fontWeight: '600',
+        lineHeight: 1.6,
+        color: '#334155',
+        align: 'left',
+        locked: false
+      }
+    ]
+  },
+  {
+    id: 'tag-stock-spotlight',
+    name: '12. Çok Satanlar & Stok Vitrini',
+    badge: 'Çok Satan / Stok',
+    category: 'stock',
+    desc: 'Hızlı teslimat, çok satan seriler ve renk varyantlarını öne çıkaran vitrin mizanpajı.',
+    bgColor: '#ffffff',
+    elements: [
+      {
+        id: 'el-stk1',
+        type: 'text',
+        x: 50,
+        y: 45,
+        width: 495,
+        height: 25,
+        content: 'FAST SHIPMENT • TOP SELECTION 2026',
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: '0.22em',
+        color: '#15803d',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-stk2',
+        type: 'text',
+        x: 50,
+        y: 70,
+        width: 340,
+        height: 40,
+        content: 'HEMEN TESLİM & ÇOK SATANLAR',
+        fontSize: 22,
+        fontWeight: '900',
+        color: '#0f172a',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-stk3',
+        type: 'text',
+        x: 405,
+        y: 72,
+        width: 140,
+        height: 28,
+        content: 'STOKTA HAZIR',
+        fontSize: 11,
+        fontWeight: '800',
+        color: '#ffffff',
+        bgColor: '#15803d',
+        align: 'center',
+        locked: false
+      },
+      {
+        id: 'el-stk4',
+        type: 'image',
+        x: 50,
+        y: 125,
+        width: 495,
+        height: 410,
+        src: '/renders/luxury_bathroom_calacatta_gold.jpg',
+        borderRadius: 4,
+        locked: false
+      },
+      {
+        id: 'el-stk5',
+        type: 'text',
+        x: 70,
+        y: 145,
+        width: 130,
+        height: 26,
+        content: '★ EN ÇOK SATAN',
+        fontSize: 10,
+        fontWeight: '800',
+        color: '#ffffff',
+        bgColor: '#b4823c',
+        align: 'center',
+        locked: false
+      },
+      {
+        id: 'el-stk6',
+        type: 'box',
+        x: 50,
+        y: 550,
+        width: 495,
+        height: 140,
+        color: '#f0fdf4',
+        borderColor: '#bbf7d0',
+        borderRadius: 8,
+        locked: false
+      },
+      {
+        id: 'el-stk7',
+        type: 'text',
+        x: 70,
+        y: 565,
+        width: 455,
+        height: 110,
+        content: 'PROJE AVANTAJLARI VE TESLİMAT GÜVENCESİ:\n• Minimum Sipariş: 1 Palet / Hemen Sevk\n• Yüzey: Full Lappato Parlak Rektifiyeli (60×120 cm)\n• Depo Lokasyonu: Bilecik & Kütahya Ana Lojistik Merkezleri\n• Şantiye Adresine 48 Saatte Doğrudan Kamyon Bazlı Teslimat İmkanı',
+        fontSize: 11,
+        fontWeight: '600',
+        lineHeight: 1.7,
+        color: '#166534',
+        align: 'left',
+        locked: false
+      },
+      {
+        id: 'el-stk8',
+        type: 'text',
+        x: 50,
+        y: 715,
+        width: 495,
+        height: 30,
+        content: 'Detaylı stok rezervasyonu ve bayi iskontoları için satış temsilciniz ile irtibata geçiniz.',
+        fontSize: 10,
+        fontWeight: '500',
+        color: '#64748b',
+        align: 'center',
+        locked: false
+      }
+    ]
   }
 ];
 
@@ -1286,6 +1711,35 @@ export default function CatalogVisualCanvasEditor({
 
   // Add single element
   const addElement = (type, extra = {}) => {
+    if (type === 'badge') {
+      const defaultW = 160;
+      const defaultH = 32;
+      const newEl = {
+        id: `el-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        type: 'text',
+        x: Math.round((canvasWidth - defaultW) / 2),
+        y: Math.round((canvasHeight - defaultH) / 2),
+        width: defaultW,
+        height: defaultH,
+        rotation: 0,
+        content: extra.content || '★ YENİ KOLEKSİYON',
+        fontSize: 11,
+        fontWeight: '800',
+        fontFamily: 'Inter, sans-serif',
+        letterSpacing: '0.12em',
+        color: '#ffffff',
+        bgColor: '#b4823c',
+        borderRadius: 6,
+        align: 'center',
+        opacity: 100,
+        locked: false,
+        hidden: false,
+        ...extra
+      };
+      addMultipleElements([newEl]);
+      return;
+    }
+
     const defaultW = type === 'text' ? 360 : type === 'line' ? 240 : type === 'qr' ? 140 : 260;
     const defaultH = type === 'text' ? 50 : type === 'line' ? 3 : type === 'qr' ? 140 : 200;
 
@@ -2352,6 +2806,16 @@ export default function CatalogVisualCanvasEditor({
           >
             <QrCode size={14} className="text-amber-400" />
             <span className="hidden md:inline">QR Kod</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => addElement('badge')}
+            className="px-2.5 py-1.5 rounded-lg hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            title="Rozet Ekle (Yeni, Çok Satan, Bookmatch vb.)"
+          >
+            <Sparkles size={14} className="text-amber-300" />
+            <span className="hidden md:inline">Rozet</span>
           </button>
         </div>
 

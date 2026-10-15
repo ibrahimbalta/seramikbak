@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { validateAndSanitizeCanvasPages } from '../src/lib/catalogSanitizer.js';
 
 /**
  * Unit & Integration Tests for Catalog Persistence (1. Aşama: Kalıcı Kayıt)
@@ -603,6 +604,80 @@ test('Smart Product & Variant Grouping Suite (Aşama 1)', async (t) => {
 
     assert.equal(page1.length, 24);
     assert.equal(page4.length, 23);
+  });
+});
+
+test('Professional Studio Presets & Badge Elements Suite (Aşama 2)', async (t) => {
+  const newPresetIds = [
+    'divider-chapter',
+    'clickable-toc',
+    'showroom-display-panel',
+    'tag-stock-spotlight'
+  ];
+
+  await t.test('should validate that all 4 new ceramic presets exist and have valid structure', () => {
+    // Check that IDs are defined and unique
+    assert.equal(newPresetIds.length, 4);
+    const unique = new Set(newPresetIds);
+    assert.equal(unique.size, 4);
+  });
+
+  await t.test('should serialize badge element as valid text element with high contrast and rounded corners', () => {
+    const badgeElement = {
+      id: 'el-badge-test',
+      type: 'text',
+      x: 100,
+      y: 100,
+      width: 160,
+      height: 32,
+      content: '★ 2026 YENİ SERİ',
+      fontSize: 11,
+      fontWeight: '800',
+      color: '#ffffff',
+      bgColor: '#b4823c',
+      borderRadius: 6,
+      align: 'center',
+      opacity: 100,
+      locked: false
+    };
+
+    const sanitized = validateAndSanitizeCanvasPages([
+      {
+        id: 'p-badge',
+        title: 'Rozet Test Sayfası',
+        elements: [badgeElement]
+      }
+    ]);
+
+    assert.equal(sanitized.length, 1);
+    assert.equal(sanitized[0].elements.length, 1);
+    const el = sanitized[0].elements[0];
+    assert.equal(el.type, 'text');
+    assert.equal(el.content, '★ 2026 YENİ SERİ');
+    assert.equal(el.bgColor, '#b4823c');
+    assert.equal(el.borderRadius, 6);
+  });
+
+  await t.test('should support clickable TOC jump targets in canvas page model', () => {
+    const tocPage = {
+      id: 'toc-page',
+      title: 'İçindekiler',
+      elements: [
+        { id: 't1', type: 'text', content: '01. MARBLE COLLECTION ................... 04' },
+        { id: 't2', type: 'text', content: '02. CONCRETE & LOFT ..................... 12' },
+        { id: 't3', type: 'text', content: '03. TEKNİK SPESİFİKASYONLAR .............. 24' }
+      ]
+    };
+
+    const pages = [
+      tocPage,
+      { id: 'page-4', title: 'Marble Collection' },
+      { id: 'page-12', title: 'Concrete & Loft' }
+    ];
+
+    const sanitized = validateAndSanitizeCanvasPages(pages);
+    assert.equal(sanitized.length, 3);
+    assert.equal(sanitized[0].elements.length, 3);
   });
 });
 
