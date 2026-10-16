@@ -242,42 +242,42 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     >
       <div 
         style={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(9, 13, 22, 0.99) 100%)',
-          border: '1px solid rgba(212, 175, 55, 0.4)',
+          background: '#ffffff',
+          border: '1px solid rgba(179, 142, 71, 0.35)',
           borderRadius: '24px',
           width: '100%',
           maxWidth: '1020px',
           maxHeight: '94vh',
           overflowY: 'auto',
-          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.25)',
+          boxShadow: '0 25px 70px rgba(15, 23, 42, 0.18), 0 0 35px rgba(212, 175, 55, 0.08)',
           padding: '24px',
           position: 'relative',
-          color: '#ffffff'
+          color: '#1e293b'
         }}
       >
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(179,142,71,0.1) 100%)', border: '1px solid rgba(212, 175, 55, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37', boxShadow: '0 4px 14px rgba(212,175,55,0.25)' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(179,142,71,0.1) 100%)', border: '1px solid rgba(212, 175, 55, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b38e47', boxShadow: '0 4px 14px rgba(179,142,71,0.18)' }}>
               <Sparkles size={22} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#0f172a', fontFamily: 'var(--font-title)' }}>
                   3D Mimari Görselleştirme Stüdyosu
                 </h3>
                 <span style={{ fontSize: '0.68rem', fontWeight: '900', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#090d16', padding: '2px 8px', borderRadius: '12px', letterSpacing: '0.04em' }}>
                   ✨ 3D MİMARİ RENDER
                 </span>
               </div>
-              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
                 Küratörlü 3D mimari mekanlarda seramiğin duruşunu, derz aralıklarını ve doğal ışık yansımalarını inceleyin.
               </span>
             </div>
           </div>
           <button 
             onClick={onClose} 
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}
+            style={{ background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#64748b', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}
           >
             <X size={18} />
           </button>
@@ -289,18 +289,18 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
             <img 
               src={selectedTile?.imageUrl || '/textures/calacatta_gold.jpg'} 
               alt="Tile" 
-              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '12px', border: '1.5px solid #d4af37', boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }} 
+              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '12px', border: '1.5px solid #d4af37', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} 
             />
             <div>
-              <div style={{ fontSize: '0.98rem', fontWeight: '900', color: '#ffffff' }}>
+              <div style={{ fontSize: '0.98rem', fontWeight: '900', color: '#0f172a' }}>
                 {selectedTile?.name || 'Seçili Seramik Modeli'}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '2px' }}>
+              <div style={{ fontSize: '0.78rem', color: '#475569', marginTop: '2px' }}>
                 {selectedTile?.width || 60}×{selectedTile?.height || 120} cm • {selectedTile?.finish || 'Full Lappato Parlak'} • {selectedTile?.style || 'Porselen Seramik'}
               </div>
             </div>
           </div>
-          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '5px 14px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#b38e47', background: 'rgba(212,175,55,0.15)', padding: '5px 14px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)', whiteSpace: 'nowrap' }}>
             🏛️ Aktif 3D Render
           </span>
         </div>
@@ -308,10 +308,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         {/* 3D SCENE SELECTOR TABS */}
         <div style={{ marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Mekan Seçin (3D Mimari Sahne):
             </span>
-            <span style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: '700' }}>
+            <span style={{ fontSize: '0.74rem', color: '#b38e47', fontWeight: '700' }}>
               {currentScene.name} • {currentScene.subtitle}
             </span>
           </div>
@@ -325,8 +325,8 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                   type="button"
                   onClick={() => setActiveSceneId(scene.id)}
                   style={{
-                    background: isActive ? 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)' : 'rgba(255,255,255,0.03)',
-                    border: isActive ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
+                    background: isActive ? 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.05) 100%)' : '#f8fafc',
+                    border: isActive ? '1.5px solid #b38e47' : '1px solid #e2e8f0',
                     borderRadius: '14px',
                     padding: '10px 14px',
                     display: 'flex',
@@ -335,15 +335,15 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                     cursor: 'pointer',
                     textAlign: 'left',
                     transition: 'all 0.2s ease',
-                    boxShadow: isActive ? '0 4px 16px rgba(212,175,55,0.25)' : 'none'
+                    boxShadow: isActive ? '0 4px 16px rgba(179,142,71,0.18)' : 'none'
                   }}
                 >
                   <span style={{ fontSize: '1.4rem' }}>{scene.icon}</span>
                   <div>
-                    <div style={{ fontSize: '0.84rem', fontWeight: '800', color: isActive ? '#d4af37' : '#ffffff' }}>
+                    <div style={{ fontSize: '0.84rem', fontWeight: '800', color: isActive ? '#b38e47' : '#0f172a' }}>
                       {scene.name}
                     </div>
-                    <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.70rem', color: '#64748b', marginTop: '2px' }}>
                       ~{scene.areaM2} m² Alan
                     </div>
                   </div>
@@ -448,12 +448,12 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
           </div>
 
           {/* QUICK CERAMIC PRESETS SWITCHER */}
-          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '12px 16px' }}>
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '12px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
-              <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Farklı Seramik Dokularını Bu Mekanda Deneyin:
               </span>
-              <span style={{ fontSize: '0.72rem', color: '#d4af37', fontWeight: '700' }}>
+              <span style={{ fontSize: '0.72rem', color: '#b38e47', fontWeight: '700' }}>
                 Seçili Dokuyu Değiştir
               </span>
             </div>
@@ -467,23 +467,24 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                     type="button"
                     onClick={() => setSelectedTile(tile)}
                     style={{
-                      background: isSelected ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.04)',
-                      border: isSelected ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
+                      background: isSelected ? 'rgba(212,175,55,0.12)' : '#ffffff',
+                      border: isSelected ? '1.5px solid #b38e47' : '1px solid #e2e8f0',
                       borderRadius: '10px',
                       padding: '8px 10px',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
                       cursor: 'pointer',
-                      textAlign: 'left'
+                      textAlign: 'left',
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     <img src={tile.imageUrl} alt={tile.name} style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'cover' }} />
                     <div style={{ overflow: 'hidden' }}>
-                      <div style={{ fontSize: '0.78rem', fontWeight: '800', color: isSelected ? '#d4af37' : '#ffffff', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                      <div style={{ fontSize: '0.78rem', fontWeight: '800', color: isSelected ? '#b38e47' : '#0f172a', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                         {tile.name}
                       </div>
-                      <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                      <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
                         {tile.style}
                       </div>
                     </div>
@@ -494,19 +495,19 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
           </div>
 
           {/* Area & Packaging Estimator Bar */}
-          <div style={{ background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '16px', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ background: 'rgba(2, 132, 199, 0.06)', border: '1px solid rgba(2, 132, 199, 0.2)', borderRadius: '16px', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Calculator size={18} style={{ color: '#38bdf8' }} />
+              <Calculator size={18} style={{ color: '#0284c7' }} />
               <div>
-                <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>
+                <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#0f172a' }}>
                   Bu {currentScene.name} İçin Tahmini Miktar:
                 </span>
-                <span style={{ fontSize: '0.84rem', fontWeight: '900', color: '#38bdf8', marginLeft: '8px' }}>
+                <span style={{ fontSize: '0.84rem', fontWeight: '900', color: '#0284c7', marginLeft: '8px' }}>
                   ~{requiredBoxes} Kutu ({totalM2WithWaste} m² — %10 fire payı dahil)
                 </span>
               </div>
             </div>
-            <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
               Standart Kutu: {boxM2.toFixed(2)} m²
             </span>
           </div>
@@ -522,8 +523,8 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               style={{
                 padding: '14px',
                 borderRadius: '14px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                color: '#090d16',
+                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                color: '#0f172a',
                 border: 'none',
                 fontWeight: '900',
                 fontSize: '0.95rem',
@@ -532,7 +533,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 6px 20px rgba(212,175,55,0.4)'
+                boxShadow: '0 4px 15px rgba(179, 142, 71, 0.3)'
               }}
             >
               <MapPin size={18} />
@@ -548,16 +549,17 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               style={{
                 padding: '12px',
                 borderRadius: '14px',
-                background: 'rgba(59, 130, 246, 0.15)',
-                color: '#93c5fd',
-                border: '1px solid rgba(59, 130, 246, 0.35)',
+                background: '#eff6ff',
+                color: '#1d4ed8',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
                 fontWeight: '800',
                 fontSize: '0.85rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                gap: '8px',
+                transition: 'all 0.2s'
               }}
             >
               <Package size={17} />
@@ -571,16 +573,17 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               style={{
                 padding: '12px',
                 borderRadius: '14px',
-                background: 'rgba(37, 211, 102, 0.15)',
-                color: '#4ade80',
-                border: '1px solid rgba(37, 211, 102, 0.35)',
+                background: '#ecfdf5',
+                color: '#047857',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
                 fontWeight: '800',
                 fontSize: '0.85rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                gap: '8px',
+                transition: 'all 0.2s'
               }}
             >
               <Share2 size={17} />
@@ -594,16 +597,17 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               style={{
                 padding: '12px',
                 borderRadius: '14px',
-                background: 'rgba(255,255,255,0.06)',
-                color: '#ffffff',
-                border: '1px solid rgba(255,255,255,0.15)',
+                background: '#f8fafc',
+                color: '#475569',
+                border: '1px solid #e2e8f0',
                 fontWeight: '700',
                 fontSize: '0.85rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                gap: '8px',
+                transition: 'all 0.2s'
               }}
             >
               <Download size={17} />

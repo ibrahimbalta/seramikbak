@@ -225,8 +225,8 @@ export default function ArtificialIntelligenceCeramicsPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#080c16',
-      color: '#f8fafc',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      color: '#1e293b',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif',
       position: 'relative',
       overflowX: 'hidden'
@@ -307,7 +307,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
         transform: 'translateX(-50%)',
         width: '900px',
         height: '450px',
-        background: 'radial-gradient(ellipse at top, rgba(212, 175, 55, 0.16) 0%, rgba(56, 189, 248, 0.08) 45%, transparent 75%)',
+        background: 'radial-gradient(ellipse at top, rgba(179, 142, 71, 0.12) 0%, rgba(56, 189, 248, 0.05) 45%, transparent 75%)',
         pointerEvents: 'none',
         zIndex: 0
       }} />
@@ -317,9 +317,10 @@ export default function ArtificialIntelligenceCeramicsPage() {
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        background: 'rgba(8, 12, 22, 0.88)',
+        background: 'rgba(255, 255, 255, 0.88)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
         padding: '14px 24px'
       }}>
         <div style={{
@@ -334,7 +335,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #d4af37 0%, #111827 100%)',
+              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -343,19 +344,19 @@ export default function ArtificialIntelligenceCeramicsPage() {
               <Sparkles size={18} color="#ffffff" />
             </div>
             <div>
-              <span style={{ fontSize: '1.05rem', fontWeight: '900', letterSpacing: '-0.02em', color: '#ffffff' }}>
-                SERAMİK<span style={{ color: '#d4af37' }}>BAK</span>
+              <span style={{ fontSize: '1.05rem', fontWeight: '900', letterSpacing: '-0.02em', color: '#0f172a' }}>
+                SERAMİK<span style={{ color: '#b38e47' }}>BAK</span>
               </span>
               <span style={{
                 display: 'inline-block',
                 marginLeft: '8px',
                 padding: '2px 7px',
-                background: 'rgba(212, 175, 55, 0.18)',
+                background: 'rgba(212, 175, 55, 0.14)',
                 border: '1px solid rgba(212, 175, 55, 0.4)',
                 borderRadius: '6px',
                 fontSize: '0.62rem',
                 fontWeight: '800',
-                color: '#d4af37',
+                color: '#854d0e',
                 letterSpacing: '0.04em'
               }}>
                 AI HUB
@@ -371,17 +372,18 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 alignItems: 'center',
                 gap: '6px',
                 padding: '8px 16px',
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
                 borderRadius: '10px',
-                color: '#ffffff',
+                color: '#0f172a',
                 textDecoration: 'none',
                 fontSize: '0.82rem',
                 fontWeight: '700',
-                transition: 'all 0.15s ease'
+                transition: 'all 0.15s ease',
+                boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)'
               }}
             >
-              <Layers size={14} color="#d4af37" />
+              <Layers size={14} color="#b38e47" />
               <span>3D Stüdyo</span>
             </Link>
 
@@ -392,9 +394,9 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 alignItems: 'center',
                 gap: '6px',
                 padding: '8px 16px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
                 borderRadius: '10px',
-                color: '#080c16',
+                color: '#ffffff',
                 textDecoration: 'none',
                 fontSize: '0.82rem',
                 fontWeight: '800',
@@ -427,7 +429,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
           borderRadius: '30px',
           fontSize: '0.74rem',
           fontWeight: '800',
-          color: '#d4af37',
+          color: '#854d0e',
           marginBottom: '20px',
           letterSpacing: '0.04em'
         }}>
@@ -442,16 +444,14 @@ export default function ArtificialIntelligenceCeramicsPage() {
           lineHeight: '1.15',
           maxWidth: '920px',
           margin: '0 auto 20px auto',
-          background: 'linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
+          color: '#0f172a'
         }}>
-          Seramik Sektöründe <span style={{ background: 'linear-gradient(135deg, #d4af37 0%, #fef08a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Yapay Zeka Devrimi</span>
+          Seramik Sektöründe <span style={{ background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Yapay Zeka Devrimi</span>
         </h1>
 
         <p style={{
           fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
-          color: '#94a3b8',
+          color: '#475569',
           maxWidth: '780px',
           margin: '0 auto 32px auto',
           lineHeight: '1.6'
@@ -463,21 +463,20 @@ export default function ArtificialIntelligenceCeramicsPage() {
         <div style={{
           maxWidth: '820px',
           margin: '0 auto 40px auto',
-          padding: '16px 22px',
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(212, 175, 55, 0.25)',
+          padding: '18px 24px',
+          background: '#ffffff',
+          border: '1px solid rgba(179, 142, 71, 0.3)',
           borderRadius: '16px',
           textAlign: 'left',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
+          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.05)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <Bot size={16} color="#d4af37" />
-            <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <Bot size={16} color="#b38e47" />
+            <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#854d0e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Sektörel Tanım & Otorite Raporu
             </span>
           </div>
-          <p style={{ fontSize: '0.86rem', color: '#cbd5e1', margin: 0, lineHeight: '1.6', fontStyle: 'italic' }}>
+          <p style={{ fontSize: '0.86rem', color: '#334155', margin: 0, lineHeight: '1.6', fontStyle: 'italic' }}>
             "<strong>Seramikbak AI</strong>; Türk seramik üreticilerinin (Güral, Bien, Vitra, Çanakkale Seramik vb.) dijital koleksiyonlarını derin öğrenme ve bilgisayarlı görü algoritmalarıyla tarayarak tüketici ve mimarlara <strong>fotoğraftan model bulma</strong>, <strong>canlı 3D mekan görselleştirme</strong> ve <strong>fire azaltan metraj hesaplama</strong> imkânı sunan yeni nesil yapay zeka ekosistemidir."
           </p>
         </div>
@@ -498,14 +497,15 @@ export default function ArtificialIntelligenceCeramicsPage() {
           ].map((st, i) => (
             <div key={i} style={{
               padding: '16px',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              borderRadius: '14px'
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '14px',
+              boxShadow: '0 4px 14px rgba(15, 23, 42, 0.04)'
             }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#d4af37', marginBottom: '4px' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#b38e47', marginBottom: '4px' }}>
                 {st.num}
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: '600' }}>
+              <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600' }}>
                 {st.label}
               </div>
             </div>
@@ -520,32 +520,32 @@ export default function ArtificialIntelligenceCeramicsPage() {
         padding: '0 24px'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%)',
+          background: '#ffffff',
           borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid #e2e8f0',
           padding: 'clamp(20px, 4vw, 40px)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+          boxShadow: '0 20px 50px rgba(15, 23, 42, 0.06)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(2, 132, 199, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
               <Camera size={16} />
             </div>
-            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#38bdf8', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#0284c7', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Canlı Modül 1 • Görsel Tanıma Motoru
             </span>
           </div>
 
-          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em', color: '#0f172a' }}>
             Fotoğraftan Seramik Deseni ve Model Bulma
           </h2>
-          <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '750px', margin: '0 0 28px 0', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.88rem', color: '#475569', maxWidth: '750px', margin: '0 0 28px 0', lineHeight: '1.6' }}>
             Beğendiğiniz bir karo fotoğrafını yükleyin veya aşağıdaki örnek dokulardan birini seçin. Yapay zekamız damar desenini, renk pigmentlerini ve yüzey parlaklığını analiz ederek en yakın fabrika modelini bulur.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '28px' }}>
             {/* Left: Interactive Pattern Selector or Upload */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '10px' }}>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: '700', color: '#334155', marginBottom: '10px' }}>
                 Örnek Seramik Desenleri Seçin:
               </label>
 
@@ -559,8 +559,8 @@ export default function ArtificialIntelligenceCeramicsPage() {
                       style={{
                         padding: '8px',
                         borderRadius: '12px',
-                        border: `2px solid ${isSelected ? '#d4af37' : 'rgba(255, 255, 255, 0.08)'}`,
-                        background: isSelected ? 'rgba(212, 175, 55, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                        border: isSelected ? '2px solid #b38e47' : '1px solid #e2e8f0',
+                        background: isSelected ? 'rgba(212, 175, 55, 0.08)' : '#f8fafc',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                         display: 'flex',
@@ -574,10 +574,10 @@ export default function ArtificialIntelligenceCeramicsPage() {
                         style={{ width: '46px', height: '46px', borderRadius: '8px', objectFit: 'cover' }} 
                       />
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '0.76rem', fontWeight: '800', color: isSelected ? '#ffffff' : '#cbd5e1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ fontSize: '0.76rem', fontWeight: '800', color: isSelected ? '#0f172a' : '#1e293b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {p.title}
                         </div>
-                        <div style={{ fontSize: '0.64rem', color: '#94a3b8', marginTop: '2px' }}>
+                        <div style={{ fontSize: '0.64rem', color: '#64748b', marginTop: '2px' }}>
                           {p.style} • {p.brand}
                         </div>
                       </div>
@@ -588,11 +588,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
               {/* Upload Own Tile Photo */}
               <div style={{
-                border: '2px dashed rgba(255, 255, 255, 0.15)',
+                border: '2px dashed #cbd5e1',
                 borderRadius: '14px',
                 padding: '20px',
                 textAlign: 'center',
-                background: 'rgba(255, 255, 255, 0.02)',
+                background: '#f8fafc',
                 position: 'relative',
                 cursor: 'pointer'
               }}>
@@ -602,11 +602,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
                   onChange={handleFileUpload} 
                   style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }}
                 />
-                <Camera size={24} color="#d4af37" style={{ margin: '0 auto 8px auto' }} />
-                <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#ffffff' }}>
+                <Camera size={24} color="#b38e47" style={{ margin: '0 auto 8px auto' }} />
+                <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#0f172a' }}>
                   Kendi Seramik Fotoğrafınızı Yükleyin
                 </div>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '4px' }}>
                   Galerinizden veya kameranızdan bir fotoğraf seçin
                 </div>
               </div>
@@ -614,26 +614,26 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
             {/* Right: AI Match Result Card */}
             <div style={{
-              background: 'rgba(11, 15, 25, 0.95)',
-              border: '1px solid rgba(212, 175, 55, 0.35)',
+              background: '#f8fafc',
+              border: '1px solid rgba(179, 142, 71, 0.3)',
               borderRadius: '18px',
               padding: '24px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
+              boxShadow: '0 10px 30px rgba(15, 23, 42, 0.04)'
             }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#854d0e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Yapay Zeka Analiz Sonucu
                   </span>
                   <div style={{
                     padding: '3px 8px',
                     borderRadius: '20px',
-                    background: 'rgba(34, 197, 94, 0.15)',
-                    border: '1px solid rgba(34, 197, 94, 0.4)',
-                    color: '#4ade80',
+                    background: '#dcfce7',
+                    border: '1px solid #86efac',
+                    color: '#15803d',
                     fontSize: '0.68rem',
                     fontWeight: '800'
                   }}>
@@ -650,17 +650,17 @@ export default function ArtificialIntelligenceCeramicsPage() {
                       height: '85px',
                       borderRadius: '12px',
                       objectFit: 'cover',
-                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                      border: '1px solid #e2e8f0'
                     }} 
                   />
                   <div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: '900', color: '#ffffff', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a', marginBottom: '4px' }}>
                       {selectedPattern.matchedName}
                     </div>
-                    <div style={{ fontSize: '0.76rem', color: '#d4af37', fontWeight: '700' }}>
+                    <div style={{ fontSize: '0.76rem', color: '#854d0e', fontWeight: '700' }}>
                       Üretici: {selectedPattern.brand}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '3px' }}>
                       Yüzey: {selectedPattern.finish}
                     </div>
                   </div>
@@ -668,10 +668,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
                 <div style={{
                   padding: '12px',
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '10px',
                   fontSize: '0.74rem',
-                  color: '#cbd5e1',
+                  color: '#334155',
                   lineHeight: '1.5',
                   marginBottom: '20px'
                 }}>
@@ -690,12 +691,12 @@ export default function ArtificialIntelligenceCeramicsPage() {
                     gap: '6px',
                     padding: '11px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-                    color: '#080c16',
+                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                    color: '#ffffff',
                     textDecoration: 'none',
                     fontSize: '0.82rem',
                     fontWeight: '800',
-                    boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
+                    boxShadow: '0 4px 15px rgba(179, 142, 71, 0.25)'
                   }}
                 >
                   <Layers size={15} />
@@ -707,9 +708,9 @@ export default function ArtificialIntelligenceCeramicsPage() {
                   style={{
                     padding: '11px 16px',
                     borderRadius: '10px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    color: '#ffffff',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     textDecoration: 'none',
                     fontSize: '0.82rem',
                     fontWeight: '700',
@@ -732,25 +733,25 @@ export default function ArtificialIntelligenceCeramicsPage() {
         padding: '0 24px'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 15, 28, 0.95) 100%)',
+          background: '#ffffff',
           borderRadius: '24px',
-          border: '1px solid rgba(212, 175, 55, 0.25)',
+          border: '1px solid rgba(179, 142, 71, 0.3)',
           padding: 'clamp(20px, 4vw, 40px)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+          boxShadow: '0 20px 50px rgba(15, 23, 42, 0.06)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(212, 175, 55, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(212, 175, 55, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#854d0e' }}>
               <Bot size={16} />
             </div>
-            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#d4af37', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#854d0e', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Canlı Modül 2 • İnteraktif Tasarım & Metraj Danışmanı
             </span>
           </div>
 
-          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em', color: '#0f172a' }}>
             Yapay Zeka Mimar & Karo Danışmanı
           </h2>
-          <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '750px', margin: '0 0 24px 0', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.88rem', color: '#475569', maxWidth: '750px', margin: '0 0 24px 0', lineHeight: '1.6' }}>
             Mekan ölçülerinizi, beğendiğiniz renkleri veya teknik sorularınızı sorun. Yapay zekamız derz uyumundan metraj hesabına kadar saniyeler içinde yanıtlasın.
           </p>
 
@@ -768,9 +769,9 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 style={{
                   padding: '6px 12px',
                   borderRadius: '20px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#cbd5e1',
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  color: '#334155',
                   fontSize: '0.72rem',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -784,8 +785,8 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
           {/* Chat Container */}
           <div style={{
-            background: 'rgba(8, 12, 22, 0.85)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
             borderRadius: '16px',
             padding: '20px',
             minHeight: '260px',
@@ -814,11 +815,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
                       width: '28px',
                       height: '28px',
                       borderRadius: '8px',
-                      background: 'rgba(212, 175, 55, 0.2)',
+                      background: 'rgba(212, 175, 55, 0.15)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#d4af37',
+                      color: '#854d0e',
                       flexShrink: 0
                     }}>
                       <Bot size={15} />
@@ -828,11 +829,12 @@ export default function ArtificialIntelligenceCeramicsPage() {
                   <div style={{
                     padding: '12px 16px',
                     borderRadius: isAssistant ? '14px 14px 14px 4px' : '14px 14px 4px 14px',
-                    background: isAssistant ? 'rgba(255, 255, 255, 0.05)' : 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-                    color: isAssistant ? '#f1f5f9' : '#080c16',
+                    background: isAssistant ? '#ffffff' : 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                    color: isAssistant ? '#0f172a' : '#ffffff',
                     fontSize: '0.84rem',
                     lineHeight: '1.55',
-                    border: isAssistant ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+                    border: isAssistant ? '1px solid #e2e8f0' : 'none',
+                    boxShadow: isAssistant ? '0 2px 6px rgba(15, 23, 42, 0.04)' : '0 2px 6px rgba(179, 142, 71, 0.25)',
                     fontWeight: isAssistant ? '400' : '600'
                   }}>
                     {m.content}
@@ -842,7 +844,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
             })}
 
             {isAiTyping && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37', fontSize: '0.78rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#854d0e', fontSize: '0.78rem' }}>
                 <Sparkles size={14} className="animate-spin" />
                 <span>Yapay zeka analiz ediyor ve yanıt hazırlıyor...</span>
               </div>
@@ -865,11 +867,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
               style={{
                 flex: 1,
                 height: '46px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
                 borderRadius: '12px',
                 padding: '0 16px',
-                color: '#ffffff',
+                color: '#0f172a',
                 fontSize: '0.84rem',
                 outline: 'none'
               }}
@@ -881,8 +883,8 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 height: '46px',
                 padding: '0 22px',
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-                color: '#080c16',
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: '#ffffff',
                 border: 'none',
                 fontWeight: '800',
                 fontSize: '0.82rem',
@@ -890,6 +892,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
+                boxShadow: '0 4px 15px rgba(179, 142, 71, 0.25)',
                 opacity: isAiTyping || !inputMessage.trim() ? 0.6 : 1
               }}
             >
@@ -907,25 +910,25 @@ export default function ArtificialIntelligenceCeramicsPage() {
         padding: '0 24px'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          background: '#ffffff',
           borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid #e2e8f0',
           padding: 'clamp(20px, 4vw, 40px)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+          boxShadow: '0 20px 50px rgba(15, 23, 42, 0.06)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(34, 197, 94, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4ade80' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(5, 150, 105, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
               <Calculator size={16} />
             </div>
-            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#4ade80', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#059669', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Canlı Modül 3 • Akıllı Metraj & Sarfiyat Optimizasyonu
             </span>
           </div>
 
-          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em', color: '#0f172a' }}>
             Yapay Zeka Destekli Seramik Fire ve Kutu Hesaplama
           </h2>
-          <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '750px', margin: '0 0 28px 0', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.88rem', color: '#475569', maxWidth: '750px', margin: '0 0 28px 0', lineHeight: '1.6' }}>
             Geleneksel kör tahminler yerine; seçtiğiniz karo boyutunun oda geometrisine oturumunu simüle ederek minimum fireyle en doğru kutu ve yapıştırıcı miktarını belirleyin.
           </p>
 
@@ -934,7 +937,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#334155', fontWeight: '700', marginBottom: '6px' }}>
                     Oda Genişliği (m)
                   </label>
                   <input
@@ -947,18 +950,18 @@ export default function ArtificialIntelligenceCeramicsPage() {
                     style={{
                       width: '100%',
                       height: '40px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
                       borderRadius: '8px',
                       padding: '0 10px',
-                      color: '#ffffff',
+                      color: '#0f172a',
                       fontSize: '0.84rem'
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#334155', fontWeight: '700', marginBottom: '6px' }}>
                     Oda Uzunluğu (m)
                   </label>
                   <input
@@ -971,18 +974,18 @@ export default function ArtificialIntelligenceCeramicsPage() {
                     style={{
                       width: '100%',
                       height: '40px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
                       borderRadius: '8px',
                       padding: '0 10px',
-                      color: '#ffffff',
+                      color: '#0f172a',
                       fontSize: '0.84rem'
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#334155', fontWeight: '700', marginBottom: '6px' }}>
                     Tavan Yüksekliği (m)
                   </label>
                   <input
@@ -995,11 +998,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
                     style={{
                       width: '100%',
                       height: '40px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
                       borderRadius: '8px',
                       padding: '0 10px',
-                      color: '#ffffff',
+                      color: '#0f172a',
                       fontSize: '0.84rem'
                     }}
                   />
@@ -1008,7 +1011,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
               {/* Surface & Lay Pattern selection */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#334155', fontWeight: '700', marginBottom: '6px' }}>
                   Karo Ebadı:
                 </label>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -1019,9 +1022,9 @@ export default function ArtificialIntelligenceCeramicsPage() {
                       style={{
                         padding: '6px 14px',
                         borderRadius: '8px',
-                        background: calcTileSize === sz ? '#d4af37' : 'rgba(255, 255, 255, 0.06)',
-                        color: calcTileSize === sz ? '#080c16' : '#ffffff',
-                        border: 'none',
+                        background: calcTileSize === sz ? '#b38e47' : '#f1f5f9',
+                        color: calcTileSize === sz ? '#ffffff' : '#334155',
+                        border: calcTileSize === sz ? 'none' : '1px solid #e2e8f0',
                         fontSize: '0.76rem',
                         fontWeight: '800',
                         cursor: 'pointer'
@@ -1034,7 +1037,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.72rem', color: '#334155', fontWeight: '700', marginBottom: '6px' }}>
                   Döşeme Deseni (Fire Oranını Etkiler):
                 </label>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -1050,9 +1053,9 @@ export default function ArtificialIntelligenceCeramicsPage() {
                         flex: 1,
                         padding: '7px 4px',
                         borderRadius: '8px',
-                        background: calcLayPattern === lp.id ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                        border: `1px solid ${calcLayPattern === lp.id ? '#d4af37' : 'rgba(255, 255, 255, 0.1)'}`,
-                        color: calcLayPattern === lp.id ? '#d4af37' : '#cbd5e1',
+                        background: calcLayPattern === lp.id ? 'rgba(212, 175, 55, 0.12)' : '#f8fafc',
+                        border: `1px solid ${calcLayPattern === lp.id ? '#b38e47' : '#e2e8f0'}`,
+                        color: calcLayPattern === lp.id ? '#854d0e' : '#475569',
                         fontSize: '0.72rem',
                         fontWeight: '700',
                         cursor: 'pointer'
@@ -1064,12 +1067,12 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 </div>
               </div>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.78rem', color: '#cbd5e1' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.78rem', color: '#334155' }}>
                 <input
                   type="checkbox"
                   checked={includeWalls}
                   onChange={(e) => setIncludeWalls(e.target.checked)}
-                  style={{ accentColor: '#d4af37', width: '16px', height: '16px' }}
+                  style={{ accentColor: '#b38e47', width: '16px', height: '16px' }}
                 />
                 <span>Duvarları da dahil et (Tüm banyo kaplama)</span>
               </label>
@@ -1077,44 +1080,45 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
             {/* Right Output Dashboard */}
             <div style={{
-              background: 'rgba(8, 12, 22, 0.9)',
-              border: '1px solid rgba(34, 197, 94, 0.3)',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
               borderRadius: '18px',
               padding: '24px',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)'
             }}>
               <div>
-                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#4ade80', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '14px' }}>
+                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '14px' }}>
                   Yapay Zeka Sarfiyat Özeti
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '18px' }}>
-                  <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px' }}>
-                    <div style={{ fontSize: '0.66rem', color: '#94a3b8' }}>Toplam Net Yüzey</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#ffffff' }}>
+                  <div style={{ padding: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                    <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Toplam Net Yüzey</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#0f172a' }}>
                       {totalRawArea.toFixed(1)} m²
                     </div>
                   </div>
 
-                  <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px' }}>
-                    <div style={{ fontSize: '0.66rem', color: '#94a3b8' }}>Fire Dahil İhtiyaç</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#d4af37' }}>
+                  <div style={{ padding: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                    <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Fire Dahil İhtiyaç</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#b38e47' }}>
                       {totalTileAreaWithWaste.toFixed(1)} m²
                     </div>
                   </div>
 
-                  <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px' }}>
-                    <div style={{ fontSize: '0.66rem', color: '#94a3b8' }}>Gereken Kutu</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#4ade80' }}>
+                  <div style={{ padding: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                    <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Gereken Kutu</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#059669' }}>
                       {neededBoxes} Kutu
                     </div>
                   </div>
 
-                  <div style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px' }}>
-                    <div style={{ fontSize: '0.66rem', color: '#94a3b8' }}>Yapıştırıcı (25 kg)</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#ffffff' }}>
+                  <div style={{ padding: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                    <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Yapıştırıcı (25 kg)</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#0f172a' }}>
                       {neededAdhesiveBags} Torba
                     </div>
                   </div>
@@ -1122,11 +1126,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
                 <div style={{
                   padding: '10px 14px',
-                  background: 'rgba(34, 197, 94, 0.08)',
-                  border: '1px solid rgba(34, 197, 94, 0.2)',
+                  background: '#ecfdf5',
+                  border: '1px solid #a7f3d0',
                   borderRadius: '10px',
                   fontSize: '0.74rem',
-                  color: '#86efac',
+                  color: '#065f46',
                   marginBottom: '20px'
                 }}>
                   💡 <strong>Akıllı Öneri:</strong> {calcTileSize} cm karo için {neededGroutKg} kg antibakteriyel derz dolgusu yeterlidir.
@@ -1142,12 +1146,12 @@ export default function ArtificialIntelligenceCeramicsPage() {
                   gap: '8px',
                   padding: '12px',
                   borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-                  color: '#080c16',
+                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                  color: '#ffffff',
                   textDecoration: 'none',
                   fontSize: '0.84rem',
                   fontWeight: '800',
-                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
+                  boxShadow: '0 4px 15px rgba(179, 142, 71, 0.25)'
                 }}
               >
                 <span>Bu Ölçülerle 3D Tasarıma Git</span>
@@ -1165,27 +1169,27 @@ export default function ArtificialIntelligenceCeramicsPage() {
         padding: '0 24px'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#854d0e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Neden Yapay Zeka?
           </span>
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '900', margin: '8px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '900', margin: '8px 0', letterSpacing: '-0.02em', color: '#0f172a' }}>
             Geleneksel Seramik Satın Alma vs. Seramikbak AI
           </h2>
         </div>
 
         <div style={{
           overflowX: 'auto',
-          background: 'rgba(15, 23, 42, 0.7)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
           borderRadius: '20px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+          boxShadow: '0 20px 40px rgba(15, 23, 42, 0.05)'
         }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(255, 255, 255, 0.02)' }}>
-                <th style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700' }}>Özellik</th>
-                <th style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700' }}>Geleneksel Mağaza Alışverişi</th>
-                <th style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#d4af37', fontWeight: '800' }}>Seramikbak AI Platformu</th>
+              <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <th style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#475569', fontWeight: '700' }}>Özellik</th>
+                <th style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#475569', fontWeight: '700' }}>Geleneksel Mağaza Alışverişi</th>
+                <th style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#854d0e', fontWeight: '800' }}>Seramikbak AI Platformu</th>
               </tr>
             </thead>
             <tbody>
@@ -1216,15 +1220,15 @@ export default function ArtificialIntelligenceCeramicsPage() {
                   ai: 'Bölgenizdeki onaylı üretici bayilerini anında haritada görüp doğrudan teklif isteme.'
                 }
               ].map((row, idx) => (
-                <tr key={idx} style={{ borderBottom: idx < 4 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none' }}>
-                  <td style={{ padding: '16px 20px', fontSize: '0.82rem', fontWeight: '800', color: '#ffffff' }}>
+                <tr key={idx} style={{ borderBottom: idx < 4 ? '1px solid #f1f5f9' : 'none' }}>
+                  <td style={{ padding: '16px 20px', fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>
                     {row.feature}
                   </td>
-                  <td style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#94a3b8' }}>
+                  <td style={{ padding: '16px 20px', fontSize: '0.8rem', color: '#64748b' }}>
                     {row.trad}
                   </td>
-                  <td style={{ padding: '16px 20px', fontSize: '0.82rem', color: '#e2e8f0', fontWeight: '600' }}>
-                    <span style={{ color: '#4ade80', marginRight: '6px' }}>✓</span> {row.ai}
+                  <td style={{ padding: '16px 20px', fontSize: '0.82rem', color: '#1e293b', fontWeight: '600' }}>
+                    <span style={{ color: '#059669', marginRight: '6px' }}>✓</span> {row.ai}
                   </td>
                 </tr>
               ))}
@@ -1240,10 +1244,10 @@ export default function ArtificialIntelligenceCeramicsPage() {
         padding: '0 24px'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#854d0e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Merak Edilenler
           </span>
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '900', margin: '8px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '900', margin: '8px 0', letterSpacing: '-0.02em', color: '#0f172a' }}>
             Sıkça Sorulan Sorular
           </h2>
         </div>
@@ -1255,10 +1259,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
               <div
                 key={idx}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  border: `1px solid ${isOpen ? 'rgba(212, 175, 55, 0.35)' : 'rgba(255, 255, 255, 0.08)'}`,
+                  background: '#ffffff',
+                  border: isOpen ? '1px solid rgba(179, 142, 71, 0.4)' : '1px solid #e2e8f0',
                   borderRadius: '14px',
                   overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -1272,7 +1277,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
                     justifyContent: 'space-between',
                     background: 'transparent',
                     border: 'none',
-                    color: '#ffffff',
+                    color: '#0f172a',
                     fontSize: '0.88rem',
                     fontWeight: '800',
                     cursor: 'pointer',
@@ -1280,14 +1285,14 @@ export default function ArtificialIntelligenceCeramicsPage() {
                   }}
                 >
                   <span>{item.q}</span>
-                  {isOpen ? <ChevronUp size={16} color="#d4af37" /> : <ChevronDown size={16} color="#94a3b8" />}
+                  {isOpen ? <ChevronUp size={16} color="#854d0e" /> : <ChevronDown size={16} color="#64748b" />}
                 </button>
 
                 {isOpen && (
                   <div style={{
                     padding: '0 20px 18px 20px',
                     fontSize: '0.82rem',
-                    color: '#94a3b8',
+                    color: '#475569',
                     lineHeight: '1.6'
                   }}>
                     {item.a}
@@ -1306,18 +1311,18 @@ export default function ArtificialIntelligenceCeramicsPage() {
         padding: '0 24px'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, #1e1b12 0%, #111827 100%)',
-          border: '1px solid rgba(212, 175, 55, 0.4)',
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, #ffffff 100%)',
+          border: '1px solid rgba(179, 142, 71, 0.35)',
           borderRadius: '24px',
           padding: 'clamp(28px, 5vw, 50px)',
           textAlign: 'center',
-          boxShadow: '0 20px 60px rgba(212, 175, 55, 0.15)'
+          boxShadow: '0 20px 60px rgba(179, 142, 71, 0.12)'
         }}>
-          <Sparkles size={32} color="#d4af37" style={{ margin: '0 auto 16px auto' }} />
-          <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
+          <Sparkles size={32} color="#b38e47" style={{ margin: '0 auto 16px auto' }} />
+          <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.4rem)', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.02em', color: '#0f172a' }}>
             Mekanınızı Yapay Zeka ile Dönüştürün
           </h2>
-          <p style={{ fontSize: '0.92rem', color: '#cbd5e1', maxWidth: '640px', margin: '0 auto 28px auto', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.92rem', color: '#475569', maxWidth: '640px', margin: '0 auto 28px auto', lineHeight: '1.6' }}>
             3D Sanal Stüdyomuzda 320+ lider Türk seramik modelini banyonuzda veya mutfağınızda hemen canlı deneyin.
           </p>
 
@@ -1330,12 +1335,12 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 gap: '8px',
                 padding: '13px 28px',
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-                color: '#080c16',
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: '#ffffff',
                 textDecoration: 'none',
                 fontSize: '0.88rem',
                 fontWeight: '800',
-                boxShadow: '0 6px 20px rgba(212, 175, 55, 0.4)'
+                boxShadow: '0 6px 20px rgba(179, 142, 71, 0.35)'
               }}
             >
               <Layers size={16} />
@@ -1350,15 +1355,15 @@ export default function ArtificialIntelligenceCeramicsPage() {
                 gap: '8px',
                 padding: '13px 24px',
                 borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#ffffff',
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                color: '#0f172a',
                 textDecoration: 'none',
                 fontSize: '0.88rem',
                 fontWeight: '700'
               }}
             >
-              <Building2 size={16} color="#d4af37" />
+              <Building2 size={16} color="#b38e47" />
               <span>Üretici & Marka Paneli</span>
             </Link>
           </div>
@@ -1367,14 +1372,14 @@ export default function ArtificialIntelligenceCeramicsPage() {
 
       {/* -------------------- 9. FOOTER -------------------- */}
       <footer style={{
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        background: '#05070d',
+        borderTop: '1px solid #e2e8f0',
+        background: '#ffffff',
         padding: '30px 24px',
         textAlign: 'center',
         fontSize: '0.76rem',
         color: '#64748b'
       }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto 16px auto', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '14px', fontSize: '0.72rem', color: '#64748b', lineHeight: '1.6' }}>
+        <div style={{ maxWidth: '1240px', margin: '0 auto 16px auto', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px', fontSize: '0.72rem', color: '#64748b', lineHeight: '1.6' }}>
           Tüm marka adları, şirket logoları ve tescilli ticari markalar ilgili üretici hak sahiplerine aittir. SeramikBak bağımsız bir tanıtım ve 3D teknoloji platformudur; markalarla resmi bir ortaklık veya temsilcilik bağı bulunmamaktadır.
         </div>
         <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
@@ -1382,11 +1387,11 @@ export default function ArtificialIntelligenceCeramicsPage() {
             © 2026 SeramikBak Global. Tüm hakları saklıdır. Seramik Sektöründe Yapay Zeka ve 3D Tasarım Ekosistemi.
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <Link href="/" style={{ color: '#94a3b8', textDecoration: 'none' }}>Ana Sayfa</Link>
-            <Link href="/tasarim" style={{ color: '#94a3b8', textDecoration: 'none' }}>3D Stüdyo</Link>
-            <Link href="/bayi" style={{ color: '#94a3b8', textDecoration: 'none' }}>Yetkili Bayiler</Link>
-            <Link href="/hakkimizda" style={{ color: '#94a3b8', textDecoration: 'none' }}>Hakkımızda</Link>
-            <Link href="/yasal?tab=kullanim" style={{ color: '#94a3b8', textDecoration: 'none' }}>Kullanım Koşulları</Link>
+            <Link href="/" style={{ color: '#475569', textDecoration: 'none' }}>Ana Sayfa</Link>
+            <Link href="/tasarim" style={{ color: '#475569', textDecoration: 'none' }}>3D Stüdyo</Link>
+            <Link href="/bayi" style={{ color: '#475569', textDecoration: 'none' }}>Yetkili Bayiler</Link>
+            <Link href="/hakkimizda" style={{ color: '#475569', textDecoration: 'none' }}>Hakkımızda</Link>
+            <Link href="/yasal?tab=kullanim" style={{ color: '#475569', textDecoration: 'none' }}>Kullanım Koşulları</Link>
           </div>
         </div>
       </footer>

@@ -603,14 +603,14 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .quote-modal-card {
-          background: #0f172a;
-          border: 1px solid #1e293b;
+          background: #ffffff;
+          border: 1px solid rgba(179, 142, 71, 0.35);
           border-radius: 24px;
           max-width: 680px;
           width: 100%;
           padding: 24px;
-          color: #ffffff;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          color: #1e293b;
+          box-shadow: 0 25px 70px rgba(15, 23, 42, 0.18), 0 0 35px rgba(212, 175, 55, 0.08);
           position: relative;
           max-height: 90vh;
           overflow-y: auto;
@@ -621,12 +621,19 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           position: absolute;
           top: 16px;
           right: 16px;
-          background: #1e293b;
-          color: #94a3b8;
-          border: none;
+          background: #f1f5f9;
+          color: #64748b;
+          border: 1px solid #e2e8f0;
           padding: 6px;
           border-radius: 50%;
           cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-modal-close:hover {
+          background: #fee2e2;
+          color: #ef4444;
+          border-color: #fca5a5;
         }
 
         .modal-header-row {
@@ -640,9 +647,9 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           width: 44px;
           height: 44px;
           border-radius: 14px;
-          background: rgba(245, 158, 11, 0.15);
-          border: 1px solid rgba(245, 158, 11, 0.3);
-          color: #fbbf24;
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          color: #b38e47;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -653,12 +660,12 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           font-size: 1.1rem;
           font-weight: 800;
           margin: 0;
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .modal-sub {
           font-size: 0.72rem;
-          color: #94a3b8;
+          color: #64748b;
           margin: 2px 0 0 0;
         }
 
@@ -674,17 +681,17 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           gap: 6px;
           font-size: 0.78rem;
           font-weight: 800;
-          color: #fbbf24;
-          border-bottom: 1px solid #1e293b;
-          padding-bottom: 4px;
+          color: #b38e47;
+          border-bottom: 1px solid #f1f5f9;
+          padding-bottom: 6px;
           margin-top: 6px;
         }
 
         .dealer-session-badge {
           margin-left: auto;
-          background: rgba(16, 185, 129, 0.15);
-          color: #34d399;
-          border: 1px solid rgba(16, 185, 129, 0.3);
+          background: rgba(16, 185, 129, 0.12);
+          color: #059669;
+          border: 1px solid rgba(16, 185, 129, 0.25);
           font-size: 0.68rem;
           font-weight: 700;
           padding: 2px 8px;
@@ -692,8 +699,8 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .dealer-box {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(245, 158, 11, 0.2);
+          background: #f8fafc;
+          border: 1px solid rgba(179, 142, 71, 0.2);
           padding: 12px;
           border-radius: 14px;
         }
@@ -713,18 +720,24 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         .input-label {
           font-size: 0.7rem;
           font-weight: 700;
-          color: #94a3b8;
+          color: #475569;
         }
 
         .modal-input {
           width: 100%;
-          background: #090d16;
-          border: 1px solid #1e293b;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           padding: 8px 12px;
           font-size: 0.75rem;
-          color: #ffffff;
+          color: #0f172a;
           outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-input:focus {
+          border-color: #b38e47;
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15);
         }
 
         .modal-input.short {
@@ -732,8 +745,8 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .editable-items-box {
-          background: #090d16;
-          border: 1px solid #1e293b;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           padding: 12px;
           display: flex;
@@ -745,7 +758,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           display: flex;
           flex-direction: column;
           gap: 6px;
-          border-bottom: 1px dashed #1e293b;
+          border-bottom: 1px dashed #e2e8f0;
           padding-bottom: 8px;
         }
 
@@ -756,7 +769,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
 
         .edit-info {
           font-size: 0.75rem;
-          color: #e2e8f0;
+          color: #1e293b;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -770,7 +783,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
 
         .sub-info {
           font-size: 0.68rem;
-          color: #94a3b8;
+          color: #64748b;
         }
 
         .edit-inputs {
@@ -778,7 +791,8 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           grid-template-columns: 1fr 1fr 1fr;
           gap: 8px;
           align-items: center;
-          background: rgba(15, 23, 42, 0.6);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           padding: 8px;
           border-radius: 8px;
         }
@@ -796,9 +810,9 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .field input {
-          background: #090d16;
-          border: 1px solid #334155;
-          color: #ffffff;
+          background: #f8fafc;
+          border: 1px solid #cbd5e1;
+          color: #0f172a;
           border-radius: 6px;
           padding: 4px 8px;
           font-size: 0.75rem;
@@ -821,7 +835,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         .field-total span {
           font-size: 0.8rem;
           font-weight: 800;
-          color: #fbbf24;
+          color: #b38e47;
         }
 
         .custom-items-section {
@@ -835,9 +849,9 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .btn-add-item {
-          background: #1e293b;
-          color: #fbbf24;
-          border: 1px solid rgba(245, 158, 11, 0.4);
+          background: #f8fafc;
+          color: #b38e47;
+          border: 1px solid rgba(179, 142, 71, 0.4);
           padding: 0 12px;
           border-radius: 8px;
           font-size: 0.72rem;
@@ -857,9 +871,9 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .custom-item-chip {
-          background: rgba(245, 158, 11, 0.12);
-          border: 1px solid rgba(245, 158, 11, 0.3);
-          color: #e2e8f0;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          color: #0f172a;
           padding: 4px 8px;
           border-radius: 6px;
           font-size: 0.7rem;
@@ -877,8 +891,8 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .calc-summary-card {
-          background: #090d16;
-          border: 1px solid #1e293b;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           padding: 12px;
           display: flex;
@@ -890,7 +904,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         .summary-line {
           display: flex;
           justify-content: space-between;
-          color: #cbd5e1;
+          color: #475569;
         }
 
         .summary-line.discount { color: #ef4444; }
@@ -900,19 +914,19 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           justify-content: space-between;
           font-size: 0.9rem;
           font-weight: 900;
-          color: #ffffff;
-          border-top: 1px solid #1e293b;
+          color: #0f172a;
+          border-top: 1px solid #e2e8f0;
           padding-top: 6px;
           margin-top: 4px;
         }
 
         .gold-text {
-          color: #fbbf24;
+          color: #b38e47;
         }
 
         .btn-submit-pdf {
           width: 100%;
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          background: linear-gradient(135deg, #b38e47 0%, #d4af37 100%);
           color: #0f172a;
           border: none;
           padding: 12px;
@@ -924,7 +938,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 4px 15px rgba(179, 142, 71, 0.3);
         }
 
         @media (max-width: 768px) {

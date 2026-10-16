@@ -195,8 +195,8 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
       position: 'fixed',
       inset: 0,
       zIndex: 99999,
-      background: 'rgba(2, 6, 23, 0.85)',
-      backdropFilter: 'blur(16px)',
+      background: 'rgba(15, 23, 42, 0.65)',
+      backdropFilter: 'blur(14px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -205,10 +205,10 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
       <div style={{
         width: '100%',
         maxWidth: step === 4 ? '1100px' : '720px',
-        background: '#090d16',
-        border: '1px solid rgba(212, 175, 55, 0.25)',
+        background: '#ffffff',
+        border: '1px solid rgba(179, 142, 71, 0.35)',
         borderRadius: '24px',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
+        boxShadow: '0 25px 70px rgba(15, 23, 42, 0.18), 0 0 35px rgba(212, 175, 55, 0.08)',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -219,30 +219,31 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
         {/* Modal Header */}
         <div style={{
           padding: '20px 28px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          borderBottom: '1px solid #f1f5f9',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'rgba(15, 23, 42, 0.6)'
+          background: '#f8fafc'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, var(--accent-gold, #d4af37), #b8860b)',
+              background: 'linear-gradient(135deg, #b38e47, #d4af37)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#0f172a'
+              color: '#0f172a',
+              boxShadow: '0 4px 12px rgba(179, 142, 71, 0.25)'
             }}>
               <Sparkles size={20} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#fff', margin: 0, fontFamily: 'Outfit, sans-serif' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', margin: 0, fontFamily: 'Outfit, sans-serif' }}>
                 30 Saniyede Banyo Tasarla (Akıllı AI Asistanı)
               </h3>
-              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+              <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
                 {step < 4 ? `Adım ${step} / 3 — Kriterlerinizi Seçin` : 'Yapay Zeka Tarafından Oluşturulan Banyo Tasarımı & Metraj Raporu'}
               </span>
             </div>
@@ -251,16 +252,17 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#94a3b8',
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              color: '#64748b',
               width: '32px',
               height: '32px',
               borderRadius: '50%',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              transition: 'all 0.2s'
             }}
           >
             <X size={18} />
@@ -268,15 +270,15 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
         </div>
 
         {/* Modal Body */}
-        <div style={{ padding: '28px', overflowY: 'auto', flex: 1 }}>
+        <div style={{ padding: '28px', overflowY: 'auto', flex: 1, background: '#ffffff', color: '#1e293b' }}>
 
           {/* STEP 1 */}
           {step === 1 && (
             <div>
-              <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#0f172a', marginBottom: '8px' }}>
                 1. Banyonuz için hayal ettiğiniz tarzı seçin:
               </h4>
-              <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '20px' }}>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '20px' }}>
                 Yapay zeka, seçtiğiniz konsepte en uyumlu seramik ve renk paletini otomatik eşleştirecektir.
               </p>
 
@@ -288,8 +290,8 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                     style={{
                       padding: '18px',
                       borderRadius: '16px',
-                      border: selectedStyle.id === styleOpt.id ? `2px solid ${styleOpt.accentColor}` : '1px solid rgba(255, 255, 255, 0.08)',
-                      background: selectedStyle.id === styleOpt.id ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                      border: selectedStyle.id === styleOpt.id ? `2px solid #b38e47` : '1px solid #e2e8f0',
+                      background: selectedStyle.id === styleOpt.id ? 'rgba(212, 175, 55, 0.08)' : '#f8fafc',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       display: 'flex',
@@ -298,15 +300,15 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff' }}>{styleOpt.name}</span>
+                      <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a' }}>{styleOpt.name}</span>
                       {selectedStyle.id === styleOpt.id && (
-                        <div style={{ background: styleOpt.accentColor, color: '#0f172a', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ background: '#b38e47', color: '#ffffff', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Check size={14} />
                         </div>
                       )}
                     </div>
-                    <p style={{ fontSize: '0.78rem', color: '#94a3b8', lineHeight: '1.4', margin: 0 }}>{styleOpt.desc}</p>
-                    <div style={{ marginTop: '6px', fontSize: '0.72rem', color: styleOpt.accentColor, fontWeight: '700' }}>
+                    <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: '1.4', margin: 0 }}>{styleOpt.desc}</p>
+                    <div style={{ marginTop: '6px', fontSize: '0.72rem', color: '#b38e47', fontWeight: '700' }}>
                       Örnek Ürün: {styleOpt.defaultTile.name} ({styleOpt.defaultTile.width}x{styleOpt.defaultTile.height} cm)
                     </div>
                   </div>
@@ -318,10 +320,10 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
           {/* STEP 2 */}
           {step === 2 && (
             <div>
-              <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#0f172a', marginBottom: '8px' }}>
                 2. Bütçe ve Segment Tercihiniz:
               </h4>
-              <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '20px' }}>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '20px' }}>
                 Seçiminize göre metrekare birim fiyatı ve malzeme kalitesi filtrelenir.
               </p>
 
@@ -333,20 +335,21 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                     style={{
                       padding: '16px 20px',
                       borderRadius: '14px',
-                      border: selectedBudget.id === bTier.id ? '2px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255, 255, 255, 0.08)',
-                      background: selectedBudget.id === bTier.id ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                      border: selectedBudget.id === bTier.id ? '2px solid #b38e47' : '1px solid #e2e8f0',
+                      background: selectedBudget.id === bTier.id ? 'rgba(212, 175, 55, 0.08)' : '#f8fafc',
                       cursor: 'pointer',
                       display: 'flex',
                       justifyContent: 'space-between',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     <div>
-                      <strong style={{ fontSize: '0.95rem', color: '#fff', display: 'block' }}>{bTier.name}</strong>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold, #d4af37)', fontWeight: '600' }}>{bTier.label}</span>
+                      <strong style={{ fontSize: '0.95rem', color: '#0f172a', display: 'block' }}>{bTier.name}</strong>
+                      <span style={{ fontSize: '0.78rem', color: '#b38e47', fontWeight: '600' }}>{bTier.label}</span>
                     </div>
                     {selectedBudget.id === bTier.id && (
-                      <div style={{ background: 'var(--accent-gold, #d4af37)', color: '#0f172a', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ background: '#b38e47', color: '#ffffff', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Check size={16} />
                       </div>
                     )}
@@ -359,10 +362,10 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
           {/* STEP 3 */}
           {step === 3 && (
             <div>
-              <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#0f172a', marginBottom: '8px' }}>
                 3. Banyonuzun Taban Alanı (m²):
               </h4>
-              <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '20px' }}>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '20px' }}>
                 Yapay zeka duvar yüksekliğini (ortalama 2.40m) ve %10 kesim fire payını ekleyerek tam metraj çıkarır.
               </p>
 
@@ -374,20 +377,21 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                     style={{
                       padding: '16px',
                       borderRadius: '14px',
-                      border: roomArea === sPreset.area && !customAreaInput ? '2px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255, 255, 255, 0.08)',
-                      background: roomArea === sPreset.area && !customAreaInput ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                      border: roomArea === sPreset.area && !customAreaInput ? '2px solid #b38e47' : '1px solid #e2e8f0',
+                      background: roomArea === sPreset.area && !customAreaInput ? 'rgba(212, 175, 55, 0.08)' : '#f8fafc',
                       cursor: 'pointer',
-                      textAlign: 'center'
+                      textAlign: 'center',
+                      transition: 'all 0.2s ease'
                     }}
                   >
-                    <strong style={{ fontSize: '1rem', color: '#fff', display: 'block', marginBottom: '4px' }}>{sPreset.name}</strong>
-                    <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{sPreset.desc}</span>
+                    <strong style={{ fontSize: '1rem', color: '#0f172a', display: 'block', marginBottom: '4px' }}>{sPreset.name}</strong>
+                    <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{sPreset.desc}</span>
                   </div>
                 ))}
               </div>
 
-              <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '16px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#94a3b8', display: 'block', marginBottom: '8px' }}>Veya Özel Taban Alanı Girin (m²):</label>
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '16px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '8px' }}>Veya Özel Taban Alanı Girin (m²):</label>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <input
                     type="number"
@@ -402,16 +406,16 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                     }}
                     style={{
                       flex: 1,
-                      background: '#0f172a',
-                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
                       borderRadius: '8px',
                       padding: '10px 14px',
-                      color: '#fff',
+                      color: '#0f172a',
                       fontSize: '0.9rem',
                       fontWeight: '700'
                     }}
                   />
-                  <span style={{ fontSize: '0.9rem', color: 'var(--accent-gold, #d4af37)', fontWeight: '800' }}>m² Taban</span>
+                  <span style={{ fontSize: '0.9rem', color: '#b38e47', fontWeight: '800' }}>m² Taban</span>
                 </div>
               </div>
             </div>
@@ -422,19 +426,19 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
             <div>
               {isGenerating ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '16px' }}>
-                  <div className="animate-spin" style={{ width: '48px', height: '48px', border: '4px solid rgba(212, 175, 55, 0.2)', borderTopColor: 'var(--accent-gold, #d4af37)', borderRadius: '50%' }} />
-                  <span style={{ fontSize: '0.95rem', fontWeight: '700', color: '#fff' }}>Yapay Zeka Banyonuzu Oluşturuyor ve Metraj Hesabı Yapıyor...</span>
+                  <div className="animate-spin" style={{ width: '48px', height: '48px', border: '4px solid rgba(212, 175, 55, 0.2)', borderTopColor: '#b38e47', borderRadius: '50%' }} />
+                  <span style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Yapay Zeka Banyonuzu Oluşturuyor ve Metraj Hesabı Yapıyor...</span>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }} className="ai-result-grid">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <div style={{
                       position: 'relative',
-                      background: '#020617',
-                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      background: '#f8fafc',
+                      border: '1px solid rgba(179, 142, 71, 0.25)',
                       borderRadius: '16px',
                       overflow: 'hidden',
-                      boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+                      boxShadow: '0 8px 30px rgba(15, 23, 42, 0.06)'
                     }}>
                       <canvas
                         ref={canvasRef}
@@ -446,17 +450,18 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                         position: 'absolute',
                         top: '12px',
                         left: '12px',
-                        background: 'rgba(15, 23, 42, 0.85)',
+                        background: 'rgba(255, 255, 255, 0.92)',
                         backdropFilter: 'blur(8px)',
                         padding: '6px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(212, 175, 55, 0.3)',
+                        border: '1px solid rgba(179, 142, 71, 0.3)',
                         fontSize: '0.72rem',
                         fontWeight: '800',
-                        color: 'var(--accent-gold, #d4af37)',
+                        color: '#b38e47',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
                       }}>
                         <Sparkles size={14} />
                         <span>AI Birebir Görsel Önizleme</span>
@@ -465,72 +470,72 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
 
                     <div style={{
                       padding: '14px',
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
                       borderRadius: '12px',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center'
                     }}>
                       <div>
-                        <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', fontWeight: '700' }}>ÖNERİLEN SERAMİK MODELİ</span>
-                        <strong style={{ fontSize: '0.9rem', color: '#fff' }}>{selectedStyle.defaultTile.name}</strong>
-                        <span style={{ fontSize: '0.74rem', color: 'var(--accent-gold, #d4af37)', display: 'block', marginTop: '2px' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', fontWeight: '700' }}>ÖNERİLEN SERAMİK MODELİ</span>
+                        <strong style={{ fontSize: '0.9rem', color: '#0f172a' }}>{selectedStyle.defaultTile.name}</strong>
+                        <span style={{ fontSize: '0.74rem', color: '#b38e47', display: 'block', marginTop: '2px', fontWeight: '600' }}>
                           {selectedStyle.defaultTile.width}x{selectedStyle.defaultTile.height} cm • {selectedStyle.defaultTile.finish}
                         </span>
                       </div>
-                      <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#fff' }}>₺{tileUnitPrice} <small style={{ fontSize: '0.65rem', color: '#94a3b8' }}>/ m²</small></span>
+                      <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#0f172a' }}>₺{tileUnitPrice} <small style={{ fontSize: '0.65rem', color: '#64748b' }}>/ m²</small></span>
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '18px' }}>
-                      <h5 style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--accent-gold, #d4af37)', marginBottom: '12px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px' }}>
+                      <h5 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#b38e47', marginBottom: '12px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Calculator size={16} />
                         <span>Otomatik Metraj ve Malzeme İhtiyacı</span>
                       </h5>
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '0.78rem' }}>
-                        <div style={{ background: '#0f172a', padding: '10px', borderRadius: '8px' }}>
-                          <span style={{ color: '#94a3b8', display: 'block' }}>Zemin + Duvar Alanı:</span>
-                          <strong style={{ color: '#fff', fontSize: '0.9rem' }}>{totalFloorM2 + totalWallM2} m²</strong>
+                        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px' }}>
+                          <span style={{ color: '#64748b', display: 'block' }}>Zemin + Duvar Alanı:</span>
+                          <strong style={{ color: '#0f172a', fontSize: '0.9rem' }}>{totalFloorM2 + totalWallM2} m²</strong>
                         </div>
-                        <div style={{ background: '#0f172a', padding: '10px', borderRadius: '8px' }}>
-                          <span style={{ color: '#94a3b8', display: 'block' }}>Toplam Seramik (%10 Fire):</span>
-                          <strong style={{ color: 'var(--accent-gold, #d4af37)', fontSize: '0.9rem' }}>{totalM2WithWaste} m² ({Math.ceil(totalM2WithWaste / 1.44)} Kutu)</strong>
+                        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px' }}>
+                          <span style={{ color: '#64748b', display: 'block' }}>Toplam Seramik (%10 Fire):</span>
+                          <strong style={{ color: '#b38e47', fontSize: '0.9rem' }}>{totalM2WithWaste} m² ({Math.ceil(totalM2WithWaste / 1.44)} Kutu)</strong>
                         </div>
-                        <div style={{ background: '#0f172a', padding: '10px', borderRadius: '8px' }}>
-                          <span style={{ color: '#94a3b8', display: 'block' }}>Kalekim Yapıştırıcı (25kg):</span>
-                          <strong style={{ color: '#fff' }}>{kalekimBags} Torba</strong>
+                        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px' }}>
+                          <span style={{ color: '#64748b', display: 'block' }}>Kalekim Yapıştırıcı (25kg):</span>
+                          <strong style={{ color: '#0f172a' }}>{kalekimBags} Torba</strong>
                         </div>
-                        <div style={{ background: '#0f172a', padding: '10px', borderRadius: '8px' }}>
-                          <span style={{ color: '#94a3b8', display: 'block' }}>Derz Dolgusu + Klips:</span>
-                          <strong style={{ color: '#fff' }}>{groutKg} kg Derz + {clipsBoxes} Klips Set</strong>
+                        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', padding: '10px', borderRadius: '8px' }}>
+                          <span style={{ color: '#64748b', display: 'block' }}>Derz Dolgusu + Klips:</span>
+                          <strong style={{ color: '#0f172a' }}>{groutKg} kg Derz + {clipsBoxes} Klips Set</strong>
                         </div>
                       </div>
                     </div>
 
-                    <div style={{ background: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '16px', padding: '18px' }}>
-                      <h5 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#fff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <ShieldCheck size={16} style={{ color: 'var(--accent-gold, #d4af37)' }} />
+                    <div style={{ background: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '16px', padding: '18px' }}>
+                      <h5 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <ShieldCheck size={16} style={{ color: '#b38e47' }} />
                         <span>Tahmini Toplam Proje Bütçesi</span>
                       </h5>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.78rem', color: '#cbd5e1' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.78rem', color: '#475569' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span>Seramik Malzeme Tutarı:</span>
-                          <strong>₺{totalTileCost.toLocaleString()}</strong>
+                          <strong style={{ color: '#0f172a' }}>₺{totalTileCost.toLocaleString()}</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span>Yapıştırıcı, Derz & Klips Tutarı:</span>
-                          <strong>₺{(kalekimCost + groutCost + clipsCost).toLocaleString()}</strong>
+                          <strong style={{ color: '#0f172a' }}>₺{(kalekimCost + groutCost + clipsCost).toLocaleString()}</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <span>Tahmini Usta İşçilik Tutarı:</span>
-                          <strong>₺{estimatedLaborCost.toLocaleString()}</strong>
+                          <strong style={{ color: '#0f172a' }}>₺{estimatedLaborCost.toLocaleString()}</strong>
                         </div>
-                        <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '8px 0' }} />
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', fontWeight: '900', color: 'var(--accent-gold, #d4af37)' }}>
+                        <hr style={{ borderColor: 'rgba(0, 0, 0, 0.08)', margin: '8px 0' }} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', fontWeight: '900', color: '#b38e47' }}>
                           <span>GENEL TOPLAM BÜTÇE:</span>
                           <span>₺{grandTotalCost.toLocaleString()}</span>
                         </div>
@@ -547,8 +552,8 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
         {/* Modal Footer Controls */}
         <div style={{
           padding: '16px 28px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'rgba(15, 23, 42, 0.8)',
+          borderTop: '1px solid #f1f5f9',
+          background: '#f8fafc',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
@@ -560,14 +565,15 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                 fontSize: '0.8rem',
                 padding: '8px 16px',
                 borderRadius: '8px',
-                border: '1px solid rgba(255,255,255,0.15)',
-                background: 'rgba(255,255,255,0.05)',
-                color: '#fff',
+                border: '1px solid #e2e8f0',
+                background: '#ffffff',
+                color: '#475569',
                 cursor: 'pointer',
                 fontWeight: '700',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '6px',
+                transition: 'all 0.2s'
               }}
             >
               <ArrowLeft size={16} />
@@ -582,14 +588,15 @@ export default function SmartBathroomAssistantModal({ isOpen, onClose, onSelectP
                 fontSize: '0.8rem',
                 padding: '8px 16px',
                 borderRadius: '8px',
-                border: '1px solid rgba(255,255,255,0.15)',
-                background: 'rgba(255,255,255,0.05)',
-                color: '#fff',
+                border: '1px solid #e2e8f0',
+                background: '#ffffff',
+                color: '#475569',
                 cursor: 'pointer',
                 fontWeight: '700',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '6px',
+                transition: 'all 0.2s'
               }}
             >
               <RefreshCw size={16} />

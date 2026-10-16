@@ -14920,10 +14920,10 @@ export default function Home() {
           width: 94%;
           border-radius: 28px;
           padding: 28px 32px;
-          background: linear-gradient(135deg, #080d1a 0%, #0f172a 50%, #172033 100%);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.15);
-          color: #ffffff;
+          background: #ffffff;
+          border: 1px solid rgba(179, 142, 71, 0.35);
+          box-shadow: 0 25px 70px rgba(15, 23, 42, 0.18), 0 0 35px rgba(212, 175, 55, 0.08);
+          color: #0f172a;
           max-height: 90vh;
           overflow-y: auto;
           box-sizing: border-box;
@@ -14938,7 +14938,7 @@ export default function Home() {
           align-items: center;
           justify-content: space-between;
           margin-bottom: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 1px solid #e2e8f0;
           padding-bottom: 16px;
           gap: 12px;
         }
@@ -14970,22 +14970,22 @@ export default function Home() {
           margin: 0;
           font-size: 1.4rem;
           font-weight: 900;
-          color: #ffffff;
+          color: #0f172a;
           font-family: var(--font-title);
           letter-spacing: -0.01em;
           line-height: 1.2;
         }
         .how-it-works-subtitle {
           font-size: 0.82rem;
-          color: #94a3b8;
+          color: #64748b;
           font-weight: 500;
           margin-top: 2px;
           line-height: 1.3;
         }
         .how-it-works-close-btn {
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #ffffff;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          color: #64748b;
           width: 36px;
           height: 36px;
           border-radius: 50%;
@@ -14997,7 +14997,9 @@ export default function Home() {
           flex-shrink: 0;
         }
         .how-it-works-close-btn:hover {
-          background: rgba(255, 255, 255, 0.18);
+          background: #fee2e2;
+          border-color: #fca5a5;
+          color: #ef4444;
           transform: rotate(90deg);
         }
 
@@ -15006,18 +15008,18 @@ export default function Home() {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 6px;
-          background: rgba(0, 0, 0, 0.45);
+          background: #f1f5f9;
           padding: 5px;
           border-radius: 16px;
           margin-bottom: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid #e2e8f0;
         }
         .how-it-works-tab-btn {
           padding: 11px 12px;
           border-radius: 12px;
           border: none;
           background: transparent;
-          color: #94a3b8;
+          color: #64748b;
           font-weight: 750;
           font-size: 0.84rem;
           cursor: pointer;
@@ -15029,8 +15031,8 @@ export default function Home() {
           white-space: nowrap;
         }
         .how-it-works-tab-btn:hover {
-          color: #f1f5f9;
-          background: rgba(255, 255, 255, 0.04);
+          color: #0f172a;
+          background: #e2e8f0;
         }
         .how-it-works-tab-btn.active {
           background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
@@ -15065,7 +15067,7 @@ export default function Home() {
         }
         .banner-text {
           font-size: 0.86rem;
-          color: #fef08a;
+          color: #854d0e;
           font-weight: 700;
           line-height: 1.5;
         }
@@ -15080,15 +15082,16 @@ export default function Home() {
           display: flex;
           gap: 16px;
           align-items: flex-start;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 18px;
           padding: 18px 20px;
           transition: all 0.2s ease;
         }
         .how-it-works-step-card:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(212, 175, 55, 0.3);
+          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.35);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
         }
         .how-it-works-step-num {
           width: 36px;
@@ -15112,13 +15115,13 @@ export default function Home() {
           margin: 0 0 6px 0;
           font-size: 1.05rem;
           font-weight: 800;
-          color: #ffffff;
+          color: #0f172a;
           line-height: 1.3;
         }
         .how-it-works-step-desc {
           margin: 0 0 10px 0;
           font-size: 0.84rem;
-          color: #cbd5e1;
+          color: #475569;
           line-height: 1.6;
         }
         .how-it-works-step-pill {
@@ -15131,19 +15134,19 @@ export default function Home() {
           border-radius: 12px;
         }
         .how-it-works-step-pill.cyan {
-          color: #38bdf8;
-          background: rgba(56, 189, 248, 0.1);
-          border: 1px solid rgba(56, 189, 248, 0.2);
+          color: #0284c7;
+          background: #e0f2fe;
+          border: 1px solid #bae6fd;
         }
         .how-it-works-step-pill.green {
-          color: #34d399;
-          background: rgba(52, 211, 153, 0.1);
-          border: 1px solid rgba(52, 211, 153, 0.2);
+          color: #059669;
+          background: #d1fae5;
+          border: 1px solid #a7f3d0;
         }
         .how-it-works-step-pill.gold {
-          color: #fef08a;
-          background: rgba(254, 240, 138, 0.1);
-          border: 1px solid rgba(254, 240, 138, 0.2);
+          color: #b45309;
+          background: #fef3c7;
+          border: 1px solid #fde68a;
         }
 
         /* Action Footer */
@@ -15177,9 +15180,9 @@ export default function Home() {
           height: 44px;
           padding: 0 20px;
           border-radius: 12px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: #cbd5e1;
+          background: #f1f5f9;
+          border: 1px solid #cbd5e1;
+          color: #475569;
           font-weight: 750;
           font-size: 0.84rem;
           cursor: pointer;
@@ -15187,8 +15190,8 @@ export default function Home() {
           white-space: nowrap;
         }
         .how-it-works-secondary-cta:hover {
-          background: rgba(255, 255, 255, 0.1);
-          color: #ffffff;
+          background: #e2e8f0;
+          color: #0f172a;
         }
 
         /* B2B Sections */
@@ -15197,12 +15200,14 @@ export default function Home() {
           padding: 24px;
         }
         .how-it-works-b2b-hero.gold-theme {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(30, 41, 59, 0.85) 100%);
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, #ffffff 100%);
           border: 1px solid rgba(212, 175, 55, 0.35);
+          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
         }
         .how-it-works-b2b-hero.blue-theme {
-          background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.9) 100%);
+          background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, #ffffff 100%);
           border: 1px solid rgba(56, 189, 248, 0.35);
+          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
         }
         .b2b-badge {
           display: inline-flex;
@@ -15215,25 +15220,27 @@ export default function Home() {
           margin-bottom: 12px;
         }
         .b2b-badge.gold {
-          background: rgba(212, 175, 55, 0.15);
-          color: #fbbf24;
+          background: #fef3c7;
+          color: #b45309;
+          border: 1px solid #fde68a;
         }
         .b2b-badge.blue {
-          background: rgba(56, 189, 248, 0.15);
-          color: #38bdf8;
+          background: #e0f2fe;
+          color: #0284c7;
+          border: 1px solid #bae6fd;
         }
         .b2b-hero-title {
           margin: 0 0 10px 0;
           font-size: 1.25rem;
           font-weight: 900;
-          color: #ffffff;
+          color: #0f172a;
           font-family: var(--font-title);
           line-height: 1.3;
         }
         .b2b-hero-desc {
           margin: 0 0 18px 0;
           font-size: 0.86rem;
-          color: #cbd5e1;
+          color: #475569;
           line-height: 1.6;
         }
         .b2b-features-grid {
@@ -15243,15 +15250,16 @@ export default function Home() {
           margin-bottom: 20px;
         }
         .b2b-feature-card {
-          background: rgba(0, 0, 0, 0.35);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           padding: 14px;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
         }
         .b2b-feature-title {
           font-size: 0.88rem;
           font-weight: 800;
-          color: #ffffff;
+          color: #0f172a;
           margin-bottom: 6px;
           display: flex;
           align-items: center;
@@ -15259,7 +15267,7 @@ export default function Home() {
         }
         .b2b-feature-text {
           font-size: 0.78rem;
-          color: #94a3b8;
+          color: #64748b;
           line-height: 1.5;
           margin: 0;
         }
@@ -15418,14 +15426,13 @@ export default function Home() {
           max-height: 94vh;
           padding: 20px 24px;
           border-radius: 20px;
-          background: rgba(30, 34, 42, 0.98);
-          border: 1px solid rgba(197, 160, 89, 0.45);
+          background: #ffffff;
+          border: 1px solid rgba(179, 142, 71, 0.35);
           backdrop-filter: blur(30px);
           -webkit-backdrop-filter: blur(30px);
-          box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 
-                      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          box-shadow: 0 30px 70px rgba(15, 23, 42, 0.18), 
                       0 0 50px rgba(197, 160, 89, 0.08);
-          color: #ffffff;
+          color: #1e293b;
           display: flex;
           flex-direction: column;
           gap: 16px;
@@ -15453,14 +15460,11 @@ export default function Home() {
         }
 
         .detail-modal-header-title h3 {
-          color: #ffffff;
+          color: #0f172a;
           font-family: var(--font-title);
           font-size: 1.45rem;
           font-weight: 700;
           letter-spacing: -0.01em;
-          background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
         }
 
         .brand-badge-detail {
@@ -15478,12 +15482,12 @@ export default function Home() {
 
         .code-text {
           font-size: 0.68rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: #64748b;
           font-family: monospace;
-          background: rgba(255, 255, 255, 0.04);
+          background: #f1f5f9;
           padding: 1px 6px;
           border-radius: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          border: 1px solid #e2e8f0;
         }
 
         .detail-modal-body {
@@ -15546,9 +15550,9 @@ export default function Home() {
           height: 200px;
           border-radius: 12px;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.5);
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
           position: relative;
         }
 
@@ -15559,8 +15563,8 @@ export default function Home() {
         }
 
         .spec-item-box {
-          background: rgba(15, 23, 42, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.07);
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           padding: 8px 10px;
           border-radius: 10px;
           display: flex;
@@ -15570,15 +15574,15 @@ export default function Home() {
         }
 
         .spec-item-box:hover {
-          background: rgba(25, 35, 60, 0.7);
-          border-color: rgba(212, 175, 55, 0.35);
+          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.4);
           transform: translateY(-2px);
-          box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 8px 18px rgba(179, 142, 71, 0.12);
         }
 
         .spec-lbl {
           font-size: 0.60rem;
-          color: #94a3b8;
+          color: #64748b;
           text-transform: uppercase;
           font-weight: 700;
           letter-spacing: 0.06em;
@@ -15587,7 +15591,7 @@ export default function Home() {
         .spec-val {
           font-size: 0.78rem;
           font-weight: 700;
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .detail-primary-actions {
@@ -15749,9 +15753,8 @@ export default function Home() {
         .btn-action-dealer, .btn-action-sample {
           padding: 11px 13px;
           border-radius: 13px;
-          background: rgba(15, 23, 42, 0.65);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -15760,7 +15763,7 @@ export default function Home() {
           position: relative;
           overflow: hidden;
           text-align: left;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
           box-sizing: border-box;
           min-width: 0;
         }
@@ -15779,19 +15782,19 @@ export default function Home() {
         .dealer-icon-circle {
           background: rgba(59, 130, 246, 0.12);
           border: 1px solid rgba(59, 130, 246, 0.28);
-          color: #60a5fa;
+          color: #2563eb;
         }
 
         .sample-icon-circle {
           background: rgba(16, 185, 129, 0.12);
           border: 1px solid rgba(16, 185, 129, 0.28);
-          color: #34d399;
+          color: #059669;
         }
 
         .btn-action-dealer .btn-title, .btn-action-sample .btn-title {
           font-size: 0.82rem;
           font-weight: 700;
-          color: #f8fafc;
+          color: #0f172a;
           line-height: 1.2;
           white-space: nowrap;
           overflow: hidden;
@@ -15802,7 +15805,7 @@ export default function Home() {
         .btn-action-dealer .btn-subtext, .btn-action-sample .btn-subtext {
           font-size: 0.68rem;
           font-weight: 500;
-          color: #94a3b8;
+          color: #64748b;
           margin-top: 2px;
           white-space: nowrap;
           overflow: hidden;
@@ -15811,16 +15814,16 @@ export default function Home() {
         }
 
         .btn-action-dealer:hover {
-          background: rgba(22, 38, 70, 0.85);
-          border-color: rgba(96, 165, 250, 0.55);
+          background: #ffffff;
+          border-color: rgba(59, 130, 246, 0.4);
           transform: translateY(-2px);
-          box-shadow: 0 8px 22px -2px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 8px 22px -2px rgba(59, 130, 246, 0.18);
         }
 
         .btn-action-dealer:hover .dealer-icon-circle {
           transform: scale(1.08);
           background: rgba(59, 130, 246, 0.22);
-          color: #93c5fd;
+          color: #1d4ed8;
         }
 
         .btn-action-sample:hover {
@@ -15848,21 +15851,21 @@ export default function Home() {
           gap: 12px !important;
           width: 100% !important;
           padding: 10px 14px !important;
-          background: rgba(255, 255, 255, 0.03) !important;
-          border: 1px solid rgba(255, 255, 255, 0.09) !important;
+          background: #f8fafc !important;
+          border: 1px solid #e2e8f0 !important;
           border-radius: 12px !important;
-          color: #e2e8f0 !important;
+          color: #0f172a !important;
           text-decoration: none !important;
           box-sizing: border-box !important;
           transition: all 0.22s ease !important;
         }
 
         :global(.btn-action-standalone:hover) {
-          background: rgba(212, 175, 55, 0.08) !important;
-          border-color: rgba(212, 175, 55, 0.4) !important;
-          color: #ffffff !important;
+          background: #ffffff !important;
+          border-color: rgba(179, 142, 71, 0.4) !important;
+          color: #0f172a !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.12) !important;
         }
 
         .standalone-left {
@@ -15896,13 +15899,13 @@ export default function Home() {
         .standalone-title {
           font-size: 0.80rem;
           font-weight: 700;
-          color: #f1f5f9;
+          color: #0f172a;
           white-space: nowrap;
         }
 
         .standalone-desc {
           font-size: 0.67rem;
-          color: #94a3b8;
+          color: #64748b;
           white-space: nowrap;
         }
 
@@ -15923,7 +15926,7 @@ export default function Home() {
         /* 4. Architect CAD Download Portal */
         .architect-download-box {
           margin-top: 14px;
-          border-top: 1px solid rgba(255, 255, 255, 0.07);
+          border-top: 1px solid #e2e8f0;
           padding-top: 14px;
           display: flex;
           flex-direction: column;
@@ -15950,18 +15953,18 @@ export default function Home() {
         .architect-badge-mini {
           font-size: 0.60rem;
           font-weight: 700;
-          color: #cbd5e1;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #475569;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
           padding: 2px 7px;
           border-radius: 5px;
           letter-spacing: 0.04em;
         }
 
         .btn-architect-download {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #e2e8f0;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #0f172a;
           font-size: 0.79rem;
           font-weight: 600;
           padding: 10px 14px;
@@ -15975,11 +15978,11 @@ export default function Home() {
         }
 
         .btn-architect-download:hover:not(:disabled) {
-          background: rgba(212, 175, 55, 0.08);
-          border-color: rgba(212, 175, 55, 0.4);
-          color: #ffffff;
+          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.4);
+          color: #0f172a;
           transform: translateY(-1px);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.12);
         }
 
         .btn-architect-download:disabled {
@@ -15995,9 +15998,9 @@ export default function Home() {
         }
 
         .detail-modal-content-premium .close-modal-btn {
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #94a3b8;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          color: #64748b;
           width: 34px;
           height: 34px;
           border-radius: 50%;
@@ -16008,9 +16011,9 @@ export default function Home() {
           transition: all 0.22s ease;
         }
         .detail-modal-content-premium .close-modal-btn:hover {
-          background: rgba(239, 68, 68, 0.18);
-          border-color: rgba(239, 68, 68, 0.45);
-          color: #fca5a5;
+          background: #fee2e2;
+          border-color: #fca5a5;
+          color: #ef4444;
           transform: rotate(90deg);
         }
 
@@ -16021,20 +16024,21 @@ export default function Home() {
         }
 
         .detail-modal-content-premium .channel-box {
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid #e2e8f0;
+          background: #f8fafc;
           border-radius: 12px;
           padding: 14px 16px;
           display: flex;
           flex-direction: column;
           gap: 10px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
           transition: all 0.3s ease;
         }
 
         .detail-modal-content-premium .channel-box:hover {
-          border-color: rgba(197, 160, 89, 0.25);
-          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+          border-color: rgba(179, 142, 71, 0.35);
+          background: #ffffff;
+          box-shadow: 0 6px 18px rgba(179, 142, 71, 0.1);
         }
 
         .channel-title {
@@ -16051,7 +16055,7 @@ export default function Home() {
 
         .channel-desc {
           font-size: 0.72rem;
-          color: rgba(255, 255, 255, 0.6);
+          color: #64748b;
           line-height: 1.4;
         }
 
@@ -16060,13 +16064,13 @@ export default function Home() {
           align-items: center;
           gap: 8px;
           font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.6);
+          color: #64748b;
           padding: 10px 0;
         }
 
         .no-channel-data {
           font-size: 0.72rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: #94a3b8;
           font-style: italic;
         }
 
@@ -16086,16 +16090,16 @@ export default function Home() {
         .calc-input-group label {
           font-size: 0.68rem;
           font-weight: 600;
-          color: rgba(255, 255, 255, 0.65);
+          color: #475569;
         }
 
         .detail-modal-content-premium .calc-input, 
         .detail-modal-content-premium .calc-select {
-          background: rgba(0, 0, 0, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
           border-radius: 8px;
           padding: 10px 12px;
-          color: #ffffff;
+          color: #0f172a;
           font-family: var(--font-body);
           font-size: 0.82rem;
           outline: none;
@@ -16105,13 +16109,13 @@ export default function Home() {
         .detail-modal-content-premium .calc-input:focus, 
         .detail-modal-content-premium .calc-select:focus {
           border-color: var(--accent-gold);
-          background: rgba(0, 0, 0, 0.35);
-          box-shadow: 0 0 12px rgba(197, 160, 89, 0.2);
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15);
         }
 
         .calc-results-panel {
-          background: rgba(0, 0, 0, 0.25);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 12px;
           padding: 14px;
           margin-top: 4px;
@@ -16124,39 +16128,40 @@ export default function Home() {
         }
 
         .calc-res-item {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           padding: 10px 12px;
           border-radius: 8px;
           display: flex;
           flex-direction: column;
           gap: 3px;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
         }
 
         .calc-res-item span {
           font-size: 0.6rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.03em;
         }
 
         .calc-res-item strong {
           font-size: 0.85rem;
-          color: #ffffff;
+          color: #0f172a;
           font-weight: 700;
         }
 
         /* Borusan Logistics Box */
         .pallet-logistics-box {
           margin-top: 14px;
-          background: linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(197, 160, 89, 0.03) 100%) !important;
-          border: 1px solid rgba(37, 99, 235, 0.25) !important;
+          background: #f8fafc !important;
+          border: 1px solid #e2e8f0 !important;
           border-radius: 12px !important;
           padding: 14px 18px !important;
           display: flex;
           flex-direction: column;
           gap: 6px;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
         }
 
         .logistics-lbl {
@@ -16172,21 +16177,21 @@ export default function Home() {
           display: flex;
           justify-content: space-between;
           font-size: 0.76rem;
-          color: rgba(255, 255, 255, 0.85);
+          color: #475569;
         }
 
         .logistics-row strong {
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .logistics-row.highlight-price {
-          border-top: 1px dashed rgba(255, 255, 255, 0.08);
+          border-top: 1px dashed #cbd5e1;
           padding-top: 8px;
           margin-top: 4px;
         }
 
         .logistics-price {
-          color: #60a5fa !important;
+          color: #2563eb !important;
           font-weight: 700;
           font-size: 0.82rem;
         }
@@ -16199,8 +16204,8 @@ export default function Home() {
         }
 
         .modal-dealer-row {
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           padding: 14px 18px;
           display: flex;
@@ -16208,25 +16213,26 @@ export default function Home() {
           align-items: center;
           gap: 12px;
           transition: all 0.3s ease;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
         }
 
         .modal-dealer-row:hover {
-          background: rgba(255, 255, 255, 0.04);
-          border-color: rgba(197, 160, 89, 0.2);
+          background: #f8fafc;
+          border-color: rgba(179, 142, 71, 0.35);
           transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.08);
         }
 
         .m-dealer-info h5 {
           font-size: 0.85rem;
           font-weight: 600;
-          color: #ffffff;
+          color: #0f172a;
           margin-bottom: 3px;
         }
 
         .m-dealer-meta {
           font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.5);
+          color: #64748b;
         }
 
         .m-dealer-meta strong {
@@ -16247,8 +16253,8 @@ export default function Home() {
         }
 
         .affiliate-row {
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           padding: 14px 18px;
           display: flex;
@@ -16259,21 +16265,21 @@ export default function Home() {
         }
 
         .affiliate-row:hover {
-          background: rgba(255, 255, 255, 0.04);
-          border-color: rgba(197, 160, 89, 0.2);
+          background: #f8fafc;
+          border-color: rgba(179, 142, 71, 0.35);
           transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.08);
         }
 
         .cheapest-row {
-          border-color: rgba(197, 160, 89, 0.35) !important;
-          background: rgba(197, 160, 89, 0.06) !important;
-          box-shadow: 0 4px 20px rgba(197, 160, 89, 0.05);
+          border-color: rgba(179, 142, 71, 0.4) !important;
+          background: rgba(179, 142, 71, 0.06) !important;
+          box-shadow: 0 4px 20px rgba(179, 142, 71, 0.05);
         }
 
         .cheapest-row:hover {
           border-color: var(--accent-gold) !important;
-          background: rgba(197, 160, 89, 0.1) !important;
+          background: rgba(179, 142, 71, 0.1) !important;
         }
 
         .cheapest-badge {
@@ -16296,12 +16302,12 @@ export default function Home() {
         }
 
         .store-name {
-          color: rgba(255, 255, 255, 0.7);
+          color: #475569;
         }
 
         .store-name.font-bold {
           font-weight: 700;
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .aff-price-action {
@@ -16336,20 +16342,20 @@ export default function Home() {
         }
 
         .aff-btn-secondary {
-          background: rgba(255, 255, 255, 0.03);
-          color: #ffffff;
+          background: #ffffff;
+          color: #0f172a;
           text-decoration: none;
           font-weight: 600;
           font-size: 0.75rem;
           padding: 8px 16px;
           border-radius: 6px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid #cbd5e1;
           transition: all 0.2s ease;
         }
 
         .aff-btn-secondary:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.2);
+          background: #f1f5f9;
+          border-color: #94a3b8;
           transform: translateY(-1px);
         }
 
@@ -16478,16 +16484,17 @@ export default function Home() {
 
         /* Search suggestions dropdown adjustments */
         .search-suggestions-dropdown {
-          background: rgba(26, 29, 36, 0.95) !important;
-          border: 1px solid var(--border-gold, rgba(197, 160, 89, 0.3)) !important;
+          background: #ffffff !important;
+          border: 1px solid rgba(179, 142, 71, 0.35) !important;
           border-radius: 12px !important;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+          box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12) !important;
         }
         .suggestion-item {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+          border-bottom: 1px solid #f1f5f9 !important;
+          color: #0f172a !important;
         }
         .suggestion-item:hover {
-          background: rgba(255, 255, 255, 0.05) !important;
+          background: #f8fafc !important;
         }
         .suggestion-item:last-child {
           border-bottom: none !important;
@@ -16505,11 +16512,11 @@ export default function Home() {
           left: calc(100% + 15px);
           top: 50%;
           transform: translateY(-50%) translateX(10px);
-          background: rgba(20, 22, 28, 0.98);
+          background: #ffffff;
           border: 1px solid var(--accent-gold);
           border-radius: 8px;
           padding: 12px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
           z-index: 100;
           width: 200px;
           opacity: 0;
@@ -16526,7 +16533,7 @@ export default function Home() {
           margin-top: -6px;
           border-width: 6px;
           border-style: solid;
-          border-color: transparent rgba(20, 22, 28, 0.98) transparent transparent;
+          border-color: transparent #ffffff transparent transparent;
         }
         
         .tooltip-title {
@@ -16544,7 +16551,8 @@ export default function Home() {
           display: flex;
           align-items: flex-end;
           justify-content: space-around;
-          background: rgba(255, 255, 255, 0.02);
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 6px;
           padding: 10px;
           height: 100px;
@@ -16563,7 +16571,7 @@ export default function Home() {
         .viz-human-head {
           width: 10px;
           height: 10px;
-          border: 1.5px solid rgba(255, 255, 255, 0.4);
+          border: 1.5px solid #94a3b8;
           border-radius: 50%;
           margin-bottom: 2px;
           background: transparent;
@@ -16571,7 +16579,7 @@ export default function Home() {
         .viz-human-body {
           width: 2px;
           height: 35px;
-          background: rgba(255, 255, 255, 0.4);
+          background: #94a3b8;
           position: relative;
         }
         .viz-human-body::before, .viz-human-body::after {
@@ -16579,7 +16587,7 @@ export default function Home() {
           position: absolute;
           width: 10px;
           height: 2px;
-          background: rgba(255, 255, 255, 0.4);
+          background: #94a3b8;
           top: 5px;
         }
         .viz-human-body::before { right: 2px; transform: rotate(-30deg); }
@@ -16587,7 +16595,7 @@ export default function Home() {
         
         .viz-lbl {
           font-size: 0.55rem;
-          color: var(--text-muted);
+          color: #64748b;
           text-align: center;
           margin-top: 4px;
           white-space: nowrap;
@@ -16607,8 +16615,8 @@ export default function Home() {
 
         .viz-tile .viz-lbl {
           font-size: 0.5rem;
-          color: #fff;
-          font-weight: 500;
+          color: #854d0e;
+          font-weight: 700;
         }
         
         /* Proportional dimensions next to 175cm human (80px height) */
