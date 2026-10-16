@@ -223,7 +223,7 @@ export default async function ProductDetailPage({ params }) {
   });
 
   return (
-    <div className="sb-dark-page min-h-screen">
+    <div className="sb-product-page min-h-screen">
       {productSchema && (
         <script
           type="application/ld+json"

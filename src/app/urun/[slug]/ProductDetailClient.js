@@ -394,7 +394,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
   const displayDealers = liveDealers.length > 0 ? liveDealers : authorizedDealers;
 
   return (
-    <div className="sb-dark-page">
+    <div className="sb-product-page">
       
       {/* ---------------- 1. CLEAN APP HEADER BAR ---------------- */}
       <header className="sb-nav-bar">
@@ -501,16 +501,16 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             {/* 3 Metric Summary Strip */}
             <div className="sb-strip-3">
               <div className="sb-strip-cell">
-                <span className="sb-cell-lbl">Format</span>
+                <span className="sb-cell-lbl">Format / Ebat</span>
                 <span className="sb-cell-val">{tileWidth}×{tileHeight} cm</span>
               </div>
               <div className="sb-strip-cell">
-                <span className="sb-cell-lbl">Tek Plaka</span>
+                <span className="sb-cell-lbl">Tek Plaka Alanı</span>
                 <span className="sb-cell-val">{tileAreaM2} m²</span>
               </div>
               <div className="sb-strip-cell">
-                <span className="sb-cell-lbl">Kenar Kesimi</span>
-                <span className="sb-cell-val">{product.rectified ? 'Rektifiye (1mm)' : 'Derzli'}</span>
+                <span className="sb-cell-lbl">Kutu / Paket</span>
+                <span className="sb-cell-val">{boxM2} m² ({tilesPerBox} Ad.)</span>
               </div>
             </div>
           </div>
@@ -532,79 +532,62 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             <h1 className="sb-title-text">{product.name}</h1>
             <p className="sb-sub-text">{productSubtitle}</p>
 
-            {/* Symmetrical Quick Specs */}
-            <div className="sb-specs-grid-4">
-              <div className="sb-spec-box">
-                <span className="sb-s-lbl">Ebat</span>
-                <span className="sb-s-val">{tileWidth}×{tileHeight} cm</span>
-              </div>
-              <div className="sb-spec-box">
-                <span className="sb-s-lbl">Yüzey Bitişi</span>
-                <span className="sb-s-val">{product.finish || 'Mat'}</span>
-              </div>
-              <div className="sb-spec-box">
-                <span className="sb-s-lbl">Tipoloji</span>
-                <span className="sb-s-val">{product.style || 'Porselen'}</span>
-              </div>
-              <div className="sb-spec-box">
-                <span className="sb-s-lbl">Paket Kutu</span>
-                <span className="sb-s-val">{boxM2} m² ({tilesPerBox} Adet)</span>
-              </div>
+            {/* Quick Feature Badges Row */}
+            <div className="sb-spec-chips-row">
+              <span className="sb-spec-chip sb-spec-chip-gold">📐 {productDimensions}</span>
+              <span className="sb-spec-chip">✨ {product.finish || 'Mat Yüzey'}</span>
+              <span className="sb-spec-chip">🏛️ {product.style || 'Porselen'}</span>
+              <span className="sb-spec-chip">{product.rectified ? '🛡️ Rektifiye (1mm Derz)' : 'Hassas Derzli'}</span>
+              {product.frostResistance && (
+                <span className="sb-spec-chip">❄️ Dış Mekan / Don Mukavemeti</span>
+              )}
             </div>
 
             {/* Symmetrical Action Hub */}
             <div className="sb-actions-panel">
-              <div className="sb-panel-caption">
-                <Sparkles size={13} className="sb-gold-icon" />
-                <span>Simülasyon & Tasarım</span>
-              </div>
+              {/* Primary Action: Fiyat Teklifi Al */}
+              <button
+                type="button"
+                onClick={() => setShowQuoteModal(true)}
+                className="sb-btn-primary-gold"
+              >
+                <Send size={18} />
+                <span>Yetkili Bayiden Fiyat Teklifi Al</span>
+              </button>
 
+              {/* Secondary Actions: Mekânımda Gör & 3D Stüdyo */}
               <div className="sb-grid-2">
                 <button
                   type="button"
                   onClick={() => { setRenovationProduct(product); setShowRenovationModal(true); }}
-                  className="sb-btn-primary-gold"
+                  className="sb-btn-secondary-camera"
                 >
-                  <Camera size={16} />
+                  <Camera size={16} style={{ color: '#b38e47' }} />
                   <span>Mekânımda Gör & Dene</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleGoTo3DStudio}
-                  className="sb-btn-dark-slate"
+                  className="sb-btn-studio"
                 >
-                  <Eye size={16} />
+                  <Sparkles size={16} style={{ color: '#b38e47' }} />
                   <span>3D Tasarım Stüdyosu</span>
                 </button>
               </div>
 
-              <div className="sb-divider" />
-
-              <div className="sb-panel-caption">
-                <ShieldCheck size={13} className="sb-gold-icon" />
-                <span>Teklif & Ücretsiz Numune</span>
-              </div>
-
-              <div className="sb-grid-2">
-                <button
-                  type="button"
-                  onClick={() => setShowQuoteModal(true)}
-                  className="sb-btn-outline-gold"
-                >
-                  <Send size={15} />
-                  <span>Fiyat Teklifi Al</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowSampleModal(true)}
-                  className="sb-btn-outline-dark"
-                >
-                  <Box size={15} />
-                  <span>15×15 Numune İste</span>
-                </button>
-              </div>
+              {/* Direct Sample Request Bar */}
+              <button
+                type="button"
+                onClick={() => setShowSampleModal(true)}
+                className="sb-sample-bar-btn"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Box size={16} className="sb-gold-icon" />
+                  <span>Projeniz için <strong>15×15 cm Ücretsiz Numune</strong> İsteyin</span>
+                </div>
+                <ChevronRight size={14} style={{ color: '#94a3b8' }} />
+              </button>
 
               {/* Compact Metraj Calculator Drawer */}
               <div className="sb-calc-container">
@@ -614,18 +597,18 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   className="sb-calc-toggle"
                 >
                   <span className="sb-calc-toggle-title">
-                    <Calculator size={14} className="sb-gold-icon" />
+                    <Calculator size={15} className="sb-gold-icon" />
                     <span>Metraj & Kutu Adedi Hesaplayıcı</span>
                   </span>
                   <span className="sb-calc-toggle-ind">
-                    {showCalculator ? 'Kapat ▲' : 'Hesapla ▼'}
+                    {showCalculator ? 'Kapat ▲' : 'Aç & Hesapla ▼'}
                   </span>
                 </button>
 
                 {showCalculator && (
                   <div className="sb-calc-body">
                     <div className="sb-calc-top-row">
-                      <span className="sb-calc-h">Net Alan:</span>
+                      <span>Kaplanacak Net Alan:</span>
                       <label className="sb-calc-cb-lbl">
                         <input
                           type="checkbox"
@@ -672,7 +655,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                       ))}
                     </div>
 
-                    <div className="sb-grid-3" style={{ marginTop: '10px' }}>
+                    <div className="sb-grid-3" style={{ marginTop: '8px' }}>
                       <div className="sb-calc-kpi">
                         <span className="sb-kpi-lbl">Toplam Alan</span>
                         <span className="sb-kpi-val">{targetArea.toFixed(1)} m²</span>
@@ -691,7 +674,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </div>
 
             </div>
-
           </div>
 
         </div>
