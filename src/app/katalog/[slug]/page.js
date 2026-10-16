@@ -137,6 +137,23 @@ export default function PublicCatalogViewerPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Listen for B2B Lead Modal triggers from catalog templates
+  useEffect(() => {
+    const handleOpenLeadModal = (e) => {
+      const p = e.detail?.product;
+      if (p) {
+        setSelectedProducts([p.name || p.sku || 'Seramik Ürün']);
+      }
+      if (e.detail?.type) {
+        setLeadType(e.detail.type);
+      }
+      setLeadSubmitted(false);
+      setShowLeadModal(true);
+    };
+    window.addEventListener('seramikbak-open-lead-modal', handleOpenLeadModal);
+    return () => window.removeEventListener('seramikbak-open-lead-modal', handleOpenLeadModal);
+  }, []);
+
   const fetchCatalog = async () => {
     setLoading(true);
     setError('');

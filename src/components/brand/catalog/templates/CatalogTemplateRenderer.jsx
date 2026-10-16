@@ -90,6 +90,14 @@ export default function CatalogTemplateRenderer({
       (catalog.showSpecs !== false ? 1 : 0) +
       1 + // application spaces
       (catalog.showContactPage !== false ? 1 : 0)
+    : (template === 'architectural-editorial' ||
+       template === 'mimar-sunum' ||
+       template === 'terra-luxe' ||
+       template === 'dogal-tas-mermer')
+    ? (catalog.showCover !== false ? 1 : 0) +
+      5 + // manifesto (1) + panoramic living (1) + hero slab (1) + macro specs (1) + collection matrix (1)
+      (catalog.showSpecs !== false ? 1 : 0) + // specs table (1)
+      (catalog.showContactPage !== false ? 1 : 0) // back cover (1)
     : (catalog.showCover !== false ? 1 : 0) +
       (catalog.showTOC !== false ? 1 : 0) +
       productPagesCount +
