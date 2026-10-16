@@ -19,6 +19,7 @@ import ShowroomCollectionTemplate from './ShowroomCollectionTemplate';
 import GlobalExportTemplate from './GlobalExportTemplate';
 import LidyaTechnicTemplate from './LidyaTechnicTemplate';
 import DecoExclusiveTemplate from './DecoExclusiveTemplate';
+import ArchitecturalEditorialTemplate from './ArchitecturalEditorialTemplate';
 import CustomCanvasPageRenderer from './CustomCanvasPageRenderer';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 
@@ -64,6 +65,14 @@ export default function CatalogTemplateRenderer({
     if (catalog.showSpecs !== false) extraPages += 1; // Technical standards & packing page
   } else if (template === 'showroom') {
     productPagesCount = Math.max(1, Math.ceil(productPagesCount / 2));
+  } else if (
+    template === 'architectural-editorial' ||
+    template === 'mimar-sunum' ||
+    template === 'terra-luxe' ||
+    template === 'dogal-tas-mermer'
+  ) {
+    productPagesCount = 2; // overview + hero detail
+    extraPages += 2; // manifesto + case studies
   }
 
   const totalPages = hasCustomCanvas
@@ -163,10 +172,13 @@ export default function CatalogTemplateRenderer({
       case 'dijital-brosur':
       case 'artisan':
         return <DecoExclusiveTemplate {...props} />;
-      case 'verona':
-      case 'dogal-tas-mermer':
-      case 'banyo-mutfak':
+      case 'architectural-editorial':
       case 'mimar-sunum':
+      case 'terra-luxe':
+      case 'dogal-tas-mermer':
+        return <ArchitecturalEditorialTemplate {...props} />;
+      case 'verona':
+      case 'banyo-mutfak':
       case 'renk-ebat-rehberi':
       case 'yeni-lansman':
       case 'premium-mimari':

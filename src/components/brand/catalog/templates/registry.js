@@ -114,7 +114,7 @@ export const CATALOG_DESIGN_FAMILIES = [
   // 4. Mimar ve Proje Sunumu
   {
     id: 'mimar-sunum',
-    aliasIds: ['architectural-portfolio'],
+    aliasIds: ['architectural-portfolio', 'architectural-editorial', 'terra-luxe'],
     name: 'Mimar ve Proje Sunumu',
     category: 'architectural',
     style: 'presentation',
