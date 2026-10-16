@@ -228,12 +228,12 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         position: 'fixed',
         inset: 0,
         zIndex: 99999,
-        background: 'rgba(5, 8, 16, 0.88)',
-        backdropFilter: 'blur(12px)',
+        background: 'rgba(15, 23, 42, 0.65)',
+        backdropFilter: 'blur(10px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '16px',
+        padding: '12px',
         overflowY: 'auto'
       }}
       onClick={(e) => {
@@ -247,10 +247,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
           borderRadius: '24px',
           width: '100%',
           maxWidth: '1020px',
-          maxHeight: '94vh',
+          maxHeight: '96dvh',
           overflowY: 'auto',
           boxShadow: '0 25px 70px rgba(15, 23, 42, 0.18), 0 0 35px rgba(212, 175, 55, 0.08)',
-          padding: '24px',
+          padding: '20px',
           position: 'relative',
           color: '#1e293b'
         }}
@@ -357,11 +357,11 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-            <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#059669', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <CheckCircle2 size={18} />
               <span>3D Render Hazır ({currentScene.name})</span>
             </div>
-            <span style={{ fontSize: '0.76rem', color: '#cbd5e1' }}>
+            <span style={{ fontSize: '0.76rem', color: '#64748b' }}>
               ↔ Çizgiyi sağa/sola sürükleyerek Ham Mekan vs. Seramik Giydirilmiş 3D Render'ı karşılaştırın
             </span>
           </div>
@@ -377,14 +377,14 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
             style={{
               position: 'relative',
               width: '100%',
-              height: '440px',
+              height: 'clamp(260px, 46vh, 440px)',
               borderRadius: '20px',
               overflow: 'hidden',
               userSelect: 'none',
               cursor: 'ew-resize',
               border: '1.5px solid rgba(212,175,55,0.5)',
-              boxShadow: '0 16px 45px rgba(0,0,0,0.6)',
-              background: '#000000'
+              boxShadow: '0 16px 45px rgba(15, 23, 42, 0.15)',
+              background: '#f8fafc'
             }}
           >
             {/* After Image (3D Rendered Result) */}
@@ -404,7 +404,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                 width: sliderPos + '%',
                 overflow: 'hidden',
                 borderRight: '3px solid #d4af37',
-                boxShadow: '4px 0 16px rgba(0,0,0,0.6)'
+                boxShadow: '4px 0 16px rgba(0,0,0,0.3)'
               }}
             >
               <img 
@@ -412,13 +412,13 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                 alt="Base Architectural Room" 
                 style={{ width: sliderContainerRef.current?.offsetWidth || '970px', height: '100%', objectFit: 'cover', maxWidth: 'none' }} 
               />
-              <span style={{ position: 'absolute', top: '14px', left: '14px', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', color: '#ffffff', padding: '6px 14px', borderRadius: '12px', fontSize: '0.76rem', fontWeight: '900', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <span style={{ position: 'absolute', top: '14px', left: '14px', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', color: '#0f172a', padding: '6px 14px', borderRadius: '12px', fontSize: '0.76rem', fontWeight: '900', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.1)' }}>
                 STANDART HAM MEKAN
               </span>
             </div>
 
             {/* After Label */}
-            <span style={{ position: 'absolute', top: '14px', right: '14px', background: 'linear-gradient(135deg, rgba(212,175,55,0.95) 0%, rgba(179,142,71,0.95) 100%)', color: '#090d16', padding: '6px 16px', borderRadius: '12px', fontSize: '0.76rem', fontWeight: '900', boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }}>
+            <span style={{ position: 'absolute', top: '14px', right: '14px', background: 'linear-gradient(135deg, rgba(212,175,55,0.95) 0%, rgba(179,142,71,0.95) 100%)', color: '#0f172a', padding: '6px 16px', borderRadius: '12px', fontSize: '0.76rem', fontWeight: '900', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)' }}>
               ✨ 3D GİYDİRME: {selectedTile?.name}
             </span>
 

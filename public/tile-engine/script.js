@@ -822,8 +822,8 @@
         if (!from || !to) return;
         const sz = parseInt(brushSizeSlider.value, 10);
         maskCtx.save();
-        maskCtx.strokeStyle = '#a855f7';
-        maskCtx.fillStyle = '#a855f7';
+        maskCtx.strokeStyle = '#b38e47';
+        maskCtx.fillStyle = '#b38e47';
         maskCtx.lineWidth = sz;
         maskCtx.lineCap = 'round';
         maskCtx.lineJoin = 'round';

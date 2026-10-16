@@ -59,14 +59,14 @@ function MekanimdaGorContent() {
   }, [slug, tileParam, productParam]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-[#06060c] overflow-hidden text-white">
+    <div className="flex flex-col w-full h-[100dvh] bg-[#f8fafc] overflow-hidden text-slate-900">
       {/* Top Navigation Bar */}
-      <nav className="flex items-center justify-between px-4 py-2.5 bg-[#0b0f19] border-b border-white/10 shrink-0 z-20">
-        <div className="flex items-center gap-3">
+      <nav className="flex items-center justify-between px-3 md:px-5 py-2.5 md:py-3 bg-white border-b border-slate-200 shrink-0 z-20 shadow-xs pt-[max(env(safe-area-inset-top),0.625rem)]">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors shadow-xs"
           >
             <ArrowLeft size={14} />
             <span>Geri Dön</span>
@@ -74,7 +74,7 @@ function MekanimdaGorContent() {
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#b38e47] px-2.5 py-1.5 rounded-xl hover:bg-slate-50 transition-colors"
           >
             <Home size={14} />
             <span className="hidden sm:inline">Ana Sayfa</span>
@@ -82,23 +82,23 @@ function MekanimdaGorContent() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 text-xs font-bold text-amber-300 tracking-wider">
-            <Sparkles size={14} className="text-indigo-400" />
+          <span className="flex items-center gap-1.5 text-xs font-extrabold text-[#b38e47] tracking-wider">
+            <Sparkles size={14} className="text-[#b38e47]" />
             <span>SERAMİKBAK AI STÜDYO</span>
           </span>
-          <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-medium text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+          <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-300/70 px-2.5 py-0.5 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#b38e47] animate-pulse"></span>
             Tile Detection Engine
           </span>
         </div>
       </nav>
 
       {/* Main Visualizer App */}
-      <main className="relative flex-1 w-full bg-[#06060c] overflow-hidden">
+      <main className="relative flex-1 w-full bg-[#f8fafc] overflow-hidden">
         {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#06060c] z-10 gap-3">
-            <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-xs font-medium text-slate-400">Yapay Zekâ Mekân Stüdyosu Hazırlanıyor...</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#f8fafc] z-10 gap-3">
+            <div className="w-8 h-8 border-2 border-[#b38e47] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-xs font-semibold text-slate-600">Yapay Zekâ Mekân Stüdyosu Hazırlanıyor...</p>
           </div>
         )}
         <iframe
@@ -115,7 +115,7 @@ function MekanimdaGorContent() {
 export default function MekanimdaGorPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#06060c] text-amber-300 text-sm font-semibold">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#f8fafc] text-[#b38e47] text-sm font-bold">
         Yapay Zekâ Mekân Stüdyosu Yükleniyor...
       </div>
     }>
