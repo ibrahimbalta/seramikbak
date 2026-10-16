@@ -1598,6 +1598,50 @@ export default function CatalogVisualCanvasEditor({
   const canvasWidth = pageFormat === 'landscape' ? 842 : pageFormat === 'square' ? 700 : 595;
   const canvasHeight = pageFormat === 'landscape' ? 595 : pageFormat === 'square' ? 700 : 842;
 
+  // Mobile app-like drawer, touch & layout state
+  const [mobileDrawer, setMobileDrawer] = useState(null); // null | 'add' | 'templates' | 'products' | 'pages' | 'inspector' | 'layers'
+  const [isMobile, setIsMobile] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const canvasWorkspaceRef = useRef(null);
+
+  useEffect(() => {
+    function handleResize() {
+      if (typeof window !== 'undefined') {
+        const mobile = window.innerWidth < 1024;
+        setIsMobile(mobile);
+        if (canvasWorkspaceRef.current) {
+          setContainerWidth(canvasWorkspaceRef.current.clientWidth);
+        } else {
+          setContainerWidth(window.innerWidth);
+        }
+      }
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const mobileAutoFitScale = useMemo(() => {
+    if (!isMobile) return 1;
+    const availW = containerWidth > 0 ? containerWidth - 24 : (typeof window !== 'undefined' ? window.innerWidth - 24 : 350);
+    const scale = availW / canvasWidth;
+    return Math.min(1, Math.max(0.35, Number(scale.toFixed(2))));
+  }, [isMobile, containerWidth, canvasWidth]);
+
+  const effectiveScale = isMobile && zoomLevel === 1 ? mobileAutoFitScale : zoomLevel;
+
+  const handlePrevPage = () => {
+    setActivePageIdx((curr) => Math.max(0, curr - 1));
+    setSelectedElId(null);
+    setSelectedElIds([]);
+  };
+
+  const handleNextPage = () => {
+    setActivePageIdx((curr) => Math.min(pages.length - 1, curr + 1));
+    setSelectedElId(null);
+    setSelectedElIds([]);
+  };
+
   useEffect(() => {
     if (currentTemplateId) {
       setSelectedTemplateId(currentTemplateId);
@@ -1847,6 +1891,58 @@ export default function CatalogVisualCanvasEditor({
       return updated;
     });
     clearSelection();
+  };
+
+  const duplicateSelectedElement = () => {
+    if (!selectedEl) return;
+    const newId = `el-${Date.now()}`;
+    const newEl = {
+      ...selectedEl,
+      id: newId,
+      x: Math.min(canvasWidth - (selectedEl.width || 50), (selectedEl.x || 0) + 20),
+      y: Math.min(canvasHeight - (selectedEl.height || 50), (selectedEl.y || 0) + 20)
+    };
+    const updated = pages.map((p, idx) => {
+      if (idx !== activePageIdx) return p;
+      const elements = Array.isArray(p?.elements) ? p.elements.filter(Boolean) : [];
+      return { ...p, elements: [...elements, newEl] };
+    });
+    pushHistory(updated);
+    setSelectedElId(newId);
+    setSelectedElIds([newId]);
+    showToast('success', 'Öğe çoğaltıldı.');
+  };
+
+  const handleTouchStartElement = (e, el, mode = 'move', corner = 'se') => {
+    e.stopPropagation();
+    if (e.touches && e.touches.length > 0) {
+      const touch = e.touches[0];
+      const fakeEvent = {
+        stopPropagation: () => e.stopPropagation(),
+        preventDefault: () => {
+          if (e.cancelable) e.preventDefault();
+        },
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        ctrlKey: false,
+        metaKey: false,
+        shiftKey: false
+      };
+      handleMouseDownElement(fakeEvent, el, mode, corner);
+    }
+  };
+
+  const handleTouchStartCanvas = (e) => {
+    if (!canvasRef.current) return;
+    const isBackdrop =
+      e.target === canvasRef.current ||
+      e.target.dataset.canvasBackground === 'true' ||
+      e.target.classList.contains('canvas-bleed-guide') ||
+      e.target.classList.contains('canvas-grid-pattern');
+
+    if (isBackdrop) {
+      clearSelection();
+    }
   };
 
   // Alignment helpers (Single to Canvas, Multi relative to Bounding Box / Distribution)
@@ -2810,16 +2906,31 @@ export default function CatalogVisualCanvasEditor({
       );
     };
 
+    const handleTouchMove = (touchEvent) => {
+      if (touchEvent.touches && touchEvent.touches.length > 0) {
+        const touch = touchEvent.touches[0];
+        handleMouseMove({
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          shiftKey: false
+        });
+      }
+    };
+
     const handleMouseUp = () => {
       dragInfoRef.current = null;
       setSnapLineX(null);
       setSnapLineY(null);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleMouseUp);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleMouseUp);
   };
 
   const filteredProducts = useMemo(() => {
@@ -2834,12 +2945,935 @@ export default function CatalogVisualCanvasEditor({
     return list;
   }, [brandProducts, productSearch, productCategoryFilter]);
 
+  // =========================================================================
+  // MOBILE APP-STYLE DRAWER CONTENT RENDERERS
+  // =========================================================================
+
+  // Mobile Drawer 1: Quick Add Menu
+  const renderAddMenuContent = () => (
+    <div className="space-y-4">
+      <p className="text-xs text-neutral-400">
+        Sayfanıza eklemek istediğiniz tasarım veya seramik bileşenini seçin:
+      </p>
+      <div className="grid grid-cols-2 gap-2.5">
+        <button
+          type="button"
+          onClick={() => {
+            addElement('text');
+            setMobileDrawer(null);
+            showToast('success', 'Metin eklendi.');
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <Type size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Metin</span>
+          <span className="text-[10px] text-neutral-400">Başlık & Açıklama</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileDrawer('products')}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <Box size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Seramik Ürünü</span>
+          <span className="text-[10px] text-neutral-400">Stoktan Ekle</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            if (fileInputRef.current) fileInputRef.current.click();
+            setMobileDrawer(null);
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <ImageIcon size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Görsel / Foto</span>
+          <span className="text-[10px] text-neutral-400">Cihazdan Yükle</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            addElement('box');
+            setMobileDrawer(null);
+            showToast('success', 'Kutu eklendi.');
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <Square size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Kutu / Panel</span>
+          <span className="text-[10px] text-neutral-400">Renkli Çerçeve</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            addElement('line');
+            setMobileDrawer(null);
+            showToast('success', 'Çizgi eklendi.');
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-600/15 border border-amber-600/30 flex items-center justify-center text-amber-500">
+            <Minus size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Çizgi / Ayraç</span>
+          <span className="text-[10px] text-neutral-400">Tasarım Çizgisi</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            addElement('qr');
+            setMobileDrawer(null);
+            showToast('success', 'QR Kod eklendi.');
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <QrCode size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">QR Kod</span>
+          <span className="text-[10px] text-neutral-400">3D Mekan / Web</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            addElement('badge');
+            setMobileDrawer(null);
+            showToast('success', 'Rozet eklendi.');
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-300">
+            <Sparkles size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Rozet</span>
+          <span className="text-[10px] text-neutral-400">Yeni / Çok Satan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setMobileDrawer('templates');
+            setTemplateSubTab('layouts');
+          }}
+          className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 flex flex-col items-center gap-2 text-center transition cursor-pointer active:scale-95"
+        >
+          <div className="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400">
+            <LayoutTemplate size={20} />
+          </div>
+          <span className="text-xs font-bold text-white">Hazır Mizanpaj</span>
+          <span className="text-[10px] text-neutral-400">Sayfa Düzeni Seç</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  // Mobile Drawer 2: Templates & Layouts
+  const renderMobileTemplatesDrawer = () => (
+    <div className="space-y-4">
+      {/* Sub Tab Switcher */}
+      <div className="flex bg-neutral-950 p-1 rounded-xl border border-neutral-800 text-xs font-bold">
+        <button
+          type="button"
+          onClick={() => setTemplateSubTab('concepts')}
+          className={`flex-1 py-2 rounded-lg transition cursor-pointer ${
+            templateSubTab === 'concepts'
+              ? 'bg-amber-500 text-neutral-950 font-black shadow'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          Katalog Şablonları ({CATALOG_MASTER_TEMPLATES.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setTemplateSubTab('layouts')}
+          className={`flex-1 py-2 rounded-lg transition cursor-pointer ${
+            templateSubTab === 'layouts'
+              ? 'bg-neutral-800 text-amber-300 font-black'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          Sayfa Mizanpajları ({PRESET_TEMPLATES.length})
+        </button>
+      </div>
+
+      {templateSubTab === 'concepts' ? (
+        <div className="space-y-3">
+          {CATALOG_MASTER_TEMPLATES.map((tmpl) => {
+            const isSelected = selectedTemplateId === tmpl.id;
+            return (
+              <div
+                key={tmpl.id}
+                className={`p-3 rounded-xl border-2 transition flex flex-col gap-2 ${
+                  isSelected
+                    ? 'border-amber-500 bg-neutral-950'
+                    : 'border-neutral-800 bg-neutral-950/70'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <img
+                    src={tmpl.mockupImg}
+                    alt={tmpl.name}
+                    className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border border-neutral-800"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[9px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
+                      {tmpl.tag}
+                    </span>
+                    <h4 className="text-xs font-bold text-white truncate">{tmpl.name}</h4>
+                    <span className="text-[10px] text-neutral-400 block truncate">{tmpl.badge}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-neutral-800/80">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleSelectMasterTemplate(tmpl.id);
+                      setMobileDrawer(null);
+                      showToast('success', `"${tmpl.name}" seçildi.`);
+                    }}
+                    className={`py-1.5 px-2 rounded-lg text-xs font-bold transition cursor-pointer text-center ${
+                      isSelected
+                        ? 'bg-amber-500 text-neutral-950 font-black'
+                        : 'bg-neutral-800 text-neutral-300 hover:text-white'
+                    }`}
+                  >
+                    {isSelected ? '✓ Aktif Şablon' : 'Bu Şablonu Seç'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleApplyMasterTemplateToPage(tmpl.id);
+                      setMobileDrawer(null);
+                      showToast('success', `"${tmpl.name}" sayfaya uygulandı.`);
+                    }}
+                    className="py-1.5 px-2 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-bold text-center border border-amber-500/30 transition cursor-pointer"
+                  >
+                    Sayfaya Uygula
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {PRESET_TEMPLATES.map((tmpl) => (
+            <div
+              key={tmpl.id}
+              className="p-3 rounded-xl border border-neutral-800 bg-neutral-950/70 flex flex-col gap-2"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-white">{tmpl.name}</h4>
+                  <span className="text-[10px] text-amber-400 font-mono">{tmpl.badge}</span>
+                </div>
+                <span className="text-[10px] text-neutral-500 font-mono">
+                  {tmpl.elements.length} Öğe
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-1.5 pt-1.5 border-t border-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleApplyPresetTemplate(tmpl);
+                    setMobileDrawer(null);
+                    showToast('success', `"${tmpl.name}" mizanpajı uygulandı.`);
+                  }}
+                  className="py-1.5 px-2 rounded-lg bg-neutral-800 text-amber-300 hover:bg-neutral-700 text-xs font-bold transition cursor-pointer text-center"
+                >
+                  Sayfaya Uygula
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleAddNewPage(tmpl);
+                    setMobileDrawer(null);
+                    showToast('success', `"${tmpl.name}" yeni sayfa olarak eklendi.`);
+                  }}
+                  className="py-1.5 px-2 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-bold border border-amber-500/40 transition cursor-pointer text-center"
+                >
+                  + Yeni Sayfa Olarak Ekle
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // Mobile Drawer 3: Products Catalog
+  const renderMobileProductsDrawer = () => (
+    <div className="space-y-3">
+      {/* Search Input */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+        <input
+          type="text"
+          value={productSearch}
+          onChange={(e) => setProductSearch(e.target.value)}
+          placeholder="Model, kod veya koleksiyon ara..."
+          className="w-full pl-9 pr-3 py-2 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-hidden focus:border-amber-500"
+        />
+      </div>
+
+      {/* Surface Category Filters */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 text-[11px] no-scrollbar">
+        {[
+          { id: 'all', label: 'Tümü' },
+          { id: 'Parlak', label: 'Parlak' },
+          { id: 'Mat', label: 'Mat' },
+          { id: 'Lappato', label: 'Lappato' },
+          { id: 'Rölyefli', label: 'Rölyefli' }
+        ].map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setProductCategoryFilter(f.id)}
+            className={`px-3 py-1 rounded-lg flex-shrink-0 transition cursor-pointer font-medium ${
+              productCategoryFilter === f.id
+                ? 'bg-amber-500 text-neutral-950 font-bold'
+                : 'bg-neutral-950 text-neutral-400 border border-neutral-800 hover:text-white'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Products List */}
+      <div className="space-y-2.5 max-h-[50vh] overflow-y-auto">
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-6 text-neutral-500 text-xs">
+            Arama kriterine uygun seramik ürünü bulunamadı.
+          </div>
+        ) : (
+          filteredProducts.map((prod) => (
+            <div
+              key={prod.id}
+              className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-950/70 flex flex-col gap-2"
+            >
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={prod.imageUrl || prod.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
+                  alt={prod.name}
+                  className="w-12 h-12 rounded-lg object-cover border border-neutral-800 flex-shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-white truncate">{prod.name}</p>
+                  <p className="text-[10px] text-neutral-400 font-mono mt-0.5">
+                    {prod.width}×{prod.height} cm • {prod.finish || 'Porselen'}
+                  </p>
+                  <p className="text-[9px] font-mono text-amber-400">
+                    {prod.sku || prod.code || 'SER-2026'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1 pt-1 border-t border-neutral-800/80">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleInsertProduct(prod, 'card');
+                    setMobileDrawer(null);
+                    showToast('success', `${prod.name} kartı eklendi.`);
+                  }}
+                  className="py-1 px-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-300 text-[10px] font-bold text-center cursor-pointer truncate"
+                >
+                  + Kart
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleInsertProduct(prod, 'slab');
+                    setMobileDrawer(null);
+                    showToast('success', `${prod.name} plakası eklendi.`);
+                  }}
+                  className="py-1 px-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold text-center border border-amber-500/30 cursor-pointer truncate"
+                >
+                  + Dev Plaka
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleInsertProduct(prod, 'spec');
+                    setMobileDrawer(null);
+                    showToast('success', `${prod.name} teknik föyü eklendi.`);
+                  }}
+                  className="py-1 px-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-cyan-300 text-[10px] font-bold text-center border border-blue-500/30 cursor-pointer truncate"
+                >
+                  + Teknik Föy
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+
+  // Mobile Drawer 4: Pages Manager
+  const renderMobilePagesDrawer = () => (
+    <div className="space-y-3">
+      {/* Top CTA: Add Page */}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            handleAddNewPage(null);
+            setMobileDrawer(null);
+            showToast('success', 'Yeni boş sayfa eklendi.');
+          }}
+          className="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+        >
+          <Plus size={14} />
+          <span>Boş Sayfa Ekle</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setMobileDrawer('templates');
+            setTemplateSubTab('layouts');
+          }}
+          className="flex-1 py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer border border-neutral-700"
+        >
+          <LayoutTemplate size={14} className="text-amber-400" />
+          <span>Şablonlu Sayfa</span>
+        </button>
+      </div>
+
+      {/* Pages List */}
+      <div className="space-y-2 max-h-[55vh] overflow-y-auto">
+        {pages.map((p, idx) => {
+          const isActive = idx === activePageIdx;
+          return (
+            <div
+              key={p.id}
+              className={`p-3 rounded-xl border transition flex items-center justify-between gap-3 cursor-pointer ${
+                isActive
+                  ? 'border-amber-500 bg-amber-500/10'
+                  : 'border-neutral-800 bg-neutral-950/70 hover:border-neutral-700'
+              }`}
+              onClick={() => {
+                setActivePageIdx(idx);
+                setSelectedElId(null);
+                setMobileDrawer(null);
+              }}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-mono font-bold flex-shrink-0 ${
+                    isActive ? 'bg-amber-500 text-neutral-950 font-black' : 'bg-neutral-800 text-neutral-400'
+                  }`}
+                >
+                  {idx + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-white truncate">
+                    {p.title || `Sayfa #${idx + 1}`}
+                  </p>
+                  <p className="text-[10px] text-neutral-400 font-mono">
+                    {p.elements?.length || 0} nesne • {p.bgColor || '#ffffff'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                {/* Duplicate Page */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const copy = {
+                      ...p,
+                      id: `page-${Date.now()}`,
+                      title: `${p.title || 'Sayfa'} (Kopya)`,
+                      elements: (p.elements || []).map((el) => ({ ...el, id: `el-${Date.now()}-${Math.random().toString(36).substr(2, 4)}` }))
+                    };
+                    const arr = [...pages];
+                    arr.splice(idx + 1, 0, copy);
+                    pushHistory(arr);
+                    setActivePageIdx(idx + 1);
+                    showToast('success', 'Sayfa çoğaltıldı.');
+                  }}
+                  className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
+                  title="Sayfayı Çoğalt"
+                >
+                  <Copy size={13} />
+                </button>
+
+                {/* Move Up */}
+                <button
+                  type="button"
+                  disabled={idx === 0}
+                  onClick={() => {
+                    if (idx === 0) return;
+                    const arr = [...pages];
+                    const temp = arr[idx];
+                    arr[idx] = arr[idx - 1];
+                    arr[idx - 1] = temp;
+                    pushHistory(arr);
+                    setActivePageIdx(idx - 1);
+                  }}
+                  className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white disabled:opacity-20 cursor-pointer"
+                  title="Yukarı Taşı"
+                >
+                  <MoveUp size={13} />
+                </button>
+
+                {/* Move Down */}
+                <button
+                  type="button"
+                  disabled={idx === pages.length - 1}
+                  onClick={() => {
+                    if (idx >= pages.length - 1) return;
+                    const arr = [...pages];
+                    const temp = arr[idx];
+                    arr[idx] = arr[idx + 1];
+                    arr[idx + 1] = temp;
+                    pushHistory(arr);
+                    setActivePageIdx(idx + 1);
+                  }}
+                  className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white disabled:opacity-20 cursor-pointer"
+                  title="Aşağı Taşı"
+                >
+                  <MoveDown size={13} />
+                </button>
+
+                {/* Delete Page */}
+                <button
+                  type="button"
+                  disabled={pages.length <= 1}
+                  onClick={() => {
+                    if (pages.length <= 1) return showToast('warning', 'Katalogda en az 1 sayfa bulunmalıdır.');
+                    const arr = pages.filter((_, i) => i !== idx);
+                    pushHistory(arr);
+                    setActivePageIdx(Math.max(0, idx - 1));
+                    showToast('info', 'Sayfa silindi.');
+                  }}
+                  className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 disabled:opacity-20 cursor-pointer"
+                  title="Sayfayı Sil"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // Mobile Drawer 5: Inspector & Formatting
+  const renderMobileInspectorDrawer = () => {
+    if (selectedEl) {
+      return (
+        <div className="space-y-4 text-xs">
+          {/* Header with Quick Actions */}
+          <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
+            <span className="font-mono text-amber-400 font-bold uppercase text-[11px]">
+              {selectedEl.type} AYARLARI
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => updateSelectedElement({ locked: !selectedEl.locked })}
+                className="px-2 py-1 rounded-lg bg-neutral-800 text-neutral-300 hover:text-white flex items-center gap-1 text-[11px] cursor-pointer"
+              >
+                {selectedEl.locked ? <Lock size={12} className="text-amber-400" /> : <Unlock size={12} />}
+                <span>{selectedEl.locked ? 'Kilitli' : 'Serbest'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteSelectedElement();
+                  setMobileDrawer(null);
+                }}
+                className="px-2 py-1 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 text-[11px] font-bold cursor-pointer"
+              >
+                Sil
+              </button>
+            </div>
+          </div>
+
+          {/* Typography Controls if Text */}
+          {selectedEl.type === 'text' && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Metin İçeriği
+                </label>
+                <textarea
+                  rows={2}
+                  value={selectedEl.content || ''}
+                  onChange={(e) => updateSelectedElement({ content: e.target.value })}
+                  className="w-full p-2 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-white focus:outline-hidden focus:border-amber-500"
+                />
+              </div>
+
+              {/* Font Size Stepper */}
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Yazı Boyutu
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ fontSize: Math.max(8, (selectedEl.fontSize || 14) - 2) })}
+                    className="w-9 h-9 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-300 font-bold flex items-center justify-center cursor-pointer text-sm"
+                  >
+                    -
+                  </button>
+                  <span className="flex-1 text-center font-mono font-bold text-white text-sm">
+                    {selectedEl.fontSize || 14} px
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ fontSize: Math.min(96, (selectedEl.fontSize || 14) + 2) })}
+                    className="w-9 h-9 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-300 font-bold flex items-center justify-center cursor-pointer text-sm"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Text Align & Style */}
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Hizalama & Kalınlık
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ align: 'left' })}
+                    className={`py-2 rounded-lg border text-center cursor-pointer ${
+                      selectedEl.align === 'left' ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                    }`}
+                  >
+                    <AlignLeft size={14} className="mx-auto" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ align: 'center' })}
+                    className={`py-2 rounded-lg border text-center cursor-pointer ${
+                      selectedEl.align === 'center' ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                    }`}
+                  >
+                    <AlignCenter size={14} className="mx-auto" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ align: 'right' })}
+                    className={`py-2 rounded-lg border text-center cursor-pointer ${
+                      selectedEl.align === 'right' ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                    }`}
+                  >
+                    <AlignRight size={14} className="mx-auto" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ fontWeight: selectedEl.fontWeight === '800' ? '400' : '800' })}
+                    className={`py-2 rounded-lg border text-center cursor-pointer font-bold ${
+                      selectedEl.fontWeight === '800' ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                    }`}
+                  >
+                    B
+                  </button>
+                </div>
+              </div>
+
+              {/* Text Color Swatches */}
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Yazı Rengi
+                </label>
+                <div className="flex items-center gap-2">
+                  {['#0f172a', '#ffffff', '#b4823c', '#0284c7', '#dc2626', '#64748b'].map((hex) => (
+                    <button
+                      key={hex}
+                      type="button"
+                      onClick={() => updateSelectedElement({ color: hex })}
+                      style={{ backgroundColor: hex }}
+                      className={`w-7 h-7 rounded-full border-2 cursor-pointer ${
+                        selectedEl.color === hex ? 'ring-2 ring-amber-400 border-white' : 'border-neutral-700'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Image Settings */}
+          {selectedEl.type === 'image' && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Görsel Uyum Modu
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ objectFit: 'cover' })}
+                    className={`py-2 rounded-lg border text-center text-xs font-bold cursor-pointer ${
+                      selectedEl.objectFit === 'cover' ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                    }`}
+                  >
+                    Doldur / Kırp
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateSelectedElement({ objectFit: 'contain' })}
+                    className={`py-2 rounded-lg border text-center text-xs font-bold cursor-pointer ${
+                      selectedEl.objectFit === 'contain' ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                    }`}
+                  >
+                    Orantılı Sığdır
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Köşe Yuvarlama (Radius)
+                </label>
+                <div className="flex items-center gap-2">
+                  {[0, 6, 12, 24].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => updateSelectedElement({ borderRadius: r })}
+                      className={`flex-1 py-1.5 rounded-lg border text-xs font-mono cursor-pointer ${
+                        (selectedEl.borderRadius || 0) === r ? 'border-amber-500 bg-amber-500/20 text-amber-300' : 'border-neutral-800 bg-neutral-950 text-neutral-400'
+                      }`}
+                    >
+                      {r}px
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Box Settings */}
+          {selectedEl.type === 'box' && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+                  Kutu Arka Planı
+                </label>
+                <div className="flex items-center gap-2">
+                  {['#f8fafc', '#ffffff', '#18181b', '#0f172a', '#fef3c7', '#dbeafe'].map((hex) => (
+                    <button
+                      key={hex}
+                      type="button"
+                      onClick={() => updateSelectedElement({ color: hex })}
+                      style={{ backgroundColor: hex }}
+                      className={`w-7 h-7 rounded-full border-2 cursor-pointer ${
+                        selectedEl.color === hex ? 'ring-2 ring-amber-400 border-white' : 'border-neutral-700'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Layer Ordering Buttons */}
+          <div>
+            <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+              Katman Sıralaması
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => changeLayerOrder(1)}
+                className="py-2 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-200 font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <MoveUp size={13} />
+                <span>Öne Getir</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => changeLayerOrder(-1)}
+                className="py-2 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-200 font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <MoveDown size={13} />
+                <span>Arkaya Gönder</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileDrawer(null)}
+            className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black text-xs cursor-pointer shadow"
+          >
+            ✓ Tuvale Dön
+          </button>
+        </div>
+      );
+    }
+
+    // Default: Page Background & Title when nothing selected
+    return (
+      <div className="space-y-4 text-xs">
+        <div>
+          <label className="text-[10px] font-bold text-neutral-400 block mb-1">
+            Aktif Sayfa Başlığı
+          </label>
+          <input
+            type="text"
+            value={currentPage?.title || ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              setPages((prev) =>
+                prev.map((p, idx) => (idx === activePageIdx ? { ...p, title: val } : p))
+              );
+            }}
+            className="w-full p-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-white focus:outline-hidden focus:border-amber-500"
+          />
+        </div>
+
+        <div>
+          <label className="text-[10px] font-bold text-neutral-400 block mb-1.5">
+            Sayfa Arka Plan Rengi
+          </label>
+          <div className="flex items-center gap-2.5">
+            {['#ffffff', '#f8fafc', '#f5f5f4', '#18181b', '#0f172a'].map((hex) => (
+              <button
+                key={hex}
+                type="button"
+                onClick={() => {
+                  const updated = pages.map((p, idx) =>
+                    idx === activePageIdx ? { ...p, bgColor: hex } : p
+                  );
+                  pushHistory(updated);
+                  showToast('info', 'Sayfa rengi güncellendi.');
+                }}
+                style={{ backgroundColor: hex }}
+                className={`w-8 h-8 rounded-full border-2 cursor-pointer ${
+                  currentPage?.bgColor === hex ? 'ring-2 ring-amber-400 border-white' : 'border-neutral-700'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setMobileDrawer(null)}
+          className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black text-xs cursor-pointer shadow"
+        >
+          ✓ Tuvale Dön
+        </button>
+      </div>
+    );
+  };
+
+  // Mobile Drawer 6: Layers
+  const renderMobileLayersDrawer = () => (
+    <div className="space-y-2 max-h-[55vh] overflow-y-auto">
+      {currentElements.length === 0 ? (
+        <div className="text-center py-6 text-neutral-500 text-xs">
+          Bu sayfada henüz nesne bulunmuyor.
+        </div>
+      ) : (
+        [...currentElements].reverse().map((el, revIdx) => {
+          const isSelected = selectedElIds.includes(el.id);
+          return (
+            <div
+              key={el.id}
+              className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 cursor-pointer ${
+                isSelected
+                  ? 'border-amber-500 bg-amber-500/10'
+                  : 'border-neutral-800 bg-neutral-950/70 hover:border-neutral-700'
+              }`}
+              onClick={() => {
+                selectElement(el.id, false);
+                setMobileDrawer('inspector');
+              }}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-5 h-5 rounded-full bg-neutral-800 text-[10px] font-mono text-neutral-400 flex items-center justify-center font-bold">
+                  {currentElements.length - revIdx}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-white truncate">
+                    {el.type === 'text' ? el.content?.slice(0, 24) || 'Metin' : el.type.toUpperCase()}
+                  </p>
+                  <p className="text-[9px] font-mono text-neutral-400">
+                    {el.width}×{el.height} px
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => toggleLockElement(el.id)}
+                  className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
+                >
+                  {el.locked ? <Lock size={12} className="text-amber-400" /> : <Unlock size={12} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleHideElement(el.id)}
+                  className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
+                >
+                  {el.hidden ? <EyeOff size={12} className="text-rose-400" /> : <Eye size={12} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    selectElement(el.id, false);
+                    deleteSelectedElement();
+                  }}
+                  className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 cursor-pointer"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+
   return (
     <div className="bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden flex flex-col text-neutral-100 select-none">
+      {/* Hidden file input for custom image uploads */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept="image/*"
+        className="hidden"
+      />
+
       {/* ========================================================================= */}
-      {/* 1. TOP STUDIO CONTROL BAR (PROFESYONEL VE SİMETRİK MATBAA KONTROL PANELİ) */}
+      {/* 1A. DESKTOP TOP STUDIO CONTROL BAR (>= lg)                                */}
       {/* ========================================================================= */}
-      <div className="h-14 bg-neutral-950 border-b border-neutral-800 px-4 flex items-center justify-between gap-3 text-xs">
+      <div className="hidden lg:flex h-14 bg-neutral-950 border-b border-neutral-800 px-4 items-center justify-between gap-3 text-xs flex-shrink-0">
         {/* Left: Studio Branding & Zoom Controls */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -3119,11 +4153,110 @@ export default function CatalogVisualCanvasEditor({
       </div>
 
       {/* ========================================================================= */}
+      {/* 1B. MOBILE APP-STYLE TOP BAR (< lg)                                       */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden bg-neutral-950 border-b border-neutral-800 px-3 py-2 flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
+        {/* Left: Studio indicator & Page Stepper */}
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center gap-1 flex-shrink-0 mr-0.5">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="font-extrabold uppercase text-white font-mono text-[10px]">
+              PRO
+            </span>
+          </div>
+
+          {/* Page Navigator */}
+          <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-0.5">
+            <button
+              type="button"
+              onClick={handlePrevPage}
+              disabled={activePageIdx === 0}
+              className="p-1 rounded text-neutral-400 hover:text-white disabled:opacity-25 cursor-pointer"
+              title="Önceki Sayfa"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileDrawer('pages')}
+              className="px-2 py-0.5 font-mono text-[11px] font-bold text-amber-300 hover:text-white transition cursor-pointer"
+              title="Sayfaları Yönet"
+            >
+              {activePageIdx + 1} / {pages.length}
+            </button>
+            <button
+              type="button"
+              onClick={handleNextPage}
+              disabled={activePageIdx >= pages.length - 1}
+              className="p-1 rounded text-neutral-400 hover:text-white disabled:opacity-25 cursor-pointer"
+              title="Sonraki Sayfa"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+
+          {/* Zoom / Fit toggle */}
+          <button
+            type="button"
+            onClick={() => setZoomLevel((z) => (z === 1 ? 1.3 : 1))}
+            className="px-2 py-1 rounded-lg bg-neutral-900 border border-neutral-800 text-[10px] font-mono font-bold text-neutral-300 hover:text-amber-400 transition cursor-pointer flex-shrink-0"
+            title="Yakınlaştır / Ekrana Sığdır"
+          >
+            {zoomLevel === 1 ? '🔍 %100' : '📱 Sığdır'}
+          </button>
+        </div>
+
+        {/* Right: Undo, Redo, Preview & Save */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            type="button"
+            onClick={handleUndo}
+            disabled={history.length === 0}
+            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white disabled:opacity-25 cursor-pointer"
+            title="Geri Al"
+          >
+            <Undo2 size={13} />
+          </button>
+          <button
+            type="button"
+            onClick={handleRedo}
+            disabled={future.length === 0}
+            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white disabled:opacity-25 cursor-pointer"
+            title="İleri Al"
+          >
+            <Redo2 size={13} />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setPreviewPageIdx(activePageIdx);
+              setPreviewOpen(true);
+            }}
+            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-sky-400 hover:text-white cursor-pointer"
+            title="Kataloğu Önizle"
+          >
+            <Eye size={14} />
+          </button>
+          {onSaveDraft && (
+            <button
+              type="button"
+              onClick={() => onSaveDraft(pages)}
+              className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black text-[11px] flex items-center gap-1 cursor-pointer shadow-sm"
+              title="Taslak Kaydet"
+            >
+              <Save size={12} />
+              <span>Kaydet</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
       {/* 2. MAIN 3-PANEL WORKSPACE                                                 */}
       {/* ========================================================================= */}
-      <div className="flex flex-col lg:flex-row min-h-[750px] max-h-[850px] overflow-hidden">
+      <div className="flex flex-col lg:flex-row min-h-[500px] lg:min-h-[750px] lg:max-h-[850px] overflow-hidden relative">
         {/* ==================== LEFT TOOLBOX PANEL (330px) ==================== */}
-        <div className="w-full lg:w-84 bg-neutral-950 border-r border-neutral-800 flex flex-col justify-between flex-shrink-0">
+        <div className="hidden lg:flex w-full lg:w-84 xl:w-96 bg-neutral-950 border-r border-neutral-800 flex-col justify-between flex-shrink-0">
           <div>
             {/* 6 Specialist Tabs */}
             <div className="grid grid-cols-6 p-1.5 bg-neutral-900/60 border-b border-neutral-800 text-[10px] font-bold">
@@ -3779,22 +4912,112 @@ export default function CatalogVisualCanvasEditor({
 
         {/* ==================== CENTER CANVAS WORKSPACE ==================== */}
         <div
-          className="flex-1 bg-neutral-900/90 p-4 sm:p-8 flex items-center justify-center overflow-auto relative"
-          onClick={() => setSelectedElId(null)}
+          ref={canvasWorkspaceRef}
+          className="flex-1 bg-neutral-900/90 p-2 sm:p-4 md:p-8 flex flex-col items-center justify-center overflow-auto relative min-h-[440px] sm:min-h-[560px]"
+          onClick={() => {
+            setSelectedElId(null);
+            setSelectedElIds([]);
+          }}
         >
+          {/* Mobile Quick Action Pill for Selected Element */}
+          {selectedEl && (
+            <div
+              className="lg:hidden absolute top-2 left-2 right-2 z-40 bg-neutral-900/95 backdrop-blur-md border border-neutral-700 rounded-xl p-1.5 shadow-2xl flex items-center justify-between gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-1.5 min-w-0 px-1">
+                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase truncate">
+                  {selectedEl.type}
+                </span>
+                {selectedEl.locked && <Lock size={11} className="text-amber-400 flex-shrink-0" />}
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setMobileDrawer('inspector')}
+                  className="px-2 py-1 rounded-lg bg-amber-500 text-neutral-950 font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                  title="Biçimlendir"
+                >
+                  <Sliders size={12} />
+                  <span>Biçim</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={duplicateSelectedElement}
+                  className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 cursor-pointer"
+                  title="Çoğalt"
+                >
+                  <Copy size={13} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => changeLayerOrder(1)}
+                  className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 cursor-pointer"
+                  title="Öne Getir"
+                >
+                  <MoveUp size={13} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => updateSelectedElement({ locked: !selectedEl.locked })}
+                  className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 cursor-pointer"
+                  title={selectedEl.locked ? 'Kilidi Aç' : 'Kilitle'}
+                >
+                  {selectedEl.locked ? <Lock size={13} className="text-amber-400" /> : <Unlock size={13} />}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={deleteSelectedElement}
+                  className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 cursor-pointer"
+                  title="Sil"
+                >
+                  <Trash2 size={13} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedElId(null);
+                    setSelectedElIds([]);
+                  }}
+                  className="p-1.5 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
+                  title="Seçimi Kapat"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Symmetrical Canvas Wrapper with Scale Transform */}
           <div
             style={{
-              transform: `scale(${zoomLevel})`,
-              transformOrigin: 'center center',
-              transition: 'transform 0.15s ease'
+              width: isMobile && zoomLevel === 1 ? `${Math.round(canvasWidth * mobileAutoFitScale)}px` : undefined,
+              height: isMobile && zoomLevel === 1 ? `${Math.round(canvasHeight * mobileAutoFitScale)}px` : undefined,
+              position: 'relative'
             }}
-            className="flex-shrink-0"
+            className="flex items-center justify-center flex-shrink-0"
           >
             <div
-              ref={canvasRef}
-              onMouseDown={handleMouseDownCanvas}
-              data-canvas-background="true"
+              style={{
+                width: `${canvasWidth}px`,
+                height: `${canvasHeight}px`,
+                transform: `scale(${effectiveScale})`,
+                transformOrigin: isMobile && zoomLevel === 1 ? 'top left' : 'center center',
+                transition: 'transform 0.15s ease'
+              }}
+              className="flex-shrink-0"
+            >
+              <div
+                ref={canvasRef}
+                onMouseDown={handleMouseDownCanvas}
+                onTouchStart={handleTouchStartCanvas}
+                data-canvas-background="true"
               style={{
                 width: `${canvasWidth}px`,
                 height: `${canvasHeight}px`,
@@ -3851,6 +5074,7 @@ export default function CatalogVisualCanvasEditor({
                   <div
                     key={el.id}
                     onMouseDown={(e) => handleMouseDownElement(e, el, 'move')}
+                    onTouchStart={(e) => handleTouchStartElement(e, el, 'move')}
                     style={{
                       position: 'absolute',
                       left: `${el.x}px`,
@@ -3880,6 +5104,7 @@ export default function CatalogVisualCanvasEditor({
                     {isSelected && !el.locked && (
                       <div
                         onMouseDown={(e) => handleMouseDownElement(e, el, 'rotate')}
+                        onTouchStart={(e) => handleTouchStartElement(e, el, 'rotate')}
                         style={{
                           position: 'absolute',
                           top: '-26px',
@@ -3966,21 +5191,25 @@ export default function CatalogVisualCanvasEditor({
                       <>
                         <div
                           onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'se')}
+                          onTouchStart={(e) => handleTouchStartElement(e, el, 'resize', 'se')}
                           className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -bottom-1.5 -right-1.5 cursor-nwse-resize z-40"
                           title="Boyutlandır (Güneydoğu)"
                         />
                         <div
                           onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'sw')}
+                          onTouchStart={(e) => handleTouchStartElement(e, el, 'resize', 'sw')}
                           className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -bottom-1.5 -left-1.5 cursor-nesw-resize z-40"
                           title="Boyutlandır (Güneybatı)"
                         />
                         <div
                           onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'ne')}
+                          onTouchStart={(e) => handleTouchStartElement(e, el, 'resize', 'ne')}
                           className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -top-1.5 -right-1.5 cursor-nesw-resize z-40"
                           title="Boyutlandır (Kuzeydoğu)"
                         />
                         <div
                           onMouseDown={(e) => handleMouseDownElement(e, el, 'resize', 'nw')}
+                          onTouchStart={(e) => handleTouchStartElement(e, el, 'resize', 'nw')}
                           className="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow absolute -top-1.5 -left-1.5 cursor-nwse-resize z-40"
                           title="Boyutlandır (Kuzeybatı)"
                         />
@@ -3996,10 +5225,11 @@ export default function CatalogVisualCanvasEditor({
               </div>
             </div>
           </div>
+          </div>
         </div>
 
         {/* ==================== RIGHT INSPECTOR PANEL (310px) ==================== */}
-        <div className="w-full lg:w-80 bg-neutral-950 border-l border-neutral-800 p-4 space-y-4 overflow-y-auto flex-shrink-0">
+        <div className="hidden lg:block w-full lg:w-80 bg-neutral-950 border-l border-neutral-800 p-4 space-y-4 overflow-y-auto flex-shrink-0">
           <div className="pb-2 border-b border-neutral-800 flex items-center justify-between">
             <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-bold truncate">
               {selectedEls.length > 1
@@ -4637,6 +5867,147 @@ export default function CatalogVisualCanvasEditor({
           )}
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 2B. MOBILE BOTTOM NAVIGATION DOCK (CANVA STYLE)                           */}
+      {/* ========================================================================= */}
+      <nav className="lg:hidden bg-neutral-950 border-t border-neutral-800 px-2 py-1.5 flex items-center justify-around flex-shrink-0 z-30 shadow-2xl">
+        {/* + Ekle */}
+        <button
+          type="button"
+          onClick={() => setMobileDrawer(mobileDrawer === 'add' ? null : 'add')}
+          className={`flex flex-col items-center py-0.5 px-2 rounded-xl transition cursor-pointer active:scale-95 ${
+            mobileDrawer === 'add' ? 'text-amber-400' : 'text-neutral-300 hover:text-white'
+          }`}
+        >
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 to-amber-400 text-neutral-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20 mb-0.5">
+            <Plus size={18} />
+          </div>
+          <span className="text-[10px] font-bold">Ekle</span>
+        </button>
+
+        {/* Şablon */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveLeftTab('templates');
+            setMobileDrawer(mobileDrawer === 'templates' ? null : 'templates');
+          }}
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl transition cursor-pointer active:scale-95 ${
+            mobileDrawer === 'templates' ? 'text-amber-400 bg-amber-500/15' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <LayoutTemplate size={18} />
+          <span className="text-[10px] font-medium mt-1">Şablon</span>
+        </button>
+
+        {/* Ürünler */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveLeftTab('products');
+            setMobileDrawer(mobileDrawer === 'products' ? null : 'products');
+          }}
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl transition cursor-pointer active:scale-95 ${
+            mobileDrawer === 'products' ? 'text-amber-400 bg-amber-500/15' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Box size={18} />
+          <span className="text-[10px] font-medium mt-1">Ürünler</span>
+        </button>
+
+        {/* Sayfalar */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveLeftTab('pages');
+            setMobileDrawer(mobileDrawer === 'pages' ? null : 'pages');
+          }}
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl transition cursor-pointer active:scale-95 ${
+            mobileDrawer === 'pages' ? 'text-amber-400 bg-amber-500/15' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Layers size={18} />
+          <span className="text-[10px] font-medium mt-1">Sayfa ({pages.length})</span>
+        </button>
+
+        {/* Biçim / Ayar */}
+        <button
+          type="button"
+          onClick={() => setMobileDrawer(mobileDrawer === 'inspector' ? null : 'inspector')}
+          className={`flex flex-col items-center py-1 px-2.5 rounded-xl transition cursor-pointer relative active:scale-95 ${
+            mobileDrawer === 'inspector' ? 'text-amber-400 bg-amber-500/15' : selectedEl ? 'text-amber-300' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Sliders size={18} />
+          <span className="text-[10px] font-medium mt-1">
+            {selectedEl ? 'Biçim' : 'Ayar'}
+          </span>
+          {selectedEl && (
+            <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-neutral-950 animate-pulse" />
+          )}
+        </button>
+
+        {/* Katmanlar */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveLeftTab('layers');
+            setMobileDrawer(mobileDrawer === 'layers' ? null : 'layers');
+          }}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition cursor-pointer active:scale-95 ${
+            mobileDrawer === 'layers' ? 'text-amber-400 bg-amber-500/15' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Sparkles size={18} />
+          <span className="text-[10px] font-medium mt-1">Katman</span>
+        </button>
+      </nav>
+
+      {/* ========================================================================= */}
+      {/* 2C. MOBILE BOTTOM SHEET (SLIDE-UP DRAWER)                                 */}
+      {/* ========================================================================= */}
+      {mobileDrawer && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-xs">
+          {/* Backdrop dismiss */}
+          <div className="flex-1" onClick={() => setMobileDrawer(null)} />
+
+          <div className="bg-neutral-900 border-t border-neutral-700 rounded-t-2xl max-h-[82vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Sheet Handle & Header */}
+            <div className="px-4 py-3 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between flex-shrink-0 relative">
+              <div className="w-10 h-1 bg-neutral-700 rounded-full mx-auto absolute top-1.5 left-1/2 -translate-x-1/2" />
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  {mobileDrawer === 'add' && <><Plus size={14} className="text-amber-400" /> Hızlı Öğe Ekle</>}
+                  {mobileDrawer === 'templates' && <><LayoutTemplate size={14} className="text-amber-400" /> Katalog Şablonları & Mizanpajlar</>}
+                  {mobileDrawer === 'products' && <><Box size={14} className="text-amber-400" /> Seramik Ürünleri ({brandProducts.length})</>}
+                  {mobileDrawer === 'pages' && <><Layers size={14} className="text-amber-400" /> Sayfa Yönetimi ({pages.length} Sayfa)</>}
+                  {mobileDrawer === 'inspector' && <><Sliders size={14} className="text-amber-400" /> {selectedEl ? `${selectedEl.type.toUpperCase()} Ayarları` : 'Sayfa Arka Planı'}</>}
+                  {mobileDrawer === 'layers' && <><Sparkles size={14} className="text-amber-400" /> Katman Sıralaması</>}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileDrawer(null)}
+                className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white cursor-pointer"
+                title="Kapat"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Scrollable Sheet Content */}
+            <div className="overflow-y-auto p-4 flex-1">
+              {mobileDrawer === 'add' && renderAddMenuContent()}
+              {mobileDrawer === 'templates' && renderMobileTemplatesDrawer()}
+              {mobileDrawer === 'products' && renderMobileProductsDrawer()}
+              {mobileDrawer === 'pages' && renderMobilePagesDrawer()}
+              {mobileDrawer === 'inspector' && renderMobileInspectorDrawer()}
+              {mobileDrawer === 'layers' && renderMobileLayersDrawer()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 3. FULLSCREEN LIVE PREVIEW MODAL                                          */}
