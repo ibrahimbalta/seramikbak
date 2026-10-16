@@ -244,7 +244,7 @@ export async function PUT(request, { params }) {
         }
       }
 
-      // Safely embed customCanvasPages inside metadata
+      // Safely embed customCanvasPages inside metadata or retain existing ones
       if (Array.isArray(customCanvasPages)) {
         if (customCanvasPages.length > 50) {
           return NextResponse.json({ error: 'Maksimum sayfa sayısı (50) aşıldı.' }, { status: 400 });
@@ -257,6 +257,29 @@ export async function PUT(request, { params }) {
             ...rawItems[0],
             _metaCustomCanvasPages: safeCanvasPages
           };
+        }
+      } else if (customCanvasPages === undefined) {
+        // Retain existing canvas pages & section settings from prior save if not explicitly sent
+        try {
+          const oldItems = JSON.parse(existing.productItems || '[]');
+          const oldMeta = oldItems.find(i => typeof i === 'object' && (i._metaCustomCanvasPages || i._metaSectionSettings));
+          if (oldMeta) {
+            if (rawItems.length === 0) {
+              rawItems = [{
+                _isMetaOnly: true,
+                _metaCustomCanvasPages: oldMeta._metaCustomCanvasPages || [],
+                _metaSectionSettings: oldMeta._metaSectionSettings || {}
+              }];
+            } else {
+              rawItems[0] = {
+                ...rawItems[0],
+                ...(oldMeta._metaCustomCanvasPages ? { _metaCustomCanvasPages: oldMeta._metaCustomCanvasPages } : {}),
+                ...(oldMeta._metaSectionSettings ? { _metaSectionSettings: oldMeta._metaSectionSettings } : {})
+              };
+            }
+          }
+        } catch (e) {
+          // Non-fatal
         }
       }
 

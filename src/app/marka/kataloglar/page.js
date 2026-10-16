@@ -195,6 +195,7 @@ export default function BrandCatalogsStandalonePage() {
                 <div className="ml-5 mt-1.5 mb-2 pl-3 border-l border-[#b4823c]/40 space-y-1">
                   {[
                     { id: 'all', label: 'Tüm Kataloglar' },
+                    { id: 'inquiries', label: 'Gelen Teklifler' },
                     { id: 'create', label: 'Yeni Katalog Oluştur' },
                     { id: 'templates', label: 'Şablonlar' },
                     { id: 'published', label: 'Yayınlananlar' },
