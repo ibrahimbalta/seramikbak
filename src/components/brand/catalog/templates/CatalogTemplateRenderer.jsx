@@ -93,7 +93,8 @@ export default function CatalogTemplateRenderer({
     : (template === 'architectural-editorial' ||
        template === 'mimar-sunum' ||
        template === 'terra-luxe' ||
-       template === 'dogal-tas-mermer')
+       template === 'dogal-tas-mermer' ||
+       template === 'premium-mimari')
     ? (catalog.showCover !== false ? 1 : 0) +
       5 + // manifesto (1) + panoramic living (1) + hero slab (1) + macro specs (1) + collection matrix (1)
       (catalog.showSpecs !== false ? 1 : 0) + // specs table (1)
@@ -197,6 +198,7 @@ export default function CatalogTemplateRenderer({
       case 'mimar-sunum':
       case 'terra-luxe':
       case 'dogal-tas-mermer':
+      case 'premium-mimari':
         return <ArchitecturalEditorialTemplate {...props} />;
       case 'material-texture':
       case 'yuzey-doku':
@@ -207,7 +209,6 @@ export default function CatalogTemplateRenderer({
       case 'banyo-mutfak':
       case 'renk-ebat-rehberi':
       case 'yeni-lansman':
-      case 'premium-mimari':
       case 'milano':
       default:
         return <MilanoLookbookTemplate {...props} />;
