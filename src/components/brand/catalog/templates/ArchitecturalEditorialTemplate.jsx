@@ -229,16 +229,16 @@ export default function ArchitecturalEditorialTemplate({
       // 1. COVER
       case 'cover':
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-stone-900 text-white relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-stone-900 text-white relative overflow-hidden select-none">
             {/* Top Brand Monogram */}
-            <div className="flex items-center justify-between border-b border-white/20 pb-4 relative z-10">
+            <div className="flex items-center justify-between border-b border-white/20 pb-3 relative z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#b4823c]" />
-                <span className="text-[11px] font-mono tracking-widest uppercase text-stone-300">
+                <span className="text-[10px] sm:text-[11px] font-mono tracking-widest uppercase text-stone-300">
                   {catalog?.coverSubtitle || 'ARCHITECTURAL ISSUE • VOL. 2026'}
                 </span>
               </div>
-              <span className="text-xs font-mono font-bold tracking-widest text-[#d4af37]">
+              <span className="text-[11px] sm:text-xs font-mono font-bold tracking-widest text-[#d4af37]">
                 {(brand.name || catalog?.title || 'SERAMİKBAK').toUpperCase()}
               </span>
             </div>
@@ -254,11 +254,11 @@ export default function ArchitecturalEditorialTemplate({
             </div>
 
             {/* Bottom Typographic Title */}
-            <div className="relative z-10 space-y-4 pt-48 pb-4">
-              <span className="px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase bg-[#b4823c] text-white font-bold inline-block shadow-md">
+            <div className="relative z-10 space-y-3 sm:space-y-4 pt-16 sm:pt-28 md:pt-40 pb-2 sm:pb-4">
+              <span className="px-2.5 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-mono tracking-widest uppercase bg-[#b4823c] text-white font-bold inline-block shadow-md">
                 EDİTORYAL MİMARİ LOOKBOOK
               </span>
-              <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight leading-tight text-white max-w-xl">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-black tracking-tight leading-tight text-white max-w-xl">
                 {catalog?.coverTitle || catalog?.title || 'TERRA • LUXE'}
               </h1>
               <p className="text-xs sm:text-sm text-stone-300 font-light max-w-lg leading-relaxed">
@@ -266,16 +266,16 @@ export default function ArchitecturalEditorialTemplate({
               </p>
 
               {/* Editorial Metadata Triplets */}
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/20 text-stone-300 max-w-lg">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 pt-3 border-t border-white/20 text-stone-300 max-w-lg">
+                <div className="bg-white/5 sm:bg-transparent p-2 sm:p-0 rounded-lg">
                   <span className="text-[9px] font-mono tracking-wider text-stone-400 uppercase block">Kürasyon</span>
                   <strong className="text-xs font-serif text-white block mt-0.5">Mimari Porselen</strong>
                 </div>
-                <div>
+                <div className="bg-white/5 sm:bg-transparent p-2 sm:p-0 rounded-lg">
                   <span className="text-[9px] font-mono tracking-wider text-stone-400 uppercase block">Ebat Yelpazesi</span>
                   <strong className="text-xs font-serif text-white block mt-0.5">60×120 • 20×120 • 30×90</strong>
                 </div>
-                <div>
+                <div className="bg-white/5 sm:bg-transparent p-2 sm:p-0 rounded-lg">
                   <span className="text-[9px] font-mono tracking-wider text-stone-400 uppercase block">Üretim Standardı</span>
                   <strong className="text-xs font-serif text-white block mt-0.5">EN 14411 Bla / LEED v4</strong>
                 </div>
@@ -283,7 +283,7 @@ export default function ArchitecturalEditorialTemplate({
             </div>
 
             {/* Footer Folio */}
-            <div className="flex items-center justify-between border-t border-white/20 pt-4 relative z-10 text-[11px] text-stone-400 font-mono">
+            <div className="flex items-center justify-between border-t border-white/20 pt-3 relative z-10 text-[10px] sm:text-[11px] text-stone-400 font-mono">
               <span>{brand.origin || 'Türkiye'}</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')} / {String(totalP).padStart(2, '0')}</span>
             </div>
@@ -293,33 +293,30 @@ export default function ArchitecturalEditorialTemplate({
       // 2. MANIFESTO & STORYTELLING
       case 'manifesto':
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-                01 • MANİFESTO & TASARIM VİZYONU
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+                01 • MİMARİ VİZYON & MANİFESTO
               </span>
-              <span className="text-[11px] font-mono text-stone-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-stone-400">
                 {brand.name || 'Bien Seramik'}
               </span>
             </div>
 
-            <div className="my-auto py-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-              <div className="md:col-span-7 space-y-4">
-                <span className="px-2.5 py-1 rounded-md bg-stone-100 text-stone-700 text-[10px] font-mono uppercase tracking-wider font-bold">
+            <div className="my-auto py-4 sm:py-6 grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 items-center">
+              <div className="md:col-span-7 space-y-3 sm:space-y-4">
+                <span className="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-mono uppercase tracking-wider font-bold">
                   Koleksiyon Felsefesi
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-serif font-extrabold text-stone-900 leading-tight">
+                <h2 className="text-xl sm:text-3xl font-serif font-extrabold text-stone-900 leading-tight">
                   &ldquo;Doğanın ham minerallerini, mimarinin kusursuz geometrisiyle dengeliyoruz.&rdquo;
                 </h2>
-                <div className="space-y-3 text-xs text-stone-600 leading-relaxed font-light">
+                <div className="space-y-2.5 text-xs text-stone-600 leading-relaxed font-light">
                   <p>
                     {catalog?.description || 'Yüzyıllardır süregelen mermer ve taş mirasının en prestijli temsilcileri; çizilmez porselen teknolojisi, yüksek sürtünme dayanımı ve sıfıra yakın su emme oranlarıyla modern mimari mekanlara zamansız bir kimlik kazandırıyor.'}
                   </p>
-                  <p>
-                    İç mekanlarda homojen ışık kırılımları oluşturan mat ve lappato yüzeyler, ıslak zeminlerde güvenli adımlar sağlayan mikro sürtünme dokusuyla dengelenmiştir.
-                  </p>
                 </div>
-                <div className="p-4 rounded-2xl bg-[#fbf6ee] border-l-4 border-[#b4823c] text-stone-800 text-xs italic font-serif leading-relaxed">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-[#fbf6ee] border-l-4 border-[#b4823c] text-stone-800 text-xs italic font-serif leading-relaxed">
                   &ldquo;Seramik yalnızca bir zemin kaplaması değil; mekanın hacmini, ışığını ve dokunsal algısını şekillendiren mimari bir kabuktur.&rdquo;
                   <span className="block font-sans font-bold text-[10px] text-[#b4823c] uppercase tracking-wider not-italic mt-1.5">
                     — {brand.name || 'Bien Seramik'} Tasarım Stüdyosu
@@ -327,8 +324,8 @@ export default function ArchitecturalEditorialTemplate({
                 </div>
               </div>
 
-              <div className="md:col-span-5 space-y-3">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200 aspect-[4/3]">
+              <div className="md:col-span-5 space-y-2.5">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-stone-200 aspect-[16/9] sm:aspect-[4/3]">
                   <img
                     src="/renders/luxury_bathroom_albatros_antrasit.jpg"
                     alt="Moodboard"
@@ -343,14 +340,11 @@ export default function ArchitecturalEditorialTemplate({
                     <img src="/textures/natural_oak.jpg" alt="Texture" className="w-full h-full object-cover" />
                   </div>
                 </div>
-                <p className="text-[10px] text-stone-400 font-mono text-center">
-                  FIG 1.1 • Mermer, Beton ve Biyofilik Ahşap Uyumu
-                </p>
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[11px] text-stone-400 font-mono">
-              <span>KOLEKSİYON MANİFESTOSU</span>
+            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono">
+              <span>MİMARİ MANİFESTO</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>
@@ -359,47 +353,47 @@ export default function ArchitecturalEditorialTemplate({
       // 3. PANORAMIC ARCHITECTURAL LIVING SPACE
       case 'panoramic_living_space':
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-                02 • MİMARİ MEKÂN ALGISI & YAŞAM ALANLARI
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+                02 • MEKÂN KONSEPTİ & UYGULAMA
               </span>
-              <span className="text-[11px] font-mono text-stone-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-stone-400">
                 PANORAMİK ÖLÇEK
               </span>
             </div>
 
-            <div className="my-auto py-4 space-y-4">
-              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-stone-200 aspect-[16/9] group">
+            <div className="my-auto py-3 space-y-3 sm:space-y-4">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl border border-stone-200 aspect-[4/3] sm:aspect-[16/9] group">
                 <img
                   src="/renders/modern_living_natural_oak.jpg"
                   alt="Architectural Living Space"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 sm:p-8 text-white">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold mb-1">
-                    VİLLA REZİDANS SALON & TERAS ENTEGRASYONU
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-4 sm:p-8 text-white">
+                  <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold mb-1">
+                    REZİDANS & YAŞAM ALANI ENTEGRASYONU
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold">
+                  <h3 className="text-lg sm:text-2xl font-serif font-bold">
                     Porselen Parke ve Geniş Plaka Füzyonu
                   </h3>
-                  <p className="text-xs text-stone-300 font-light mt-1 max-w-xl leading-relaxed">
-                    Yerden ısıtmalı zeminlerde ahşabın sıcak dokunuşu ile geniş ebat porselen plakaların modern dinginliği tek bir hacimde buluşuyor.
+                  <p className="text-xs text-stone-200 font-light mt-1 max-w-xl leading-relaxed">
+                    Yerden ısıtmalı zeminlerde ahşap dokunuş ile geniş porselen plakaların monolitik estetiği tek bir hacimde buluşuyor.
                   </p>
                 </div>
               </div>
 
               {/* Space Specification Triplets */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
                 <div className="p-3 rounded-xl bg-stone-50 border border-stone-200">
                   <span className="text-[10px] font-mono text-stone-400 uppercase block">Derz Genişliği</span>
                   <strong className="text-xs font-serif text-stone-900 block mt-0.5">1.5 mm Lazer Rektifiye</strong>
-                  <p className="text-[10px] text-stone-500 mt-1">Zeminde monolitik ve kesintisiz akış hissi sağlar.</p>
+                  <p className="text-[10px] text-stone-500 mt-0.5">Zeminde monolitik ve kesintisiz akış hissi sağlar.</p>
                 </div>
                 <div className="p-3 rounded-xl bg-stone-50 border border-stone-200">
                   <span className="text-[10px] font-mono text-stone-400 uppercase block">Termal Uyumluluk</span>
                   <strong className="text-xs font-serif text-stone-900 block mt-0.5">Yerden Isıtma %100 Uyum</strong>
-                  <p className="text-[10px] text-stone-500 mt-1">Yüksek ısı iletim katsayısı ile enerji tasarrufu.</p>
+                  <p className="text-[10px] text-stone-500 mt-0.5">Yüksek ısı iletim katsayısı ile enerji verimliliği.</p>
                 </div>
                 <div className="p-3 rounded-xl bg-stone-50 border border-stone-200">
                   <span className="text-[10px] font-mono text-stone-400 uppercase block">3D Simülasyon</span>
@@ -409,13 +403,13 @@ export default function ArchitecturalEditorialTemplate({
                   >
                     <span>Mekânda Canlı Gör →</span>
                   </Link>
-                  <p className="text-[10px] text-stone-500 mt-1">Kendi mekan fotoğrafınızda anında deneyin.</p>
+                  <p className="text-[10px] text-stone-500 mt-0.5">Kendi odanızın fotoğrafında anında deneyin.</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[11px] text-stone-400 font-mono">
-              <span>DOĞAL IŞIK KIRILIM VE AKUSTİK DENGE ANALİZİ</span>
+            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono">
+              <span>MEKÂN ENTEGRASYON ANALİZİ</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>
@@ -425,33 +419,33 @@ export default function ArchitecturalEditorialTemplate({
       case 'hero_slab':
         const heroSlab = pageItem.product || safeProducts[0];
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-                03 • İMZA SERİ ODAĞI
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+                03 • İMZA SERİSİ
               </span>
-              <span className="text-[11px] font-mono text-stone-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-stone-400">
                 SKU: {heroSlab.code || heroSlab.sku || 'MİMARİ-ÖZEL'}
               </span>
             </div>
 
-            <div className="my-auto py-4 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <div className="my-auto py-3 sm:py-4 grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 items-center">
               <div className="md:col-span-7 space-y-3">
-                <div className="relative rounded-2xl overflow-hidden shadow-xl border border-stone-200 aspect-[3/4] group">
+                <div className="relative rounded-2xl overflow-hidden shadow-xl border border-stone-200 aspect-[4/3] sm:aspect-[3/4] group">
                   <img
                     src={heroSlab.imageUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
                     alt={heroSlab.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/60 backdrop-blur-md text-white flex items-center justify-between">
-                    <div>
+                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/60 backdrop-blur-md text-white flex items-center justify-between gap-2">
+                    <div className="min-w-0">
                       <span className="text-[9px] font-mono uppercase text-amber-300 block font-bold">MEKAN UYGULAMASI</span>
-                      <p className="text-xs font-serif font-bold">Monolitik Geniş Ebat Duvar ve Zemin</p>
+                      <p className="text-xs font-serif font-bold truncate">Monolitik Geniş Ebat Kaplama</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleTriggerInquiry(heroSlab, 'sample')}
-                      className="px-3 py-1.5 rounded-lg bg-[#b4823c] hover:bg-[#9a6e2e] text-white font-bold text-[10px] shadow transition cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-[#b4823c] hover:bg-[#9a6e2e] text-white font-bold text-[10px] shadow transition cursor-pointer flex-shrink-0"
                     >
                       Numune İste
                     </button>
@@ -459,12 +453,12 @@ export default function ArchitecturalEditorialTemplate({
                 </div>
               </div>
 
-              <div className="md:col-span-5 space-y-4">
+              <div className="md:col-span-5 space-y-3 sm:space-y-4">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-widest text-[#b4823c] font-bold block mb-1">
                     {heroSlab.style || 'Mimari Porselen'}
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-serif font-black text-stone-900 leading-tight">
+                  <h2 className="text-xl sm:text-3xl font-serif font-black text-stone-900 leading-tight">
                     {heroSlab.name}
                   </h2>
                   <p className="text-xs text-stone-500 font-mono mt-1">
@@ -476,12 +470,12 @@ export default function ArchitecturalEditorialTemplate({
                   {heroSlab.description || 'Derin mineral damar geçişleri ve ışığı kusursuz kıran nano yüzey teknolojisi ile çağdaş hacimler için monolitik estetik.'}
                 </p>
 
-                <div className="p-3.5 rounded-2xl bg-[#fbf6ee] border border-amber-200/60 space-y-1.5">
+                <div className="p-3 sm:p-3.5 rounded-2xl bg-[#fbf6ee] border border-amber-200/60 space-y-1">
                   <span className="text-[10px] font-mono uppercase font-bold text-[#b4823c] block">
-                    Mimari Şartname Tercihi
+                    Mimari Tercih
                   </span>
                   <p className="text-xs text-stone-800 font-serif leading-snug">
-                    Yüksek sürtünme mukavemeti ve rektifiye kenar kesimi ile otel, lobi ve prestijli konut projelerinde ömür boyu dayanıklılık.
+                    Yüksek sürtünme mukavemeti ve rektifiye kenar kesimi ile otel, lobi ve prestijli konut projelerinde uzun ömürlü dayanıklılık.
                   </p>
                 </div>
 
@@ -496,8 +490,8 @@ export default function ArchitecturalEditorialTemplate({
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[11px] text-stone-400 font-mono">
-              <span>MİMARİ PROJE SPESİFİKASYON KARTI</span>
+            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono">
+              <span>İMZA SERİSİ DETAYI</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>
@@ -507,73 +501,73 @@ export default function ArchitecturalEditorialTemplate({
       case 'macro_texture_specs':
         const macroItem = pageItem.product || safeProducts[0];
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-                04 • MALZEME VE DOKU ANALİZİ (10× MAKRO ZOOM)
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+                04 • DOKU & MALZEME MÜHENDİSLİĞİ
               </span>
-              <span className="text-[11px] font-mono text-stone-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-stone-400">
                 {macroItem.name}
               </span>
             </div>
 
-            <div className="my-auto py-4 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-              <div className="md:col-span-6 space-y-3">
-                <div className="relative rounded-2xl overflow-hidden shadow-lg border border-stone-200 aspect-square group">
+            <div className="my-auto py-3 sm:py-4 grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 items-center">
+              <div className="md:col-span-6 space-y-2.5">
+                <div className="relative rounded-2xl overflow-hidden shadow-lg border border-stone-200 aspect-[16/9] sm:aspect-square group">
                   <img
                     src={macroItem.textureUrl || macroItem.imageUrl || '/textures/calacatta_gold.jpg'}
                     alt="10x Macro Surface"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono font-bold">
-                    10× MAKRO DOKU • MİKRO GÖZENEK
+                  <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-white text-[9px] font-mono font-bold">
+                    10× MAKRO DOKU
                   </div>
                 </div>
-                <p className="text-[11px] text-stone-600 leading-relaxed font-light text-center">
-                  Doğal mineral geçişlerini koruyan nano koruyucu yüzey tabakası ve mikrometrik rektifiye kenar kesimi.
+                <p className="text-[11px] text-stone-500 leading-relaxed font-light text-center">
+                  Doğal mineral geçişleri ve mikrometrik rektifiye kenar kesimi.
                 </p>
               </div>
 
-              <div className="md:col-span-6 space-y-4">
+              <div className="md:col-span-6 space-y-3">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-bold block">
                     Fiziksel Özellikler
                   </span>
-                  <h3 className="text-xl font-serif font-bold text-stone-900">
-                    Porselen Gövde Mühendisliği
+                  <h3 className="text-lg sm:text-xl font-serif font-bold text-stone-900">
+                    Porselen Gövde Spesifikasyonu
                   </h3>
                 </div>
 
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Nominal Ebat:</span>
                     <strong className="font-mono text-stone-900">{macroItem.width}×{macroItem.height} cm</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Gövde Kalınlığı:</span>
                     <strong className="font-mono text-stone-900">{macroItem.thickness ? `${macroItem.thickness} mm` : '9.5 mm'}</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Yüzey Karakteri:</span>
                     <strong className="text-stone-800">{macroItem.finish || 'Mat Porselen'}</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Aşınma Direnci:</span>
                     <strong className="font-mono text-[#b4823c] font-bold">
                       {macroItem.peiRating ? `PEI ${macroItem.peiRating}` : 'PEI IV'}
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Kaymazlık Sınıfı:</span>
                     <strong className="font-mono">{macroItem.slipResistance || 'R10'} (DIN 51130)</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Su Emme Katsayısı:</span>
                     <strong className="font-mono text-emerald-700 font-bold">&lt; %0.05</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                  <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
                     <span className="font-semibold text-stone-500">Kenar Tipi:</span>
-                    <strong className="text-stone-800">{macroItem.rectified ? 'Lazer Kesim Rektifiye' : 'Standart'}</strong>
+                    <strong className="text-stone-800">{macroItem.rectified ? 'Lazer Rektifiye' : 'Standart'}</strong>
                   </div>
                 </div>
 
@@ -588,8 +582,8 @@ export default function ArchitecturalEditorialTemplate({
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[11px] text-stone-400 font-mono">
-              <span>LABORATUVAR TESTİ: EN ISO 10545 STANDARDI</span>
+            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono">
+              <span>MALZEME VE DOKU ANALİZİ</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>
@@ -598,31 +592,31 @@ export default function ArchitecturalEditorialTemplate({
       // 6. COLLECTION FAMILY & COMPARISON MATRIX
       case 'collection_matrix':
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-                05 • KOLEKSİYON AİLESİ & KARŞILAŞTIRMA MATRİSİ
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+                05 • KOLEKSİYON AİLESİ
               </span>
-              <span className="text-[11px] font-mono text-stone-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-stone-400">
                 {safeProducts.length} SEÇKİN MODEL
               </span>
             </div>
 
-            <div className="pt-2">
-              <h2 className="text-2xl font-serif font-extrabold text-stone-900">
+            <div className="pt-1 sm:pt-2">
+              <h2 className="text-xl sm:text-2xl font-serif font-extrabold text-stone-900">
                 Küratör Porselen Yelpazesi
               </h2>
               <p className="text-xs text-stone-500 font-light mt-0.5">
-                Mekanın fonksiyonuna göre optimize edilmiş yüzey, ebat ve kalınlık seçenekleri.
+                Mekanın fonksiyonuna göre optimize edilmiş yüzey ve ebat seçenekleri.
               </p>
             </div>
 
-            <div className="my-auto py-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="my-auto py-2.5 sm:py-3 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               {safeProducts.slice(0, 6).map((p, idx) => (
                 <div
                   key={p.id || idx}
                   onClick={() => handleTriggerInquiry(p, 'quote')}
-                  className="group p-3 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-amber-400/80 hover:bg-white transition-all shadow-2xs hover:shadow-md cursor-pointer flex flex-col justify-between"
+                  className="group p-2.5 sm:p-3 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-amber-400/80 hover:bg-white transition-all shadow-2xs hover:shadow-md cursor-pointer flex flex-col justify-between"
                 >
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-white mb-2 border border-stone-200">
                     <img
@@ -630,13 +624,13 @@ export default function ArchitecturalEditorialTemplate({
                       alt={p.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-black/70 text-white backdrop-blur-xs">
+                    <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-mono font-bold bg-black/70 text-white backdrop-blur-xs">
                       {p.width && p.height ? `${p.width}×${p.height} cm` : 'Plaka'}
                     </span>
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[9px] font-mono text-stone-400 uppercase block">0{idx + 1} • {p.style || 'Mimari Seri'}</span>
+                    <span className="text-[8px] sm:text-[9px] font-mono text-stone-400 uppercase block">0{idx + 1} • {p.style || 'Mimari Seri'}</span>
                     <h4 className="text-xs font-bold text-stone-900 group-hover:text-[#b4823c] transition truncate">
                       {p.name}
                     </h4>
@@ -651,8 +645,8 @@ export default function ArchitecturalEditorialTemplate({
               ))}
             </div>
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[11px] text-stone-400 font-mono">
-              <span>TÜM SERİLER REKTİFİYE KENAR KESİMİNE SAHİPTİR</span>
+            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono">
+              <span>KOLEKSİYON GENEL BAKIŞ</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>
@@ -661,27 +655,27 @@ export default function ArchitecturalEditorialTemplate({
       // 7. SPECS TABLE (LOGISTICS & PACKAGING)
       case 'specs_table':
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-white text-stone-900 relative overflow-hidden select-none">
             <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-                06 • TEKNİK ŞARTNAME & LOJİSTİK PARAMETRELER
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+                06 • TEKNİK ŞARTNAME & LOJİSTİK
               </span>
-              <span className="text-[11px] font-mono text-stone-400">
+              <span className="text-[10px] sm:text-[11px] font-mono text-stone-400">
                 STANDART: ISO 13006
               </span>
             </div>
 
-            <div className="pt-2">
-              <h2 className="text-2xl font-serif font-extrabold text-stone-900">
+            <div className="pt-1 sm:pt-2">
+              <h2 className="text-xl sm:text-2xl font-serif font-extrabold text-stone-900">
                 Mimari Teknik Spesifikasyonlar
               </h2>
               <p className="text-xs text-stone-500 font-light mt-0.5">
-                İnşaat şartnameleri, hakedişler ve ihracat lojistik planlaması için teyitli değerler.
+                İnşaat şartnameleri ve lojistik planlaması için teyitli parametreler.
               </p>
             </div>
 
-            <div className="my-auto py-3 overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
+            <div className="my-auto py-2 overflow-x-auto -mx-1 px-1">
+              <table className="w-full text-left text-xs border-collapse min-w-[500px]">
                 <thead>
                   <tr className="border-b-2 border-stone-300 bg-stone-100/70 text-[11px] font-mono text-stone-600">
                     <th className="py-2 px-3">Ürün Adı & Kodu</th>
@@ -689,7 +683,7 @@ export default function ArchitecturalEditorialTemplate({
                     <th className="py-2 px-3">Yüzey</th>
                     <th className="py-2 px-3">PEI</th>
                     <th className="py-2 px-3">Kaymazlık</th>
-                    <th className="py-2 px-3">Kutu (m²)</th>
+                    <th className="py-2 px-3">Kutu</th>
                     <th className="py-2 px-3 text-right">Aksiyon</th>
                   </tr>
                 </thead>
@@ -722,27 +716,27 @@ export default function ArchitecturalEditorialTemplate({
               </table>
             </div>
 
-            <div className="grid grid-cols-4 gap-3 p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 sm:p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-center">
               <div>
-                <span className="text-[10px] font-mono text-stone-400 block uppercase">Su Emme</span>
+                <span className="text-[9px] sm:text-[10px] font-mono text-stone-400 block uppercase">Su Emme</span>
                 <strong className="text-xs font-bold text-stone-800 font-mono">E ≤ 0.05%</strong>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-stone-400 block uppercase">Donma Direnci</span>
+                <span className="text-[9px] sm:text-[10px] font-mono text-stone-400 block uppercase">Donma Direnci</span>
                 <strong className="text-xs font-bold text-emerald-700 font-mono">Dayanıklı (EN ISO)</strong>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-stone-400 block uppercase">Kimyasal Direnç</span>
+                <span className="text-[9px] sm:text-[10px] font-mono text-stone-400 block uppercase">Kimyasal Direnç</span>
                 <strong className="text-xs font-bold text-stone-800 font-mono">Sınıf GA / GLA</strong>
               </div>
               <div>
-                <span className="text-[10px] font-mono text-stone-400 block uppercase">Çevre Standardı</span>
-                <strong className="text-xs font-bold text-[#b4823c] font-mono">LEED / EPD Onaylı</strong>
+                <span className="text-[9px] sm:text-[10px] font-mono text-stone-400 block uppercase">Çevre Standardı</span>
+                <strong className="text-xs font-bold text-[#b4823c] font-mono">LEED / EPD</strong>
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[11px] text-stone-400 font-mono">
-              <span>TÜM TESTLER AKREDİTE LABORATUVARLARDA DOĞRULANMIŞTIR</span>
+            <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono">
+              <span>TEKNİK ŞARTNAME BİLGİLERİ</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>
@@ -751,22 +745,22 @@ export default function ArchitecturalEditorialTemplate({
       // 8. BACK COVER
       case 'back_cover':
         return (
-          <div key={pageItem.pageIndex} className="catalog-page p-6 sm:p-12 flex flex-col justify-between bg-stone-950 text-white relative overflow-hidden select-none text-center">
+          <div key={pageItem.pageIndex} className="catalog-page p-4 sm:p-8 md:p-12 flex flex-col justify-between bg-stone-950 text-white relative overflow-hidden select-none text-center">
             <div className="flex items-center justify-between border-b border-white/10 pb-3 text-left">
-              <span className="text-[11px] font-mono tracking-widest text-stone-400 uppercase">
+              <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-stone-400 uppercase">
                 KURUMSAL ARKA KAPAK
               </span>
-              <span className="text-[11px] font-mono text-[#d4af37] font-bold">
+              <span className="text-[10px] sm:text-[11px] font-mono text-[#d4af37] font-bold">
                 {brand.name || catalog?.title || 'Bien Seramik'}
               </span>
             </div>
 
-            <div className="my-auto py-8 max-w-sm mx-auto space-y-6">
-              <div className="space-y-2">
-                <div className="w-16 h-16 rounded-3xl bg-[#b4823c] text-white flex items-center justify-center font-serif text-2xl font-black mx-auto shadow-xl">
+            <div className="my-auto py-4 sm:py-8 max-w-sm mx-auto space-y-4 sm:space-y-6">
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-[#b4823c] text-white flex items-center justify-center font-serif text-xl sm:text-2xl font-black mx-auto shadow-xl">
                   {(brand.name || 'BS').slice(0, 2).toUpperCase()}
                 </div>
-                <h2 className="text-2xl font-serif font-bold text-white">
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-white">
                   {brand.name || 'Bien Seramik'}
                 </h2>
                 <p className="text-xs text-stone-400 font-light">
@@ -775,22 +769,22 @@ export default function ArchitecturalEditorialTemplate({
               </div>
 
               {/* 3D QR Code Showcase */}
-              <div className="p-4 rounded-3xl bg-white/5 border border-white/10 space-y-2.5">
+              <div className="p-3.5 sm:p-4 rounded-3xl bg-white/5 border border-white/10 space-y-2">
                 <span className="text-[10px] font-mono uppercase text-amber-300 font-bold block">
                   3D MEKANDA DENE & VİRTUAL STUDIO
                 </span>
-                <div className="w-28 h-28 bg-white p-2 rounded-2xl mx-auto flex items-center justify-center shadow-sm">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 bg-white p-2 rounded-2xl mx-auto flex items-center justify-center shadow-sm">
                   <div className="w-full h-full bg-stone-900 rounded-xl flex flex-col items-center justify-center text-white">
-                    <QrCode size={52} className="text-amber-400" />
-                    <span className="text-[8px] font-mono text-stone-300 mt-1">3D SCAN</span>
+                    <QrCode size={44} className="text-amber-400" />
+                    <span className="text-[8px] font-mono text-stone-300 mt-0.5">3D SCAN</span>
                   </div>
                 </div>
-                <p className="text-[11px] text-stone-300 font-light">
-                  Akıllı telefonunuzun kamerasıyla QR kodu okutarak bu karoları kendi odanızda anında 3D deneyimleyin.
+                <p className="text-[10px] sm:text-[11px] text-stone-300 font-light">
+                  Kameranızla QR kodu okutarak bu karoları odanızda anında 3D deneyimleyin.
                 </p>
                 <Link
                   href="/mekan-dene"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline pt-1"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline pt-0.5"
                 >
                   <span>3D Mekan Motorunu Başlat</span>
                   <ArrowRight size={13} />
@@ -798,13 +792,13 @@ export default function ArchitecturalEditorialTemplate({
               </div>
 
               {/* Contact Information */}
-              <div className="grid grid-cols-2 gap-2 text-left text-xs">
-                <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left text-xs">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/10">
                   <span className="text-[9px] font-mono text-stone-400 uppercase block font-bold">Mimar Masası</span>
                   <p className="font-bold text-white text-xs mt-0.5">{catalog?.contactPhone || '+90 850 888 00 00'}</p>
                   <span className="text-[10px] text-stone-400">{catalog?.contactEmail || 'proje@seramikbak.com'}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white/5 border border-white/10">
                   <span className="text-[9px] font-mono text-stone-400 uppercase block font-bold">Genel Merkez</span>
                   <p className="text-stone-300 font-medium text-[11px] mt-0.5 leading-snug">
                     {catalog?.contactAddress || 'Bilecik Fabrika & İstanbul Showroom'}
@@ -813,8 +807,8 @@ export default function ArchitecturalEditorialTemplate({
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/10 pt-3 text-[11px] text-stone-400 font-mono text-left">
-              <span>SERAMİKBAK DİJİTAL YAYIN PLATFORMU © 2026</span>
+            <div className="flex items-center justify-between border-t border-white/10 pt-3 text-[10px] sm:text-[11px] text-stone-400 font-mono text-left">
+              <span>SERAMİKBAK DİJİTAL LOOKBOOK</span>
               <span>SAYFA {String(pageNum).padStart(2, '0')}</span>
             </div>
           </div>

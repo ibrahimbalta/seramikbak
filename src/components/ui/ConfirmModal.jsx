@@ -132,12 +132,12 @@ export default function ConfirmModal({
       aria-labelledby="confirm-modal-title"
       aria-describedby="confirm-modal-description"
       onClick={handleBackdropClick}
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       <div
-        className={`relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 sm:p-7 border border-slate-100 transition-all duration-200 transform ${
+        className={`relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-5 sm:p-7 border border-slate-100 transition-all duration-200 transform max-h-[90dvh] overflow-y-auto overscroll-contain ${
           isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >

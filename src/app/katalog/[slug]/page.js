@@ -400,46 +400,33 @@ export default function PublicCatalogViewerPage() {
   return (
     <div className="min-h-screen bg-neutral-900 flex flex-col text-white relative">
       {/* Top Sticky Header */}
-      <header className="sticky top-0 z-40 bg-neutral-950/95 backdrop-blur-md border-b border-white/10 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 no-print">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-40 bg-neutral-950/95 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 no-print">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/"
-            className="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 flex items-center gap-1.5 transition flex-shrink-0"
             title="SeramikBak Ana Sayfa"
           >
-            <ArrowLeft size={15} />
-            <span className="hidden sm:inline font-semibold">SeramikBak</span>
+            <ArrowLeft size={16} />
+            <span className="hidden sm:inline font-semibold text-xs">SeramikBak</span>
           </Link>
 
-          <div className="h-4 w-px bg-white/20" />
+          <div className="h-4 w-px bg-white/20 hidden sm:block flex-shrink-0" />
 
-          <div>
-            <h1 className="text-sm font-bold text-white tracking-wide truncate max-w-xs md:max-w-md">
+          <div className="min-w-0">
+            <h1 className="text-xs sm:text-sm font-bold text-white tracking-wide truncate max-w-[140px] xs:max-w-[180px] sm:max-w-xs md:max-w-md">
               {catalog.title}
             </h1>
-            <p className="text-[11px] text-neutral-400 font-medium flex items-center gap-1.5">
+            <p className="text-[10px] sm:text-[11px] text-neutral-400 font-medium truncate flex items-center gap-1.5">
               <span>{brand.name || 'Marka'}</span>
               <span>&bull;</span>
-              <span>
-                {products.length > 0
-                  ? `${products.length} Seramik Ürün`
-                  : `${catalog.customCanvasPages?.length || 0} Özel Tasarım Sayfası`}
-              </span>
-              {catalog.viewCount > 0 && (
-                <>
-                  <span>&bull;</span>
-                  <span className="inline-flex items-center gap-1 text-neutral-400">
-                    <Eye size={11} className="text-amber-400" />
-                    <span>{catalog.viewCount}</span>
-                  </span>
-                </>
-              )}
+              <span>{products.length > 0 ? `${products.length} Ürün` : 'Katalog'}</span>
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {/* Table of Contents Toggle */}
           <button
             type="button"
@@ -447,7 +434,7 @@ export default function PublicCatalogViewerPage() {
               setShowTocDrawer(!showTocDrawer);
               setShowProductDrawer(false);
             }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+            className={`p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
               showTocDrawer
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                 : 'bg-white/10 hover:bg-white/20 text-white'
@@ -466,14 +453,15 @@ export default function PublicCatalogViewerPage() {
                 setShowProductDrawer(!showProductDrawer);
                 setShowTocDrawer(false);
               }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
+              className={`p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
                 showProductDrawer
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                   : 'bg-white/10 hover:bg-white/20 text-white'
               }`}
+              title={`Ürün Ara (${products.length})`}
             >
               <Search size={14} className="text-amber-400" />
-              <span>Ürün Ara ({products.length})</span>
+              <span className="hidden lg:inline">Ürünler ({products.length})</span>
             </button>
           )}
 
@@ -481,18 +469,18 @@ export default function PublicCatalogViewerPage() {
           <button
             type="button"
             onClick={() => setShowQrModal(true)}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer flex-shrink-0"
             title="QR Kod ile Mobil Cihazda Aç"
           >
             <QrCode size={15} />
           </button>
 
           {/* Enhanced Share Dropdown */}
-          <div className="relative" ref={shareMenuRef}>
+          <div className="relative flex-shrink-0" ref={shareMenuRef}>
             <button
               type="button"
               onClick={() => setShowShareMenu(!showShareMenu)}
-              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
               aria-expanded={showShareMenu}
             >
               <Share2 size={14} className={showShareMenu ? 'text-amber-400' : ''} />
@@ -504,7 +492,7 @@ export default function PublicCatalogViewerPage() {
             </button>
 
             {showShareMenu && (
-              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-neutral-950 border border-white/15 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-52 sm:w-56 max-w-[calc(100vw-1rem)] rounded-2xl bg-neutral-950 border border-white/15 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                 <div className="px-3 py-2 border-b border-white/10 mb-1">
                   <p className="text-[11px] font-bold text-white">Kataloğu Paylaş</p>
                   <p className="text-[10px] text-neutral-400 truncate">{catalog.title}</p>
@@ -570,17 +558,19 @@ export default function PublicCatalogViewerPage() {
             type="button"
             onClick={handlePrint}
             disabled={isPrinting}
-            className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer"
+            className="px-2.5 sm:px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer flex-shrink-0"
+            title="PDF İndir / Yazdır"
           >
-            {isPrinting ? <Loader2 size={15} className="animate-spin" /> : <Printer size={15} />}
-            <span>{isPrinting ? 'PDF Hazırlanıyor...' : 'PDF İndir / Yazdır'}</span>
+            {isPrinting ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
+            <span className="hidden sm:inline">{isPrinting ? 'Hazırlanıyor...' : 'PDF İndir'}</span>
+            <span className="sm:hidden text-[11px] font-bold">PDF</span>
           </button>
         </div>
       </header>
 
       {/* Collapsible Table of Contents Navigation Drawer */}
       {showTocDrawer && (
-        <div className="bg-neutral-950/95 border-b border-white/10 px-4 md:px-8 py-5 no-print animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="bg-neutral-950/95 border-b border-white/10 px-4 md:px-8 py-5 no-print animate-in fade-in slide-in-from-top-2 duration-150 max-h-[75vh] overflow-y-auto overscroll-contain">
           <div className="max-w-5xl mx-auto space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2">
@@ -688,7 +678,7 @@ export default function PublicCatalogViewerPage() {
 
       {/* Collapsible Product Search & Direct Navigation Drawer */}
       {showProductDrawer && (
-        <div className="bg-neutral-950 border-b border-white/10 px-4 md:px-8 py-5 no-print animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="bg-neutral-950 border-b border-white/10 px-4 md:px-8 py-5 no-print animate-in fade-in slide-in-from-top-2 duration-150 max-h-[75vh] overflow-y-auto overscroll-contain">
           <div className="max-w-5xl mx-auto space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
@@ -770,10 +760,10 @@ export default function PublicCatalogViewerPage() {
       </main>
 
       {/* B2B Lead Generation Floating Panel (Bottom-Right) */}
-      <div className="fixed bottom-6 right-6 z-40 no-print flex flex-col items-end" ref={leadPanelRef}>
+      <div className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40 no-print flex flex-col items-end" ref={leadPanelRef}>
         {/* Expandable Action Card */}
         {showLeadPanel && (
-          <div className="mb-3 w-80 rounded-3xl bg-white/95 backdrop-blur-md border border-stone-200/90 shadow-2xl p-5 text-slate-900 space-y-3.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="mb-3 w-[calc(100vw-1.5rem)] xs:w-80 max-w-sm rounded-3xl bg-white/95 backdrop-blur-md border border-stone-200/90 shadow-2xl p-4 sm:p-5 text-slate-900 space-y-3.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
             <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-[#fbf6ee] text-[#b4823c] border border-[#e8d5b5] flex items-center justify-center">
@@ -788,6 +778,7 @@ export default function PublicCatalogViewerPage() {
                 type="button"
                 onClick={() => setShowLeadPanel(false)}
                 className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-stone-100 transition cursor-pointer"
+                title="Kapat"
               >
                 <X size={14} />
               </button>
@@ -833,7 +824,7 @@ export default function PublicCatalogViewerPage() {
         <button
           type="button"
           onClick={() => setShowLeadPanel(!showLeadPanel)}
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-bold text-xs shadow-2xl shadow-amber-900/30 hover:shadow-amber-900/50 transition-all duration-300 hover:scale-105 cursor-pointer ring-2 ring-amber-300/40"
+          className="group relative flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-bold text-xs shadow-2xl shadow-amber-900/30 hover:shadow-amber-900/50 transition-all duration-300 hover:scale-105 cursor-pointer ring-2 ring-amber-300/40"
           aria-label="B2B Fiyat Teklifi ve Numune Talebi"
         >
           {/* Gentle Pulse Dot */}
@@ -842,7 +833,7 @@ export default function PublicCatalogViewerPage() {
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
           </span>
 
-          <Sparkles size={16} className="text-amber-200" />
+          <Sparkles size={15} className="text-amber-200" />
           <span className="tracking-wide">B2B Fiyat & Numune</span>
         </button>
       </div>
@@ -851,7 +842,7 @@ export default function PublicCatalogViewerPage() {
       <button
         type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-6 left-6 z-40 no-print w-11 h-11 rounded-full bg-neutral-950/90 hover:bg-neutral-900 text-amber-400 border border-amber-500/30 hover:border-amber-400 shadow-xl backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer group ${
+        className={`fixed bottom-4 sm:bottom-6 left-3 sm:left-6 z-40 no-print w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-neutral-950/90 hover:bg-neutral-900 text-amber-400 border border-amber-500/30 hover:border-amber-400 shadow-xl backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 cursor-pointer group ${
           showScrollTop ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
         }`}
         aria-label="Sayfanın Başına Dön"
@@ -862,330 +853,332 @@ export default function PublicCatalogViewerPage() {
 
       {/* B2B Lead Generation Contact Form Modal (Premium Luminous Architectural Styling) */}
       {showLeadModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto no-print animate-in fade-in duration-200">
-          <div className="bg-white text-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-stone-200/90 relative my-8 animate-in zoom-in-95 duration-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 no-print overflow-hidden animate-in fade-in duration-200">
+          <div className="bg-white text-slate-900 rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[90dvh] flex flex-col shadow-2xl border border-stone-200/90 relative animate-in zoom-in-95 duration-200 overflow-hidden">
             {/* Top Architectural Bronze Bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#b4823c] via-amber-400 to-[#b4823c]" />
+            <div className="h-1.5 bg-gradient-to-r from-[#b4823c] via-amber-400 to-[#b4823c] flex-shrink-0" />
 
-            {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-stone-100 pb-4 pt-1">
+            {/* Pinned Sticky Header */}
+            <div className="flex items-start justify-between border-b border-stone-100 px-5 sm:px-7 py-3 sm:py-3.5 flex-shrink-0 bg-white">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#fbf6ee] text-[#b4823c] border border-[#e8d5b5] shadow-2xs mb-2">
-                  <Sparkles size={12} className="text-[#b4823c]" />
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-[#fbf6ee] text-[#b4823c] border border-[#e8d5b5] shadow-2xs mb-1">
+                  <Sparkles size={11} className="text-[#b4823c]" />
                   <span>
                     {leadType === 'sample' ? 'Mimari Numune Masası' : 'Kurumsal B2B Fiyat Teklifi'}
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-serif font-extrabold text-slate-900 tracking-tight">
+                <h3 className="text-lg sm:text-2xl font-serif font-extrabold text-slate-900 tracking-tight">
                   {leadType === 'sample' ? 'Seramik Numune Talebi' : 'Fiyat Teklifi Talebi'}
                 </h3>
-                <p className="text-xs text-slate-500 font-medium mt-1">
-                  <span className="font-semibold text-slate-800">{catalog.title}</span> için doğrudan üretici marka yetkilisine iletilir.
+                <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate max-w-xs sm:max-w-md">
+                  <span className="font-semibold text-slate-800">{catalog.title}</span> için doğrudan iletilir.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowLeadModal(false)}
-                className="p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-stone-100 transition cursor-pointer"
+                className="p-1.5 sm:p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-stone-100 transition cursor-pointer flex-shrink-0"
                 title="Kapat"
               >
                 <X size={18} />
               </button>
             </div>
 
-            {leadSubmitted ? (
-              <div className="py-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
-                  <CheckCircle2 size={36} />
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold text-slate-900">Talebiniz Marka Yetkilisine İletildi!</h4>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto mt-1.5 leading-relaxed">
-                    Talebiniz <strong>{brand.name || 'marka'}</strong> dijital katalog yönetim masasına ve teklif havuzuna başarıyla kaydedildi. Yetkililerimiz en kısa sürede sizinle iletişime geçecektir.
-                  </p>
-                </div>
-                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 max-w-sm mx-auto text-left text-xs space-y-1">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Talep Sahibi:</span>
-                    <strong className="text-slate-900">{leadForm.name}</strong>
+            {/* Scrollable Modal Body */}
+            <div className="p-4 sm:p-6 sm:px-7 overflow-y-auto flex-1 overscroll-contain space-y-4">
+              {leadSubmitted ? (
+                <div className="py-6 sm:py-8 text-center space-y-4">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
+                    <CheckCircle2 size={32} />
                   </div>
-                  {leadForm.company && (
+                  <div>
+                    <h4 className="text-base sm:text-lg font-bold text-slate-900">Talebiniz Marka Yetkilisine İletildi!</h4>
+                    <p className="text-xs text-slate-500 max-w-md mx-auto mt-1.5 leading-relaxed">
+                      Talebiniz <strong>{brand.name || 'marka'}</strong> dijital katalog masasına başarıyla kaydedildi. Yetkililerimiz en kısa sürede sizinle iletişime geçecektir.
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 max-w-sm mx-auto text-left text-xs space-y-1">
                     <div className="flex justify-between text-slate-600">
-                      <span>Firma:</span>
-                      <strong className="text-slate-900">{leadForm.company}</strong>
+                      <span>Talep Sahibi:</span>
+                      <strong className="text-slate-900">{leadForm.name}</strong>
+                    </div>
+                    {leadForm.company && (
+                      <div className="flex justify-between text-slate-600">
+                        <span>Firma:</span>
+                        <strong className="text-slate-900">{leadForm.company}</strong>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-slate-600">
+                      <span>Telefon:</span>
+                      <strong className="text-slate-900">{leadForm.phone}</strong>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Kapsam:</span>
+                      <strong className="text-[#b4823c]">{selectedProducts.length} Seçili Seramik Ürün</strong>
+                    </div>
+                  </div>
+                  <div className="pt-2 flex justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLeadSubmitted(false);
+                        setLeadForm({ name: '', company: '', email: '', phone: '', message: '' });
+                      }}
+                      className="px-4 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-xs font-bold text-slate-700 transition cursor-pointer shadow-2xs"
+                    >
+                      Yeni Talep Oluştur
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowLeadModal(false)}
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
+                    >
+                      Tamam
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleLeadSubmit} className="space-y-4">
+                  {submitError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                      <AlertCircle size={15} className="flex-shrink-0" />
+                      <span>{submitError}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-slate-600">
-                    <span>Telefon:</span>
-                    <strong className="text-slate-900">{leadForm.phone}</strong>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Kapsam:</span>
-                    <strong className="text-[#b4823c]">{selectedProducts.length} Seçili Seramik Ürünü</strong>
-                  </div>
-                </div>
-                <div className="pt-2 flex justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLeadSubmitted(false);
-                      setLeadForm({ name: '', company: '', email: '', phone: '', message: '' });
-                    }}
-                    className="px-4 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-xs font-bold text-slate-700 transition cursor-pointer shadow-2xs"
-                  >
-                    Yeni Talep Oluştur
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowLeadModal(false)}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
-                  >
-                    Tamam
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleLeadSubmit} className="space-y-4">
-                {submitError && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                    <AlertCircle size={15} className="flex-shrink-0" />
-                    <span>{submitError}</span>
-                  </div>
-                )}
 
-                {/* Switch between Quote & Sample */}
-                <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-stone-100/90 border border-stone-200/80 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setLeadType('quote')}
-                    className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                      leadType === 'quote'
-                        ? 'bg-white text-slate-900 shadow-xs border border-stone-200/80'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                  >
-                    <Tag size={13} className={leadType === 'quote' ? 'text-[#b4823c]' : ''} />
-                    <span>Fiyat Teklifi İste</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLeadType('sample')}
-                    className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                      leadType === 'sample'
-                        ? 'bg-white text-slate-900 shadow-xs border border-stone-200/80'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
-                  >
-                    <Package size={13} className={leadType === 'sample' ? 'text-[#b4823c]' : ''} />
-                    <span>Numune Talep Et</span>
-                  </button>
-                </div>
+                  {/* Switch between Quote & Sample */}
+                  <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-stone-100/90 border border-stone-200/80 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setLeadType('quote')}
+                      className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        leadType === 'quote'
+                          ? 'bg-white text-slate-900 shadow-xs border border-stone-200/80'
+                          : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      <Tag size={13} className={leadType === 'quote' ? 'text-[#b4823c]' : ''} />
+                      <span>Fiyat Teklifi İste</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLeadType('sample')}
+                      className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        leadType === 'sample'
+                          ? 'bg-white text-slate-900 shadow-xs border border-stone-200/80'
+                          : 'text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      <Package size={13} className={leadType === 'sample' ? 'text-[#b4823c]' : ''} />
+                      <span>Numune Talep Et</span>
+                    </button>
+                  </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                        <User size={13} className="text-[#b4823c]" />
+                        <span>Ad Soyad *</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={leadForm.name}
+                        onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
+                        placeholder="Örn: Selin Yılmaz"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                        <Building2 size={13} className="text-[#b4823c]" />
+                        <span>Firma / Proje Ofisi</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={leadForm.company}
+                        onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
+                        placeholder="Örn: Yılmaz Mimarlık"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                        <Mail size={13} className="text-[#b4823c]" />
+                        <span>E-posta Adresi *</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={leadForm.email}
+                        onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                        placeholder="selin@mimarlik.com"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                        <Phone size={13} className="text-[#b4823c]" />
+                        <span>Telefon Numarası *</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={leadForm.phone}
+                        onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
+                        placeholder="05XX XXX XX XX"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* İlgilenilen Ürünler (Auto-filled Tags) */}
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                      <User size={13} className="text-[#b4823c]" />
-                      <span>Ad Soyad *</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={leadForm.name}
-                      onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
-                      placeholder="Örn: Selin Yılmaz"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                    />
-                  </div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                        <Tag size={13} className="text-[#b4823c]" />
+                        <span>İlgilenilen Ürünler ({selectedProducts.length} Seçili)</span>
+                      </label>
+                      {products.length > 0 && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <button
+                            type="button"
+                            onClick={selectAllProducts}
+                            className="font-bold text-[#b4823c] hover:underline cursor-pointer"
+                          >
+                            Tümünü Seç
+                          </button>
+                          <span className="text-slate-300">&bull;</span>
+                          <button
+                            type="button"
+                            onClick={clearAllProducts}
+                            className="font-medium text-slate-500 hover:text-slate-800 cursor-pointer"
+                          >
+                            Temizle
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                      <Building2 size={13} className="text-[#b4823c]" />
-                      <span>Firma / Proje Ofisi</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={leadForm.company}
-                      onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
-                      placeholder="Örn: Yılmaz Mimarlık A.Ş."
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                      <Mail size={13} className="text-[#b4823c]" />
-                      <span>E-posta Adresi *</span>
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={leadForm.email}
-                      onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
-                      placeholder="selin@mimarlik.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                      <Phone size={13} className="text-[#b4823c]" />
-                      <span>Telefon Numarası *</span>
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={leadForm.phone}
-                      onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
-                      placeholder="05XX XXX XX XX"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                    />
-                  </div>
-                </div>
-
-                {/* İlgilenilen Ürünler (Auto-filled Tags) */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                      <Tag size={13} className="text-[#b4823c]" />
-                      <span>İlgilenilen Ürünler ({selectedProducts.length} Seçili)</span>
-                    </label>
-                    {products.length > 0 && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <button
-                          type="button"
-                          onClick={selectAllProducts}
-                          className="font-bold text-[#b4823c] hover:underline cursor-pointer"
-                        >
-                          Tümünü Seç
-                        </button>
-                        <span className="text-slate-300">&bull;</span>
-                        <button
-                          type="button"
-                          onClick={clearAllProducts}
-                          className="font-medium text-slate-500 hover:text-slate-800 cursor-pointer"
-                        >
-                          Temizle
-                        </button>
+                    {products.length > 0 ? (
+                      <div className="p-2.5 rounded-2xl bg-stone-50/80 border border-stone-200/90 max-h-32 overflow-y-auto flex flex-wrap gap-1.5">
+                        {products.map((p) => {
+                          const pName = p.name || p.sku || `Ürün #${p.id}`;
+                          const isSelected = selectedProducts.includes(pName);
+                          return (
+                            <button
+                              key={p.id || pName}
+                              type="button"
+                              onClick={() => toggleProductSelection(pName)}
+                              className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#fbf6ee] text-[#8d6225] border border-[#e8d5b5] shadow-2xs'
+                                  : 'bg-white text-slate-600 border border-stone-200 hover:border-amber-300 hover:text-slate-900'
+                              }`}
+                            >
+                              <span>{pName}</span>
+                              {isSelected ? (
+                                <Check size={12} className="text-[#b4823c]" />
+                              ) : (
+                                <span className="text-slate-400 font-bold">+</span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder="Örn: 60x120 Mermer Serisi, Mat Yüzey..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                      />
                     )}
                   </div>
 
-                  {products.length > 0 ? (
-                    <div className="p-2.5 rounded-2xl bg-stone-50/80 border border-stone-200/90 max-h-36 overflow-y-auto flex flex-wrap gap-1.5">
-                      {products.map((p) => {
-                        const pName = p.name || p.sku || `Ürün #${p.id}`;
-                        const isSelected = selectedProducts.includes(pName);
-                        return (
-                          <button
-                            key={p.id || pName}
-                            type="button"
-                            onClick={() => toggleProductSelection(pName)}
-                            className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-                              isSelected
-                                ? 'bg-[#fbf6ee] text-[#8d6225] border border-[#e8d5b5] shadow-2xs'
-                                : 'bg-white text-slate-600 border border-stone-200 hover:border-amber-300 hover:text-slate-900'
-                            }`}
-                          >
-                            <span>{pName}</span>
-                            {isSelected ? (
-                              <Check size={12} className="text-[#b4823c]" />
-                            ) : (
-                              <span className="text-slate-400 font-bold">+</span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      placeholder="Örn: 60x120 Mermer Serisi, Mat Yüzey..."
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                  {/* Mesaj */}
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <FileText size={13} className="text-[#b4823c]" />
+                      <span>Proje Notları & Mesaj</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={leadForm.message}
+                      onChange={(e) => setLeadForm({ ...leadForm, message: e.target.value })}
+                      placeholder={
+                        leadType === 'sample'
+                          ? 'Numune kiti teslimat adresi veya özel yüzey beklentilerinizi yazınız...'
+                          : 'Tahmini metraj (m²), proje lokasyonu ve termin planınız...'
+                      }
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs resize-none"
                     />
-                  )}
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    İlgilendiğiniz seramik ürünlerini etiketlere tıklayarak belirleyebilirsiniz.
-                  </p>
-                </div>
+                  </div>
 
-                {/* Mesaj */}
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                    <FileText size={13} className="text-[#b4823c]" />
-                    <span>Proje Notları & Mesaj</span>
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={leadForm.message}
-                    onChange={(e) => setLeadForm({ ...leadForm, message: e.target.value })}
-                    placeholder={
-                      leadType === 'sample'
-                        ? 'Numune kiti teslimat adresi veya özel yüzey beklentilerinizi yazınız...'
-                        : 'Tahmini metraj (m²), proje lokasyonu, uygulama alanı ve termin planınız...'
-                    }
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmittingLead}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] disabled:opacity-60 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-900/15 transition-all cursor-pointer active:scale-[0.99]"
-                >
-                  {isSubmittingLead ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin text-white" />
-                      <span>Talep Markaya İletiliyor...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send size={15} />
-                      <span>
-                        {leadType === 'sample' ? 'Numune Talebini Gönder' : 'Teklif Talebini Gönder'}
-                      </span>
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+                  <button
+                    type="submit"
+                    disabled={isSubmittingLead}
+                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] disabled:opacity-60 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-900/15 transition-all cursor-pointer active:scale-[0.99]"
+                  >
+                    {isSubmittingLead ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin text-white" />
+                        <span>Talep Markaya İletiliyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send size={15} />
+                        <span>
+                          {leadType === 'sample' ? 'Numune Talebini Gönder' : 'Teklif Talebini Gönder'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {/* QR Code Share Modal */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
-          <div className="bg-white text-neutral-900 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print overflow-hidden animate-in fade-in duration-150">
+          <div className="bg-white text-neutral-900 rounded-2xl max-w-sm w-full max-h-[90dvh] flex flex-col shadow-2xl border border-stone-200 overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-3.5 flex-shrink-0">
               <span className="text-sm font-extrabold">Web Kataloğu QR Kodu</span>
               <button
                 type="button"
                 onClick={() => setShowQrModal(false)}
-                className="text-neutral-400 hover:text-neutral-800"
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-800 transition"
               >
                 <X size={16} />
               </button>
             </div>
-            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 inline-block mx-auto">
-              {products[0]?.qrCodeUrl ? (
-                <img src={products[0].qrCodeUrl} alt="QR Code" className="w-40 h-40 mx-auto" />
-              ) : (
-                <QrCode size={140} className="text-neutral-900 mx-auto" />
-              )}
+            <div className="p-5 overflow-y-auto flex-1 text-center space-y-4">
+              <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 inline-block mx-auto">
+                {products[0]?.qrCodeUrl ? (
+                  <img src={products[0].qrCodeUrl} alt="QR Code" className="w-36 h-36 sm:w-40 sm:h-40 mx-auto" />
+                ) : (
+                  <QrCode size={130} className="text-neutral-900 mx-auto" />
+                )}
+              </div>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                Mobil cihazınızın kamerasıyla okutarak <strong>{catalog.title}</strong> kataloğuna anında
+                erişebilirsiniz.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowQrModal(false)}
+                className="w-full py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer"
+              >
+                Kapat
+              </button>
             </div>
-            <p className="text-xs text-neutral-500">
-              Mobil cihazınızın kamerasıyla okutarak <strong>{catalog.title}</strong> kataloğuna anında
-              erişebilirsiniz.
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowQrModal(false)}
-              className="w-full py-2.5 rounded-xl bg-neutral-900 text-white text-xs font-bold"
-            >
-              Tamam
-            </button>
           </div>
         </div>
       )}

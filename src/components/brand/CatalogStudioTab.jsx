@@ -4567,9 +4567,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {/* MODAL: VERSION HISTORY (SÜRÜM GEÇMİŞİ)                                    */}
       {/* ========================================================================= */}
       {versionModalCatalog && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl border border-neutral-200 max-w-lg w-full max-h-[90dvh] flex flex-col p-5 sm:p-6 space-y-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <History size={18} className="text-[#b4823c]" />
                 <h3 className="text-base font-extrabold text-neutral-900">Katalog Sürüm Geçmişi</h3>
@@ -4577,17 +4577,17 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               <button
                 type="button"
                 onClick={() => setVersionModalCatalog(null)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700"
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 transition"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 flex-shrink-0">
               <strong>{versionModalCatalog.title}</strong> kataloğuna ait kaydedilmiş sürümler:
             </p>
 
-            <div className="space-y-2.5 max-h-64 overflow-y-auto">
+            <div className="space-y-2.5 flex-1 overflow-y-auto pr-1">
               <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/40 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">
@@ -4620,18 +4620,18 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     setVersionModalCatalog(null);
                     handleEdit(target, false);
                   }}
-                  className="px-3 py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-100 text-xs font-bold text-neutral-700"
+                  className="px-3 py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-100 text-xs font-bold text-neutral-700 transition"
                 >
                   Bu Sürümü Aç
                 </button>
               </div>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end pt-2 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setVersionModalCatalog(null)}
-                className="px-4 py-2 rounded-xl bg-neutral-900 text-white text-xs font-bold"
+                className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition cursor-pointer"
               >
                 Kapat
               </button>
@@ -4655,9 +4655,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       )}
 
       {syncModalCatalog && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 max-w-xl w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-hidden animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl border border-neutral-200 max-w-xl w-full max-h-[90dvh] flex flex-col p-5 sm:p-6 space-y-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <RefreshCw size={18} className="text-[#b4823c]" />
                 <h3 className="text-base font-extrabold text-neutral-900">
@@ -4667,17 +4667,17 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               <button
                 type="button"
                 onClick={() => setSyncModalCatalog(null)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700"
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 transition"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <p className="text-xs text-neutral-600 leading-relaxed">
+            <p className="text-xs text-neutral-600 leading-relaxed flex-shrink-0">
               <strong>{syncModalCatalog.catalog.title}</strong> kataloğunda yer alan aşağıdaki ürünlerin bilgileri veritabanında güncellendi. Sayfa düzeninizi bozmadan yeni verileri senkronize etmek ister misiniz?
             </p>
 
-            <div className="space-y-2.5 max-h-60 overflow-y-auto">
+            <div className="space-y-2.5 flex-1 overflow-y-auto pr-1">
               {syncModalCatalog.changes.map((ch, idx) => (
                 <div key={idx} className="p-3 rounded-xl border border-amber-200 bg-amber-50/40 space-y-1.5">
                   <p className="text-xs font-extrabold text-neutral-900">{ch.product.name}</p>
@@ -4693,11 +4693,11 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               ))}
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setSyncModalCatalog(null)}
-                className="px-4 py-2 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-600"
+                className="px-4 py-2 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-600 hover:bg-neutral-50 transition cursor-pointer"
               >
                 Sabit Sürümü Koru
               </button>
@@ -4708,7 +4708,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   setSyncModalCatalog(null);
                   handleEdit(target, false);
                 }}
-                className="px-4 py-2 rounded-xl bg-[#b4823c] text-white text-xs font-bold"
+                className="px-4 py-2 rounded-xl bg-[#b4823c] hover:bg-[#9a6e2e] text-white text-xs font-bold transition cursor-pointer"
               >
                 Önizle ve Güncelle
               </button>

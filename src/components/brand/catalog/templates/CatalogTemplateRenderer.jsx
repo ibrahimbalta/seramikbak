@@ -283,8 +283,7 @@ export default function CatalogTemplateRenderer({
           .deco-square-page {
             max-width: 100% !important;
             aspect-ratio: auto !important;
-            min-height: 520px !important;
-            padding: 1.25rem 1rem !important;
+            min-height: auto !important;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
           }
         }
