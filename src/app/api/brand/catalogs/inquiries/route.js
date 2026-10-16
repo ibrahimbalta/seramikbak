@@ -168,12 +168,22 @@ export async function GET(request) {
     // Parse rich metadata from notes
     const inquiries = rawLeads.map((item) => {
       let parsedMeta = {};
+      let isJsonNotes = false;
       try {
-        if (item.notes && item.notes.startsWith('{')) {
+        if (item.notes && item.notes.trim().startsWith('{')) {
           parsedMeta = JSON.parse(item.notes);
+          isJsonNotes = true;
         }
       } catch (e) {
-        parsedMeta = { customerMessage: item.notes };
+        parsedMeta = {};
+      }
+
+      // Safely extract real customer message, never leak raw JSON payload
+      let userMsg = '';
+      if (typeof parsedMeta.customerMessage === 'string' && parsedMeta.customerMessage.trim()) {
+        userMsg = parsedMeta.customerMessage.trim();
+      } else if (!isJsonNotes && typeof item.notes === 'string' && !item.notes.trim().startsWith('{')) {
+        userMsg = item.notes.trim();
       }
 
       return {
@@ -190,7 +200,7 @@ export async function GET(request) {
         catalogSlug: parsedMeta.catalogSlug || null,
         catalogId: parsedMeta.catalogId || null,
         selectedProducts: parsedMeta.selectedProducts || [],
-        customerMessage: parsedMeta.customerMessage || item.notes || '',
+        customerMessage: userMsg,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt
       };

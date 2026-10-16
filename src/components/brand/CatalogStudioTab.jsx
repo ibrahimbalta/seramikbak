@@ -2054,29 +2054,29 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {viewMode === 'inquiries' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Top Bar with Back Button */}
-          <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white rounded-3xl border border-stone-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className="p-2.5 rounded-2xl border border-neutral-200 hover:bg-neutral-50 text-neutral-600 transition cursor-pointer shadow-2xs hover:border-neutral-300"
+                className="p-2.5 rounded-2xl border border-stone-200 hover:bg-stone-50 text-stone-600 transition cursor-pointer shadow-2xs hover:border-stone-300"
                 title="Kataloglarıma Dön"
               >
                 <ArrowLeft size={18} />
               </button>
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-neutral-900 tracking-tight">
+                  <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-stone-900 tracking-tight">
                     Katalog Teklif & Numune Talepleri
                   </h1>
                   {inquiriesStats.newCount > 0 && (
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-neutral-950 shadow-xs animate-pulse">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-stone-950 shadow-xs animate-pulse">
                       {inquiriesStats.newCount} Yeni Talep
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-neutral-500 font-medium mt-1">
-                  Herkese açık dijital kataloglarınızı inceleyen mimar, müteahhit ve kurumsal müşterilerden gelen doğrudan talepler
+                <p className="text-xs text-stone-500 font-medium mt-1">
+                  Dijital kataloglarınızı inceleyen mimar, müteahhit ve kurumsal müşterilerden gelen doğrudan talepler
                 </p>
               </div>
             </div>
@@ -2086,7 +2086,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 type="button"
                 onClick={loadInquiries}
                 disabled={inquiriesLoading}
-                className="px-4 py-2.5 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-2xs"
+                className="px-4 py-2.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-2xs"
               >
                 <RefreshCw size={14} className={inquiriesLoading ? 'animate-spin text-[#b4823c]' : ''} />
                 <span>Yenile</span>
@@ -2094,7 +2094,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                className="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
               >
                 <span>Kataloglarıma Dön</span>
               </button>
@@ -2104,19 +2104,19 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
           {/* 4 KPI Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: Toplam Talep */}
-            <div className="bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-2xs">
-              <div className="flex items-center justify-between text-neutral-500 text-xs font-semibold mb-2">
+            <div className="bg-white rounded-2xl border border-stone-200/80 p-4.5 shadow-2xs hover:shadow-xs transition">
+              <div className="flex items-center justify-between text-stone-500 text-xs font-semibold mb-2">
                 <span>Toplam Talep</span>
-                <div className="w-8 h-8 rounded-xl bg-neutral-100 text-neutral-700 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-stone-100 text-stone-700 flex items-center justify-center">
                   <Inbox size={16} />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-neutral-900">{inquiriesStats.total}</div>
-              <p className="text-[11px] text-neutral-400 mt-1 font-medium">Gelen tüm talepler</p>
+              <div className="text-2xl font-extrabold text-stone-900">{inquiriesStats.total}</div>
+              <p className="text-[11px] text-stone-400 mt-1 font-medium">Gelen tüm talepler</p>
             </div>
 
             {/* Card 2: Yeni / Bekleyen */}
-            <div className="bg-white rounded-2xl border border-amber-300/80 p-4.5 shadow-2xs bg-gradient-to-br from-white to-amber-50/40">
+            <div className="bg-white rounded-2xl border border-amber-300/80 p-4.5 shadow-2xs bg-gradient-to-br from-white to-amber-50/40 hover:shadow-xs transition">
               <div className="flex items-center justify-between text-amber-800 text-xs font-bold mb-2">
                 <span>Yeni / Bekleyen</span>
                 <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center">
@@ -2128,116 +2128,133 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             </div>
 
             {/* Card 3: Fiyat Teklifleri */}
-            <div className="bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-2xs">
-              <div className="flex items-center justify-between text-neutral-500 text-xs font-semibold mb-2">
+            <div className="bg-white rounded-2xl border border-stone-200/80 p-4.5 shadow-2xs hover:shadow-xs transition">
+              <div className="flex items-center justify-between text-stone-500 text-xs font-semibold mb-2">
                 <span>Fiyat Teklifleri</span>
-                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
                   <Tag size={16} />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-neutral-900">{inquiriesStats.quoteCount}</div>
-              <p className="text-[11px] text-neutral-400 mt-1 font-medium">B2B fiyat talebi</p>
+              <div className="text-2xl font-extrabold text-stone-900">{inquiriesStats.quoteCount}</div>
+              <p className="text-[11px] text-stone-400 mt-1 font-medium">B2B fiyat talebi</p>
             </div>
 
             {/* Card 4: Numune Talepleri */}
-            <div className="bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-2xs">
-              <div className="flex items-center justify-between text-neutral-500 text-xs font-semibold mb-2">
+            <div className="bg-white rounded-2xl border border-stone-200/80 p-4.5 shadow-2xs hover:shadow-xs transition">
+              <div className="flex items-center justify-between text-stone-500 text-xs font-semibold mb-2">
                 <span>Numune Talepleri</span>
                 <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                   <Package size={16} />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-neutral-900">{inquiriesStats.sampleCount}</div>
-              <p className="text-[11px] text-neutral-400 mt-1 font-medium">Fiziksel karo numunesi</p>
+              <div className="text-2xl font-extrabold text-stone-900">{inquiriesStats.sampleCount}</div>
+              <p className="text-[11px] text-stone-400 mt-1 font-medium">Fiziksel karo numunesi</p>
             </div>
           </div>
 
           {/* Filter & Search Bar */}
-          <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3.5">
+          <div className="bg-white rounded-2xl border border-stone-200/80 p-3.5 sm:p-4 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5">
             {/* Search Input */}
             <div className="relative w-full md:w-80">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
                 type="text"
                 value={inquirySearch}
                 onChange={(e) => setInquirySearch(e.target.value)}
-                placeholder="Müşteri, firma, telefon, ürün veya katalog ara..."
-                className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-medium text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-[#b4823c] focus:bg-white transition"
+                placeholder="Müşteri, firma, telefon, ürün ara..."
+                className="w-full pl-9 pr-8 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-medium text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#b4823c] focus:bg-white transition"
               />
+              {inquirySearch && (
+                <button
+                  type="button"
+                  onClick={() => setInquirySearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-0.5"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
 
             {/* Status & Type Filter Pills */}
-            <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
-              {[
-                { id: 'ALL', label: 'Tümü' },
-                { id: 'NEW', label: 'Yeni' },
-                { id: 'CONTACTED', label: 'Görüşüldü' },
-                { id: 'OFFER_SENT', label: 'Teklif Verildi' },
-                { id: 'COMPLETED', label: 'Tamamlandı' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setInquiryStatusFilter(tab.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
-                    inquiryStatusFilter === tab.id
-                      ? 'bg-neutral-900 text-white shadow-xs'
-                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            <div className="flex items-center gap-2 flex-wrap justify-between md:justify-end">
+              {/* Status Segmented Control */}
+              <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl">
+                {[
+                  { id: 'ALL', label: 'Tümü' },
+                  { id: 'NEW', label: 'Yeni' },
+                  { id: 'CONTACTED', label: 'Görüşüldü' },
+                  { id: 'OFFER_SENT', label: 'Teklif Verildi' },
+                  { id: 'COMPLETED', label: 'Tamamlandı' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setInquiryStatusFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      inquiryStatusFilter === tab.id
+                        ? 'bg-white text-stone-900 shadow-xs'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
 
-              <div className="h-4 w-px bg-neutral-200 mx-1 hidden sm:block" />
-
-              {/* Type Filter */}
-              {[
-                { id: 'ALL', label: 'Tüm Tipler' },
-                { id: 'quote', label: 'Fiyat' },
-                { id: 'sample', label: 'Numune' }
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setInquiryTypeFilter(t.id)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    inquiryTypeFilter === t.id
-                      ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                      : 'text-neutral-500 hover:text-neutral-800'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
+              {/* Type Segmented Control */}
+              <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl">
+                {[
+                  { id: 'ALL', label: 'Tüm Tipler' },
+                  { id: 'quote', label: 'Fiyat' },
+                  { id: 'sample', label: 'Numune' }
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setInquiryTypeFilter(t.id)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      inquiryTypeFilter === t.id
+                        ? 'bg-amber-500 text-stone-950 shadow-xs font-extrabold'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Inquiries Content Cards List */}
           {inquiriesLoading ? (
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-2xl border border-neutral-200/80 p-5 animate-pulse space-y-3">
-                  <div className="flex justify-between">
-                    <div className="h-4 bg-neutral-200 rounded w-1/4" />
-                    <div className="h-4 bg-neutral-200 rounded w-1/6" />
+                <div key={i} className="bg-white rounded-2xl border border-stone-200/80 p-6 animate-pulse space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-stone-200 rounded-2xl" />
+                      <div className="space-y-2">
+                        <div className="h-4 bg-stone-200 rounded w-32" />
+                        <div className="h-3 bg-stone-100 rounded w-24" />
+                      </div>
+                    </div>
+                    <div className="h-7 bg-stone-200 rounded-xl w-28" />
                   </div>
-                  <div className="h-5 bg-neutral-200 rounded w-1/3" />
-                  <div className="h-3 bg-neutral-100 rounded w-1/2" />
+                  <div className="h-12 bg-stone-100 rounded-xl" />
                 </div>
               ))}
             </div>
           ) : filteredInquiries.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-neutral-200/90 p-12 text-center shadow-sm space-y-3">
+            <div className="bg-white rounded-3xl border border-stone-200/90 p-12 text-center shadow-xs space-y-3">
               <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-[#b4823c] flex items-center justify-center mx-auto border border-amber-500/20">
                 <Inbox size={26} />
               </div>
-              <h3 className="text-lg font-serif font-bold text-neutral-900">
+              <h3 className="text-lg font-serif font-bold text-stone-900">
                 {inquirySearch || inquiryStatusFilter !== 'ALL' || inquiryTypeFilter !== 'ALL'
                   ? 'Filtrelere Uygun Talep Bulunamadı'
                   : 'Henüz Gelen Teklif veya Numune Talebi Bulunmuyor'}
               </h3>
-              <p className="text-xs text-neutral-500 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
                 Müşterileriniz herkese açık dijital kataloglarınızı inceleyip "Fiyat Teklifi Al" veya "Numune Talep Et" butonunu kullandığında talepler doğrudan bu masaya düşecektir.
               </p>
               {inquiries.length > 0 && (
@@ -2248,7 +2265,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     setInquiryStatusFilter('ALL');
                     setInquiryTypeFilter('ALL');
                   }}
-                  className="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-neutral-700 transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-bold text-stone-700 transition cursor-pointer"
                 >
                   Filtreleri Temizle
                 </button>
@@ -2265,218 +2282,289 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 const mailtoSubject = `Re: [${item.typeLabel}] ${item.catalogTitle || 'Katalog Talebi'}`;
                 const mailtoUrl = `mailto:${encodeURIComponent(item.email || '')}?subject=${encodeURIComponent(mailtoSubject)}`;
 
+                // DEFENSIVE SANITIZATION: Never leak raw JSON string into customerMessage!
+                const rawMsg = (item.customerMessage || '').trim();
+                const isJsonOrBogus = !rawMsg || rawMsg.startsWith('{') || rawMsg.startsWith('{"') || rawMsg === 'null' || rawMsg === 'undefined';
+                const safeCustomerMessage = isJsonOrBogus ? '' : rawMsg;
+
+                // Customer Initials
+                const initials = (item.customerName || 'Müşteri')
+                  .trim()
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .join('')
+                  .toUpperCase() || 'M';
+
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-2xl border border-neutral-200/90 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all space-y-4 relative overflow-hidden"
+                    className="bg-white rounded-2xl border border-stone-200/90 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden divide-y divide-stone-100"
                   >
-                    {/* Top Row: Type Badge, Catalog Source, Timestamp & Status Dropdown */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-100 pb-3.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {/* Type Badge */}
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                            isSample
-                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-900 border border-amber-200'
-                          }`}
-                        >
-                          {isSample ? <Package size={13} /> : <Tag size={13} />}
-                          <span>{item.typeLabel}</span>
-                        </span>
+                    {/* TOP SECTION: Customer Identity, Type Badge, Catalog & Status */}
+                    <div className="p-5 sm:p-6 bg-gradient-to-b from-stone-50/50 to-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      {/* Left: Avatar + Customer Details + Badges */}
+                      <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-stone-900 to-stone-800 text-amber-300 font-bold text-sm flex items-center justify-center shadow-xs flex-shrink-0 border border-stone-700">
+                          {initials}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <h3 className="text-base font-bold text-stone-900 tracking-tight">
+                              {item.customerName || 'İsimsiz Talep'}
+                            </h3>
 
-                        {/* Catalog Source Badge */}
-                        {item.catalogTitle && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-700 text-xs font-medium">
-                            <BookOpen size={12} className="text-neutral-500" />
-                            <span className="truncate max-w-[200px]">{item.catalogTitle}</span>
-                          </span>
-                        )}
+                            {/* Type Pill */}
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                isSample
+                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                  : 'bg-amber-50 text-amber-900 border border-amber-200'
+                              }`}
+                            >
+                              {isSample ? <Package size={12} /> : <Tag size={12} />}
+                              <span>{item.typeLabel}</span>
+                            </span>
 
-                        {/* Date */}
-                        <span className="text-[11px] text-neutral-400 font-medium flex items-center gap-1">
-                          <Clock size={11} />
-                          <span>{new Date(item.createdAt).toLocaleString('tr-TR')}</span>
-                        </span>
+                            {/* Catalog Pill */}
+                            {item.catalogTitle && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 text-[11px] font-medium border border-stone-200">
+                                <BookOpen size={11} className="text-stone-500" />
+                                <span className="truncate max-w-[200px]">{item.catalogTitle}</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs text-stone-500 mt-1 flex-wrap">
+                            <span className="flex items-center gap-1 font-medium">
+                              <Building2 size={12} className="text-stone-400" />
+                              <span>{item.companyName || 'Bireysel / Proje Mimarı'}</span>
+                            </span>
+                            <span className="text-stone-300">&bull;</span>
+                            <span className="flex items-center gap-1 font-mono text-[11px] text-stone-400">
+                              <Clock size={11} />
+                              <span>{new Date(item.createdAt).toLocaleString('tr-TR')}</span>
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Status Selector Dropdown */}
-                      <div className="flex items-center gap-2 self-end sm:self-auto">
-                        <span className="text-[11px] font-bold text-neutral-400 hidden sm:inline">Durum:</span>
-                        <select
-                          value={item.status}
-                          disabled={updatingInquiryId === item.id}
-                          onChange={(e) => handleUpdateInquiryStatus(item.id, e.target.value)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer outline-none shadow-2xs ${
-                            item.status === 'NEW'
-                              ? 'bg-amber-50 text-amber-800 border-amber-300'
-                              : item.status === 'CONTACTED'
-                              ? 'bg-blue-50 text-blue-800 border-blue-200'
-                              : item.status === 'OFFER_SENT'
-                              ? 'bg-purple-50 text-purple-800 border-purple-200'
-                              : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                          }`}
-                        >
-                          <option value="NEW">🟡 Yeni Talep</option>
-                          <option value="CONTACTED">🔵 Görüşüldü</option>
-                          <option value="OFFER_SENT">🟣 Teklif Verildi</option>
-                          <option value="COMPLETED">🟢 Tamamlandı</option>
-                        </select>
+                      {/* Right: Modern Status Select */}
+                      <div className="flex items-center gap-2 self-start md:self-center flex-shrink-0">
+                        <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider hidden sm:inline">
+                          Durum
+                        </span>
+                        <div className="relative">
+                          <select
+                            value={item.status}
+                            disabled={updatingInquiryId === item.id}
+                            onChange={(e) => handleUpdateInquiryStatus(item.id, e.target.value)}
+                            className={`pl-3 pr-8 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer appearance-none outline-none shadow-2xs ${
+                              item.status === 'NEW'
+                                ? 'bg-amber-50 text-amber-900 border-amber-300 focus:ring-2 focus:ring-amber-400/40'
+                                : item.status === 'CONTACTED'
+                                ? 'bg-sky-50 text-sky-900 border-sky-300 focus:ring-2 focus:ring-sky-400/40'
+                                : item.status === 'OFFER_SENT'
+                                ? 'bg-purple-50 text-purple-900 border-purple-300 focus:ring-2 focus:ring-purple-400/40'
+                                : 'bg-emerald-50 text-emerald-900 border-emerald-300 focus:ring-2 focus:ring-emerald-400/40'
+                            }`}
+                          >
+                            <option value="NEW">🟡 Yeni Talep</option>
+                            <option value="CONTACTED">🔵 Görüşüldü</option>
+                            <option value="OFFER_SENT">🟣 Teklif Verildi</option>
+                            <option value="COMPLETED">🟢 Tamamlandı</option>
+                          </select>
+                          <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-stone-500" />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Customer & Company Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                      {/* Name & Company */}
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-lg bg-neutral-100 text-neutral-700 flex items-center justify-center font-bold text-xs">
-                            <User size={14} />
+                    {/* MIDDLE SECTION: Contact Info & Interested Products */}
+                    <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-5">
+                      {/* Left: Contact Channels (Col 5) */}
+                      <div className="md:col-span-5 space-y-2.5">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
+                          İletişim Bilgileri
+                        </div>
+                        <div className="space-y-2">
+                          {/* Phone */}
+                          <div className="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 border border-stone-200/70">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                                <Phone size={13} />
+                              </div>
+                              <a
+                                href={`tel:${item.phone}`}
+                                className="text-xs font-bold text-stone-900 hover:text-[#b4823c] truncate"
+                              >
+                                {item.phone}
+                              </a>
+                            </div>
+                            <a
+                              href={waUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] font-bold text-emerald-700 hover:underline flex items-center gap-0.5 ml-2 flex-shrink-0"
+                            >
+                              <span>WhatsApp</span>
+                              <ExternalLink size={10} />
+                            </a>
                           </div>
-                          <div>
-                            <h4 className="text-sm font-extrabold text-neutral-900 leading-tight">
-                              {item.customerName}
-                            </h4>
-                            {item.companyName && (
-                              <p className="text-xs text-neutral-500 font-medium flex items-center gap-1 mt-0.5">
-                                <Building2 size={11} className="text-neutral-400" />
-                                <span>{item.companyName}</span>
-                              </p>
+
+                          {/* Email */}
+                          <div className="flex items-center justify-between p-2.5 rounded-xl bg-stone-50 border border-stone-200/70">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center flex-shrink-0">
+                                <Mail size={13} />
+                              </div>
+                              {item.email ? (
+                                <a
+                                  href={mailtoUrl}
+                                  className="text-xs font-medium text-stone-800 hover:text-[#b4823c] truncate"
+                                  title={item.email}
+                                >
+                                  {item.email}
+                                </a>
+                              ) : (
+                                <span className="text-xs text-stone-400 font-medium">E-posta girilmedi</span>
+                              )}
+                            </div>
+                            {item.email && (
+                              <a
+                                href={mailtoUrl}
+                                className="text-[10px] font-bold text-sky-700 hover:underline flex items-center gap-0.5 ml-2 flex-shrink-0"
+                              >
+                                <span>Yaz</span>
+                                <ExternalLink size={10} />
+                              </a>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Phone & WhatsApp */}
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-neutral-400 font-bold block">İletişim Telefonu</span>
-                        <a
-                          href={`tel:${item.phone}`}
-                          className="inline-flex items-center gap-1.5 text-xs font-extrabold text-neutral-800 hover:text-[#b4823c] transition"
-                        >
-                          <Phone size={13} className="text-emerald-600" />
-                          <span>{item.phone}</span>
-                        </a>
-                      </div>
+                      {/* Right: Selected Products (Col 7) */}
+                      <div className="md:col-span-7 space-y-2.5">
+                        <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-stone-400">
+                          <span>Talep Edilen Ürünler</span>
+                          <span className="font-mono text-stone-500 font-normal">
+                            {Array.isArray(item.selectedProducts) ? item.selectedProducts.length : 0} adet
+                          </span>
+                        </div>
 
-                      {/* Email */}
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-neutral-400 font-bold block">E-posta Adresi</span>
-                        {item.email ? (
-                          <a
-                            href={mailtoUrl}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-700 hover:text-[#b4823c] truncate max-w-full transition"
-                          >
-                            <Mail size={13} className="text-blue-500 flex-shrink-0" />
-                            <span className="truncate">{item.email}</span>
-                          </a>
+                        {Array.isArray(item.selectedProducts) && item.selectedProducts.length > 0 ? (
+                          <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-1">
+                            {item.selectedProducts.map((prod, pIdx) => {
+                              const pTitle = typeof prod === 'string' ? prod : prod.name || `Ürün #${pIdx + 1}`;
+                              return (
+                                <div
+                                  key={pIdx}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-stone-200/90 text-xs font-medium text-stone-800 shadow-2xs hover:border-[#b4823c]/50 transition"
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#b4823c]" />
+                                  <span>{pTitle}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
                         ) : (
-                          <span className="text-xs text-neutral-400">Belirtilmedi</span>
+                          <div className="p-4 rounded-xl bg-stone-50 border border-dashed border-stone-200 text-xs text-stone-400 text-center">
+                            Genel katalog üzerinden talep oluşturuldu (tekil ürün seçilmedi).
+                          </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Selected Products Tags */}
-                    {Array.isArray(item.selectedProducts) && item.selectedProducts.length > 0 && (
-                      <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] font-bold text-neutral-600">
-                          <span className="flex items-center gap-1">
-                            <Tag size={12} className="text-[#b4823c]" />
-                            <span>İlgilenilen Seramik Ürünleri ({item.selectedProducts.length})</span>
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {item.selectedProducts.map((prod, pIdx) => {
-                            const pTitle = typeof prod === 'string' ? prod : prod.name || `Ürün #${pIdx + 1}`;
-                            return (
-                              <span
-                                key={pIdx}
-                                className="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-xs font-semibold text-neutral-800 shadow-2xs"
-                              >
-                                {pTitle}
-                              </span>
-                            );
-                          })}
+                    {/* OPTIONAL CLEAN NOTE: Only shown when customer actually typed a real message (never leaks JSON) */}
+                    {safeCustomerMessage && (
+                      <div className="px-5 sm:px-6 py-4 bg-amber-50/20">
+                        <div className="p-4 rounded-xl bg-white border border-amber-200/60 shadow-2xs space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                            <FileText size={13} className="text-amber-600" />
+                            <span>Müşteri Notu:</span>
+                          </div>
+                          <p className="text-xs text-stone-700 leading-relaxed font-medium pl-4 border-l-2 border-amber-400 whitespace-pre-line">
+                            {safeCustomerMessage}
+                          </p>
                         </div>
                       </div>
                     )}
 
-                    {/* Customer Message / Project Notes */}
-                    {item.customerMessage && (
-                      <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs text-neutral-800 leading-relaxed font-medium space-y-1">
-                        <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 flex items-center gap-1">
-                          <FileText size={11} />
-                          <span>Müşteri Proje Notu & Açıklaması:</span>
-                        </div>
-                        <p className="whitespace-pre-line text-neutral-700 pl-3 border-l-2 border-amber-400">
-                          {item.customerMessage}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Quick Action Buttons */}
-                    <div className="flex items-center justify-between pt-2 border-t border-neutral-100 flex-wrap gap-2.5">
+                    {/* BOTTOM ACTIONS BAR */}
+                    <div className="p-4 sm:p-5 bg-stone-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      {/* Left: Communication Shortcuts */}
                       <div className="flex items-center gap-2 flex-wrap">
-                        {/* WhatsApp Action */}
+                        {/* WhatsApp Button */}
                         <a
                           href={waUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer"
                         >
                           <MessageCircle size={14} />
-                          <span>WhatsApp ile Yanıtla</span>
+                          <span>WhatsApp ile İletişime Geç</span>
                         </a>
 
-                        {/* Phone Call */}
+                        {/* Direct Phone Call */}
                         <a
                           href={`tel:${item.phone}`}
-                          className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                          className="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-800 border border-stone-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
                         >
                           <Phone size={13} className="text-emerald-600" />
                           <span>Telefonla Ara</span>
                         </a>
 
-                        {/* Email Reply */}
+                        {/* Email */}
                         {item.email && (
                           <a
                             href={mailtoUrl}
-                            className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                            className="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-800 border border-stone-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
                           >
-                            <Mail size={13} className="text-blue-600" />
+                            <Mail size={13} className="text-sky-600" />
                             <span>E-posta Gönder</span>
                           </a>
                         )}
                       </div>
 
-                      {/* Quick Status Toggle Button */}
-                      {item.status === 'NEW' && (
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateInquiryStatus(item.id, 'CONTACTED')}
-                          className="px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition cursor-pointer"
-                        >
-                          İletişime Geçildi Olarak İşaretle &rarr;
-                        </button>
-                      )}
-                      {item.status === 'CONTACTED' && (
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateInquiryStatus(item.id, 'OFFER_SENT')}
-                          className="px-3 py-1.5 rounded-lg border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] transition cursor-pointer"
-                        >
-                          Teklif Verildi Olarak İşaretle &rarr;
-                        </button>
-                      )}
-                      {item.status === 'OFFER_SENT' && (
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateInquiryStatus(item.id, 'COMPLETED')}
-                          className="px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition cursor-pointer"
-                        >
-                          Tamamlandı Olarak Kapat &rarr;
-                        </button>
-                      )}
+                      {/* Right: Next Stage Advancement */}
+                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                        {item.status === 'NEW' && (
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateInquiryStatus(item.id, 'CONTACTED')}
+                            className="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                          >
+                            <span>Görüşüldü Olarak İşaretle</span>
+                            <ArrowRight size={13} />
+                          </button>
+                        )}
+                        {item.status === 'CONTACTED' && (
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateInquiryStatus(item.id, 'OFFER_SENT')}
+                            className="px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                          >
+                            <span>Teklif Verildi Olarak İşaretle</span>
+                            <ArrowRight size={13} />
+                          </button>
+                        )}
+                        {item.status === 'OFFER_SENT' && (
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateInquiryStatus(item.id, 'COMPLETED')}
+                            className="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                          >
+                            <CheckCircle2 size={13} />
+                            <span>Tamamlandı Olarak Kapat</span>
+                          </button>
+                        )}
+                        {item.status === 'COMPLETED' && (
+                          <span className="text-xs font-bold text-emerald-700 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
+                            <CheckCircle2 size={13} />
+                            <span>Talep Tamamlandı</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
