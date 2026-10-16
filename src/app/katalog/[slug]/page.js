@@ -93,6 +93,8 @@ export default function PublicCatalogViewerPage() {
     phone: '',
     message: ''
   });
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const shareMenuRef = useRef(null);
   const leadPanelRef = useRef(null);
@@ -228,48 +230,46 @@ export default function PublicCatalogViewerPage() {
     setSelectedProducts([]);
   };
 
-  // Handle B2B Lead Form Submit
-  const handleLeadSubmit = (e) => {
+  // Handle B2B Lead Form Submit (Direct DB save to Brand Portal)
+  const handleLeadSubmit = async (e) => {
     e.preventDefault();
-    const isQuote = leadType === 'quote';
-    const recipientEmail = catalog?.brand?.email || 'destek@seramikbak.com';
-    const subject = `[${isQuote ? 'Fiyat Teklifi Talebi' : 'Numune Talebi'}] ${catalog?.title || 'Katalog'} - ${leadForm.company || leadForm.name}`;
-
-    const productListText =
-      selectedProducts.length > 0
-        ? selectedProducts.map((p) => `• ${p}`).join('\n')
-        : 'Tüm Katalog Ürünleri';
-
-    const body = [
-      `--- ${isQuote ? 'B2B FİYAT TEKLİFİ TALEBİ' : 'SERAMİK NUMUNE TALEBİ'} ---`,
-      '',
-      `Katalog: ${catalog?.title || ''}`,
-      `Marka: ${catalog?.brand?.name || 'SeramikBak'}`,
-      `Katalog Bağlantısı: ${currentUrl}`,
-      '',
-      'MÜŞTERİ BİLGİLERİ:',
-      `Ad Soyad: ${leadForm.name}`,
-      `Firma Adı: ${leadForm.company || 'Belirtilmedi'}`,
-      `E-posta: ${leadForm.email}`,
-      `Telefon: ${leadForm.phone}`,
-      '',
-      'TALEP EDİLEN ÜRÜNLER:',
-      productListText,
-      '',
-      'MESAJ / PROJE NOTLARI:',
-      leadForm.message || 'Özel bir not belirtilmedi.',
-      '',
-      '-------------------------------------------',
-      'Bu talep SeramikBak Dijital Katalog B2B Modülü üzerinden oluşturulmuştur.'
-    ].join('\n');
-
-    const mailtoUrl = `mailto:${encodeURIComponent(recipientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    if (typeof window !== 'undefined') {
-      window.open(mailtoUrl, '_blank') || (window.location.href = mailtoUrl);
+    if (!leadForm.name?.trim() || !leadForm.phone?.trim()) {
+      alert('Lütfen Ad Soyad ve Telefon numarası giriniz.');
+      return;
     }
 
-    setLeadSubmitted(true);
+    setIsSubmittingLead(true);
+    setSubmitError('');
+
+    try {
+      const res = await fetch('/api/brand/catalogs/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          catalogId: catalog?.id,
+          catalogSlug: slug,
+          brandId: catalog?.brandId || catalog?.brand?.id,
+          leadType,
+          name: leadForm.name,
+          company: leadForm.company,
+          email: leadForm.email,
+          phone: leadForm.phone,
+          selectedProducts,
+          message: leadForm.message
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLeadSubmitted(true);
+      } else {
+        setSubmitError(data.error || 'Talep iletilemedi.');
+      }
+    } catch (err) {
+      setSubmitError('Bağlantı hatası: ' + err.message);
+    } finally {
+      setIsSubmittingLead(false);
+    }
   };
 
   const filteredProducts = useMemo(() => {
@@ -756,27 +756,27 @@ export default function PublicCatalogViewerPage() {
       <div className="fixed bottom-6 right-6 z-40 no-print flex flex-col items-end" ref={leadPanelRef}>
         {/* Expandable Action Card */}
         {showLeadPanel && (
-          <div className="mb-3 w-80 rounded-2xl bg-neutral-950/95 backdrop-blur-md border border-amber-500/30 shadow-2xl p-4 text-white space-y-3.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+          <div className="mb-3 w-80 rounded-3xl bg-white/95 backdrop-blur-md border border-stone-200/90 shadow-2xl p-5 text-slate-900 space-y-3.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-[#fbf6ee] text-[#b4823c] border border-[#e8d5b5] flex items-center justify-center">
                   <Sparkles size={15} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white">B2B Proje Masası</h4>
-                  <p className="text-[10px] text-amber-400/90 font-medium">Hızlı Kurumsal Servis</p>
+                  <h4 className="text-xs font-bold text-slate-900">B2B Proje Masası</h4>
+                  <p className="text-[10px] text-[#b4823c] font-bold">Hızlı Kurumsal Servis</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowLeadPanel(false)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition"
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-stone-100 transition cursor-pointer"
               >
                 <X size={14} />
               </button>
             </div>
 
-            <p className="text-xs text-neutral-300 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
               Mimari projeler, bayi ve toptan alımlarınız için doğrudan marka temsilcisinden özel fiyat veya fiziksel numune talep edin.
             </p>
 
@@ -789,9 +789,9 @@ export default function PublicCatalogViewerPage() {
                   setShowLeadModal(true);
                   setShowLeadPanel(false);
                 }}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
               >
-                <FileText size={15} />
+                <Tag size={14} />
                 <span>Fiyat Teklifi İste</span>
               </button>
 
@@ -803,9 +803,9 @@ export default function PublicCatalogViewerPage() {
                   setShowLeadModal(true);
                   setShowLeadPanel(false);
                 }}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center justify-center gap-2 border border-white/10 transition cursor-pointer"
+                className="w-full py-2.5 px-3.5 rounded-xl bg-stone-100 hover:bg-stone-200/70 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 border border-stone-200 transition cursor-pointer"
               >
-                <Package size={15} className="text-amber-400" />
+                <Package size={14} className="text-[#b4823c]" />
                 <span>Numune Talep Et</span>
               </button>
             </div>
@@ -816,16 +816,16 @@ export default function PublicCatalogViewerPage() {
         <button
           type="button"
           onClick={() => setShowLeadPanel(!showLeadPanel)}
-          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-bold text-xs shadow-2xl shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105 cursor-pointer ring-2 ring-amber-400/50"
+          className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-bold text-xs shadow-2xl shadow-amber-900/30 hover:shadow-amber-900/50 transition-all duration-300 hover:scale-105 cursor-pointer ring-2 ring-amber-300/40"
           aria-label="B2B Fiyat Teklifi ve Numune Talebi"
         >
           {/* Gentle Pulse Dot */}
           <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-950 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-neutral-950"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
           </span>
 
-          <Sparkles size={16} className="text-neutral-950" />
+          <Sparkles size={16} className="text-amber-200" />
           <span className="tracking-wide">B2B Fiyat & Numune</span>
         </button>
       </div>
@@ -843,30 +843,34 @@ export default function PublicCatalogViewerPage() {
         <ChevronUp size={20} className="group-hover:-translate-y-0.5 transition-transform" />
       </button>
 
-      {/* B2B Lead Generation Contact Form Modal */}
+      {/* B2B Lead Generation Contact Form Modal (Premium Luminous Architectural Styling) */}
       {showLeadModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto no-print">
-          <div className="bg-neutral-950 border border-white/15 text-white rounded-3xl max-w-xl w-full p-6 md:p-8 space-y-6 shadow-2xl relative my-8 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto no-print animate-in fade-in duration-200">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-stone-200/90 relative my-8 animate-in zoom-in-95 duration-200 overflow-hidden">
+            {/* Top Architectural Bronze Bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#b4823c] via-amber-400 to-[#b4823c]" />
+
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-white/10 pb-4">
+            <div className="flex items-start justify-between border-b border-stone-100 pb-4 pt-1">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-2">
-                  <Sparkles size={11} />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#fbf6ee] text-[#b4823c] border border-[#e8d5b5] shadow-2xs mb-2">
+                  <Sparkles size={12} className="text-[#b4823c]" />
                   <span>
-                    {leadType === 'sample' ? 'Mimari Numune Hizmeti' : 'Kurumsal B2B Fiyat Teklifi'}
+                    {leadType === 'sample' ? 'Mimari Numune Masası' : 'Kurumsal B2B Fiyat Teklifi'}
                   </span>
                 </div>
-                <h3 className="text-lg md:text-xl font-extrabold text-white">
+                <h3 className="text-xl sm:text-2xl font-serif font-extrabold text-slate-900 tracking-tight">
                   {leadType === 'sample' ? 'Seramik Numune Talebi' : 'Fiyat Teklifi Talebi'}
                 </h3>
-                <p className="text-xs text-neutral-400 mt-0.5">
-                  <strong>{catalog.title}</strong> kataloğundaki ürünler için teklif oluşturun.
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  <span className="font-semibold text-slate-800">{catalog.title}</span> için doğrudan üretici marka yetkilisine iletilir.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowLeadModal(false)}
-                className="p-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10 transition"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-stone-100 transition cursor-pointer"
+                title="Kapat"
               >
                 <X size={18} />
               </button>
@@ -874,64 +878,96 @@ export default function PublicCatalogViewerPage() {
 
             {leadSubmitted ? (
               <div className="py-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
+                <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
                   <CheckCircle2 size={36} />
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-white">Talebiniz Başarıyla Hazırlandı!</h4>
-                  <p className="text-xs text-neutral-400 max-w-md mx-auto mt-1 leading-relaxed">
-                    E-posta istemciniz otomatik olarak açıldı. Talebiniz temsilcimize iletilmek üzere hazırlandı.
+                  <h4 className="text-lg font-bold text-slate-900">Talebiniz Marka Yetkilisine İletildi!</h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Talebiniz <strong>{brand.name || 'marka'}</strong> dijital katalog yönetim masasına ve teklif havuzuna başarıyla kaydedildi. Yetkililerimiz en kısa sürede sizinle iletişime geçecektir.
                   </p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 max-w-sm mx-auto text-left text-xs space-y-1">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Talep Sahibi:</span>
+                    <strong className="text-slate-900">{leadForm.name}</strong>
+                  </div>
+                  {leadForm.company && (
+                    <div className="flex justify-between text-slate-600">
+                      <span>Firma:</span>
+                      <strong className="text-slate-900">{leadForm.company}</strong>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-slate-600">
+                    <span>Telefon:</span>
+                    <strong className="text-slate-900">{leadForm.phone}</strong>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Kapsam:</span>
+                    <strong className="text-[#b4823c]">{selectedProducts.length} Seçili Seramik Ürünü</strong>
+                  </div>
                 </div>
                 <div className="pt-2 flex justify-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setLeadSubmitted(false)}
-                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition cursor-pointer"
+                    onClick={() => {
+                      setLeadSubmitted(false);
+                      setLeadForm({ name: '', company: '', email: '', phone: '', message: '' });
+                    }}
+                    className="px-4 py-2.5 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-xs font-bold text-slate-700 transition cursor-pointer shadow-2xs"
                   >
                     Yeni Talep Oluştur
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowLeadModal(false)}
-                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs transition cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
                   >
-                    Kapat
+                    Tamam
                   </button>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleLeadSubmit} className="space-y-4">
+                {submitError && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                    <AlertCircle size={15} className="flex-shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 {/* Switch between Quote & Sample */}
-                <div className="grid grid-cols-2 p-1 rounded-xl bg-white/5 border border-white/10">
+                <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-stone-100/90 border border-stone-200/80 gap-1.5">
                   <button
                     type="button"
                     onClick={() => setLeadType('quote')}
-                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+                    className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       leadType === 'quote'
-                        ? 'bg-amber-500 text-neutral-950 shadow-md'
-                        : 'text-neutral-400 hover:text-white'
+                        ? 'bg-white text-slate-900 shadow-xs border border-stone-200/80'
+                        : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    Fiyat Teklifi İste
+                    <Tag size={13} className={leadType === 'quote' ? 'text-[#b4823c]' : ''} />
+                    <span>Fiyat Teklifi İste</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setLeadType('sample')}
-                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+                    className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       leadType === 'sample'
-                        ? 'bg-amber-500 text-neutral-950 shadow-md'
-                        : 'text-neutral-400 hover:text-white'
+                        ? 'bg-white text-slate-900 shadow-xs border border-stone-200/80'
+                        : 'text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    Numune Talep Et
+                    <Package size={13} className={leadType === 'sample' ? 'text-[#b4823c]' : ''} />
+                    <span>Numune Talep Et</span>
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                      <User size={13} className="text-amber-400" />
+                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <User size={13} className="text-[#b4823c]" />
                       <span>Ad Soyad *</span>
                     </label>
                     <input
@@ -940,29 +976,29 @@ export default function PublicCatalogViewerPage() {
                       value={leadForm.name}
                       onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
                       placeholder="Örn: Selin Yılmaz"
-                      className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                      <Building2 size={13} className="text-amber-400" />
-                      <span>Firma Adı</span>
+                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <Building2 size={13} className="text-[#b4823c]" />
+                      <span>Firma / Proje Ofisi</span>
                     </label>
                     <input
                       type="text"
                       value={leadForm.company}
                       onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
                       placeholder="Örn: Yılmaz Mimarlık A.Ş."
-                      className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                      <Mail size={13} className="text-amber-400" />
+                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <Mail size={13} className="text-[#b4823c]" />
                       <span>E-posta Adresi *</span>
                     </label>
                     <input
@@ -971,14 +1007,14 @@ export default function PublicCatalogViewerPage() {
                       value={leadForm.email}
                       onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
                       placeholder="selin@mimarlik.com"
-                      className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                      <Phone size={13} className="text-amber-400" />
-                      <span>Telefon *</span>
+                    <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <Phone size={13} className="text-[#b4823c]" />
+                      <span>Telefon Numarası *</span>
                     </label>
                     <input
                       type="tel"
@@ -986,7 +1022,7 @@ export default function PublicCatalogViewerPage() {
                       value={leadForm.phone}
                       onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
                       placeholder="05XX XXX XX XX"
-                      className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                     />
                   </div>
                 </div>
@@ -994,24 +1030,24 @@ export default function PublicCatalogViewerPage() {
                 {/* İlgilenilen Ürünler (Auto-filled Tags) */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[11px] font-semibold text-neutral-300 flex items-center gap-1.5">
-                      <Tag size={13} className="text-amber-400" />
+                    <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                      <Tag size={13} className="text-[#b4823c]" />
                       <span>İlgilenilen Ürünler ({selectedProducts.length} Seçili)</span>
                     </label>
                     {products.length > 0 && (
-                      <div className="flex items-center gap-2 text-[10px]">
+                      <div className="flex items-center gap-2 text-xs">
                         <button
                           type="button"
                           onClick={selectAllProducts}
-                          className="text-amber-400 hover:underline cursor-pointer"
+                          className="font-bold text-[#b4823c] hover:underline cursor-pointer"
                         >
                           Tümünü Seç
                         </button>
-                        <span className="text-neutral-600">&bull;</span>
+                        <span className="text-slate-300">&bull;</span>
                         <button
                           type="button"
                           onClick={clearAllProducts}
-                          className="text-neutral-400 hover:underline cursor-pointer"
+                          className="font-medium text-slate-500 hover:text-slate-800 cursor-pointer"
                         >
                           Temizle
                         </button>
@@ -1020,7 +1056,7 @@ export default function PublicCatalogViewerPage() {
                   </div>
 
                   {products.length > 0 ? (
-                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/15 max-h-36 overflow-y-auto flex flex-wrap gap-1.5">
+                    <div className="p-2.5 rounded-2xl bg-stone-50/80 border border-stone-200/90 max-h-36 overflow-y-auto flex flex-wrap gap-1.5">
                       {products.map((p) => {
                         const pName = p.name || p.sku || `Ürün #${p.id}`;
                         const isSelected = selectedProducts.includes(pName);
@@ -1029,17 +1065,17 @@ export default function PublicCatalogViewerPage() {
                             key={p.id || pName}
                             type="button"
                             onClick={() => toggleProductSelection(pName)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition cursor-pointer ${
+                            className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
                               isSelected
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                : 'bg-white/5 text-neutral-400 border border-white/10 hover:text-white'
+                                ? 'bg-[#fbf6ee] text-[#8d6225] border border-[#e8d5b5] shadow-2xs'
+                                : 'bg-white text-slate-600 border border-stone-200 hover:border-amber-300 hover:text-slate-900'
                             }`}
                           >
                             <span>{pName}</span>
                             {isSelected ? (
-                              <Check size={11} className="text-amber-400" />
+                              <Check size={12} className="text-[#b4823c]" />
                             ) : (
-                              <span className="text-neutral-600">+</span>
+                              <span className="text-slate-400 font-bold">+</span>
                             )}
                           </button>
                         );
@@ -1049,18 +1085,18 @@ export default function PublicCatalogViewerPage() {
                     <input
                       type="text"
                       placeholder="Örn: 60x120 Mermer Serisi, Mat Yüzey..."
-                      className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                     />
                   )}
-                  <p className="text-[10px] text-neutral-500 mt-1">
+                  <p className="text-[10px] text-slate-400 mt-1">
                     İlgilendiğiniz seramik ürünlerini etiketlere tıklayarak belirleyebilirsiniz.
                   </p>
                 </div>
 
                 {/* Mesaj */}
                 <div>
-                  <label className="text-[11px] font-semibold text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                    <FileText size={13} className="text-amber-400" />
+                  <label className="text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                    <FileText size={13} className="text-[#b4823c]" />
                     <span>Proje Notları & Mesaj</span>
                   </label>
                   <textarea
@@ -1069,21 +1105,31 @@ export default function PublicCatalogViewerPage() {
                     onChange={(e) => setLeadForm({ ...leadForm, message: e.target.value })}
                     placeholder={
                       leadType === 'sample'
-                        ? 'Numune kiti için teslimat adresi veya özel yüzey beklentilerinizi yazınız...'
+                        ? 'Numune kiti teslimat adresi veya özel yüzey beklentilerinizi yazınız...'
                         : 'Tahmini metraj (m²), proje lokasyonu, uygulama alanı ve termin planınız...'
                     }
-                    className="w-full px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-amber-400 resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-stone-50/70 border border-stone-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-[#b4823c] focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition cursor-pointer"
+                  disabled={isSubmittingLead}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] disabled:opacity-60 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-900/15 transition-all cursor-pointer active:scale-[0.99]"
                 >
-                  <Send size={15} />
-                  <span>
-                    {leadType === 'sample' ? 'Numune Talebini Gönder' : 'Teklif Talebini Gönder'}
-                  </span>
+                  {isSubmittingLead ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin text-white" />
+                      <span>Talep Markaya İletiliyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={15} />
+                      <span>
+                        {leadType === 'sample' ? 'Numune Talebini Gönder' : 'Teklif Talebini Gönder'}
+                      </span>
+                    </>
+                  )}
                 </button>
               </form>
             )}

@@ -1895,6 +1895,7 @@ export default function BrandPortalPage() {
                     >
                       {[
                         { subId: 'all', label: 'Tüm Kataloglar' },
+                        { subId: 'inquiries', label: 'Gelen Teklifler', isNew: true },
                         { subId: 'create', label: 'Yeni Katalog Oluştur' },
                         { subId: 'templates', label: 'Şablonlar' },
                         { subId: 'published', label: 'Yayınlananlar' },

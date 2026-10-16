@@ -49,7 +49,15 @@ import {
   Bell,
   Calendar,
   Upload,
-  Zap
+  Zap,
+  Phone,
+  Mail,
+  MessageCircle,
+  Tag,
+  Package,
+  Inbox,
+  Building2,
+  User
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
 import CatalogTemplateGallery, { CATALOG_TEMPLATES_DATA } from './catalog/CatalogTemplateGallery';
@@ -103,6 +111,15 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
   const [cardDisplayMode, setCardDisplayMode] = useState('grid'); // 'grid' | 'list'
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
+
+  // Catalog Inquiries (Quote & Sample Requests from Public Catalogs)
+  const [inquiries, setInquiries] = useState([]);
+  const [inquiriesStats, setInquiriesStats] = useState({ total: 0, newCount: 0, quoteCount: 0, sampleCount: 0, completedCount: 0 });
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
+  const [inquiryStatusFilter, setInquiryStatusFilter] = useState('ALL'); // 'ALL' | 'NEW' | 'CONTACTED' | 'OFFER_SENT' | 'COMPLETED'
+  const [inquiryTypeFilter, setInquiryTypeFilter] = useState('ALL'); // 'ALL' | 'quote' | 'sample'
+  const [inquirySearch, setInquirySearch] = useState('');
+  const [updatingInquiryId, setUpdatingInquiryId] = useState(null);
 
   // Available brand products
   const [availableProducts, setAvailableProducts] = useState([]);
@@ -257,6 +274,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     if (externalSubSection === 'all') {
       setViewMode('list');
       setFilterTab('all');
+    } else if (externalSubSection === 'inquiries') {
+      setViewMode('inquiries');
     } else if (externalSubSection === 'create') {
       handleStartNew();
     } else if (externalSubSection === 'templates') {
@@ -303,6 +322,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     if (brandId) {
       loadCatalogs();
       loadBrandProducts();
+      loadInquiries();
     }
   }, [brandId]);
 
@@ -338,6 +358,88 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       setProductsLoading(false);
     }
   };
+
+  // Load Inquiries (Quote & Sample Requests from Public Catalogs)
+  const loadInquiries = async () => {
+    if (!brandId) return;
+    setInquiriesLoading(true);
+    try {
+      const res = await fetch(`/api/brand/catalogs/inquiries?brandId=${brandId}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInquiries(data.inquiries || []);
+        setInquiriesStats(data.stats || { total: 0, newCount: 0, quoteCount: 0, sampleCount: 0, completedCount: 0 });
+      }
+    } catch (err) {
+      console.error('Failed to load inquiries:', err);
+    } finally {
+      setInquiriesLoading(false);
+    }
+  };
+
+  // Handle Inquiry Status Update
+  const handleUpdateInquiryStatus = async (inquiryId, newStatus) => {
+    setUpdatingInquiryId(inquiryId);
+    try {
+      const res = await fetch('/api/brand/catalogs/inquiries', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: inquiryId, status: newStatus })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInquiries((prev) =>
+          prev.map((item) => (item.id === inquiryId ? { ...item, status: newStatus } : item))
+        );
+        showToast('success', 'Talep durumu güncellendi.');
+        loadInquiries();
+      } else {
+        showToast('error', data.error || 'Güncelleme yapılamadı.');
+      }
+    } catch (err) {
+      showToast('error', 'Hata: ' + err.message);
+    } finally {
+      setUpdatingInquiryId(null);
+    }
+  };
+
+  // Filtered Inquiries
+  const filteredInquiries = useMemo(() => {
+    return inquiries.filter((item) => {
+      if (inquiryStatusFilter !== 'ALL' && item.status !== inquiryStatusFilter) {
+        return false;
+      }
+      if (inquiryTypeFilter !== 'ALL' && item.leadType !== inquiryTypeFilter) {
+        return false;
+      }
+      if (inquirySearch.trim()) {
+        const q = inquirySearch.toLowerCase().trim();
+        const matchName = item.customerName?.toLowerCase().includes(q);
+        const matchCompany = item.companyName?.toLowerCase().includes(q);
+        const matchEmail = item.email?.toLowerCase().includes(q);
+        const matchPhone = item.phone?.toLowerCase().includes(q);
+        const matchCatalog = item.catalogTitle?.toLowerCase().includes(q);
+        const matchMsg = item.customerMessage?.toLowerCase().includes(q);
+        const matchProducts =
+          Array.isArray(item.selectedProducts) &&
+          item.selectedProducts.some((p) =>
+            (typeof p === 'string' ? p : p.name || '')?.toLowerCase().includes(q)
+          );
+        if (
+          !matchName &&
+          !matchCompany &&
+          !matchEmail &&
+          !matchPhone &&
+          !matchCatalog &&
+          !matchMsg &&
+          !matchProducts
+        ) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [inquiries, inquiryStatusFilter, inquiryTypeFilter, inquirySearch]);
 
   // Parse productItems helper (supports both legacy array and extended object with metadata)
   const parseCatalogMeta = (rawProductItems) => {
@@ -1216,6 +1318,20 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                       <BookOpen size={15} />
                       <span>Şablonları Keşfet</span>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('inquiries')}
+                      className="px-4 py-2.5 rounded-xl border border-amber-400/40 hover:border-amber-400 bg-amber-500/15 hover:bg-amber-500/25 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer"
+                    >
+                      <Sparkles size={15} className="text-amber-300" />
+                      <span>Gelen Teklifler</span>
+                      {inquiriesStats.newCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-neutral-950">
+                          {inquiriesStats.newCount} Yeni
+                        </span>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1342,6 +1458,24 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         {tab.label}
                       </button>
                     ))}
+
+                    <div className="h-4 w-px bg-neutral-200 mx-1 hidden sm:block" />
+
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('inquiries')}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        inquiriesStats.newCount > 0
+                          ? 'bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs hover:bg-amber-100'
+                          : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                      }`}
+                    >
+                      <Sparkles size={12} className="text-[#b4823c]" />
+                      <span>Gelen Teklifler ({inquiriesStats.total})</span>
+                      {inquiriesStats.newCount > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      )}
+                    </button>
                   </div>
 
                   {/* Right Controls: Sort & Grid/List View */}
@@ -1911,6 +2045,444 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* VIEW MODE: INQUIRIES (GELEN TEKLİF VE NUMUNE TALEPLERİ MASASI)             */}
+      {/* ========================================================================= */}
+      {viewMode === 'inquiries' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          {/* Top Bar with Back Button */}
+          <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className="p-2.5 rounded-2xl border border-neutral-200 hover:bg-neutral-50 text-neutral-600 transition cursor-pointer shadow-2xs hover:border-neutral-300"
+                title="Kataloglarıma Dön"
+              >
+                <ArrowLeft size={18} />
+              </button>
+              <div>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1 className="text-xl sm:text-2xl font-serif font-extrabold text-neutral-900 tracking-tight">
+                    Katalog Teklif & Numune Talepleri
+                  </h1>
+                  {inquiriesStats.newCount > 0 && (
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-neutral-950 shadow-xs animate-pulse">
+                      {inquiriesStats.newCount} Yeni Talep
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-neutral-500 font-medium mt-1">
+                  Herkese açık dijital kataloglarınızı inceleyen mimar, müteahhit ve kurumsal müşterilerden gelen doğrudan talepler
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 self-end sm:self-auto">
+              <button
+                type="button"
+                onClick={loadInquiries}
+                disabled={inquiriesLoading}
+                className="px-4 py-2.5 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-2xs"
+              >
+                <RefreshCw size={14} className={inquiriesLoading ? 'animate-spin text-[#b4823c]' : ''} />
+                <span>Yenile</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className="px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+              >
+                <span>Kataloglarıma Dön</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 4 KPI Summary Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Toplam Talep */}
+            <div className="bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-2xs">
+              <div className="flex items-center justify-between text-neutral-500 text-xs font-semibold mb-2">
+                <span>Toplam Talep</span>
+                <div className="w-8 h-8 rounded-xl bg-neutral-100 text-neutral-700 flex items-center justify-center">
+                  <Inbox size={16} />
+                </div>
+              </div>
+              <div className="text-2xl font-extrabold text-neutral-900">{inquiriesStats.total}</div>
+              <p className="text-[11px] text-neutral-400 mt-1 font-medium">Gelen tüm talepler</p>
+            </div>
+
+            {/* Card 2: Yeni / Bekleyen */}
+            <div className="bg-white rounded-2xl border border-amber-300/80 p-4.5 shadow-2xs bg-gradient-to-br from-white to-amber-50/40">
+              <div className="flex items-center justify-between text-amber-800 text-xs font-bold mb-2">
+                <span>Yeni / Bekleyen</span>
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center">
+                  <Sparkles size={16} />
+                </div>
+              </div>
+              <div className="text-2xl font-extrabold text-amber-900">{inquiriesStats.newCount}</div>
+              <p className="text-[11px] text-amber-700/80 mt-1 font-medium">Dönüş bekleyen müşteri</p>
+            </div>
+
+            {/* Card 3: Fiyat Teklifleri */}
+            <div className="bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-2xs">
+              <div className="flex items-center justify-between text-neutral-500 text-xs font-semibold mb-2">
+                <span>Fiyat Teklifleri</span>
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Tag size={16} />
+                </div>
+              </div>
+              <div className="text-2xl font-extrabold text-neutral-900">{inquiriesStats.quoteCount}</div>
+              <p className="text-[11px] text-neutral-400 mt-1 font-medium">B2B fiyat talebi</p>
+            </div>
+
+            {/* Card 4: Numune Talepleri */}
+            <div className="bg-white rounded-2xl border border-neutral-200/90 p-4.5 shadow-2xs">
+              <div className="flex items-center justify-between text-neutral-500 text-xs font-semibold mb-2">
+                <span>Numune Talepleri</span>
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Package size={16} />
+                </div>
+              </div>
+              <div className="text-2xl font-extrabold text-neutral-900">{inquiriesStats.sampleCount}</div>
+              <p className="text-[11px] text-neutral-400 mt-1 font-medium">Fiziksel karo numunesi</p>
+            </div>
+          </div>
+
+          {/* Filter & Search Bar */}
+          <div className="bg-white rounded-2xl border border-neutral-200/90 p-4 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3.5">
+            {/* Search Input */}
+            <div className="relative w-full md:w-80">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <input
+                type="text"
+                value={inquirySearch}
+                onChange={(e) => setInquirySearch(e.target.value)}
+                placeholder="Müşteri, firma, telefon, ürün veya katalog ara..."
+                className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-medium text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-[#b4823c] focus:bg-white transition"
+              />
+            </div>
+
+            {/* Status & Type Filter Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
+              {[
+                { id: 'ALL', label: 'Tümü' },
+                { id: 'NEW', label: 'Yeni' },
+                { id: 'CONTACTED', label: 'Görüşüldü' },
+                { id: 'OFFER_SENT', label: 'Teklif Verildi' },
+                { id: 'COMPLETED', label: 'Tamamlandı' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setInquiryStatusFilter(tab.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                    inquiryStatusFilter === tab.id
+                      ? 'bg-neutral-900 text-white shadow-xs'
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+
+              <div className="h-4 w-px bg-neutral-200 mx-1 hidden sm:block" />
+
+              {/* Type Filter */}
+              {[
+                { id: 'ALL', label: 'Tüm Tipler' },
+                { id: 'quote', label: 'Fiyat' },
+                { id: 'sample', label: 'Numune' }
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setInquiryTypeFilter(t.id)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    inquiryTypeFilter === t.id
+                      ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                      : 'text-neutral-500 hover:text-neutral-800'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Inquiries Content Cards List */}
+          {inquiriesLoading ? (
+            <div className="space-y-3.5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-2xl border border-neutral-200/80 p-5 animate-pulse space-y-3">
+                  <div className="flex justify-between">
+                    <div className="h-4 bg-neutral-200 rounded w-1/4" />
+                    <div className="h-4 bg-neutral-200 rounded w-1/6" />
+                  </div>
+                  <div className="h-5 bg-neutral-200 rounded w-1/3" />
+                  <div className="h-3 bg-neutral-100 rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : filteredInquiries.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-neutral-200/90 p-12 text-center shadow-sm space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-[#b4823c] flex items-center justify-center mx-auto border border-amber-500/20">
+                <Inbox size={26} />
+              </div>
+              <h3 className="text-lg font-serif font-bold text-neutral-900">
+                {inquirySearch || inquiryStatusFilter !== 'ALL' || inquiryTypeFilter !== 'ALL'
+                  ? 'Filtrelere Uygun Talep Bulunamadı'
+                  : 'Henüz Gelen Teklif veya Numune Talebi Bulunmuyor'}
+              </h3>
+              <p className="text-xs text-neutral-500 max-w-md mx-auto leading-relaxed">
+                Müşterileriniz herkese açık dijital kataloglarınızı inceleyip "Fiyat Teklifi Al" veya "Numune Talep Et" butonunu kullandığında talepler doğrudan bu masaya düşecektir.
+              </p>
+              {inquiries.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInquirySearch('');
+                    setInquiryStatusFilter('ALL');
+                    setInquiryTypeFilter('ALL');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-xs font-bold text-neutral-700 transition cursor-pointer"
+                >
+                  Filtreleri Temizle
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredInquiries.map((item) => {
+                const isSample = item.leadType === 'sample';
+                const cleanPhone = (item.phone || '').replace(/\D/g, '');
+                const waPhone = cleanPhone.startsWith('0') ? '9' + cleanPhone : cleanPhone.startsWith('90') ? cleanPhone : '90' + cleanPhone;
+                const waMessage = `Merhaba Sayın ${item.customerName}, ${item.catalogTitle || 'SeramikBak dijital kataloğumuz'} üzerinden ilettiğiniz ${isSample ? 'numune' : 'fiyat teklifi'} talebiniz hakkında size ulaşıyorum.`;
+                const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waMessage)}`;
+                const mailtoSubject = `Re: [${item.typeLabel}] ${item.catalogTitle || 'Katalog Talebi'}`;
+                const mailtoUrl = `mailto:${encodeURIComponent(item.email || '')}?subject=${encodeURIComponent(mailtoSubject)}`;
+
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-2xl border border-neutral-200/90 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all space-y-4 relative overflow-hidden"
+                  >
+                    {/* Top Row: Type Badge, Catalog Source, Timestamp & Status Dropdown */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-100 pb-3.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Type Badge */}
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                            isSample
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-900 border border-amber-200'
+                          }`}
+                        >
+                          {isSample ? <Package size={13} /> : <Tag size={13} />}
+                          <span>{item.typeLabel}</span>
+                        </span>
+
+                        {/* Catalog Source Badge */}
+                        {item.catalogTitle && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-700 text-xs font-medium">
+                            <BookOpen size={12} className="text-neutral-500" />
+                            <span className="truncate max-w-[200px]">{item.catalogTitle}</span>
+                          </span>
+                        )}
+
+                        {/* Date */}
+                        <span className="text-[11px] text-neutral-400 font-medium flex items-center gap-1">
+                          <Clock size={11} />
+                          <span>{new Date(item.createdAt).toLocaleString('tr-TR')}</span>
+                        </span>
+                      </div>
+
+                      {/* Status Selector Dropdown */}
+                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                        <span className="text-[11px] font-bold text-neutral-400 hidden sm:inline">Durum:</span>
+                        <select
+                          value={item.status}
+                          disabled={updatingInquiryId === item.id}
+                          onChange={(e) => handleUpdateInquiryStatus(item.id, e.target.value)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer outline-none shadow-2xs ${
+                            item.status === 'NEW'
+                              ? 'bg-amber-50 text-amber-800 border-amber-300'
+                              : item.status === 'CONTACTED'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200'
+                              : item.status === 'OFFER_SENT'
+                              ? 'bg-purple-50 text-purple-800 border-purple-200'
+                              : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          }`}
+                        >
+                          <option value="NEW">🟡 Yeni Talep</option>
+                          <option value="CONTACTED">🔵 Görüşüldü</option>
+                          <option value="OFFER_SENT">🟣 Teklif Verildi</option>
+                          <option value="COMPLETED">🟢 Tamamlandı</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Customer & Company Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                      {/* Name & Company */}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-neutral-100 text-neutral-700 flex items-center justify-center font-bold text-xs">
+                            <User size={14} />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-extrabold text-neutral-900 leading-tight">
+                              {item.customerName}
+                            </h4>
+                            {item.companyName && (
+                              <p className="text-xs text-neutral-500 font-medium flex items-center gap-1 mt-0.5">
+                                <Building2 size={11} className="text-neutral-400" />
+                                <span>{item.companyName}</span>
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Phone & WhatsApp */}
+                      <div className="space-y-1">
+                        <span className="text-[11px] text-neutral-400 font-bold block">İletişim Telefonu</span>
+                        <a
+                          href={`tel:${item.phone}`}
+                          className="inline-flex items-center gap-1.5 text-xs font-extrabold text-neutral-800 hover:text-[#b4823c] transition"
+                        >
+                          <Phone size={13} className="text-emerald-600" />
+                          <span>{item.phone}</span>
+                        </a>
+                      </div>
+
+                      {/* Email */}
+                      <div className="space-y-1">
+                        <span className="text-[11px] text-neutral-400 font-bold block">E-posta Adresi</span>
+                        {item.email ? (
+                          <a
+                            href={mailtoUrl}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-700 hover:text-[#b4823c] truncate max-w-full transition"
+                          >
+                            <Mail size={13} className="text-blue-500 flex-shrink-0" />
+                            <span className="truncate">{item.email}</span>
+                          </a>
+                        ) : (
+                          <span className="text-xs text-neutral-400">Belirtilmedi</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Selected Products Tags */}
+                    {Array.isArray(item.selectedProducts) && item.selectedProducts.length > 0 && (
+                      <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-bold text-neutral-600">
+                          <span className="flex items-center gap-1">
+                            <Tag size={12} className="text-[#b4823c]" />
+                            <span>İlgilenilen Seramik Ürünleri ({item.selectedProducts.length})</span>
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {item.selectedProducts.map((prod, pIdx) => {
+                            const pTitle = typeof prod === 'string' ? prod : prod.name || `Ürün #${pIdx + 1}`;
+                            return (
+                              <span
+                                key={pIdx}
+                                className="px-2.5 py-1 rounded-lg bg-white border border-stone-200 text-xs font-semibold text-neutral-800 shadow-2xs"
+                              >
+                                {pTitle}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Customer Message / Project Notes */}
+                    {item.customerMessage && (
+                      <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs text-neutral-800 leading-relaxed font-medium space-y-1">
+                        <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+                          <FileText size={11} />
+                          <span>Müşteri Proje Notu & Açıklaması:</span>
+                        </div>
+                        <p className="whitespace-pre-line text-neutral-700 pl-3 border-l-2 border-amber-400">
+                          {item.customerMessage}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Quick Action Buttons */}
+                    <div className="flex items-center justify-between pt-2 border-t border-neutral-100 flex-wrap gap-2.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* WhatsApp Action */}
+                        <a
+                          href={waUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                        >
+                          <MessageCircle size={14} />
+                          <span>WhatsApp ile Yanıtla</span>
+                        </a>
+
+                        {/* Phone Call */}
+                        <a
+                          href={`tel:${item.phone}`}
+                          className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                        >
+                          <Phone size={13} className="text-emerald-600" />
+                          <span>Telefonla Ara</span>
+                        </a>
+
+                        {/* Email Reply */}
+                        {item.email && (
+                          <a
+                            href={mailtoUrl}
+                            className="px-3.5 py-2 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition cursor-pointer"
+                          >
+                            <Mail size={13} className="text-blue-600" />
+                            <span>E-posta Gönder</span>
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Quick Status Toggle Button */}
+                      {item.status === 'NEW' && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateInquiryStatus(item.id, 'CONTACTED')}
+                          className="px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          İletişime Geçildi Olarak İşaretle &rarr;
+                        </button>
+                      )}
+                      {item.status === 'CONTACTED' && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateInquiryStatus(item.id, 'OFFER_SENT')}
+                          className="px-3 py-1.5 rounded-lg border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          Teklif Verildi Olarak İşaretle &rarr;
+                        </button>
+                      )}
+                      {item.status === 'OFFER_SENT' && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateInquiryStatus(item.id, 'COMPLETED')}
+                          className="px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          Tamamlandı Olarak Kapat &rarr;
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
