@@ -63,10 +63,15 @@ function LegalContentReader() {
       <h3>2. Fikri Mülkiyet Hakları</h3>
       <p>Platformda yer alan tüm yazılımlar, tasarım kodları, arayüz elementleri, 3D stüdyo döşeme algoritmaları, SeramikBak markası, tescilli logolar ve sergilenen ürünlerin dijital dokuları (textures) SeramikBak'a veya ilgili üretici markalara aittir. Yazılı izin olmaksızın bu içeriklerin kopyalanması, kazınması (scraping), çoğaltılması veya ticari amaçlarla başka platformlarda kullanılması 5846 sayılı Fikir ve Sanat Eserleri Kanunu uyarınca yasaktır.</p>
 
-      <h3>3. Kullanıcıların Yükümlülükleri</h3>
+      <h3>3. Bağımsız Platform Beyanı ve Tasviri Marka Kullanımı (SMK m. 7/5)</h3>
+      <p>SeramikBak platformunda, dijital kataloglarda, arama filtrelerinde ve karşılaştırma ekranlarında bahsi geçen tüm üretici marka adları, şirket unvanları, ürün modelleri ve fabrika logoları münhasıran ilgili üretici şirketlerin fikri ve sınai mülkiyetindedir.</p>
+      <p>Söz konusu marka ve işaretler, <strong>6769 sayılı Sınai Mülkiyet Kanunu'nun 7. maddesinin 5. fıkrası</strong> ve dürüst ticari kullanım ilkeleri uyarınca; yalnızca tüketicilere ve bayilere ürünlerin kaynağını, model adını, ebatını ve uyumluluk niteliklerini doğru açıklayabilmek amacıyla (<strong>tasviri / nominative fair use</strong>) kullanılmaktadır.</p>
+      <p>SeramikBak, listelenen seramik üreticisi markalardan tamamen bağımsız bir dijital pazaryeri, sergileme ve 3D görselleştirme teknolojisi sağlayıcısıdır; adı geçen üreticilerle doğrudan sermaye ortaklığı, münhasır bayilik veya resmi ana temsilcilik bağı bulunmamaktadır.</p>
+
+      <h3>4. Kullanıcıların Yükümlülükleri</h3>
       <p>Kullanıcılar, platformu kullanırken yalnızca hukuka uygun amaçlarla işlem yapabilirler. 3D Sanal Stüdyo modülüne yüklenecek oda fotoğraflarının telif haklarının kullanıcıya ait olması veya kullanım izninin bulunması gerekmektedir. Sisteme virüs, zararlı kod yüklenmesi veya sunucuların işleyişini bozacak siber saldırı girişimlerinde bulunulması durumunda SeramikBak her türlü adli ve cezai takibat hakkını saklı tutar.</p>
 
-      <h3>4. Değişiklik ve Kesintiler</h3>
+      <h3>5. Değişiklik ve Kesintiler</h3>
       <p>SeramikBak, teknolojik gelişmeler ve yasal gereklilikler doğrultusunda web sitesinde sunduğu hizmetleri, arayüz tasarımlarını ve işbu kullanım koşullarını önceden bildirmeksizin tek taraflı olarak değiştirme, askıya alma veya sonlandırma hakkına sahiptir.</p>
     `,
     cerez: `

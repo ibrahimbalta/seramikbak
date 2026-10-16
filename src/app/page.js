@@ -8332,6 +8332,13 @@ export default function Home() {
 
 
 
+        {/* Trademark & Independent Platform Notice */}
+        <div className="footer-disclaimer-notice" style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '11px', color: '#94a3b8', lineHeight: '1.6', textAlign: 'center' }}>
+          <p>
+            <strong style={{ color: '#cbd5e1' }}>Marka ve Bağımsızlık Bildirimi:</strong> Sitede ve dijital kataloglarda yer alan tüm üretici marka adları, şirket logoları, model serileri ve tescilli ticari markalar ilgili üretici hak sahiplerine aittir. SeramikBak, 6769 sayılı Sınai Mülkiyet Kanunu m. 7/5 uyarınca dürüstçe ve tasviri kullanım kapsamında bağımsız bir dijital tanıtım, sergi, karşılaştırma ve 3D görselleştirme teknolojisi platformudur; adı geçen markalarla doğrudan veya resmi bir ortaklık, distribütörlük ya da temsilcilik bağı bulunmamaktadır.
+          </p>
+        </div>
+
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <div className="footer-bottom-left">

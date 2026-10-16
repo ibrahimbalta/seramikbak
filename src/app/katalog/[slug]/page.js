@@ -1324,8 +1324,15 @@ export default function PublicCatalogViewerPage() {
             </div>
           </div>
 
+          {/* Trademark & Independence Disclaimer */}
+          <div className="pt-6 pb-2 border-t border-white/10 text-center">
+            <p className="text-[11px] text-neutral-400/80 leading-relaxed max-w-4xl mx-auto">
+              Bu dijital katalogda adı geçen tüm seramik markaları, logolar ve model serileri ilgili üretici şirketlerin tescilli mülkiyetindedir. SeramikBak, bağımsız bir dijital sergileme ve katalog altyapısı teknolojisi olup bahsi geçen markalarla resmi bir temsilcilik ya da ortaklık bağı bulunmamaktadır.
+            </p>
+          </div>
+
           {/* Bottom Branding Bar */}
-          <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             <p className="text-[11px] text-neutral-500">
               &copy; {new Date().getFullYear()} {brand.name || 'SeramikBak'} &bull; Tüm hakları saklıdır.
             </p>

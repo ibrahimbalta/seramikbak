@@ -1374,6 +1374,9 @@ export default function ArtificialIntelligenceCeramicsPage() {
         fontSize: '0.76rem',
         color: '#64748b'
       }}>
+        <div style={{ maxWidth: '1240px', margin: '0 auto 16px auto', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '14px', fontSize: '0.72rem', color: '#64748b', lineHeight: '1.6' }}>
+          Tüm marka adları, şirket logoları ve tescilli ticari markalar ilgili üretici hak sahiplerine aittir. SeramikBak bağımsız bir tanıtım ve 3D teknoloji platformudur; markalarla resmi bir ortaklık veya temsilcilik bağı bulunmamaktadır.
+        </div>
         <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             © 2026 SeramikBak Global. Tüm hakları saklıdır. Seramik Sektöründe Yapay Zeka ve 3D Tasarım Ekosistemi.
@@ -1383,6 +1386,7 @@ export default function ArtificialIntelligenceCeramicsPage() {
             <Link href="/tasarim" style={{ color: '#94a3b8', textDecoration: 'none' }}>3D Stüdyo</Link>
             <Link href="/bayi" style={{ color: '#94a3b8', textDecoration: 'none' }}>Yetkili Bayiler</Link>
             <Link href="/hakkimizda" style={{ color: '#94a3b8', textDecoration: 'none' }}>Hakkımızda</Link>
+            <Link href="/yasal?tab=kullanim" style={{ color: '#94a3b8', textDecoration: 'none' }}>Kullanım Koşulları</Link>
           </div>
         </div>
       </footer>
