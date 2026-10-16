@@ -33,63 +33,11 @@ import {
   RotateCcw
 } from 'lucide-react';
 
-// Real Cohesive Curated Architectural Ceramic Products
+// Real Cohesive Curated Architectural Ceramic Products from Bien Seramik Database
 const PROTOTYPE_PRODUCTS = [
   {
-    id: 'prod-1',
-    name: 'Aren White Lappato',
-    series: 'Aren Architectural Series',
-    code: 'P156ZDRAJ30X0XCAAW50',
-    dimensions: '60×120 cm',
-    width: 60,
-    height: 120,
-    thickness: '9.5 mm',
-    surface: 'Lappato Yarı Parlak',
-    bodyType: 'Renkli Gövde Porselen',
-    colorTone: 'Kırık Beyaz / İpeksi Gri Damar',
-    pei: 'PEI IV',
-    slip: 'R9',
-    waterAbsorption: '< %0.08',
-    frostResistant: true,
-    rectified: true,
-    boxM2: '1.44 m²',
-    boxPcs: 2,
-    palletM2: '46.08 m²',
-    palletKg: '980 kg',
-    renderUrl: '/renders/luxury_bathroom_calacatta_gold.jpg',
-    textureUrl: '/textures/calacatta_gold.jpg',
-    macroZoomText: 'Doğal İtalyan Carrara mermerinden ilham alan derin gri-altın damar geçişleri ve nano lappato yüzey parlaklığı.',
-    architecturalNotes: 'Geniş banyo hacimleri, otel lobileri ve prestijli rezidans zeminlerinde monolitik genişlik hissi sağlar.'
-  },
-  {
-    id: 'prod-2',
-    name: 'Calacatta Marmi Grigio',
-    series: 'Calacatta Marmi Series',
-    code: 'CALACATTA-MARMI-60X60',
-    dimensions: '60×60 cm',
-    width: 60,
-    height: 60,
-    thickness: '9.0 mm',
-    surface: 'Doğal Mat Yüzey',
-    bodyType: 'Teknik Sırlı Porselen',
-    colorTone: 'Duman Grisi & Beyaz Mermer',
-    pei: 'PEI IV',
-    slip: 'R10',
-    waterAbsorption: '< %0.05',
-    frostResistant: true,
-    rectified: true,
-    boxM2: '1.44 m²',
-    boxPcs: 4,
-    palletM2: '43.20 m²',
-    palletKg: '890 kg',
-    renderUrl: '/renders/luxury_bathroom_albatros_antrasit.jpg',
-    textureUrl: '/textures/albatros_antrasit.jpg',
-    macroZoomText: 'Hafif dokulu mat seramik gövde, ıslak ayak kaymazlığı sunarken leke tutmayan koruyucu sır tabakası.',
-    architecturalNotes: 'Islak hacim zeminleri, mutfak zemin kaplamaları ve yoğun sirkülasyonlu koridorlar için optimum sürtünme dayanımı.'
-  },
-  {
-    id: 'prod-3',
-    name: 'Bona Dea Concrete Grey',
+    id: '02a4542a-0ff4-4e58-99ca-f74773625cf3',
+    name: 'Bien Bona Dea Light Grey',
     series: 'Bona Dea Architectural Slab',
     code: 'P156XDRB55TX0XMXXG40',
     dimensions: '60×120 cm',
@@ -99,6 +47,7 @@ const PROTOTYPE_PRODUCTS = [
     surface: 'Brüt Beton Mat Dokusu',
     bodyType: 'Full Body Teknik Porselen',
     colorTone: 'Açık Çimento Grisi',
+    style: 'Taş-Beton',
     pei: 'PEI V (Ağır Trafik)',
     slip: 'R10B',
     waterAbsorption: '< %0.02',
@@ -110,47 +59,107 @@ const PROTOTYPE_PRODUCTS = [
     palletKg: '1010 kg',
     renderUrl: '/renders/luxury_bathroom_loft_beton.jpg',
     textureUrl: '/textures/loft_beton.jpg',
+    remoteImageUrl: 'https://bienseramik.com.tr/uploads/P156XDRB55TX0XMXXG40.png',
     macroZoomText: 'Mikro gözenekli endüstriyel beton dokusu. Homojen matlık ve yüksek mekanik aşınma direnci.',
     architecturalNotes: 'Modern loft daireler, ticari mağazalar, sanat galerileri ve açık ofis zeminlerinde çağdaş mimari duruş.'
   },
   {
-    id: 'prod-4',
-    name: 'Shell Stone Beige Out20',
-    series: 'Shell 20mm Outdoor Series',
-    code: '7BANTSEET-SHELL-BEIGE-20MM',
-    dimensions: '60×120 cm (20 mm)',
-    width: 60,
-    height: 120,
-    thickness: '20.0 mm (Ağır Yük Plakası)',
-    surface: 'Antislip Taş Yüzey',
-    bodyType: 'Ekstra Kalın Dış Mekan Porselen',
-    colorTone: 'Sıcak Bej / Kireçtaşı',
-    pei: 'PEI V',
-    slip: 'R11 A+B+C',
-    waterAbsorption: '< %0.01',
-    frostResistant: true,
-    rectified: true,
-    boxM2: '0.72 m²',
-    boxPcs: 1,
-    palletM2: '21.60 m²',
-    palletKg: '990 kg',
-    renderUrl: '/renders/modern_living_natural_oak.jpg',
-    textureUrl: '/textures/keops_bej.jpg',
-    macroZoomText: '20 mm yükseltilmiş döşeme ve kuru çim/kum üzeri yapıştırmasız montaja uygun kırılma mukavemeti (10.000 N+).',
-    architecturalNotes: 'Havuz kenarları, teras bahçeleri, villa girişleri ve otopark üstü hafif araç trafiği alanları.'
-  },
-  {
-    id: 'prod-5',
-    name: 'Concept Grigio Lappato',
-    series: 'Concept Urban Architectural',
-    code: 'P015ZDRC180X0XFAAG50',
+    id: '0352490c-ca27-4d85-9fb6-3160fe3bc141',
+    name: 'Bien Calacatta Marmi',
+    series: 'Calacatta Marmi Series',
+    code: 'CALACATTA-MARMI-60X60',
     dimensions: '60×60 cm',
     width: 60,
     height: 60,
+    thickness: '9.0 mm',
+    surface: 'Doğal Mat Yüzey',
+    bodyType: 'Teknik Sırlı Porselen',
+    colorTone: 'Duman Grisi & Beyaz Mermer',
+    style: 'Mermer',
+    pei: 'PEI IV',
+    slip: 'R10',
+    waterAbsorption: '< %0.05',
+    frostResistant: true,
+    rectified: true,
+    boxM2: '1.44 m²',
+    boxPcs: 4,
+    palletM2: '43.20 m²',
+    palletKg: '890 kg',
+    renderUrl: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+    textureUrl: '/textures/calacatta_gold.jpg',
+    remoteImageUrl: 'https://bienseramik.com.tr/uploads/calacatta-marmı-60x60.png',
+    macroZoomText: 'Hafif dokulu mat seramik gövde, ıslak ayak kaymazlığı sunarken leke tutmayan nano koruyucu tabaka.',
+    architecturalNotes: 'Islak hacim zeminleri, mutfak zemin kaplamaları ve yoğun sirkülasyonlu koridorlar için optimum sürtünme dayanımı.'
+  },
+  {
+    id: '032f3ee4-8fd8-4305-a425-4603b2ca9c97',
+    name: 'Bien Iroko Warm Grey',
+    series: 'Iroko Biophilic Wood',
+    code: 'G192ZDRI21TV0XMXXG50',
+    dimensions: '20×120 cm Planka',
+    width: 20,
+    height: 120,
     thickness: '9.5 mm',
-    surface: 'Full Lappato Kristal Parlak',
-    bodyType: 'Teknik Porselen',
-    colorTone: 'Titanyum Koyu Gri',
+    surface: 'Doğal Ahşap Dokusu',
+    bodyType: 'Porselen Parke Hibrit',
+    colorTone: 'Sıcak Gri / Meşe Doğal Damar',
+    style: 'Ahşap',
+    pei: 'PEI IV',
+    slip: 'R10',
+    waterAbsorption: '< %0.06',
+    frostResistant: true,
+    rectified: true,
+    boxM2: '1.20 m²',
+    boxPcs: 5,
+    palletM2: '43.20 m²',
+    palletKg: '880 kg',
+    renderUrl: '/renders/modern_living_natural_oak.jpg',
+    textureUrl: '/textures/natural_oak.jpg',
+    remoteImageUrl: 'https://bienseramik.com.tr/uploads/G192ZDRI21TV0XMXXG50.png',
+    macroZoomText: 'Doğal ahşap damarlarının rölyef dokusunu porselenin çizilmezliği ve su geçirmezliğiyle birleştiren 3D senkronize yüzey.',
+    architecturalNotes: 'Yerden ısıtmalı salonlar, spa dinlenme alanları ve restoran zeminlerinde biyofilik sıcaklık.'
+  },
+  {
+    id: '03e35a41-ffb5-44e8-ace0-00700c9a60ce',
+    name: 'Bien Bond Beige',
+    series: 'Bond Architectural Slab',
+    code: 'W168ZDRB93XX0XMXXB50',
+    dimensions: '40×120 cm',
+    width: 40,
+    height: 120,
+    thickness: '9.5 mm',
+    surface: 'İpeksi Mat Dokunuş',
+    bodyType: 'Teknik Duvar & Zemin Porselen',
+    colorTone: 'Sıcak Bej / Kireçtaşı',
+    style: 'Mix',
+    pei: 'PEI IV',
+    slip: 'R9',
+    waterAbsorption: '< %0.04',
+    frostResistant: true,
+    rectified: true,
+    boxM2: '1.44 m²',
+    boxPcs: 3,
+    palletM2: '43.20 m²',
+    palletKg: '920 kg',
+    renderUrl: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    textureUrl: '/textures/keops_bej.jpg',
+    remoteImageUrl: 'https://bienseramik.com.tr/uploads/W168ZDRB93XX0XMXXB50.png',
+    macroZoomText: 'Zarif kireçtaşı sedimantasyon çizgileri, yumuşak ışık emilimi ve mimari dinginlik.',
+    architecturalNotes: 'Minimalist rezidans banyoları, konsolosluk binaları ve villa iç mekanlarında monolitik sakinlik.'
+  },
+  {
+    id: '023d0f3f-2d80-4ac4-b2a4-69bdf4122672',
+    name: 'Bien Maxi Mat Beyaz',
+    series: 'Maxi Pure Collection',
+    code: 'G015XDRM720X0XMAAW50',
+    dimensions: '60×60 cm',
+    width: 60,
+    height: 60,
+    thickness: '9.0 mm',
+    surface: 'Pürüzsüz Mat Beyaz',
+    bodyType: 'Sırlı Porselen Karo',
+    colorTone: 'Karasal Saf Beyaz',
+    style: 'Mermer',
     pei: 'PEI IV',
     slip: 'R9',
     waterAbsorption: '< %0.05',
@@ -159,37 +168,40 @@ const PROTOTYPE_PRODUCTS = [
     boxM2: '1.44 m²',
     boxPcs: 4,
     palletM2: '43.20 m²',
-    palletKg: '920 kg',
+    palletKg: '900 kg',
     renderUrl: '/images/showroom_hero_flagship.jpg',
-    textureUrl: '/textures/magma_antrasit.jpg',
-    macroZoomText: 'Cam benzeri parlaklık derinliği sunan kristal sır teknolojisi ve mikrometrik rektifiye kenar kesimi.',
-    architecturalNotes: 'İç mekan lüks salonlar, otel suitleri ve kurumsal yönetim katlarında aydınlatmayı artıran yansıtıcı yüzey.'
+    textureUrl: '/textures/loft_beton.jpg',
+    remoteImageUrl: 'https://bienseramik.com.tr/uploads/G015XDRM720X0XMAAW50.png',
+    macroZoomText: 'Kusursuz mat beyazlık derinliği. Işığı yansıtmadan hacmi genişleten homojen doku.',
+    architecturalNotes: 'Sanat galerileri, çağdaş mutfak zeminleri ve aydınlık çalışma ofislerinde nötr zemin fonu.'
   },
   {
-    id: 'prod-6',
-    name: 'Sakura Natural Wood',
-    series: 'Sakura Biophilic Collection',
-    code: 'G015ZDRR390X0XMAAK30',
-    dimensions: '20×120 cm / 60×60 cm Modül',
-    width: 60,
-    height: 60,
-    thickness: '9.0 mm',
-    surface: 'Doğal Ahşap Rölyef',
-    bodyType: 'Porselen Parke Hibrit',
-    colorTone: 'Doğal Meşe / Bal Rengi',
-    pei: 'PEI IV',
-    slip: 'R10',
-    waterAbsorption: '< %0.06',
-    frostResistant: true,
+    id: '00068a18-24fe-47e9-9cd3-bf38ea6425f3',
+    name: 'Bien Yuta Beyaz Dekofon',
+    series: 'Yuta Relief Decor',
+    code: 'W188ZDRY20040XMAAW50',
+    dimensions: '30×90 cm',
+    width: 30,
+    height: 90,
+    thickness: '10.5 mm',
+    surface: '3D Rölyef Geometrik',
+    bodyType: 'Özel Tasarım Duvar Karosu',
+    colorTone: 'Optik Beyaz & Işık Kırılımları',
+    style: 'Mix Dekofon',
+    pei: 'PEI III (Duvar Odaklı)',
+    slip: 'N/A',
+    waterAbsorption: '< %10 (Duvar)',
+    frostResistant: false,
     rectified: true,
-    boxM2: '1.44 m²',
+    boxM2: '1.08 m²',
     boxPcs: 4,
-    palletM2: '43.20 m²',
-    palletKg: '880 kg',
-    renderUrl: '/renders/luxury_bathroom_natural_oak.jpg',
-    textureUrl: '/textures/natural_oak.jpg',
-    macroZoomText: 'Gerçek meşe ağacının damar dokusunu seramiğin su ve leke geçirmezliği ile buluşturan 3D senkronize yüzey.',
-    architecturalNotes: 'Yerden ısıtmalı villa salonları, spa dinlenme alanları ve restorasyon projelerinde biyofilik sıcaklık.'
+    palletM2: '38.88 m²',
+    palletKg: '720 kg',
+    renderUrl: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+    textureUrl: '/textures/magma_antrasit.jpg',
+    remoteImageUrl: 'https://bienseramik.com.tr/uploads/W188ZDRY20040XMAAW50.png',
+    macroZoomText: '3 boyutlu dalga rölyefi. Yan açılı mimari aydınlatmada heykelsi gölge ve ışık oyunları üretir.',
+    architecturalNotes: 'Otel lobi resepsiyon arkası, master banyo odak duvarı ve restoran giriş akslarında imza yüzey.'
   }
 ];
 
@@ -198,13 +210,13 @@ export default function CatalogPrototypePage() {
   const [spreadMode, setSpreadMode] = useState('single'); // 'single' (1 Sayfa) | 'spread' (Çift Sayfa Dergi)
   const [activeBrandPreset, setActiveBrandPreset] = useState('bien'); // 'bien' | 'kutahya'
   const [activePalette, setActivePalette] = useState('travertine'); // 'travertine' | 'slate' | 'bronze'
-  const [zoomLevel, setZoomLevel] = useState(100);
   const [selectedProductForModal, setSelectedProductForModal] = useState(null);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
   const [inquiryType, setInquiryType] = useState('quote');
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
 
-  const totalPages = 7;
+  // Exact 8 Pages Requested by User
+  const totalPages = 8;
 
   // Active Brand Profile
   const currentBrand = useMemo(() => {
@@ -214,7 +226,7 @@ export default function CatalogPrototypePage() {
         tagline: 'Modern Yaşam Alanları İçin İleri Seramik Teknolojileri',
         origin: 'Kütahya, Türkiye',
         founded: '1989',
-        logoUrl: '/logos/bien.png', // fallback
+        logoUrl: '/logos/bien.png',
         accentColor: '#1e293b',
         secondaryColor: '#94a3b8'
       };
@@ -308,10 +320,10 @@ export default function CatalogPrototypePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-stone-900 uppercase tracking-wider">
-                  Örnek Mimari Lookbook Prototipi
+                  HTML Dijital Katalog Prototipi
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-900 border border-amber-500/30">
-                  Aşama 3 Tasarım
+                  8 Sayfa Master Tasarım
                 </span>
               </div>
               <p className="text-[11px] text-stone-500 font-medium">
@@ -398,20 +410,21 @@ export default function CatalogPrototypePage() {
         </div>
       </header>
 
-      {/* 2. SUB-NAVIGATION BAR (SAYFA NUMARALARI VE DERGİ KONTROLLERİ) */}
+      {/* 2. SUB-NAVIGATION BAR (8 SAYFA DOĞRUDAN ATLANABİLİR BÖLÜM ÇUBUĞU) */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-extrabold uppercase tracking-widest text-[11px] text-stone-400">
-            Sayfalar:
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          <span className="font-extrabold uppercase tracking-widest text-[11px] text-stone-400 mr-1">
+            Sayfa Akışı:
           </span>
           {[
             { num: 1, title: 'Kapak' },
-            { num: 2, title: 'İlham & Hikaye' },
-            { num: 3, title: 'Koleksiyon Ailesi' },
-            { num: 4, title: 'Ürün Detayı' },
-            { num: 5, title: 'Teknik Tablo' },
-            { num: 6, title: 'Mekân Uygulamaları' },
-            { num: 7, title: 'İletişim & QR' }
+            { num: 2, title: 'Hikâye & Vizyon' },
+            { num: 3, title: 'Mimari Uygulama' },
+            { num: 4, title: 'İmza Ürün' },
+            { num: 5, title: 'Detay & Doku' },
+            { num: 6, title: 'Koleksiyon Matrisi' },
+            { num: 7, title: 'Teknik Şartname' },
+            { num: 8, title: 'İletişim & QR' }
           ].map((item) => (
             <button
               key={item.num}
@@ -424,13 +437,13 @@ export default function CatalogPrototypePage() {
               }`}
             >
               <span>{item.num}.</span>
-              <span className="hidden md:inline">{item.title}</span>
+              <span className="hidden lg:inline">{item.title}</span>
             </button>
           ))}
         </div>
 
         {/* Pager Prev / Next */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <button
             type="button"
             onClick={handlePrevPage}
@@ -664,10 +677,10 @@ export default function CatalogPrototypePage() {
 }
 
 // -------------------------------------------------------------
-// PROTOTYPE 7 MASTER PAGES RENDERER (EDITORIAL ARCHITECTURAL QUALITY)
+// PROTOTYPE 8 MASTER PAGES RENDERER (EDITORIAL ARCHITECTURAL QUALITY)
 // -------------------------------------------------------------
 function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectProduct }) {
-  // PAGE 1: ETKİLEYİCİ MARKA VE KOLEKSİYON KAPAĞI (COVER)
+  // PAGE 1: TAM EKRAN GÖRSELLİ PREMİUM KAPAK (COVER)
   if (pageNum === 1) {
     return (
       <div className="h-full flex flex-col justify-between relative z-10">
@@ -694,13 +707,13 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-6 sm:p-10 text-white">
               <span className="inline-block px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase bg-[#b4823c] text-white font-bold w-fit mb-2 shadow-sm">
-                EXCLUSIVE LOOKBOOK
+                EXCLUSIVE LOOKBOOK &bull; BIEN SERAMİK
               </span>
               <h1 className="text-3xl sm:text-5xl font-serif font-black tracking-tight leading-tight">
                 TERRA &bull; LUXE
               </h1>
               <p className="text-xs sm:text-sm text-stone-300 font-light max-w-lg mt-2 leading-relaxed">
-                Işığın mermer damarlarındaki yankısı, yüksek dayanımlı porselen gövde ve çağdaş mimari mekanlar için tasarlanmış geniş ebat plakalar.
+                Işığın mermer ve beton dokusundaki yankısı, yüksek mekanik mukavemetli porselen gövde ve çağdaş mimari mekanlar için tasarlanmış geniş ebat plakalar.
               </p>
             </div>
           </div>
@@ -713,7 +726,7 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
             </div>
             <div>
               <span className="text-[10px] font-mono tracking-wider text-stone-400 uppercase block">Ebat Yelpazesi</span>
-              <strong className="text-xs font-serif text-stone-900 block mt-0.5">60×60 &bull; 60×120 &bull; 20mm</strong>
+              <strong className="text-xs font-serif text-stone-900 block mt-0.5">60×120 &bull; 40×120 &bull; 20×120</strong>
             </div>
             <div>
               <span className="text-[10px] font-mono tracking-wider text-stone-400 uppercase block">Üretim Standardı</span>
@@ -731,7 +744,7 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
     );
   }
 
-  // PAGE 2: KOLEKSİYON HİKÂYESİ VE İLHAM SAYFASI (STORYTELLING & MOODBOARD)
+  // PAGE 2: KOLEKSİYONUN HİKÂYESİ VE TASARIM YAKLAŞIMI (STORY & MANIFESTO)
   if (pageNum === 2) {
     return (
       <div className="h-full flex flex-col justify-between relative z-10">
@@ -757,10 +770,10 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
             </h2>
             <div className="space-y-3 text-xs text-stone-600 leading-relaxed font-light">
               <p>
-                Terra Luxe koleksiyonu; yüzyıllardır İtalyan taş ocaklarından çıkan Carrara ve Grigio mermerlerinin dingin dokularını, modern porselen teknolojisinin sıfır su emme ve çizilmezlik avantajlarıyla bir araya getiriyor.
+                Terra Luxe koleksiyonu; Anadolu ve İtalyan taş ocaklarından ilham alan mermer damarlarını, brüt betonun dingin griliğini ve ahşabın biyofilik sıcaklığını modern porselen teknolojisiyle harmanlar.
               </p>
               <p>
-                İç mekanlarda homojen ışık kırılımları oluşturan nano-lappato yüzeyler, ıslak zeminlerde ise güvenli adımlar sağlayan mikro-mat sır tabakasıyla desteklenmiştir. Mimar ve iç mimarlara projenin tüm ölçeklerinde tutarlı bir tasarım dili sunar.
+                İç mekanlarda homojen ışık kırılımları oluşturan mat yüzeyler, ıslak zeminlerde güvenli adımlar sağlayan mikro sürtünme dokusuyla desteklenmiştir. Mimar ve iç mimarlara projenin tüm ölçeklerinde tutarlı bir tasarım dili sunar.
               </p>
             </div>
 
@@ -813,77 +826,78 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
     );
   }
 
-  // PAGE 3: ÜRÜN AİLESİNİ SUNAN EDİTORYAL SAYFA (COLLECTION OVERVIEW GRID)
+  // PAGE 3: BÜYÜK MİMARİ UYGULAMA GÖRSELİ (FULL-BLEED ARCHITECTURAL LIFESTYLE SPREAD)
   if (pageNum === 3) {
     return (
       <div className="h-full flex flex-col justify-between relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200/80 pb-3">
           <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-            02 &bull; KOLEKSİYON AİLESİ & EBAT HARİTASI
+            02 &bull; MİMARİ MEKÂN ALGISI & YAŞAM ALANLARI
           </span>
           <span className="text-[11px] font-mono tracking-widest text-stone-400">
-            6 TEMEL SERİ
+            PANORAMİK ÖLÇEK
           </span>
         </div>
 
-        {/* Title */}
-        <div className="pt-2">
-          <h2 className="text-2xl font-serif font-extrabold text-stone-900">
-            Küratör Porselen Yelpazesi
-          </h2>
-          <p className="text-xs text-stone-500 font-light mt-0.5">
-            Mekanın fonksiyonuna göre optimize edilmiş yüzey, ebat ve kalınlık seçenekleri.
-          </p>
-        </div>
-
-        {/* 6 Products Grid */}
-        <div className="my-auto py-4 grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-          {products.map((p, idx) => (
-            <div
-              key={p.id}
-              onClick={() => onSelectProduct(p)}
-              className="group p-3 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-amber-400/80 hover:bg-white transition-all shadow-2xs hover:shadow-md cursor-pointer flex flex-col justify-between"
-            >
-              {/* Product Thumbnail */}
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-white mb-2.5 border border-stone-200">
-                <img
-                  src={p.textureUrl || p.renderUrl}
-                  alt={p.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-black/70 text-white backdrop-blur-xs">
-                  {p.dimensions}
-                </span>
-              </div>
-
-              {/* Product Meta */}
-              <div className="space-y-1">
-                <span className="text-[9px] font-mono text-stone-400 uppercase block">0{idx + 1} &bull; {p.series}</span>
-                <h4 className="text-xs font-bold text-stone-900 group-hover:text-[#b4823c] transition truncate">
-                  {p.name}
-                </h4>
-                <div className="flex items-center justify-between text-[10px] text-stone-500 pt-1 border-t border-stone-100">
-                  <span>{p.surface}</span>
-                  <span className="font-mono font-bold text-stone-700">{p.pei}</span>
-                </div>
-              </div>
+        {/* Full-bleed Architectural Visual */}
+        <div className="my-auto py-4 space-y-4">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-stone-200 aspect-[16/9] group">
+            <img
+              src="/renders/modern_living_natural_oak.jpg"
+              alt="Architectural Living Space"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 sm:p-8 text-white">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold mb-1">
+                VİLLA REZİDANS SALON & TERAS ENTEGRASYONU
+              </span>
+              <h3 className="text-xl sm:text-2xl font-serif font-bold">
+                Bien Iroko 20×120 & Bona Dea 60×120 Füzyonu
+              </h3>
+              <p className="text-xs text-stone-300 font-light mt-1 max-w-xl leading-relaxed">
+                Yerden ısıtmalı zeminlerde ahşabın sıcak dokunuşu ile geniş ebat beton plakaların modern dinginliği tek bir hacimde buluşuyor.
+              </p>
             </div>
-          ))}
+          </div>
+
+          {/* Architectural Notes & Specs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            <div className="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <span className="text-[10px] font-mono text-stone-400 uppercase block">Derz Genişliği</span>
+              <strong className="text-xs font-serif text-stone-900 block mt-0.5">1.5 mm Lazer Rektifiye</strong>
+              <p className="text-[10px] text-stone-500 mt-1">Zeminde monolitik ve kesintisiz akış hissi sağlar.</p>
+            </div>
+            <div className="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <span className="text-[10px] font-mono text-stone-400 uppercase block">Termal Uyumluluk</span>
+              <strong className="text-xs font-serif text-stone-900 block mt-0.5">Yerden Isıtma %100 Uyum</strong>
+              <p className="text-[10px] text-stone-500 mt-1">Yüksek ısı iletim katsayısı ile enerji tasarrufu.</p>
+            </div>
+            <div className="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <span className="text-[10px] font-mono text-stone-400 uppercase block">3D Simülasyon</span>
+              <Link
+                href="/mekan-dene"
+                className="text-xs font-bold text-[#b4823c] hover:underline flex items-center gap-1 mt-0.5"
+              >
+                <span>Mekânda Canlı Gör &rarr;</span>
+              </Link>
+              <p className="text-[10px] text-stone-500 mt-1">Kendi odanızın fotoğrafında deneyin.</p>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-stone-200/80 text-[11px] text-stone-400 font-mono">
-          <span>TÜM PLAKALAR REKTİFİYE & DONMA DAYANIMLIDIR</span>
+          <span>DOĞAL IŞIK KIRILIM VE AKUSTİK DENGE ANALİZİ</span>
           <span>SAYFA 03</span>
         </div>
       </div>
     );
   }
 
-  // PAGE 4: BÜYÜK GÖRSELLİ TEK ÜRÜN DETAY SAYFASI (HERO PRODUCT SHOWCASE)
+  // PAGE 4: BİR ÜRÜNÜ ÖNE ÇIKARAN EDİTORYAL TANITIM SAYFASI (HERO SIGNATURE SLAB)
   if (pageNum === 4) {
-    const heroProduct = products[0]; // Aren White Lappato
+    const heroProduct = products[0]; // Bien Bona Dea Light Grey
     return (
       <div className="h-full flex flex-col justify-between relative z-10">
         {/* Header */}
@@ -896,7 +910,7 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
           </span>
         </div>
 
-        {/* Hero Product Layout: Left Big Slab + Right Macro Zoom & Specs */}
+        {/* Hero Slab Layout: Monumental Vertical Ratio */}
         <div className="my-auto py-4 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           {/* Left: Monumental Vertical Slab (7 Cols) */}
           <div className="md:col-span-7 space-y-3">
@@ -924,7 +938,7 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
             </div>
           </div>
 
-          {/* Right: Detailed Typography & Macro Texture (5 Cols) */}
+          {/* Right: Detailed Narrative & Features (5 Cols) */}
           <div className="md:col-span-5 space-y-4">
             <div>
               <span className="text-[10px] font-mono uppercase tracking-widest text-[#b4823c] font-bold block mb-1">
@@ -938,42 +952,17 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
               </p>
             </div>
 
-            {/* Macro Zoom Box */}
-            <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-mono uppercase text-stone-400 font-bold">
-                <span>Yüzey Dokusu (10x Makro Zoom)</span>
-                <span className="text-[#b4823c]">Lappato Nano</span>
-              </div>
-              <div className="h-28 rounded-xl overflow-hidden border border-stone-200 relative">
-                <img
-                  src={heroProduct.textureUrl}
-                  alt="Texture Macro"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <p className="text-[11px] text-stone-600 leading-relaxed font-light">
-                {heroProduct.macroZoomText}
-              </p>
-            </div>
+            <p className="text-xs text-stone-600 leading-relaxed font-light">
+              {heroProduct.architecturalNotes}
+            </p>
 
-            {/* Architectural Highlights */}
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
-                <span className="font-semibold text-stone-500">Aşınma Sınıfı:</span>
-                <strong className="font-mono">{heroProduct.pei} (Yüksek Yoğunluk)</strong>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
-                <span className="font-semibold text-stone-500">Kaymazlık:</span>
-                <strong className="font-mono">{heroProduct.slip}</strong>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
-                <span className="font-semibold text-stone-500">Su Emme:</span>
-                <strong className="font-mono text-emerald-700">{heroProduct.waterAbsorption}</strong>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-stone-100 text-stone-700">
-                <span className="font-semibold text-stone-500">Kenar Tipi:</span>
-                <strong className="text-stone-800">Lazer Kesim Rektifiye</strong>
-              </div>
+            <div className="p-3.5 rounded-2xl bg-[#fbf6ee] border border-amber-200/60 space-y-1.5">
+              <span className="text-[10px] font-mono uppercase font-bold text-[#b4823c] block">
+                Mimari Şartname Tercihi
+              </span>
+              <p className="text-xs text-stone-800 font-serif leading-snug">
+                PEI V aşınma sınıfı ve R10B kaymazlık profili ile havaalanı, otel lobisi ve prestijli konut zeminlerinde ömür boyu dayanıklılık.
+              </p>
             </div>
 
             <button
@@ -982,7 +971,7 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
               className="w-full py-2.5 rounded-xl border border-[#b4823c] text-[#b4823c] hover:bg-[#b4823c] hover:text-white font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
             >
               <Sparkles size={14} />
-              <span>Bu Ürün İçin Teklif Al</span>
+              <span>Bu Ürün İçin Proje Fiyatı Al</span>
             </button>
           </div>
         </div>
@@ -996,14 +985,178 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
     );
   }
 
-  // PAGE 5: ÜRÜN VARYANTLARI VE TEKNİK ÖZELLİKLER TABLOSU (SPEC SHEET & LOGISTICS)
+  // PAGE 5: ÜRÜN GÖRSELİ, EBAT, YÜZEY VE TEKNİK BİLGİLERİ İÇEREN DETAY SAYFASI (MACRO TEXTURE & SPECS)
   if (pageNum === 5) {
+    const heroProduct = products[0]; // Bien Bona Dea
     return (
       <div className="h-full flex flex-col justify-between relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200/80 pb-3">
           <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-            04 &bull; TEKNİK ŞARTNAME & LOJİSTİK PARAMETRELER
+            04 &bull; MALZEME VE DOKU ANALİZİ (10× MAKRO ZOOM)
+          </span>
+          <span className="text-[11px] font-mono tracking-widest text-stone-400">
+            {heroProduct.name}
+          </span>
+        </div>
+
+        {/* Deep Dive Texture & Specifications Grid */}
+        <div className="my-auto py-4 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          {/* Left: 10x Macro Zoom Panel (6 Cols) */}
+          <div className="md:col-span-6 space-y-3">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-stone-200 aspect-square group">
+              <img
+                src={heroProduct.textureUrl}
+                alt="10x Macro Surface"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono font-bold">
+                10× MAKRO DOKU &bull; MİKRO GÖZENEK
+              </div>
+            </div>
+            <p className="text-[11px] text-stone-600 leading-relaxed font-light text-center">
+              {heroProduct.macroZoomText}
+            </p>
+          </div>
+
+          {/* Right: Technical Matrix (6 Cols) */}
+          <div className="md:col-span-6 space-y-4">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-bold block">
+                Fiziksel Özellikler
+              </span>
+              <h3 className="text-xl font-serif font-bold text-stone-900">
+                Porselen Gövde Mühendisliği
+              </h3>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Nominal Ebat:</span>
+                <strong className="font-mono text-stone-900">{heroProduct.dimensions}</strong>
+              </div>
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Gövde Kalınlığı:</span>
+                <strong className="font-mono text-stone-900">{heroProduct.thickness}</strong>
+              </div>
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Yüzey Karakteri:</span>
+                <strong className="text-stone-800">{heroProduct.surface}</strong>
+              </div>
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Aşınma Direnci:</span>
+                <strong className="font-mono text-[#b4823c] font-bold">{heroProduct.pei}</strong>
+              </div>
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Kaymazlık Sınıfı:</span>
+                <strong className="font-mono">{heroProduct.slip} (DIN 51130)</strong>
+              </div>
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Su Emme Katsayısı:</span>
+                <strong className="font-mono text-emerald-700 font-bold">{heroProduct.waterAbsorption}</strong>
+              </div>
+              <div className="flex justify-between py-2 border-b border-stone-100 text-stone-700">
+                <span className="font-semibold text-stone-500">Kenar Tipi:</span>
+                <strong className="text-stone-800">Lazer Kesim Rektifiye</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onSelectProduct(heroProduct)}
+              className="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+            >
+              <Package size={14} />
+              <span>Numune Kiti ve Teknik Föy İste</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-stone-200/80 text-[11px] text-stone-400 font-mono">
+          <span>LABORATUVAR TESTİ: EN ISO 10545 STANDARDI</span>
+          <span>SAYFA 05</span>
+        </div>
+      </div>
+    );
+  }
+
+  // PAGE 6: BİRDEN FAZLA ÜRÜNÜN KARŞILAŞTIRILDIĞI KOLEKSİYON SAYFASI (COLLECTION GRID & COMPARISON)
+  if (pageNum === 6) {
+    return (
+      <div className="h-full flex flex-col justify-between relative z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-stone-200/80 pb-3">
+          <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+            05 &bull; KOLEKSİYON AİLESİ & KARŞILAŞTIRMA MATRİSİ
+          </span>
+          <span className="text-[11px] font-mono tracking-widest text-stone-400">
+            6 İMZA MODEL
+          </span>
+        </div>
+
+        {/* Title */}
+        <div className="pt-2">
+          <h2 className="text-2xl font-serif font-extrabold text-stone-900">
+            Bien Seramik Küratör Yelpazesi
+          </h2>
+          <p className="text-xs text-stone-500 font-light mt-0.5">
+            Mekanın fonksiyonuna göre optimize edilmiş yüzey, ebat ve kalınlık seçenekleri.
+          </p>
+        </div>
+
+        {/* 6 Products Comparison Grid */}
+        <div className="my-auto py-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {products.map((p, idx) => (
+            <div
+              key={p.id}
+              onClick={() => onSelectProduct(p)}
+              className="group p-3 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-amber-400/80 hover:bg-white transition-all shadow-2xs hover:shadow-md cursor-pointer flex flex-col justify-between"
+            >
+              {/* Product Thumbnail */}
+              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-white mb-2 border border-stone-200">
+                <img
+                  src={p.textureUrl || p.renderUrl}
+                  alt={p.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-black/70 text-white backdrop-blur-xs">
+                  {p.dimensions}
+                </span>
+              </div>
+
+              {/* Product Meta */}
+              <div className="space-y-1">
+                <span className="text-[9px] font-mono text-stone-400 uppercase block">0{idx + 1} &bull; {p.style}</span>
+                <h4 className="text-xs font-bold text-stone-900 group-hover:text-[#b4823c] transition truncate">
+                  {p.name}
+                </h4>
+                <div className="flex items-center justify-between text-[10px] text-stone-500 pt-1 border-t border-stone-100">
+                  <span className="truncate">{p.surface}</span>
+                  <span className="font-mono font-bold text-stone-700 flex-shrink-0">{p.pei}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-stone-200/80 text-[11px] text-stone-400 font-mono">
+          <span>TÜM SERİLER REKTİFİYE KENAR KESİMİNE SAHİPTİR</span>
+          <span>SAYFA 06</span>
+        </div>
+      </div>
+    );
+  }
+
+  // PAGE 7: OKUNAKLI TEKNİK ÖZELLİKLER TABLOSU (COMPREHENSIVE SPEC SHEET & PACKAGING)
+  if (pageNum === 7) {
+    return (
+      <div className="h-full flex flex-col justify-between relative z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-stone-200/80 pb-3">
+          <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
+            06 &bull; TEKNİK ŞARTNAME & LOJİSTİK PARAMETRELER
           </span>
           <span className="text-[11px] font-mono tracking-widest text-stone-400">
             STANDART: ISO 13006
@@ -1086,104 +1239,14 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-stone-200/80 text-[11px] text-stone-400 font-mono">
           <span>TÜM TESTLER AKREDİTE LABORATUVARLARDA DOĞRULANMIŞTIR</span>
-          <span>SAYFA 05</span>
+          <span>SAYFA 07</span>
         </div>
       </div>
     );
   }
 
-  // PAGE 6: MİMARİ UYGULAMA VE KULLANIM ALANLARI SAYFASI (CASE STUDIES)
-  if (pageNum === 6) {
-    return (
-      <div className="h-full flex flex-col justify-between relative z-10">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-200/80 pb-3">
-          <span className="text-[11px] font-mono tracking-widest text-[#b4823c] font-bold uppercase">
-            05 &bull; MİMARİ UYGULAMA ALANLARI & VAKA ANALİZLERİ
-          </span>
-          <span className="text-[11px] font-mono tracking-widest text-stone-400">
-            PROJE REFERANSLARI
-          </span>
-        </div>
-
-        {/* Title */}
-        <div className="pt-2">
-          <h2 className="text-2xl font-serif font-extrabold text-stone-900">
-            Mekânda Yaşayan Seramik
-          </h2>
-          <p className="text-xs text-stone-500 font-light mt-0.5">
-            Konut, otel ve ticari alanlarda malzeme uyumu ve aydınlatma senaryoları.
-          </p>
-        </div>
-
-        {/* 3 Case Study Panels */}
-        <div className="my-auto py-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Case 1: Lüks Banyo */}
-          <div className="rounded-2xl bg-stone-50 border border-stone-200 p-3.5 space-y-2.5">
-            <div className="rounded-xl overflow-hidden aspect-[4/3] border border-stone-200">
-              <img
-                src="/renders/luxury_bathroom_loft_beton.jpg"
-                alt="Bathroom Case"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <span className="text-[9px] font-mono uppercase text-[#b4823c] font-bold block">01 &bull; Islak Hacim</span>
-              <h4 className="text-sm font-serif font-bold text-stone-900">Mono-Loft Spa Entegrasyonu</h4>
-              <p className="text-[11px] text-stone-600 leading-relaxed font-light mt-1">
-                Bona Dea Concrete serisi ile oluşturulan derzsiz zemin hissi, gömme armatürler ve antrasit detaylarla çağdaş bir sükunet yaratır.
-              </p>
-            </div>
-          </div>
-
-          {/* Case 2: Yaşam Alanı & Salon */}
-          <div className="rounded-2xl bg-stone-50 border border-stone-200 p-3.5 space-y-2.5">
-            <div className="rounded-xl overflow-hidden aspect-[4/3] border border-stone-200">
-              <img
-                src="/renders/modern_living_natural_oak.jpg"
-                alt="Living Room Case"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <span className="text-[9px] font-mono uppercase text-[#b4823c] font-bold block">02 &bull; Salon & Teras</span>
-              <h4 className="text-sm font-serif font-bold text-stone-900">Doğal Ahşap & Seramik Füzyonu</h4>
-              <p className="text-[11px] text-stone-600 leading-relaxed font-light mt-1">
-                Yerden ısıtma sistemleriyle %100 uyumlu Sakura serisi, ahşabın sıcaklığını sıfır bakım gereksinimiyle mekanın merkezine taşır.
-              </p>
-            </div>
-          </div>
-
-          {/* Case 3: Ticari Lobi & Showroom */}
-          <div className="rounded-2xl bg-stone-50 border border-stone-200 p-3.5 space-y-2.5">
-            <div className="rounded-xl overflow-hidden aspect-[4/3] border border-stone-200">
-              <img
-                src="/images/showroom_hero_flagship.jpg"
-                alt="Commercial Case"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <span className="text-[9px] font-mono uppercase text-[#b4823c] font-bold block">03 &bull; Ticari & Lobi</span>
-              <h4 className="text-sm font-serif font-bold text-stone-900">Yoğun Sirkülasyon Mukavemeti</h4>
-              <p className="text-[11px] text-stone-600 leading-relaxed font-light mt-1">
-                PEI V sınıfı yüzey aşınma direnci sayesinde alışveriş merkezleri, havalimanları ve plaza girişlerinde ömür boyu parlaklık.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-stone-200/80 text-[11px] text-stone-400 font-mono">
-          <span>TÜM MEKANLAR SERAMİKBAK 3D MOTORUNDA SİMÜLE EDİLEBİLİR</span>
-          <span>SAYFA 06</span>
-        </div>
-      </div>
-    );
-  }
-
-  // PAGE 7: MARKA İLETİŞİMİ VE ARKA KAPAK (BACK COVER & 3D QR PORTAL)
-  if (pageNum === 7) {
+  // PAGE 8: MARKA İLETİŞİM BİLGİLERİ VE TASARIMLI ARKA KAPAK (BACK COVER & 3D QR PORTAL)
+  if (pageNum === 8) {
     return (
       <div className="h-full flex flex-col justify-between relative z-10 text-center">
         {/* Header */}
@@ -1256,7 +1319,7 @@ function PrototypePageContent({ pageNum, brand, products, themeStyles, onSelectP
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-stone-200/80 text-[11px] text-stone-400 font-mono text-left">
           <span>SERAMİKBAK DİJİTAL YAYIN PLATFORMU &copy; 2026</span>
-          <span>SAYFA 07</span>
+          <span>SAYFA 08</span>
         </div>
       </div>
     );

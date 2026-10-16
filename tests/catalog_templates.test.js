@@ -14,12 +14,13 @@ import {
  */
 
 test('Katalog Şablon Registry & 12 Tasarım Ailesi Testleri', async (t) => {
-  await t.test('12 tasarım ailesinin tümü kayıtlı ve eksiksiz olmalı', () => {
-    assert.equal(CATALOG_DESIGN_FAMILIES.length, 12, 'Toplam 12 tasarım ailesi bulunmalı');
+  await t.test('13 tasarım ailesinin tümü kayıtlı ve eksiksiz olmalı', () => {
+    assert.equal(CATALOG_DESIGN_FAMILIES.length, 13, 'Toplam 13 tasarım ailesi bulunmalı');
     
     const requiredIds = [
       'premium-mimari',
       'minimal-koleksiyon',
+      'material-texture',
       'teknik-urun',
       'mimar-sunum',
       'banyo-mutfak',
@@ -99,7 +100,7 @@ test('Katalog Şablon Registry & 12 Tasarım Ailesi Testleri', async (t) => {
 
     // Empty query returns all
     const all = filterTemplates({ category: 'all', style: 'all', searchQuery: '' });
-    assert.equal(all.length, 12);
+    assert.equal(all.length, 13);
   });
 });
 
