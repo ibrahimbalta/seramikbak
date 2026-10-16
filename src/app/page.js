@@ -7628,62 +7628,73 @@ export default function Home() {
 
       {/* LEAD REQUEST MODAL */}
       {showLeadModal && leadProduct && leadDealer && (
-        <div className="modal-overlay animate-fade-in">
-          <div className="modal-content glass-panel-gold">
-            <div className="modal-header">
-              <h3>Bayiden Fiyat Teklifi Al</h3>
-              <button onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); setLeadErrorMsg(''); }} className="close-modal-btn">✕</button>
+        <div className="modal-overlay animate-fade-in" onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); setLeadErrorMsg(''); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '540px', width: '92%', borderRadius: '24px', padding: '28px', background: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.12)' }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(179, 142, 71, 0.1)', color: '#b38e47', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Building2 size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>Bayiden Fiyat & Proje Teklifi Al</h3>
+                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>Yetkili bayi doğrudan size özel teklif hazırlasın</p>
+                </div>
+              </div>
+              <button onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); setLeadErrorMsg(''); }} className="close-modal-btn" style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', cursor: 'pointer' }}>✕</button>
             </div>
             
             {leadErrorMsg && (
-              <div className="alert-box error" style={{ margin: '12px', padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#f87171', fontSize: '0.85rem' }}>
+              <div className="alert-box error" style={{ margin: '14px 0 0 0', padding: '12px 14px', borderRadius: '10px', background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', fontSize: '0.85rem' }}>
                 ⚠️ {leadErrorMsg}
               </div>
             )}
             
             {leadSuccessMsg ? (
-              <div className="modal-success-state">
-                <CheckCircle size={48} className="success-icon" />
-                <p>{leadSuccessMsg}</p>
-                <button onClick={() => setShowLeadModal(false)} className="btn-primary" style={{ marginTop: '20px' }}>Kapat</button>
+              <div className="modal-success-state" style={{ textAlign: 'center', padding: '30px 10px' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', border: '1px solid #bbf7d0' }}>
+                  <CheckCircle size={38} />
+                </div>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: '0 0 8px 0' }}>Teklif Talebiniz İletildi!</h4>
+                <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.5', margin: 0 }}>{leadSuccessMsg}</p>
+                <button onClick={() => setShowLeadModal(false)} className="btn-primary" style={{ marginTop: '22px', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#ffffff', border: 'none', borderRadius: '12px', padding: '12px 28px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 15px rgba(179, 142, 71, 0.25)' }}>Kapat</button>
               </div>
             ) : (
-              <form onSubmit={handleLeadSubmit} className="modal-form">
-                <div className="modal-product-summary">
-                  <div className="m-pic" style={{ position: 'relative', overflow: 'hidden' }}>
+              <form onSubmit={handleLeadSubmit} className="modal-form" style={{ marginTop: '16px' }}>
+                <div className="modal-product-summary" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '12px 14px', display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '14px' }}>
+                  <div className="m-pic" style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, border: '1px solid #e2e8f0' }}>
                     <TileVisualPreview style={leadProduct.style} color={leadProduct.color} finish={leadProduct.finish} width={leadProduct.width} height={leadProduct.height} imageUrl={leadProduct.imageUrl} />
                   </div>
-                  <div>
-                    <strong>{leadProduct.brand?.name} - {leadProduct.name}</strong>
-                    <p>{leadProduct.width}x{leadProduct.height} cm • {leadProduct.finish}</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--accent-blue)', marginTop: '4px' }}>Bayi: {leadDealer.name}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <strong style={{ fontSize: '0.92rem', color: '#0f172a', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{leadProduct.brand?.name} - {leadProduct.name}</strong>
+                    <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '2px 0 0 0' }}>{leadProduct.width}x{leadProduct.height} cm • {leadProduct.finish}</p>
+                    <p style={{ fontSize: '0.75rem', color: '#b38e47', fontWeight: '700', margin: '3px 0 0 0' }}>Yetkili Bayi: {leadDealer.name}</p>
                   </div>
                 </div>
-                <div className="form-group"><label>Adınız Soyadınız</label><input type="text" className="form-input" value={leadName} onChange={(e) => setLeadName(e.target.value)} required placeholder="Ahmet Yılmaz" /></div>
+                <div className="form-group"><label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Adınız Soyadınız *</label><input type="text" className="form-input" value={leadName} onChange={(e) => setLeadName(e.target.value)} required placeholder="Ahmet Yılmaz" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} /></div>
                 <div className="form-group-row">
-                  <div className="form-group"><label>Telefon</label><input type="tel" className="form-input" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)} required placeholder="0555 123 4567" /></div>
-                  <div className="form-group"><label>E-Posta</label><input type="email" className="form-input" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} required placeholder="ahmet@mail.com" /></div>
+                  <div className="form-group"><label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Telefon *</label><input type="tel" className="form-input" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)} required placeholder="0555 123 4567" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} /></div>
+                  <div className="form-group"><label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>E-Posta *</label><input type="email" className="form-input" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} required placeholder="ahmet@mail.com" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} /></div>
                 </div>
-                <div className="form-group"><label>Notlar</label><textarea className="form-input form-textarea" value={leadNotes} onChange={(e) => setLeadNotes(e.target.value)} placeholder="Miktar ve nakliye detaylarını ekleyebilirsiniz..." rows={2} /></div>
+                <div className="form-group"><label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Proje Notları / Metraj</label><textarea className="form-input form-textarea" value={leadNotes} onChange={(e) => setLeadNotes(e.target.value)} placeholder="Tahmini metraj veya uygulama detaylarını ekleyebilirsiniz..." rows={2} style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px' }} /></div>
                 
                 {/* Additional services */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', margin: '12px 0', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '12px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', margin: '14px 0', borderTop: '1px solid #e2e8f0', paddingTop: '14px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.84rem', color: '#334155', fontWeight: '600', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                     <input 
                       type="checkbox" 
                       checked={requestedUsta} 
                       onChange={(e) => setRequestedUsta(e.target.checked)} 
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#b38e47' }}
                     />
                     <span>🛠️ Seramik Döşeme Ustası İstiyorum (+ Fiyat Tahmini)</span>
                   </label>
                   
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.84rem', color: '#334155', fontWeight: '600', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                     <input 
                       type="checkbox" 
                       checked={requestedArchitect} 
                       onChange={(e) => setRequestedArchitect(e.target.checked)} 
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#b38e47' }}
                     />
                     <span>📐 Ücretsiz Mimar Desteği ve 3D Tasarım İstiyorum</span>
                   </label>
@@ -7691,22 +7702,22 @@ export default function Home() {
 
                 {/* Conditional fields for Architect Support */}
                 {requestedArchitect && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', border: '1px dashed rgba(255,255,255,0.1)', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '14px', background: 'rgba(179, 142, 71, 0.05)', borderRadius: '12px', border: '1px dashed rgba(179, 142, 71, 0.35)', marginBottom: '14px' }}>
                     <div className="form-group" style={{ margin: 0 }}>
-                      <label style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Oda/Banyo Ölçüleri</label>
+                      <label style={{ fontSize: '0.78rem', color: '#8c6a27', fontWeight: '700' }}>Oda / Banyo Ölçüleri</label>
                       <input 
                         type="text" 
                         className="form-input" 
                         value={projectDimensions} 
                         onChange={(e) => setProjectDimensions(e.target.value)} 
-                        placeholder="Örn: En: 2m, Boy: 3.5m, Yükseklik: 2.6m"
-                        style={{ height: '36px', fontSize: '0.8rem' }}
+                        placeholder="Örn: En: 2.2m, Boy: 3.4m, Yükseklik: 2.6m"
+                        style={{ height: '40px', fontSize: '0.85rem', background: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '10px' }}
                       />
                     </div>
                     
                     <div className="form-group" style={{ margin: 0 }}>
-                      <label style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Kroki veya Oda Fotoğrafı Yükle</label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                      <label style={{ fontSize: '0.78rem', color: '#8c6a27', fontWeight: '700' }}>Kroki veya Oda Fotoğrafı Yükle</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px', flexWrap: 'wrap' }}>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -7717,39 +7728,39 @@ export default function Home() {
                         <label 
                           htmlFor="lead-photo-upload-input" 
                           className="btn-secondary btn-sm"
-                          style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', height: '36px', padding: '0 12px' }}
+                          style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', height: '38px', padding: '0 14px', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#0f172a', fontWeight: '600', fontSize: '0.82rem' }}
                         >
-                          <UploadCloud size={14} />
+                          <UploadCloud size={15} style={{ color: '#b38e47' }} />
                           {isUploadingPhoto ? 'Yükleniyor...' : 'Görsel Seç'}
                         </label>
                         {projectPhotoUrl ? (
-                          <span style={{ fontSize: '0.72rem', color: 'var(--accent-blue)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '200px' }}>
+                          <span style={{ fontSize: '0.78rem', color: '#16a34a', fontWeight: '600', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '220px' }}>
                             ✓ Fotoğraf Eklendi
                           </span>
                         ) : (
-                          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Henüz dosya seçilmedi (isteğe bağlı)</span>
+                          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Henüz dosya seçilmedi (isteğe bağlı)</span>
                         )}
                       </div>
                     </div>
                   </div>
                 )}
 
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', margin: '12px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', margin: '14px 0' }}>
                   <input 
                     type="checkbox" 
                     id="lead-kvkk-check" 
                     checked={leadKvkkAccepted} 
                     onChange={(e) => setLeadKvkkAccepted(e.target.checked)} 
                     required
-                    style={{ marginTop: '3px', cursor: 'pointer' }}
+                    style={{ marginTop: '3px', cursor: 'pointer', accentColor: '#b38e47', width: '16px', height: '16px' }}
                   />
-                  <label htmlFor="lead-kvkk-check" style={{ fontSize: '0.78rem', color: '#94a3b8', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
-                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: 'var(--accent-gold, #d4af37)', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
+                  <label htmlFor="lead-kvkk-check" style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
                   </label>
                 </div>
 
-                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }} disabled={isUploadingPhoto || isSubmittingLead}>
-                  {isUploadingPhoto ? 'Görsel Yükleniyor...' : isSubmittingLead ? 'Teklif Gönderiliyor...' : 'Teklifi Gönder'}
+                <button type="submit" className="btn-primary w-full-btn" style={{ background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#ffffff', border: 'none', borderRadius: '12px', padding: '14px', fontWeight: '800', fontSize: '0.95rem', cursor: 'pointer', boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)', minHeight: '48px', width: '100%' }} disabled={isUploadingPhoto || isSubmittingLead}>
+                  {isUploadingPhoto ? 'Görsel Yükleniyor...' : isSubmittingLead ? 'Teklif Gönderiliyor...' : 'Teklifi Yetkili Bayiye Gönder'}
                 </button>
               </form>
             )}
@@ -7767,77 +7778,84 @@ export default function Home() {
       {/* SAMPLE ORDER (NUMUNE KARO TALEBİ) MODAL */}
       {showSampleModal && sampleProduct && (
         <div className="modal-overlay animate-fade-in" onClick={() => setShowSampleModal(false)}>
-          <div className="modal-content glass-panel-gold" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px', width: '92%' }}>
-            <div className="modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Truck size={20} className="gold-icon" />
-                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Adrese Ücretsiz Numune Karo İste</h3>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px', width: '92%', borderRadius: '24px', padding: '28px', background: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.12)' }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(179, 142, 71, 0.1)', color: '#b38e47', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Truck size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>Adrese Ücretsiz Numune Karo İste</h3>
+                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>15×15 cm numune adresinize ücretsiz kargolanır</p>
+                </div>
               </div>
-              <button onClick={() => setShowSampleModal(false)} className="close-modal-btn">✕</button>
+              <button onClick={() => setShowSampleModal(false)} className="close-modal-btn" style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f1f5f9', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', cursor: 'pointer' }}>✕</button>
             </div>
 
             {sampleErrorMsg && (
-              <div className="alert-box error" style={{ margin: '12px 0 0 0', padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem' }}>
+              <div className="alert-box error" style={{ margin: '14px 0 0 0', padding: '12px 14px', borderRadius: '10px', background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', fontSize: '0.85rem' }}>
                 ⚠️ {sampleErrorMsg}
               </div>
             )}
 
             {sampleSuccessMsg ? (
-              <div className="modal-success-state" style={{ textAlign: 'center', padding: '30px 20px' }}>
-                <CheckCircle size={54} className="success-icon" style={{ color: '#34d399', marginBottom: '16px' }} />
-                <h4 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 8px 0', color: '#ffffff' }}>Numune Karo Talebiniz Alındı!</h4>
-                <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.5' }}>{sampleSuccessMsg}</p>
-                <button onClick={() => setShowSampleModal(false)} className="btn-primary" style={{ marginTop: '20px', padding: '10px 24px', borderRadius: '10px' }}>Kapat</button>
+              <div className="modal-success-state" style={{ textAlign: 'center', padding: '30px 10px' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', border: '1px solid #bbf7d0' }}>
+                  <CheckCircle size={38} />
+                </div>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 8px 0', color: '#0f172a' }}>Numune Karo Talebiniz Alındı!</h4>
+                <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.5' }}>{sampleSuccessMsg}</p>
+                <button onClick={() => setShowSampleModal(false)} className="btn-primary" style={{ marginTop: '22px', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#ffffff', border: 'none', borderRadius: '12px', padding: '12px 28px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 15px rgba(179, 142, 71, 0.25)' }}>Kapat</button>
               </div>
             ) : (
               <form onSubmit={handleSampleSubmit} className="modal-form" style={{ marginTop: '16px' }}>
                 {/* Product Summary Box */}
-                <div className="modal-product-summary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 16px', display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
-                  <div className="m-pic" style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0 }}>
+                <div className="modal-product-summary" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '12px 14px', display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                  <div className="m-pic" style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, border: '1px solid #e2e8f0' }}>
                     <TileVisualPreview style={sampleProduct.style} color={sampleProduct.color} finish={sampleProduct.finish} width={sampleProduct.width} height={sampleProduct.height} imageUrl={sampleProduct.imageUrl} />
                   </div>
                   <div>
-                    <strong style={{ fontSize: '0.92rem', color: '#ffffff', display: 'block' }}>{sampleProduct.brand?.name} - {sampleProduct.name}</strong>
-                    <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{sampleProduct.width}x{sampleProduct.height} cm • {sampleProduct.finish}</span>
-                    {sampleDealer && <p style={{ fontSize: '0.75rem', color: '#38bdf8', margin: '2px 0 0 0' }}>Yetkili Bayi: {sampleDealer.name}</p>}
+                    <strong style={{ fontSize: '0.92rem', color: '#0f172a', display: 'block' }}>{sampleProduct.brand?.name} - {sampleProduct.name}</strong>
+                    <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{sampleProduct.width}x{sampleProduct.height} cm • {sampleProduct.finish}</span>
+                    {sampleDealer && <p style={{ fontSize: '0.75rem', color: '#b38e47', fontWeight: '700', margin: '3px 0 0 0' }}>Yetkili Bayi: {sampleDealer.name}</p>}
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Adınız Soyadınız *</label>
-                  <input type="text" className="form-input" value={sampleName} onChange={(e) => setSampleName(e.target.value)} required placeholder="Ahmet Yılmaz" />
+                  <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Adınız Soyadınız *</label>
+                  <input type="text" className="form-input" value={sampleName} onChange={(e) => setSampleName(e.target.value)} required placeholder="Ahmet Yılmaz" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} />
                 </div>
 
                 <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Telefon *</label>
-                    <input type="tel" className="form-input" value={samplePhone} onChange={(e) => setSamplePhone(e.target.value)} required placeholder="0555 123 4567" />
+                    <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Telefon *</label>
+                    <input type="tel" className="form-input" value={samplePhone} onChange={(e) => setSamplePhone(e.target.value)} required placeholder="0555 123 4567" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} />
                   </div>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>E-Posta *</label>
-                    <input type="email" className="form-input" value={sampleEmail} onChange={(e) => setSampleEmail(e.target.value)} required placeholder="ahmet@example.com" />
+                    <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>E-Posta *</label>
+                    <input type="email" className="form-input" value={sampleEmail} onChange={(e) => setSampleEmail(e.target.value)} required placeholder="ahmet@example.com" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} />
                   </div>
                 </div>
 
                 <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>İl / Şehir *</label>
-                    <input type="text" className="form-input" value={sampleCity} onChange={(e) => setSampleCity(e.target.value)} required placeholder="İstanbul" />
+                    <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>İl / Şehir *</label>
+                    <input type="text" className="form-input" value={sampleCity} onChange={(e) => setSampleCity(e.target.value)} required placeholder="İstanbul" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} />
                   </div>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>İlçe</label>
-                    <input type="text" className="form-input" value={sampleDistrict} onChange={(e) => setSampleDistrict(e.target.value)} placeholder="Kadıköy" />
+                    <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>İlçe</label>
+                    <input type="text" className="form-input" value={sampleDistrict} onChange={(e) => setSampleDistrict(e.target.value)} placeholder="Kadıköy" style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px', minHeight: '44px' }} />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Kargo Teslimat Adresi *</label>
-                  <textarea className="form-input form-textarea" value={sampleAddress} onChange={(e) => setSampleAddress(e.target.value)} required placeholder="Mahalle, cadde, sokak, bina ve daire no..." rows={2} />
+                  <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Kargo Teslimat Adresi *</label>
+                  <textarea className="form-input form-textarea" value={sampleAddress} onChange={(e) => setSampleAddress(e.target.value)} required placeholder="Mahalle, cadde, sokak, bina ve daire no..." rows={2} style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px' }} />
                 </div>
 
                 <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Özel Not / Proje Detayı (Opsiyonel)</label>
-                  <input type="text" className="form-input" value={sampleNotes} onChange={(e) => setSampleNotes(e.target.value)} placeholder="Örn: 100 m² banyo yenileme projemiz için renk kontrolü yapacağım." />
+                  <label style={{ fontSize: '0.8rem', color: '#334155', fontWeight: '700' }}>Özel Not / Proje Detayı (Opsiyonel)</label>
+                  <input type="text" className="form-input" value={sampleNotes} onChange={(e) => setSampleNotes(e.target.value)} placeholder="Örn: 100 m² banyo yenileme projemiz için renk kontrolü yapacağım." style={{ background: '#ffffff', color: '#0f172a', border: '1.5px solid #cbd5e1', borderRadius: '12px' }} />
                 </div>
 
                 <button 
@@ -7846,19 +7864,21 @@ export default function Home() {
                   disabled={sampleSubmitting}
                   style={{
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                    color: '#0f172a',
+                    color: '#ffffff',
                     fontWeight: '800',
-                    fontSize: '0.92rem',
-                    padding: '13px',
+                    fontSize: '0.95rem',
+                    padding: '14px',
                     borderRadius: '12px',
-                    marginTop: '12px',
+                    marginTop: '14px',
                     width: '100%',
                     border: 'none',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    minHeight: '48px',
+                    boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)'
                   }}
                 >
                   {sampleSubmitting ? (
@@ -7868,8 +7888,8 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      <Truck size={16} />
-                      <span>Numune Karo Talebini Tamamla</span>
+                      <Truck size={17} />
+                      <span>Ücretsiz Numune Karo Talebini Gönder</span>
                     </>
                   )}
                 </button>
