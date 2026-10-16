@@ -38,8 +38,13 @@ export default function CatalogTemplateRenderer({
 
   if (!catalog) return null;
 
-  const hasCustomCanvas = Array.isArray(catalog?.customCanvasPages) && catalog.customCanvasPages.length > 0;
-  const template = catalog.template || 'milano';
+  const hasCustomCanvas =
+    (catalog?.template === 'custom-canvas' ||
+      catalog?.template === 'serbest-tuval' ||
+      catalog?.useCustomCanvas === true) &&
+    Array.isArray(catalog?.customCanvasPages) &&
+    catalog.customCanvasPages.length > 0;
+  const template = catalog.template || 'premium-mimari';
   const isLandscape = catalog.orientation === 'landscape';
 
   // Calculate total pages dynamically (Custom canvas pages vs Easy mode templates)
@@ -49,12 +54,6 @@ export default function CatalogTemplateRenderer({
   if (hasCustomCanvas) {
     productPagesCount = 0;
     extraPages = 0;
-  } else if (template === 'milano') {
-    extraPages += 1; // Manifesto & Innovation page
-    productPagesCount = productPagesCount * 2; // 2 pages per product (Sol: Mekan & Teknik / Sağ: Dikey Plaka)
-    if (catalog.showSpecs !== false) extraPages += 1; // Technical standards page
-    extraPages += 1; // Application areas page
-    if (catalog.showQrCodes !== false) extraPages += 1; // Digital 3D studio page
   } else if (template === 'lidya') {
     extraPages += 1; // System & 4 domains page
     extraPages += 1; // Colour engineering page
@@ -73,10 +72,12 @@ export default function CatalogTemplateRenderer({
     template === 'architectural-editorial' ||
     template === 'mimar-sunum' ||
     template === 'terra-luxe' ||
-    template === 'dogal-tas-mermer'
+    template === 'dogal-tas-mermer' ||
+    template === 'premium-mimari' ||
+    template === 'milano'
   ) {
-    productPagesCount = 2; // overview + hero detail
-    extraPages += 2; // manifesto + case studies
+    productPagesCount = 2;
+    extraPages = 2;
   }
 
   const totalPages = hasCustomCanvas
@@ -94,7 +95,8 @@ export default function CatalogTemplateRenderer({
        template === 'mimar-sunum' ||
        template === 'terra-luxe' ||
        template === 'dogal-tas-mermer' ||
-       template === 'premium-mimari')
+       template === 'premium-mimari' ||
+       template === 'milano')
     ? (catalog.showCover !== false ? 1 : 0) +
       5 + // manifesto (1) + panoramic living (1) + hero slab (1) + macro specs (1) + collection matrix (1)
       (catalog.showSpecs !== false ? 1 : 0) + // specs table (1)
@@ -194,24 +196,23 @@ export default function CatalogTemplateRenderer({
       case 'dijital-brosur':
       case 'artisan':
         return <DecoExclusiveTemplate {...props} />;
-      case 'architectural-editorial':
-      case 'mimar-sunum':
-      case 'terra-luxe':
-      case 'dogal-tas-mermer':
-      case 'premium-mimari':
-        return <ArchitecturalEditorialTemplate {...props} />;
       case 'material-texture':
       case 'yuzey-doku':
       case 'doku-renk':
       case 'yuzey-ve-doku':
         return <MaterialTextureTemplate {...props} />;
+      case 'architectural-editorial':
+      case 'mimar-sunum':
+      case 'terra-luxe':
+      case 'dogal-tas-mermer':
+      case 'premium-mimari':
+      case 'milano':
       case 'verona':
       case 'banyo-mutfak':
       case 'renk-ebat-rehberi':
       case 'yeni-lansman':
-      case 'milano':
       default:
-        return <MilanoLookbookTemplate {...props} />;
+        return <ArchitecturalEditorialTemplate {...props} />;
     }
   };
 

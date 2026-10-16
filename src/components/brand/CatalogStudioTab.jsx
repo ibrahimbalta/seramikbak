@@ -542,7 +542,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     return changes;
   };
 
-  const handleStartNew = (presetTemplate = 'milano', initialStep = 1) => {
+  const handleStartNew = (presetTemplate = 'premium-mimari', initialStep = 1) => {
     setActiveCatalogId(null);
     setStudioMode('easy');
     setFormData({
@@ -1574,7 +1574,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                       Fabrika ürünlerinizden dilediklerinizi seçin; hazır editoryal şablonlarımızla dakikalar içinde profesyonel bir dijital katalog oluşturun.
                     </p>
                     <button
-                      onClick={() => handleStartNew('milano', 1)}
+                      onClick={() => handleStartNew('premium-mimari', 1)}
                       className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#b4823c] to-amber-700 hover:from-[#9f7131] hover:to-amber-800 text-white font-extrabold text-xs inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                     >
                       <Plus size={16} strokeWidth={2.5} />
@@ -2032,7 +2032,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                             products: catProducts
                           });
                         } else {
-                          handleStartNew('milano', 1);
+                          handleStartNew('premium-mimari', 1);
                         }
                       }}
                       className="flex-1 py-2.5 px-3 rounded-xl bg-[#b4823c] hover:bg-[#9f7131] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
