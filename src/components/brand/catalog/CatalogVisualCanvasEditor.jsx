@@ -48,8 +48,11 @@ import {
   Compass,
   X,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  RefreshCw,
+  Link2
 } from 'lucide-react';
+import { showToast } from '@/components/ui/CatalogToast';
 
 // ============================================================================
 // ANA KATALOG ŞABLONLARI (12 ADET KURUMSAL MATBAA ŞABLONU)
@@ -2161,7 +2164,7 @@ export default function CatalogVisualCanvasEditor({
     setAutoSaveStatus(`Tüm katalog "${tmplObj.name}" şablonuna dönüştürüldü`);
   };
 
-  // Insert real brand product onto canvas (ATOMIC & CRASH-PROOF)
+  // Insert real brand product onto canvas (ATOMIC, DATA-BOUND & CRASH-PROOF)
   const handleInsertProduct = (prod, mode = 'card') => {
     if (!prod) return;
     if (onUseProduct) {
@@ -2186,7 +2189,9 @@ export default function CatalogVisualCanvasEditor({
           objectFit: 'cover',
           borderRadius: 0,
           locked: false,
-          hidden: false
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'image'
         },
         {
           id: `el-slab-txt-${ts}`,
@@ -2201,7 +2206,77 @@ export default function CatalogVisualCanvasEditor({
           color: '#0f172a',
           align: 'center',
           locked: false,
-          hidden: false
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'title'
+        }
+      ]);
+    } else if (mode === 'spec') {
+      // Technical spec & texture layout (Data-Bound)
+      addMultipleElements([
+        {
+          id: `el-spec-img-${ts}`,
+          type: 'image',
+          src: prodImg,
+          x: 40,
+          y: 90,
+          width: 250,
+          height: 380,
+          objectFit: 'cover',
+          borderRadius: 4,
+          locked: false,
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'image'
+        },
+        {
+          id: `el-spec-tex-${ts}`,
+          type: 'image',
+          src: prod.textureUrl || prodImg,
+          x: 40,
+          y: 490,
+          width: 100,
+          height: 100,
+          objectFit: 'cover',
+          borderRadius: 8,
+          locked: false,
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'texture'
+        },
+        {
+          id: `el-spec-title-${ts}`,
+          type: 'text',
+          content: `${prod.name || 'Seramik Karo'}\n${prod.width || 60}×${prod.height || 120} cm • ${prod.finish || 'Mat'}`,
+          x: 310,
+          y: 90,
+          width: 245,
+          height: 80,
+          fontSize: 16,
+          fontWeight: '800',
+          color: '#0f172a',
+          align: 'left',
+          locked: false,
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'title'
+        },
+        {
+          id: `el-spec-box-${ts}`,
+          type: 'text',
+          content: `TEKNİK PARAMETRELER\n• Kod: ${prod.sku || prod.code || 'SB-101'}\n• Aşınma: PEI ${prod.peiRating || '4'}\n• Kaymazlık: ${prod.slipResistance || 'R10'}\n• Rektifiye: ${prod.rectified !== false ? 'Evet' : 'Hayır'}\n• Don Dayanımı: ${prod.frostResistance !== false ? 'Var' : 'Yok'}`,
+          x: 310,
+          y: 180,
+          width: 245,
+          height: 140,
+          fontSize: 11,
+          fontWeight: '500',
+          color: '#334155',
+          align: 'left',
+          locked: false,
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'specs'
         }
       ]);
     } else {
@@ -2218,7 +2293,9 @@ export default function CatalogVisualCanvasEditor({
           objectFit: 'cover',
           borderRadius: 0,
           locked: false,
-          hidden: false
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'image'
         },
         {
           id: `el-card-title-${ts}`,
@@ -2233,7 +2310,9 @@ export default function CatalogVisualCanvasEditor({
           color: '#0f172a',
           align: 'left',
           locked: false,
-          hidden: false
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'title'
         },
         {
           id: `el-card-sku-${ts}`,
@@ -2248,10 +2327,80 @@ export default function CatalogVisualCanvasEditor({
           color: '#b4823c',
           align: 'right',
           locked: false,
-          hidden: false
+          hidden: false,
+          boundProductId: prod.id,
+          boundField: 'sku'
         }
       ]);
     }
+  };
+
+  // Synchronize canvas elements that are bound to brand catalog products
+  const handleSyncProductData = () => {
+    if (!brandProducts || brandProducts.length === 0) {
+      if (typeof window !== 'undefined') {
+        showToast('info', 'Senkronize edilecek marka ürünü bulunamadı.');
+      }
+      return 0;
+    }
+    const prodMap = new Map(brandProducts.map((p) => [String(p.id), p]));
+    let updatedCount = 0;
+
+    setCanvasPages((prevPages) => {
+      const newPages = prevPages.map((page) => {
+        let pageModified = false;
+        const newElements = page.elements.map((el) => {
+          if (!el.boundProductId) return el;
+          const prod = prodMap.get(String(el.boundProductId));
+          if (!prod) return el;
+
+          let updated = { ...el };
+          if (el.boundField === 'image') {
+            const newImg = prod.imageUrl || prod.textureUrl;
+            if (newImg && updated.src !== newImg) {
+              updated.src = newImg;
+              pageModified = true;
+              updatedCount++;
+            }
+          } else if (el.boundField === 'texture') {
+            const newTex = prod.textureUrl || prod.imageUrl;
+            if (newTex && updated.src !== newTex) {
+              updated.src = newTex;
+              pageModified = true;
+              updatedCount++;
+            }
+          } else if (el.boundField === 'title') {
+            const newTitle = `${prod.name || 'Seramik Karo'}\n${prod.width || 60}×${prod.height || 120} cm • ${prod.finish || 'Parlak'}`;
+            if (updated.content !== newTitle) {
+              updated.content = newTitle;
+              pageModified = true;
+              updatedCount++;
+            }
+          } else if (el.boundField === 'sku') {
+            const newSku = `SKU: ${prod.sku || prod.code || 'BN-5501'}`;
+            if (updated.content !== newSku) {
+              updated.content = newSku;
+              pageModified = true;
+              updatedCount++;
+            }
+          }
+          return updated;
+        });
+
+        return pageModified ? { ...page, elements: newElements } : page;
+      });
+
+      return newPages;
+    });
+
+    if (typeof window !== 'undefined') {
+      if (updatedCount > 0) {
+        showToast('success', `${updatedCount} adet bağlı ürün verisi güncellendi.`);
+      } else {
+        showToast('info', 'Tüm bağlı ürün verileri zaten güncel.');
+      }
+    }
+    return updatedCount;
   };
 
   // Handle local image file upload
@@ -2896,6 +3045,17 @@ export default function CatalogVisualCanvasEditor({
             Kesim Çizgisi
           </button>
 
+          {/* Live Data Sync Button */}
+          <button
+            type="button"
+            onClick={handleSyncProductData}
+            className="px-2.5 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5"
+            title="Tuvaldeki bağlı ürünleri (fiyat, ebat, görsel) güncel ürün listesiyle senkronize et"
+          >
+            <RefreshCw size={12} className="text-cyan-400" />
+            <span className="hidden lg:inline">Verileri Güncelle</span>
+          </button>
+
           <div className="h-5 w-px bg-neutral-800" />
 
           {/* Undo / Redo */}
@@ -3341,6 +3501,15 @@ export default function CatalogVisualCanvasEditor({
                         >
                           + Dev Plaka Silueti
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => handleInsertProduct(prod, 'spec')}
+                          className="col-span-2 px-2 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-cyan-300 text-[10px] font-bold text-center border border-blue-500/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                          title="Ürün görseli, doku karesi ve teknik şartname kutusunu canlı veri bağlı olarak ekler"
+                        >
+                          <Link2 size={11} className="text-cyan-400" />
+                          <span>+ Teknik Föy & Doku (Veri Bağlı)</span>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -3526,6 +3695,11 @@ export default function CatalogVisualCanvasEditor({
                           <span className={`text-xs truncate ${el.hidden ? 'line-through opacity-50' : ''}`}>
                             {el.content ? el.content.slice(0, 18) : el.type.toUpperCase()}
                           </span>
+                          {el.boundProductId && (
+                            <span title="Canlı Katalog Ürününe Bağlı" className="inline-flex items-center text-cyan-400 flex-shrink-0">
+                              <Link2 size={11} />
+                            </span>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>

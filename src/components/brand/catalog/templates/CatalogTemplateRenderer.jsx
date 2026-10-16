@@ -20,6 +20,7 @@ import GlobalExportTemplate from './GlobalExportTemplate';
 import LidyaTechnicTemplate from './LidyaTechnicTemplate';
 import DecoExclusiveTemplate from './DecoExclusiveTemplate';
 import ArchitecturalEditorialTemplate from './ArchitecturalEditorialTemplate';
+import MaterialTextureTemplate from './MaterialTextureTemplate';
 import CustomCanvasPageRenderer from './CustomCanvasPageRenderer';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 
@@ -65,6 +66,9 @@ export default function CatalogTemplateRenderer({
     if (catalog.showSpecs !== false) extraPages += 1; // Technical standards & packing page
   } else if (template === 'showroom') {
     productPagesCount = Math.max(1, Math.ceil(productPagesCount / 2));
+  } else if (template === 'spec-sheet' || template === 'teknik-urun' || template === 'nordic') {
+    if (catalog.showSpecs !== false) extraPages += 1;
+    productPagesCount = products.length > 0 ? products.length : 1;
   } else if (
     template === 'architectural-editorial' ||
     template === 'mimar-sunum' ||
@@ -77,6 +81,15 @@ export default function CatalogTemplateRenderer({
 
   const totalPages = hasCustomCanvas
     ? catalog.customCanvasPages.length
+    : (template === 'material-texture' ||
+       template === 'yuzey-doku' ||
+       template === 'doku-renk' ||
+       template === 'yuzey-ve-doku')
+    ? (catalog.showCover !== false ? 1 : 0) +
+      3 + // surface philosophy + spectrum grid + macro focus
+      (catalog.showSpecs !== false ? 1 : 0) +
+      1 + // application spaces
+      (catalog.showContactPage !== false ? 1 : 0)
     : (catalog.showCover !== false ? 1 : 0) +
       (catalog.showTOC !== false ? 1 : 0) +
       productPagesCount +
@@ -177,6 +190,11 @@ export default function CatalogTemplateRenderer({
       case 'terra-luxe':
       case 'dogal-tas-mermer':
         return <ArchitecturalEditorialTemplate {...props} />;
+      case 'material-texture':
+      case 'yuzey-doku':
+      case 'doku-renk':
+      case 'yuzey-ve-doku':
+        return <MaterialTextureTemplate {...props} />;
       case 'verona':
       case 'banyo-mutfak':
       case 'renk-ebat-rehberi':
@@ -190,6 +208,7 @@ export default function CatalogTemplateRenderer({
 
   return (
     <div
+      id="catalog-print-stage"
       ref={containerRef}
       className={`catalog-super-renderer ${mode === 'print' ? 'mode-print' : 'mode-interactive'} ${
         isFullscreen ? 'is-fullscreen' : ''

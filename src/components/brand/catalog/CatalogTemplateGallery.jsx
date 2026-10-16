@@ -65,6 +65,19 @@ export const CATALOG_TEMPLATES_DATA = [
     description: 'İtalyan Carrara ve Verona taş ocakları ihtişamında bookmatch damar takipli lüks katalog.'
   },
   {
+    id: 'yuzey-ve-doku',
+    templateId: 'material-texture',
+    name: 'Yüzey & Doku Monografı',
+    type: 'Monograf',
+    style: 'Premium',
+    styleBadgeClass: 'bg-amber-50 text-amber-900 border-amber-200',
+    pageCount: 16,
+    colorCode: '#d4af37',
+    colorGroup: 'sand',
+    coverImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    description: '10x makro yüzey dokuları, ışık yansıma indeksi (GU) ve mikro rölyef seramik monografı.'
+  },
+  {
     id: 'teknik-katalog',
     templateId: 'teknik-urun',
     name: 'Teknik Katalog',

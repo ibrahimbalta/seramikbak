@@ -82,6 +82,35 @@ export const CATALOG_DESIGN_FAMILIES = [
     ]
   },
 
+  // Material & Texture (Yüzey ve Doku Monografı)
+  {
+    id: 'material-texture',
+    aliasIds: ['yuzey-doku', 'doku-renk', 'yuzey-ve-doku', 'texture-monograph'],
+    name: 'Yüzey ve Doku Monografı',
+    category: 'architectural',
+    style: 'luxury-stone',
+    targetAudience: 'Malzeme Kütüphaneleri, İç Mimarlar, Lüks Konut Tasarımcıları',
+    tag: '10x Makro Doku & Işık Yansıması',
+    badge: 'MALZEME & DOKU',
+    aspect: 'A4 Dikey Yüzey Çalışması',
+    orientation: 'portrait',
+    accentColor: '#d4af37',
+    bgColor: '#12161a',
+    darkTheme: true,
+    coverImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    description: 'Seramik karo yüzeylerini, ışık yansıma indeksini (GU), mikro rölyef dokularını ve 10x makro yakın çekimleri öne çıkaran malzeme monografı.',
+    supportedPages: [
+      { type: 'material_cover', label: 'Doku Kapağı', desc: 'Yüksek kontrastlı yüzey kapağı ve altın detaylar' },
+      { type: 'surface_philosophy', label: 'Yüzey Felsefesi', desc: 'Sır teknolojisi ve 3D mikro rölyef açıklamaları' },
+      { type: 'spectrum_grid', label: 'Doku Spektrumu', desc: 'Dokunsal numune kartları ve renk spektrumu' },
+      { type: 'macro_focus', label: '10x Makro Detay', desc: 'Damar kırılımları ve yüzey parlaklık analizi' },
+      { type: 'texture_specs', label: 'Işık & Sürtünme', desc: 'Gloss Units ve DIN 51130 sürtünme testleri' },
+      { type: 'application_spaces', label: 'Mimari Yaşam', desc: 'Farklı ışık koşullarında mekan içi duruş' },
+      { type: 'material_back', label: 'Numune & Arka Kapak', desc: 'Fiziksel numune siparişi ve 3D doku tarama' }
+    ]
+  },
+
   // 3. Teknik Ürün Kataloğu
   {
     id: 'teknik-urun',

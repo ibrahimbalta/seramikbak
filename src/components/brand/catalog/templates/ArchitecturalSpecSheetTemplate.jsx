@@ -52,6 +52,7 @@ export default function ArchitecturalSpecSheetTemplate({
   if (catalog?.showCover !== false) pages.push({ type: 'cover' });
   if (catalog?.showTOC !== false) pages.push({ type: 'toc' });
   safeProducts.forEach((p, idx) => pages.push({ type: 'product', product: p, index: idx }));
+  if (catalog?.showSpecs !== false) pages.push({ type: 'matrix_specs' });
   if (catalog?.showContactPage !== false) pages.push({ type: 'contact' });
 
   const renderSinglePage = (pageObj, pageIndex) => {
@@ -465,6 +466,164 @@ export default function ArchitecturalSpecSheetTemplate({
           <div className="border-t-2 border-slate-900 pt-2.5 flex justify-between items-center text-xs text-slate-600 font-mono">
             <span>
               {brand.name} Mimari Teknik Şartname &bull; Poz: {p.code || `SB-${index + 101}`}
+            </span>
+            <span>Sayfa {pageNum.toString().padStart(2, '0')}</span>
+          </div>
+        </section>
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // MASTER MATRIX & PACKAGING / LOGISTICS SPECIFICATION TABLE
+    // -------------------------------------------------------------------------
+    if (pageObj.type === 'matrix_specs') {
+      const pageNum = pageIndex + 1;
+      return (
+        <section
+          key="matrix_specs"
+          className="catalog-page relative p-6 sm:p-10 bg-slate-50 text-slate-900 flex flex-col justify-between overflow-hidden border border-slate-300 font-mono"
+        >
+          {/* Antet Header */}
+          <div className="border-b-2 border-slate-800 pb-3 flex justify-between items-center">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-blue-600 rounded-xs" />
+                <span className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                  {brand.name || 'SERAMİK'} &bull; GENEL PERFORMANS MATRİSİ VE LOJİSTİK FÖYÜ
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-0.5">
+                TS EN 14411 EK-G BIA &bull; MİMARİ İHALE VE ŞARTNAME ONAY MATRİSİ &bull; ISO 9001:2015
+              </p>
+            </div>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-bold border border-blue-200">
+              ŞARTNAME EKİ
+            </span>
+          </div>
+
+          <div className="my-auto py-3 space-y-4">
+            {/* Table 1: Cross-Product Technical Performance Matrix */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                  <ShieldCheck size={14} className="text-blue-600" />
+                  <span>1. Ürün Karşılaştırma ve Dayanım Sınıfları</span>
+                </h4>
+                <span className="text-[9px] text-slate-500">ISO 10545 Standardı</span>
+              </div>
+
+              <div className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-xs">
+                <table className="w-full text-left border-collapse text-[10px]">
+                  <thead>
+                    <tr className="bg-slate-200 text-slate-800 border-b border-slate-300">
+                      <th className="p-2 font-bold">Poz / Ürün Adı</th>
+                      <th className="p-2 font-bold">Ebat (cm)</th>
+                      <th className="p-2 font-bold">Kalınlık</th>
+                      <th className="p-2 font-bold">Yüzey</th>
+                      <th className="p-2 font-bold">Kaymazlık</th>
+                      <th className="p-2 font-bold">PEI</th>
+                      <th className="p-2 font-bold">Kırılma (N)</th>
+                      <th className="p-2 font-bold">Rektifiye</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {safeProducts.slice(0, 7).map((prod, idx) => (
+                      <tr key={prod.id || idx} className="hover:bg-slate-50 transition">
+                        <td className="p-2 font-bold text-slate-900">
+                          {prod.name}
+                          <span className="block text-[8px] text-slate-500 font-normal">
+                            {prod.code || `SB-${idx + 101}`}
+                          </span>
+                        </td>
+                        <td className="p-2 text-slate-700">{prod.width || 60}×{prod.height || 120}</td>
+                        <td className="p-2 text-slate-700">{prod.thickness || 9.5} mm</td>
+                        <td className="p-2 text-slate-700">{prod.finish || 'Mat'}</td>
+                        <td className="p-2 font-bold text-blue-700">{prod.slipResistance || 'R10'}</td>
+                        <td className="p-2 font-bold text-slate-800">PEI {prod.peiRating || 4}</td>
+                        <td className="p-2 text-slate-700">≥ 2200 N</td>
+                        <td className="p-2 text-emerald-700 font-bold">
+                          {prod.rectified !== false ? 'Evet' : 'Hayır'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Table 2: Packaging, Pallet & Logistics Calculation Matrix */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                  <Box size={14} className="text-emerald-600" />
+                  <span>2. Paketleme, Palet ve Sevkiyat Normları</span>
+                </h4>
+                <span className="text-[9px] text-slate-500">Euro-Palet Standartları (80×120 / 100×120)</span>
+              </div>
+
+              <div className="border border-slate-300 rounded-lg overflow-hidden bg-white shadow-xs">
+                <table className="w-full text-left border-collapse text-[10px]">
+                  <thead>
+                    <tr className="bg-slate-200 text-slate-800 border-b border-slate-300">
+                      <th className="p-2 font-bold">Format</th>
+                      <th className="p-2 font-bold">Adet / Kutu</th>
+                      <th className="p-2 font-bold">m² / Kutu</th>
+                      <th className="p-2 font-bold">Kutu / Palet</th>
+                      <th className="p-2 font-bold">m² / Palet</th>
+                      <th className="p-2 font-bold">Palet Brüt (kg)</th>
+                      <th className="p-2 font-bold">20' Konteyner</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    <tr className="hover:bg-slate-50">
+                      <td className="p-2 font-bold text-slate-900">60×120 Porselen Karo</td>
+                      <td className="p-2 text-slate-700">2 Adet</td>
+                      <td className="p-2 text-slate-700">1.44 m²</td>
+                      <td className="p-2 text-slate-700">32 Kutu</td>
+                      <td className="p-2 font-bold text-slate-900">46.08 m²</td>
+                      <td className="p-2 text-slate-700">~1.050 kg</td>
+                      <td className="p-2 text-blue-700 font-bold">24 Palet / 1.106 m²</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50">
+                      <td className="p-2 font-bold text-slate-900">60×60 Porselen Karo</td>
+                      <td className="p-2 text-slate-700">4 Adet</td>
+                      <td className="p-2 text-slate-700">1.44 m²</td>
+                      <td className="p-2 text-slate-700">30 Kutu</td>
+                      <td className="p-2 font-bold text-slate-900">43.20 m²</td>
+                      <td className="p-2 text-slate-700">~980 kg</td>
+                      <td className="p-2 text-blue-700 font-bold">26 Palet / 1.123 m²</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50">
+                      <td className="p-2 font-bold text-slate-900">120×280 Dev Plaka (6 mm)</td>
+                      <td className="p-2 text-slate-700">1 Plaka</td>
+                      <td className="p-2 text-slate-700">3.36 m²</td>
+                      <td className="p-2 text-slate-700">20 Sandık</td>
+                      <td className="p-2 font-bold text-slate-900">67.20 m²</td>
+                      <td className="p-2 text-slate-700">~1.120 kg</td>
+                      <td className="p-2 text-blue-700 font-bold">A-Frame Sehpası</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Quality & Environmental Certifications Row */}
+            <div className="p-3 bg-white border border-slate-300 rounded-lg flex items-center justify-between text-[10px]">
+              <div className="flex items-center gap-4">
+                <span className="font-bold text-slate-900 uppercase">Sertifikasyonlar:</span>
+                <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 font-bold">CE EN 14411</span>
+                <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 font-bold">ISO 9001 / 14001</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold">LEED v4.1 Compliant</span>
+                <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 font-bold">TSE Çift Yıldız</span>
+              </div>
+              <span className="text-slate-500 font-mono text-[9px]">%100 Doğal Kil ve Kristal Mineraller</span>
+            </div>
+          </div>
+
+          {/* Running Footer */}
+          <div className="border-t-2 border-slate-800 pt-2 flex justify-between items-center text-xs text-slate-600 font-mono">
+            <span>
+              {brand.name} Mimari Teknik Şartname &bull; Genel Matris ve Lojistik Föyü
             </span>
             <span>Sayfa {pageNum.toString().padStart(2, '0')}</span>
           </div>
