@@ -1669,45 +1669,63 @@ Yetkili Satış & Showroom Departmanı`;
       <>
         <main className="login-layout" style={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: isMobile ? '12px' : '24px',
-          fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
+          padding: isMobile ? '16px 12px' : '32px 20px',
+          fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
+          position: 'relative'
         }}>
+          {/* Subtle Architectural Grid Background */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `
+              linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px',
+            pointerEvents: 'none'
+          }} />
+
           <div className="login-card glass-panel" style={{
-            background: 'rgba(17, 24, 39, 0.75)',
-            backdropFilter: 'var(--glass-backdrop, blur(16px))',
-            border: '1px solid rgba(212, 175, 55, 0.2)',
-            borderRadius: 'var(--border-radius-lg, 24px)',
-            padding: isMobile ? '24px 16px' : '40px',
+            position: 'relative',
+            zIndex: 2,
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: isMobile ? '20px' : '24px',
+            padding: isMobile ? '28px 18px' : '40px',
             width: '100%',
-            maxWidth: registerTab === 'login' ? '450px' : '700px',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)',
+            maxWidth: registerTab === 'login' ? '460px' : '720px',
+            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05)',
             transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             boxSizing: 'border-box'
           }}>
           {/* Header */}
-          <div className="login-header" style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <div className="login-header" style={{ textAlign: 'center', marginBottom: '26px' }}>
             <Link href="/" style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
               textDecoration: 'none',
-              color: 'var(--text-muted, #94a3b8)',
+              color: '#475569',
               marginBottom: '16px',
-              fontSize: '0.8rem',
+              fontSize: '0.82rem',
               fontWeight: '600',
-              transition: 'color 0.2s'
+              padding: '6px 14px',
+              borderRadius: '10px',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              transition: 'all 0.2s'
             }} className="hover-gold-text">
               <ArrowLeft size={14} /> Ana Sayfaya Dön
             </Link>
             <div className="logo-icon" style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              width: '50px',
+              height: '50px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
               color: '#ffffff',
               border: '1.5px solid #d4af37',
               display: 'flex',
@@ -1715,18 +1733,18 @@ Yetkili Satış & Showroom Departmanı`;
               justifyContent: 'center',
               fontWeight: '900',
               fontSize: '1.4rem',
-              margin: '0 auto 12px auto',
-              boxShadow: '0 4px 15px rgba(15,23,42,0.4), 0 0 10px rgba(212,175,55,0.2)'
+              margin: '0 auto 14px auto',
+              boxShadow: '0 6px 16px rgba(15, 23, 42, 0.12), 0 0 12px rgba(212, 175, 55, 0.2)'
             }}>SB</div>
             <h3 style={{ 
-              fontSize: '1.45rem', 
+              fontSize: '1.5rem', 
               fontWeight: '800', 
-              color: '#fff', 
-              margin: '0 0 6px 0',
+              color: '#0f172a', 
+              margin: '0 0 8px 0',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               letterSpacing: '-0.02em'
             }}>Bayi İş Ortaklığı Portalı</h3>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: '0.84rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
               Yetkili satıcılar için stok, teklif ve müşteri talepleri yönetim merkezi.
             </p>
           </div>
@@ -1735,24 +1753,25 @@ Yetkili Satış & Showroom Departmanı`;
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: '#f1f5f9',
             padding: '4px',
-            borderRadius: '10px',
+            borderRadius: '12px',
             marginBottom: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.05)'
+            border: '1px solid #e2e8f0'
           }}>
             <button
               type="button"
               onClick={() => { setRegisterTab('login'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: registerTab === 'login' ? '#d4af37' : 'transparent',
-                border: 'none',
+                background: registerTab === 'login' ? '#ffffff' : 'transparent',
+                border: registerTab === 'login' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
                 padding: '10px',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 fontWeight: '700',
-                color: registerTab === 'login' ? '#090d16' : '#94a3b8',
+                color: registerTab === 'login' ? '#0f172a' : '#64748b',
                 borderRadius: '8px',
                 cursor: 'pointer',
+                boxShadow: registerTab === 'login' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -1762,14 +1781,15 @@ Yetkili Satış & Showroom Departmanı`;
               type="button"
               onClick={() => { setRegisterTab('register'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: registerTab === 'register' ? '#d4af37' : 'transparent',
-                border: 'none',
+                background: registerTab === 'register' ? '#ffffff' : 'transparent',
+                border: registerTab === 'register' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
                 padding: '10px',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 fontWeight: '700',
-                color: registerTab === 'register' ? '#090d16' : '#94a3b8',
+                color: registerTab === 'register' ? '#0f172a' : '#64748b',
                 borderRadius: '8px',
                 cursor: 'pointer',
+                boxShadow: registerTab === 'register' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -1782,15 +1802,15 @@ Yetkili Satış & Showroom Departmanı`;
             <div className="login-form-wrapper">
               {inactivityLogoutReason && (
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  borderRadius: '10px',
-                  padding: '10px 14px',
-                  fontSize: '0.8rem',
+                  background: '#fffbeb',
+                  border: '1px solid #fde68a',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  color: '#f87171',
+                  gap: '10px',
+                  color: '#b45309',
                   fontWeight: '600',
                   lineHeight: '1.5',
                   marginBottom: '18px'
@@ -1802,25 +1822,25 @@ Yetkili Satış & Showroom Departmanı`;
 
               {loginError && (
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  color: '#f87171',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  borderRadius: '10px',
-                  padding: '10px 14px',
-                  fontSize: '0.78rem',
+                  background: '#fef2f2',
+                  color: '#b91c1c',
+                  border: '1px solid #fecaca',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   marginBottom: '18px'
                 }}>
-                  <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
                   <span>{loginError}</span>
                 </div>
               )}
 
               <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>E-posta veya Telefon</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>E-posta veya Telefon</label>
                   <div style={{ position: 'relative' }}>
                     <input
                       type="text"
@@ -1832,21 +1852,21 @@ Yetkili Satış & Showroom Departmanı`;
                         width: '100%',
                         padding: '12px 16px 12px 42px',
                         borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.85rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.86rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
                       className="login-input"
                     />
-                    <User size={15} style={{ position: 'absolute', left: '15px', top: '15px', color: '#94a3b8' }} />
+                    <User size={16} style={{ position: 'absolute', left: '15px', top: '14px', color: '#64748b' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Şifre</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Şifre</label>
                   <div style={{ position: 'relative' }}>
                     <input
                       type="password"
@@ -1858,16 +1878,16 @@ Yetkili Satış & Showroom Departmanı`;
                         width: '100%',
                         padding: '12px 16px 12px 42px',
                         borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.85rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.86rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
                       className="login-input"
                     />
-                    <Lock size={15} style={{ position: 'absolute', left: '15px', top: '15px', color: '#94a3b8' }} />
+                    <Lock size={16} style={{ position: 'absolute', left: '15px', top: '14px', color: '#64748b' }} />
                   </div>
                 </div>
 
@@ -1876,18 +1896,18 @@ Yetkili Satış & Showroom Departmanı`;
                   disabled={isLoading}
                   style={{
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                    color: '#090d16',
+                    color: '#ffffff',
                     border: 'none',
                     borderRadius: '10px',
                     padding: '13px',
                     fontWeight: '800',
-                    fontSize: '0.9rem',
+                    fontSize: '0.92rem',
                     cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(212, 175, 55, 0.15)',
+                    boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px',
+                    gap: '8px',
                     marginTop: '6px',
                     transition: 'all 0.2s'
                   }}
@@ -1912,36 +1932,36 @@ Yetkili Satış & Showroom Departmanı`;
             <div className="register-form-wrapper">
               {regSuccess && (
                 <div style={{
-                  background: 'rgba(16, 185, 129, 0.1)',
-                  color: '#34d399',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                  borderRadius: '10px',
-                  padding: '10px 14px',
-                  fontSize: '0.78rem',
+                  background: '#f0fdf4',
+                  color: '#15803d',
+                  border: '1px solid #bbf7d0',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   marginBottom: '18px'
                 }}>
-                  <CheckCircle size={15} style={{ flexShrink: 0 }} />
+                  <CheckCircle size={16} style={{ flexShrink: 0 }} />
                   <span>{regSuccess}</span>
                 </div>
               )}
 
               {regError && (
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  color: '#f87171',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  borderRadius: '10px',
-                  padding: '10px 14px',
-                  fontSize: '0.78rem',
+                  background: '#fef2f2',
+                  color: '#b91c1c',
+                  border: '1px solid #fecaca',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   marginBottom: '18px'
                 }}>
-                  <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
                   <span>{regError}</span>
                 </div>
               )}
@@ -1949,7 +1969,7 @@ Yetkili Satış & Showroom Departmanı`;
               <form onSubmit={handleRegisterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="campaign-inputs-grid">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Bayi Adı / Şube</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Bayi Adı / Şube</label>
                     <input
                       type="text"
                       value={regName}
@@ -1959,17 +1979,17 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.8rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.82rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none'
                       }}
                       className="login-input"
                     />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Yetkili Marka</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Yetkili Marka</label>
                     <select
                       value={regBrandId}
                       onChange={(e) => setRegBrandId(e.target.value)}
@@ -1977,10 +1997,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.8rem',
-                        background: '#0f172a',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.82rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -1995,7 +2015,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="campaign-inputs-grid">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>E-posta</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>E-posta</label>
                     <input
                       type="email"
                       value={regEmail}
@@ -2005,17 +2025,17 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.8rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.82rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none'
                       }}
                       className="login-input"
                     />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Telefon</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Telefon</label>
                     <input
                       type="tel"
                       value={regPhone}
@@ -2025,10 +2045,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.8rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.82rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2037,7 +2057,7 @@ Yetkili Satış & Showroom Departmanı`;
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Şifre</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Şifre</label>
                   <input
                     type="password"
                     value={regPassword}
@@ -2047,10 +2067,10 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      fontSize: '0.8rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.82rem',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       outline: 'none'
                     }}
                     className="login-input"
@@ -2059,7 +2079,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="campaign-inputs-grid">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>İlçe</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>İlçe</label>
                     <input
                       type="text"
                       value={regDistrict}
@@ -2069,17 +2089,17 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.8rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.82rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none'
                       }}
                       className="login-input"
                     />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Şehir</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Şehir</label>
                     <input
                       type="text"
                       value={regCity}
@@ -2089,10 +2109,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.8rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.82rem',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2101,7 +2121,7 @@ Yetkili Satış & Showroom Departmanı`;
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Şube Açık Adresi</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Şube Açık Adresi</label>
                   <textarea
                     value={regAddress}
                     onChange={(e) => setRegAddress(e.target.value)}
@@ -2111,10 +2131,10 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      fontSize: '0.8rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.82rem',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       outline: 'none',
                       fontFamily: 'inherit',
                       resize: 'none'
@@ -2125,10 +2145,10 @@ Yetkili Satış & Showroom Departmanı`;
 
                 {/* Lat Lng Geocoding helper */}
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: '#f8fafc',
                   padding: '14px',
                   borderRadius: '12px',
-                  border: '1px dashed rgba(255, 255, 255, 0.1)',
+                  border: '1px dashed #cbd5e1',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px'
@@ -2140,18 +2160,18 @@ Yetkili Satış & Showroom Departmanı`;
                     alignItems: isMobile ? 'stretch' : 'center',
                     gap: isMobile ? '8px' : '0px'
                   }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#cbd5e1', textAlign: isMobile ? 'center' : 'left' }}>Harita Koordinatları</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#334155', textAlign: isMobile ? 'center' : 'left' }}>Harita Koordinatları</span>
                     <button
                       type="button"
                       onClick={handleGeocode}
                       disabled={isGeocoding}
                       style={{
-                        background: 'rgba(212, 175, 55, 0.15)',
-                        color: '#d4af37',
-                        border: '1px solid rgba(212, 175, 55, 0.3)',
+                        background: '#fef3c7',
+                        color: '#92400e',
+                        border: '1px solid #fde68a',
                         borderRadius: '6px',
                         padding: '6px 10px',
-                        fontSize: '0.7rem',
+                        fontSize: '0.72rem',
                         fontWeight: '700',
                         cursor: 'pointer',
                         display: 'flex',
@@ -2167,7 +2187,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                   <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#94a3b8' }}>Enlem (Lat)</label>
+                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#64748b' }}>Enlem (Lat)</label>
                       <input
                         type="text"
                         value={regLat}
@@ -2177,17 +2197,17 @@ Yetkili Satış & Showroom Departmanı`;
                         style={{
                           padding: '6px 8px',
                           borderRadius: '6px',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          border: '1px solid #cbd5e1',
                           fontSize: '0.75rem',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          color: '#fff',
+                          background: '#ffffff',
+                          color: '#0f172a',
                           outline: 'none',
                           fontFamily: 'monospace'
                         }}
                       />
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#94a3b8' }}>Boylam (Lng)</label>
+                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#64748b' }}>Boylam (Lng)</label>
                       <input
                         type="text"
                         value={regLng}
@@ -2197,10 +2217,10 @@ Yetkili Satış & Showroom Departmanı`;
                         style={{
                           padding: '6px 8px',
                           borderRadius: '6px',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          border: '1px solid #cbd5e1',
                           fontSize: '0.75rem',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          color: '#fff',
+                          background: '#ffffff',
+                          color: '#0f172a',
                           outline: 'none',
                           fontFamily: 'monospace'
                         }}
@@ -2216,10 +2236,10 @@ Yetkili Satış & Showroom Departmanı`;
                     checked={kvkkAccepted} 
                     onChange={(e) => setKvkkAccepted(e.target.checked)} 
                     required
-                    style={{ marginTop: '3px', cursor: 'pointer' }}
+                    style={{ marginTop: '3px', cursor: 'pointer', accentColor: '#b38e47' }}
                   />
-                  <label htmlFor="kvkk-check" style={{ fontSize: '0.75rem', color: '#94a3b8', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
-                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#d4af37', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> ve <Link href="/yasal?tab=bayi-sozlesme" target="_blank" style={{ color: '#d4af37', fontWeight: '600', textDecoration: 'underline' }}>Bayi Üyelik Sözleşmesi'ni</Link> okudum, kabul ediyorum.
+                  <label htmlFor="kvkk-check" style={{ fontSize: '0.75rem', color: '#64748b', lineHeight: '1.45', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> ve <Link href="/yasal?tab=bayi-sozlesme" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>Bayi Üyelik Sözleşmesi'ni</Link> okudum, kabul ediyorum.
                   </label>
                 </div>
 
@@ -2228,14 +2248,14 @@ Yetkili Satış & Showroom Departmanı`;
                   disabled={isRegistering}
                   style={{
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                    color: '#090d16',
+                    color: '#ffffff',
                     border: 'none',
                     borderRadius: '10px',
                     padding: '13px',
                     fontWeight: '800',
-                    fontSize: '0.9rem',
+                    fontSize: '0.92rem',
                     cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(212, 175, 55, 0.15)',
+                    boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2264,10 +2284,10 @@ Yetkili Satış & Showroom Departmanı`;
           {/* Footer security badge */}
           <div style={{
             textAlign: 'center',
-            marginTop: '32px',
-            fontSize: '0.72rem',
+            marginTop: '28px',
+            fontSize: '0.75rem',
             color: '#64748b',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid #f1f5f9',
             paddingTop: '16px'
           }}>
             🔒 SSL ve Yetkili Bayi Ağ Güvenliği Koruması Altındadır.
@@ -2278,14 +2298,26 @@ Yetkili Satış & Showroom Departmanı`;
 
       {/* Local styles for login/registration */}
       <style jsx>{`
+        .login-input:focus {
+          border-color: #b38e47 !important;
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15) !important;
+        }
+        .login-btn:hover {
+          filter: brightness(1.05);
+          transform: translateY(-1px);
+        }
+        .hover-gold-text:hover {
+          color: #b38e47 !important;
+          border-color: #cbd5e1 !important;
+        }
         @media (max-width: 768px) {
           .login-card {
             padding: 24px 16px !important;
-            border-radius: 16px !important;
+            border-radius: 18px !important;
           }
           .campaign-inputs-grid {
             grid-template-columns: 1fr !important;
-            gap: 16px !important;
+            gap: 14px !important;
           }
         }
       `}</style>

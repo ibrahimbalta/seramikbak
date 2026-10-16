@@ -634,14 +634,14 @@ export default function ArchitectPortalPage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #070b14 0%, #0d1527 50%, #0a0f1d 100%)',
-        color: '#f8fafc',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+        color: '#0f172a',
         fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: isMobile ? '16px 12px 32px 12px' : '24px 16px',
+        padding: isMobile ? '16px 12px 32px 12px' : '32px 20px',
         position: 'relative',
         boxSizing: 'border-box'
       }}>
@@ -650,8 +650,8 @@ export default function ArchitectPortalPage() {
           position: 'absolute',
           inset: 0,
           backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)
+            linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)
           `,
           backgroundSize: '24px 24px',
           pointerEvents: 'none'
@@ -660,25 +660,28 @@ export default function ArchitectPortalPage() {
         {/* Back Link */}
         <div style={{
           width: '100%',
-          maxWidth: '460px',
+          maxWidth: authTab === 'login' ? '460px' : '680px',
           display: 'flex',
           justifyContent: 'flex-start',
           marginBottom: '16px',
           position: 'relative',
-          zIndex: 10
+          zIndex: 10,
+          transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
           <Link href="/" style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            color: '#94a3b8',
+            color: '#475569',
             textDecoration: 'none',
             fontSize: '0.82rem',
             fontWeight: '600',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.06)'
+            padding: '6px 14px',
+            borderRadius: '10px',
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
+            transition: 'all 0.2s'
           }}>
             <ArrowRight size={14} style={{ transform: 'rotate(180deg)' }} />
             <span>Ana Sayfaya Dön</span>
@@ -690,14 +693,14 @@ export default function ArchitectPortalPage() {
           position: 'relative',
           zIndex: 10,
           width: '100%',
-          maxWidth: '460px',
-          background: 'rgba(13, 21, 39, 0.85)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(212, 175, 55, 0.22)',
+          maxWidth: authTab === 'login' ? '460px' : '680px',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
           borderRadius: isMobile ? '20px' : '24px',
-          padding: isMobile ? '24px 18px' : '36px 32px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 35px rgba(212, 175, 55, 0.06)',
-          boxSizing: 'border-box'
+          padding: isMobile ? '28px 18px' : '36px 32px',
+          boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05)',
+          boxSizing: 'border-box',
+          transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '22px' }}>
@@ -709,8 +712,8 @@ export default function ArchitectPortalPage() {
               height: '50px',
               borderRadius: '14px',
               background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-              color: '#090d16',
-              boxShadow: '0 8px 20px rgba(212, 175, 55, 0.3)',
+              color: '#ffffff',
+              boxShadow: '0 8px 20px rgba(179, 142, 71, 0.25)',
               marginBottom: '14px'
             }}>
               <Compass size={26} />
@@ -721,11 +724,11 @@ export default function ArchitectPortalPage() {
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               margin: '0 0 6px 0',
               letterSpacing: '-0.02em',
-              color: '#fff'
+              color: '#0f172a'
             }}>
-              SeramikBak <span style={{ color: '#d4af37' }}>ArchStudio</span>
+              SeramikBak <span style={{ color: '#b38e47' }}>ArchStudio</span>
             </h1>
-            <p style={{ fontSize: isMobile ? '0.8rem' : '0.86rem', color: '#94a3b8', margin: 0, lineHeight: 1.45 }}>
+            <p style={{ fontSize: isMobile ? '0.82rem' : '0.86rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
               Mimarlık ofisleri ve tasarımcılar için B2B şartname, numune ve 3D BIM stüdyosu.
             </p>
           </div>
@@ -734,24 +737,25 @@ export default function ArchitectPortalPage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            background: 'rgba(255, 255, 255, 0.04)',
-            borderRadius: '10px',
-            padding: '3px',
-            marginBottom: '20px',
-            border: '1px solid rgba(255, 255, 255, 0.06)'
+            background: '#f1f5f9',
+            borderRadius: '12px',
+            padding: '4px',
+            marginBottom: '22px',
+            border: '1px solid #e2e8f0'
           }}>
             <button
               onClick={() => { setAuthTab('login'); setAuthError(''); }}
               style={{
-                padding: '9px',
-                border: 'none',
+                padding: '10px',
+                border: authTab === 'login' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
                 borderRadius: '8px',
-                background: authTab === 'login' ? '#d4af37' : 'transparent',
-                color: authTab === 'login' ? '#090d16' : '#94a3b8',
+                background: authTab === 'login' ? '#ffffff' : 'transparent',
+                color: authTab === 'login' ? '#0f172a' : '#64748b',
                 fontWeight: '700',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 cursor: 'pointer',
-                transition: 'all 0.15s'
+                boxShadow: authTab === 'login' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
+                transition: 'all 0.2s'
               }}
             >
               Mimar Girişi
@@ -759,15 +763,16 @@ export default function ArchitectPortalPage() {
             <button
               onClick={() => { setAuthTab('register'); setAuthError(''); }}
               style={{
-                padding: '9px',
-                border: 'none',
+                padding: '10px',
+                border: authTab === 'register' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
                 borderRadius: '8px',
-                background: authTab === 'register' ? '#d4af37' : 'transparent',
-                color: authTab === 'register' ? '#090d16' : '#94a3b8',
+                background: authTab === 'register' ? '#ffffff' : 'transparent',
+                color: authTab === 'register' ? '#0f172a' : '#64748b',
                 fontWeight: '700',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 cursor: 'pointer',
-                transition: 'all 0.15s'
+                boxShadow: authTab === 'register' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
+                transition: 'all 0.2s'
               }}
             >
               Yeni Ofis Kaydı
@@ -776,9 +781,9 @@ export default function ArchitectPortalPage() {
 
           {authSuccess && (
             <div style={{
-              background: 'rgba(16, 185, 129, 0.12)',
-              border: '1px solid rgba(16, 185, 129, 0.35)',
-              color: '#34d399',
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              color: '#15803d',
               borderRadius: '12px',
               padding: '12px 16px',
               fontSize: '0.82rem',
@@ -788,9 +793,9 @@ export default function ArchitectPortalPage() {
               gap: '10px',
               lineHeight: 1.45
             }}>
-              <CheckCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <CheckCircle size={18} style={{ flexShrink: 0, marginTop: '2px', color: '#16a34a' }} />
               <div>
-                <strong style={{ display: 'block', color: '#6ee7b7', marginBottom: '2px' }}>Başvurunuz Alındı</strong>
+                <strong style={{ display: 'block', color: '#166534', marginBottom: '2px' }}>Başvurunuz Alındı</strong>
                 <span>{authSuccess}</span>
               </div>
             </div>
@@ -798,9 +803,9 @@ export default function ArchitectPortalPage() {
 
           {authError && (
             <div style={{
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#f87171',
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: '#b91c1c',
               borderRadius: '12px',
               padding: '12px 16px',
               fontSize: '0.82rem',
@@ -818,7 +823,7 @@ export default function ArchitectPortalPage() {
           {authTab === 'login' ? (
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#334155', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   KURUMSAL E-POSTA ADRESİ
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -832,20 +837,21 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '12px 14px 12px 40px',
                       borderRadius: '10px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       fontSize: '0.88rem',
                       outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
-                  <User size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }} />
+                  <User size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: '#64748b' }} />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#334155', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   ŞİFRE
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -859,15 +865,16 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '12px 14px 12px 40px',
                       borderRadius: '10px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       fontSize: '0.88rem',
                       outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
-                  <Lock size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }} />
+                  <Lock size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: '#64748b' }} />
                 </div>
               </div>
 
@@ -877,20 +884,22 @@ export default function ArchitectPortalPage() {
                 style={{
                   width: '100%',
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                  color: '#090d16',
+                  color: '#ffffff',
                   border: 'none',
                   borderRadius: '10px',
                   padding: '13px',
                   fontWeight: '800',
-                  fontSize: '0.9rem',
+                  fontSize: '0.92rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
                   marginTop: '6px',
-                  boxShadow: '0 4px 16px rgba(212, 175, 55, 0.25)'
+                  boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
+                  transition: 'all 0.2s'
                 }}
+                className="login-btn"
               >
                 {authLoading ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
                 <span>ArchStudio'ya Giriş Yap</span>
@@ -898,9 +907,9 @@ export default function ArchitectPortalPage() {
             </form>
           ) : (
             /* REGISTER FORM */
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   MİMARLIK OFİSİ / ŞİRKET UNVANI *
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -914,20 +923,22 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px 10px 38px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
-                  <Building2 size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: '#94a3b8' }} />
+                  <Building2 size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: '#64748b' }} />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     YETKİLİ MİMAR ADI *
                   </label>
                   <input
@@ -940,16 +951,18 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     UNVAN
                   </label>
                   <select
@@ -959,12 +972,14 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: '#1e293b',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   >
                     <option value="Yüksek Mimar">Yüksek Mimar</option>
                     <option value="Mimar">Mimar</option>
@@ -977,7 +992,7 @@ export default function ArchitectPortalPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     E-POSTA *
                   </label>
                   <input
@@ -990,16 +1005,18 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     TELEFON *
                   </label>
                   <input
@@ -1012,19 +1029,21 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     ŞEHİR
                   </label>
                   <select
@@ -1034,18 +1053,20 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: '#1e293b',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   >
                     {TURKEY_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     ODA SİCİL (OPSİYONEL)
                   </label>
                   <input
@@ -1057,18 +1078,20 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
-                      fontSize: '0.82rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '0.84rem',
+                      outline: 'none',
                       boxSizing: 'border-box'
                     }}
+                    className="login-input"
                   />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#334155', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   ŞİFRE *
                 </label>
                 <input
@@ -1081,12 +1104,14 @@ export default function ArchitectPortalPage() {
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    color: '#fff',
-                    fontSize: '0.82rem',
+                    border: '1px solid #cbd5e1',
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    fontSize: '0.84rem',
+                    outline: 'none',
                     boxSizing: 'border-box'
                   }}
+                  className="login-input"
                 />
               </div>
 
@@ -1096,20 +1121,22 @@ export default function ArchitectPortalPage() {
                 style={{
                   width: '100%',
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                  color: '#090d16',
+                  color: '#ffffff',
                   border: 'none',
                   borderRadius: '10px',
-                  padding: '12px',
+                  padding: '13px',
                   fontWeight: '800',
-                  fontSize: '0.9rem',
+                  fontSize: '0.92rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
                   marginTop: '6px',
-                  boxShadow: '0 4px 16px rgba(212, 175, 55, 0.25)'
+                  boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
+                  transition: 'all 0.2s'
                 }}
+                className="login-btn"
               >
                 {authLoading ? <Loader2 size={16} className="animate-spin" /> : <User size={16} />}
                 <span>ArchStudio Hesabı Oluştur</span>
@@ -1118,10 +1145,22 @@ export default function ArchitectPortalPage() {
           )}
 
           {/* Footer note */}
-          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.75rem', color: '#64748b' }}>
+          <div style={{ textAlign: 'center', marginTop: '28px', fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
             Tüm 16 seramik markasının resmi şartname ve 3D BIM arşivi tek çatı altında.
           </div>
         </div>
+
+        {/* Local styles for login */}
+        <style jsx>{`
+          .login-input:focus {
+            border-color: #b38e47 !important;
+            box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15) !important;
+          }
+          .login-btn:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+          }
+        `}</style>
       </div>
     );
   }

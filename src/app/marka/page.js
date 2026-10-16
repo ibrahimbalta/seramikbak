@@ -1186,44 +1186,62 @@ export default function BrandPortalPage() {
       <>
         <main className="login-layout" style={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: isMobile ? '12px' : '24px',
-          fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
+          padding: isMobile ? '16px 12px' : '32px 20px',
+          fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
+          position: 'relative'
         }}>
+          {/* Subtle Architectural Grid Background */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `
+              linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px',
+            pointerEvents: 'none'
+          }} />
+
           <div className="login-card glass-panel" style={{
-            background: 'rgba(17, 24, 39, 0.75)',
-            backdropFilter: 'var(--glass-backdrop, blur(16px))',
-            border: '1px solid rgba(212, 175, 55, 0.2)',
-            borderRadius: 'var(--border-radius-lg, 24px)',
-            padding: isMobile ? '24px 16px' : '40px 36px',
+            position: 'relative',
+            zIndex: 2,
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: isMobile ? '20px' : '24px',
+            padding: isMobile ? '28px 18px' : '40px 36px',
             width: '100%',
-            maxWidth: registerTab === 'login' ? '450px' : '650px',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)',
+            maxWidth: registerTab === 'login' ? '460px' : '680px',
+            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05)',
             transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             boxSizing: 'border-box'
           }}>
-          <div className="login-header" style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div className="login-header" style={{ textAlign: 'center', marginBottom: '26px' }}>
             <Link href="/" style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
               textDecoration: 'none',
-              color: 'var(--text-muted, #94a3b8)',
+              color: '#475569',
               marginBottom: '16px',
-              fontSize: '0.8rem',
+              fontSize: '0.82rem',
               fontWeight: '600',
-              transition: 'color 0.2s'
+              padding: '6px 14px',
+              borderRadius: '10px',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              transition: 'all 0.2s'
             }} className="hover-gold-text">
               <ArrowLeft size={14} /> Ana Sayfaya Dön
             </Link>
             <div className="logo-icon" style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              width: '50px',
+              height: '50px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
               color: '#ffffff',
               border: '1.5px solid #d4af37',
               display: 'flex',
@@ -1231,18 +1249,18 @@ export default function BrandPortalPage() {
               justifyContent: 'center',
               fontWeight: '900',
               fontSize: '1.4rem',
-              margin: '0 auto 12px auto',
-              boxShadow: '0 4px 15px rgba(15,23,42,0.4), 0 0 10px rgba(212,175,55,0.2)'
+              margin: '0 auto 14px auto',
+              boxShadow: '0 6px 16px rgba(15, 23, 42, 0.12), 0 0 12px rgba(212, 175, 55, 0.2)'
             }}>SB</div>
             <h3 style={{ 
-              fontSize: '1.45rem', 
+              fontSize: '1.5rem', 
               fontWeight: '800', 
-              color: '#fff', 
-              margin: '0 0 6px 0',
+              color: '#0f172a', 
+              margin: '0 0 8px 0',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               letterSpacing: '-0.02em'
             }}>B2B Marka Portalı</h3>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>
+            <p style={{ fontSize: '0.84rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
               Seramik fabrikaları ve üretici yetkilileri için akıllı analiz, bayi ve reklam kontrol paneli.
             </p>
           </div>
@@ -1251,24 +1269,25 @@ export default function BrandPortalPage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: '#f1f5f9',
             padding: '4px',
-            borderRadius: '10px',
+            borderRadius: '12px',
             marginBottom: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.05)'
+            border: '1px solid #e2e8f0'
           }}>
             <button
               type="button"
               onClick={() => { setRegisterTab('login'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: registerTab === 'login' ? '#d4af37' : 'transparent',
-                border: 'none',
+                background: registerTab === 'login' ? '#ffffff' : 'transparent',
+                border: registerTab === 'login' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
                 padding: '10px',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 fontWeight: '700',
-                color: registerTab === 'login' ? '#090d16' : '#94a3b8',
+                color: registerTab === 'login' ? '#0f172a' : '#64748b',
                 borderRadius: '8px',
                 cursor: 'pointer',
+                boxShadow: registerTab === 'login' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -1278,14 +1297,15 @@ export default function BrandPortalPage() {
               type="button"
               onClick={() => { setRegisterTab('register'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: registerTab === 'register' ? '#d4af37' : 'transparent',
-                border: 'none',
+                background: registerTab === 'register' ? '#ffffff' : 'transparent',
+                border: registerTab === 'register' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
                 padding: '10px',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 fontWeight: '700',
-                color: registerTab === 'register' ? '#090d16' : '#94a3b8',
+                color: registerTab === 'register' ? '#0f172a' : '#64748b',
                 borderRadius: '8px',
                 cursor: 'pointer',
+                boxShadow: registerTab === 'register' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -1298,14 +1318,14 @@ export default function BrandPortalPage() {
             <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               {inactivityLogoutReason && (
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  background: '#fffbeb',
+                  border: '1px solid #fde68a',
                   borderRadius: '12px',
                   padding: '12px 16px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  color: '#f87171',
+                  color: '#b45309',
                   fontSize: '0.82rem',
                   fontWeight: '600',
                   lineHeight: '1.5'
@@ -1317,12 +1337,12 @@ export default function BrandPortalPage() {
 
               {loginError && (
                 <div className="error-alert" style={{
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  color: '#f87171',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  background: '#fef2f2',
+                  color: '#b91c1c',
+                  border: '1px solid #fecaca',
                   borderRadius: '12px',
                   padding: '12px 16px',
-                  fontSize: '0.8rem',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
@@ -1333,7 +1353,7 @@ export default function BrandPortalPage() {
               )}
 
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KULLANICI ADI VEYA E-POSTA</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>KULLANICI ADI VEYA E-POSTA</label>
                 <div style={{ position: 'relative' }}>
                   <input 
                     type="text" 
@@ -1345,22 +1365,22 @@ export default function BrandPortalPage() {
                       width: '100%',
                       padding: '13px 16px 13px 44px',
                       borderRadius: '12px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      border: '1px solid #cbd5e1',
                       fontSize: '0.88rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       outline: 'none',
                       boxSizing: 'border-box',
                       transition: 'border-color 0.2s, box-shadow 0.2s'
                     }}
                     className="login-input"
                   />
-                  <User size={16} style={{ position: 'absolute', left: '16px', top: '15px', color: '#94a3b8' }} />
+                  <User size={16} style={{ position: 'absolute', left: '16px', top: '15px', color: '#64748b' }} />
                 </div>
               </div>
 
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ŞİFRE</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>ŞİFRE</label>
                 <div style={{ position: 'relative' }}>
                   <input 
                     type="password" 
@@ -1372,17 +1392,17 @@ export default function BrandPortalPage() {
                       width: '100%',
                       padding: '13px 16px 13px 44px',
                       borderRadius: '12px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      border: '1px solid #cbd5e1',
                       fontSize: '0.88rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#fff',
+                      background: '#ffffff',
+                      color: '#0f172a',
                       outline: 'none',
                       boxSizing: 'border-box',
                       transition: 'border-color 0.2s, box-shadow 0.2s'
                     }}
                     className="login-input"
                   />
-                  <Lock size={16} style={{ position: 'absolute', left: '16px', top: '15px', color: '#94a3b8' }} />
+                  <Lock size={16} style={{ position: 'absolute', left: '16px', top: '15px', color: '#64748b' }} />
                 </div>
               </div>
 
@@ -1391,14 +1411,14 @@ export default function BrandPortalPage() {
                 disabled={loginLoading}
                 style={{
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                  color: '#111',
+                  color: '#ffffff',
                   border: 'none',
                   borderRadius: '12px',
                   padding: '14px',
                   fontWeight: '800',
                   fontSize: '0.92rem',
                   cursor: 'pointer',
-                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.2)',
+                  boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1428,12 +1448,12 @@ export default function BrandPortalPage() {
             <form onSubmit={handleBrandRegister} className="register-form" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {regError && (
                 <div style={{
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  color: '#f87171',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  background: '#fef2f2',
+                  color: '#b91c1c',
+                  border: '1px solid #fecaca',
                   borderRadius: '12px',
                   padding: '12px 16px',
-                  fontSize: '0.8rem',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
@@ -1445,12 +1465,12 @@ export default function BrandPortalPage() {
 
               {regSuccess && (
                 <div style={{
-                  background: 'rgba(34, 197, 94, 0.1)',
-                  color: '#4ade80',
-                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  background: '#f0fdf4',
+                  color: '#15803d',
+                  border: '1px solid #bbf7d0',
                   borderRadius: '12px',
-                  padding: '14px 16px',
-                  fontSize: '0.85rem',
+                  padding: '12px 16px',
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px'
@@ -1462,7 +1482,7 @@ export default function BrandPortalPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     ÜRETİCİ / MARKA FİRMA ADI *
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -1476,20 +1496,21 @@ export default function BrandPortalPage() {
                         width: '100%',
                         padding: '12px 14px 12px 40px',
                         borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: '1px solid #cbd5e1',
                         fontSize: '0.85rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
+                      className="login-input"
                     />
-                    <Building2 size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                    <Building2 size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#64748b' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     YETKİLİ AD SOYAD *
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -1503,22 +1524,23 @@ export default function BrandPortalPage() {
                         width: '100%',
                         padding: '12px 14px 12px 40px',
                         borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: '1px solid #cbd5e1',
                         fontSize: '0.85rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
+                      className="login-input"
                     />
-                    <User size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                    <User size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#64748b' }} />
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     KURUMSAL E-POSTA *
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -1532,20 +1554,21 @@ export default function BrandPortalPage() {
                         width: '100%',
                         padding: '12px 14px 12px 40px',
                         borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: '1px solid #cbd5e1',
                         fontSize: '0.85rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
+                      className="login-input"
                     />
-                    <User size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                    <User size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#64748b' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     TELEFON / WHATSAPP *
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -1559,21 +1582,22 @@ export default function BrandPortalPage() {
                         width: '100%',
                         padding: '12px 14px 12px 40px',
                         borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: '1px solid #cbd5e1',
                         fontSize: '0.85rem',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
+                        background: '#ffffff',
+                        color: '#0f172a',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
+                      className="login-input"
                     />
-                    <Activity size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                    <Activity size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#64748b' }} />
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   ÜRÜN KATEGORİSİ & KATILIM NOTUNUZ (OPSİYONEL)
                 </label>
                 <textarea
@@ -1585,14 +1609,15 @@ export default function BrandPortalPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    border: '1px solid #cbd5e1',
                     fontSize: '0.85rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    color: '#fff',
+                    background: '#ffffff',
+                    color: '#0f172a',
                     outline: 'none',
                     boxSizing: 'border-box',
                     resize: 'vertical'
                   }}
+                  className="login-input"
                 />
               </div>
 
@@ -1602,9 +1627,9 @@ export default function BrandPortalPage() {
                   id="markaKvkkAccepted"
                   checked={kvkkAccepted}
                   onChange={(e) => setKvkkAccepted(e.target.checked)}
-                  style={{ cursor: 'pointer', accentColor: '#d4af37' }}
+                  style={{ cursor: 'pointer', accentColor: '#b38e47' }}
                 />
-                <label htmlFor="markaKvkkAccepted" style={{ fontSize: '0.78rem', color: '#94a3b8', cursor: 'pointer' }}>
+                <label htmlFor="markaKvkkAccepted" style={{ fontSize: '0.78rem', color: '#64748b', cursor: 'pointer' }}>
                   <span>SeramikBak B2B Marka Katılım Şartları ve KVKK Aydınlatma Metnini okudum, kabul ediyorum.</span>
                 </label>
               </div>
@@ -1614,14 +1639,14 @@ export default function BrandPortalPage() {
                 disabled={isRegistering}
                 style={{
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                  color: '#111',
+                  color: '#ffffff',
                   border: 'none',
                   borderRadius: '12px',
                   padding: '14px',
                   fontWeight: '800',
                   fontSize: '0.92rem',
                   cursor: 'pointer',
-                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.2)',
+                  boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1629,6 +1654,7 @@ export default function BrandPortalPage() {
                   marginTop: '8px',
                   transition: 'all 0.2s'
                 }}
+                className="login-btn"
               >
                 {isRegistering ? (
                   <>
@@ -1645,7 +1671,7 @@ export default function BrandPortalPage() {
             </form>
           )}
 
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <div style={{ marginTop: '28px', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
             <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
               🔒 SSL ve Üretici Marka Portalı Güvenliği Koruması Altındadır.
             </span>
@@ -1655,10 +1681,22 @@ export default function BrandPortalPage() {
 
       {/* Local styles for login */}
       <style jsx>{`
+        .login-input:focus {
+          border-color: #b38e47 !important;
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15) !important;
+        }
+        .login-btn:hover {
+          filter: brightness(1.05);
+          transform: translateY(-1px);
+        }
+        .hover-gold-text:hover {
+          color: #b38e47 !important;
+          border-color: #cbd5e1 !important;
+        }
         @media (max-width: 768px) {
           .login-card {
-            padding: 24px 18px !important;
-            border-radius: 16px !important;
+            padding: 24px 16px !important;
+            border-radius: 18px !important;
           }
         }
       `}</style>
