@@ -4917,7 +4917,6 @@ export default function Home() {
                   padding: '4px 4px 12px 4px'
                 }}>
                   {weeklyProducts.map((p) => {
-                    const price = p.cheapestOffer?.price || 480;
                     const brandShort = p.brand?.name ? p.brand.name.split(' ')[0] : 'Seramik';
                     return (
                       <div 
@@ -6027,7 +6026,6 @@ export default function Home() {
                             <span className="swapper-name">{prod.name}</span>
                             <div className="swapper-meta">
                               <small>{prod.brand?.name} • {prod.width}x{prod.height} cm</small>
-                              <strong className="swapper-price">{prod.cheapestOffer?.price ? `${prod.cheapestOffer.price} ₺/m²` : ''}</strong>
                             </div>
                           </div>
                         </div>
@@ -6319,7 +6317,6 @@ export default function Home() {
                         {surfacesList.map(s => {
                           const prodImage = s.product.imageUrl || s.product.textureUrl || '/textures/calacatta_gold.jpg';
                           const brandName = s.product.brand?.name || 'Yetkili Marka';
-                          const price = s.product.cheapestOffer?.price;
 
                           return (
                             <div key={s.target} className="summary-surface-card">
@@ -6328,9 +6325,6 @@ export default function Home() {
                                   <span className="surface-status-dot" />
                                   {s.label.toUpperCase()}
                                 </span>
-                                {price && (
-                                  <span className="surface-price-badge">{price} ₺/m²</span>
-                                )}
                               </div>
 
                               <div className="surface-card-content">
