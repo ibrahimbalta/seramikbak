@@ -17,45 +17,101 @@ export default function TileVisualPreview({ style, color, finish, width, height,
   
   const seoAltString = altText || `${brandName ? brandName + ' ' : ''}${productName ? productName + ' - ' : ''}${color || ''} ${style || ''} ${finish || ''} Seramik Fayans Karo (${width}x${height} cm) | Ceramic Porcelain Tile Fliesen سيراميك`;
 
-  // Determine intelligent realistic fallback texture
+  // Determine intelligent realistic fallback texture with deterministic hash variation
   const getMatchingFallbackTexture = () => {
     const s = (style || '').toLowerCase();
     const c = (color || '').toLowerCase();
     const n = (productName || '').toLowerCase();
     const full = `${s} ${c} ${n}`;
 
-    if (s.includes('ahşap') || s.includes('wood') || n.includes('wood') || n.includes('oak') || n.includes('sedir')) {
-      if (c.includes('gri') || n.includes('gri')) return '/textures/sedir_gri.jpg';
-      return (c.includes('koyu') || n.includes('dark') || n.includes('teak') || c.includes('ceviz')) ? '/textures/teak_ahsap.jpg' : '/textures/natural_oak.jpg';
+    // Simple deterministic hash based on name to provide diverse realistic textures
+    let hash = 0;
+    for (let i = 0; i < n.length; i++) {
+      hash = (hash * 31 + n.charCodeAt(i)) & 0xffffffff;
     }
+    const absHash = Math.abs(hash);
+
+    // 1. AHŞAP / WOOD
+    if (s.includes('ahşap') || s.includes('wood') || n.includes('wood') || n.includes('oak') || n.includes('sedir') || n.includes('ceviz')) {
+      if (c.includes('gri') || n.includes('gri')) return '/textures/sedir_gri.jpg';
+      if (c.includes('koyu') || n.includes('dark') || n.includes('teak') || c.includes('ceviz')) return '/textures/teak_ahsap.jpg';
+      if (n.includes('çam') || n.includes('akçaağaç') || n.includes('blonde')) return '/textures/sedir_akcaagac.jpg';
+      const woodPool = ['/textures/natural_oak.jpg', '/textures/teak_ahsap.jpg', '/textures/sedir_akcaagac.jpg'];
+      return woodPool[absHash % woodPool.length];
+    }
+
+    // 2. SPECIFIC NOTABLE COLLECTIONS
     if (n.includes('vista')) {
       return (isDark || c.includes('antrasit')) ? '/textures/vista_antrasit.jpg' : '/textures/vista_bej.jpg';
     }
-    if (n.includes('portland') && (isDark || c.includes('fume') || c.includes('antrasit'))) {
-      return '/textures/portland_fume.jpg';
+    if (n.includes('portland')) {
+      return (isDark || c.includes('fume') || c.includes('antrasit')) ? '/textures/portland_fume.jpg' : '/textures/vintage_gri.jpg';
     }
-    if (n.includes('swan') || (isBeige && s.includes('mermer'))) {
-      return '/textures/swan_bone.jpg';
+    if (n.includes('swan')) {
+      return isDark ? '/textures/albatros_antrasit.jpg' : '/textures/swan_bone.jpg';
     }
     if (n.includes('pulpis')) {
       return '/textures/pulpis_gri.jpg';
     }
-    if (n.includes('trax') || n.includes('oxido')) {
+    if (n.includes('trax') || n.includes('oxido') || n.includes('corten')) {
       return '/textures/trax_oxido.jpg';
     }
-    if (s.includes('mermer') || s.includes('marble') || n.includes('calacatta') || n.includes('mermer')) {
-      return (isDark || c.includes('antrasit')) ? '/textures/borneo_antrasit.jpg' : '/textures/calacatta_gold.jpg';
+    if (n.includes('calacatta') || n.includes('carrara') || n.includes('statuario')) {
+      return isDark ? '/textures/borneo_antrasit.jpg' : '/textures/calacatta_gold.jpg';
     }
-    if (s.includes('taş') || s.includes('stone') || isBeige) {
-      return '/textures/travertino_classico.jpg';
+
+    // 3. COLOR & MATERIAL POOLS
+    // Dark / Anthracite / Black / Füme
+    if (isDark || c.includes('antrasit') || c.includes('siyah') || c.includes('dark') || c.includes('nero') || n.includes('antrasit') || n.includes('siyah')) {
+      if (s.includes('mermer') || n.includes('marble')) return '/textures/borneo_antrasit.jpg';
+      if (s.includes('beton') || n.includes('loft') || n.includes('cement')) return '/textures/loft_beton.jpg';
+      const darkPool = ['/textures/magma_antrasit.jpg', '/textures/albatros_antrasit.jpg', '/textures/borneo_antrasit.jpg', '/textures/vista_antrasit.jpg', '/textures/loft_beton.jpg'];
+      return darkPool[absHash % darkPool.length];
     }
-    if (isDark) {
-      return '/textures/albatros_antrasit.jpg';
+
+    // Brown / Kahverengi
+    if (isBrown || c.includes('kahve') || c.includes('brown')) {
+      const brownPool = ['/textures/vista_bej.jpg', '/textures/teak_ahsap.jpg', '/textures/keops_bej.jpg'];
+      return brownPool[absHash % brownPool.length];
     }
-    if (isBrown) {
-      return '/textures/vista_bej.jpg';
+
+    // Beige / Cream / Bone / Fildişi / Almond
+    if (isBeige || c.includes('bej') || c.includes('krem') || c.includes('fildişi') || c.includes('almond') || c.includes('kemik') || c.includes('bone') || c.includes('ivory')) {
+      if (s.includes('mermer')) return '/textures/swan_bone.jpg';
+      const beigePool = ['/textures/vista_bej.jpg', '/textures/keops_bej.jpg', '/textures/swan_bone.jpg', '/textures/travertino_classico.jpg'];
+      return beigePool[absHash % beigePool.length];
     }
-    return '/textures/thor_gri.jpg';
+
+    // Grey / Gri
+    if (c.includes('gri') || c.includes('grey') || c.includes('silver') || n.includes('grey') || n.includes('gri')) {
+      if (s.includes('mermer')) return '/textures/pulpis_gri.jpg';
+      if (s.includes('beton')) return '/textures/concrete_light_grey.jpg';
+      const greyPool = ['/textures/thor_gri.jpg', '/textures/vintage_gri.jpg', '/textures/pulpis_gri.jpg', '/textures/concrete_light_grey.jpg'];
+      return greyPool[absHash % greyPool.length];
+    }
+
+    // White / Beyaz
+    if (c.includes('beyaz') || c.includes('white') || n.includes('beyaz') || n.includes('white')) {
+      const whitePool = ['/textures/senzo_beyaz.jpg', '/textures/calacatta_gold.jpg'];
+      return whitePool[absHash % whitePool.length];
+    }
+
+    // 4. STYLE FALLBACKS
+    if (s.includes('mermer') || s.includes('marble')) {
+      const marblePool = ['/textures/calacatta_gold.jpg', '/textures/senzo_beyaz.jpg', '/textures/swan_bone.jpg', '/textures/borneo_antrasit.jpg'];
+      return marblePool[absHash % marblePool.length];
+    }
+    if (s.includes('beton') || s.includes('concrete')) {
+      const betonPool = ['/textures/concrete_light_grey.jpg', '/textures/loft_beton.jpg', '/textures/vintage_gri.jpg'];
+      return betonPool[absHash % betonPool.length];
+    }
+    if (s.includes('taş') || s.includes('stone')) {
+      const stonePool = ['/textures/thor_gri.jpg', '/textures/travertino_classico.jpg', '/textures/vintage_gri.jpg', '/textures/magma_antrasit.jpg', '/textures/keops_bej.jpg'];
+      return stonePool[absHash % stonePool.length];
+    }
+
+    const defaultPool = ['/textures/thor_gri.jpg', '/textures/calacatta_gold.jpg', '/textures/vista_bej.jpg', '/textures/senzo_beyaz.jpg'];
+    return defaultPool[absHash % defaultPool.length];
   };
 
   const fallbackTexture = getMatchingFallbackTexture();
