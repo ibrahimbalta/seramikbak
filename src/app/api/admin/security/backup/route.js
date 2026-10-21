@@ -22,7 +22,11 @@ export async function GET(request) {
       systemSettings,
       dealerInventories,
       outletListings,
-      installers
+      installers,
+      architects,
+      users,
+      catalogs,
+      sampleOrders
     ] = await Promise.all([
       prisma.brand.findMany(),
       prisma.product.findMany(),
@@ -35,7 +39,11 @@ export async function GET(request) {
       prisma.systemSetting.findMany(),
       prisma.dealerInventory.findMany(),
       prisma.outletListing.findMany(),
-      prisma.installer.findMany()
+      prisma.installer.findMany(),
+      prisma.architect.findMany(),
+      prisma.user.findMany(),
+      prisma.brandCatalog.findMany(),
+      prisma.sampleOrder.findMany()
     ]);
 
     const backupData = {
@@ -51,7 +59,11 @@ export async function GET(request) {
           leads: leads.length,
           projects: projects.length,
           installers: installers.length,
-          outletListings: outletListings.length
+          outletListings: outletListings.length,
+          architects: architects.length,
+          users: users.length,
+          catalogs: catalogs.length,
+          sampleOrders: sampleOrders.length
         }
       },
       data: {
@@ -66,7 +78,11 @@ export async function GET(request) {
         systemSettings,
         dealerInventories,
         outletListings,
-        installers
+        installers,
+        architects,
+        users,
+        catalogs,
+        sampleOrders
       }
     };
 
