@@ -342,7 +342,7 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
             gap: '22px',
             marginBottom: '70px'
           }}>
-            {filteredProducts.map((p) => {
+            {filteredProducts.map((p, pIdx) => {
               const productSlug = slugify(`${brand.name} ${p.name}`);
               return (
                 <div
@@ -368,6 +368,7 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
                         imageUrl={p.imageUrl}
                         productName={p.name}
                         brandName={brand.name}
+                        priority={pIdx < 6}
                       />
                     </div>
 

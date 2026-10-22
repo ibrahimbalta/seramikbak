@@ -4964,6 +4964,8 @@ export default function Home() {
                             src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
                             alt={p.name} 
                             loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
                             style={{
                               width: '100%',
                               height: '100%',

@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
-import { cropWhiteBorders } from '../utils/imageTextureUtils';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 // PROCEDURAL TILE VISUAL PREVIEW COMPONENT
 // Renders beautiful CSS + SVG tile representations so the page is highly 
 // visual and clearly screams "ceramics" without broken image paths.
-// If a real image is provided (imageUrl), it loads the image instead.
+// If a real image is provided (imageUrl), it loads the image directly
+// from fast high-speed CDNs with lazy decoding and intelligent fallbacks.
 // ----------------------------------------------------------------------
-export default function TileVisualPreview({ style, color, finish, width, height, imageUrl, productName, brandName, altText }) {
+export default function TileVisualPreview({ style, color, finish, width, height, imageUrl, productName, brandName, altText, priority = false }) {
   const [imageError, setImageError] = useState(false);
   const [useFallbackTexture, setUseFallbackTexture] = useState(false);
+  const [useProxyFallback, setUseProxyFallback] = useState(false);
 
   const isDark = (color || '').toLowerCase().includes('antrasit') || (color || '').toLowerCase().includes('siyah') || (color || '').toLowerCase().includes('füme');
   const isBeige = (color || '').toLowerCase().includes('bej') || (color || '').toLowerCase().includes('krem');
@@ -126,40 +127,11 @@ export default function TileVisualPreview({ style, color, finish, width, height,
     bgColor = isBeige ? '#e3d6c3' : '#a0a4ab'; // Beige/Grey concrete
   }
 
-  const [cleanedSrc, setCleanedSrc] = useState(null);
-
-  useEffect(() => {
-    if (!imageUrl || imageError || useFallbackTexture) return;
-    const rawSrc = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
-      ? `/api/proxy?url=${encodeURIComponent(imageUrl)}`
-      : imageUrl;
-    
-    let active = true;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      if (!active) return;
-      const cropped = cropWhiteBorders(img);
-      if (cropped && cropped instanceof HTMLCanvasElement) {
-        try {
-          setCleanedSrc(cropped.toDataURL());
-        } catch (e) {
-          setCleanedSrc(rawSrc);
-        }
-      } else {
-        setCleanedSrc(rawSrc);
-      }
-    };
-    img.onerror = () => {
-      if (active) setCleanedSrc(rawSrc);
-    };
-    img.src = rawSrc;
-
-    return () => { active = false; };
-  }, [imageUrl, imageError, useFallbackTexture]);
-
   const handleImageError = () => {
-    if (!useFallbackTexture && fallbackTexture) {
+    // If direct CDN load failed for an external URL and proxy hasn't been tried yet, try proxy once
+    if (!useFallbackTexture && !useProxyFallback && imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+      setUseProxyFallback(true);
+    } else if (!useFallbackTexture && fallbackTexture) {
       setUseFallbackTexture(true);
     } else {
       setImageError(true);
@@ -170,11 +142,10 @@ export default function TileVisualPreview({ style, color, finish, width, height,
   const effectiveUrl = useFallbackTexture ? fallbackTexture : (imageUrl || fallbackTexture);
 
   if (effectiveUrl && !imageError) {
-    const rawDisplaySrc = (effectiveUrl.startsWith('http://') || effectiveUrl.startsWith('https://'))
+    // Use direct URL for maximum CDN speed; only route through proxy if direct load failed
+    const displaySrc = (!useFallbackTexture && useProxyFallback && (effectiveUrl.startsWith('http://') || effectiveUrl.startsWith('https://')))
       ? `/api/proxy?url=${encodeURIComponent(effectiveUrl)}`
       : effectiveUrl;
-
-    const displaySrc = (!useFallbackTexture && cleanedSrc) ? cleanedSrc : rawDisplaySrc;
 
     return (
       <div className="tile-preview-container" style={{ backgroundColor: bgColor }} title={seoAltString} aria-label={seoAltString}>
@@ -184,7 +155,9 @@ export default function TileVisualPreview({ style, color, finish, width, height,
           title={seoAltString}
           referrerPolicy="no-referrer"
           onError={handleImageError} 
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "low"}
+          decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
         {finish === 'Parlak' && <div className="tile-gloss-reflection" />}

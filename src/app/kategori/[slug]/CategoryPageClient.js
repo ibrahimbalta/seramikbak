@@ -374,7 +374,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
             gap: '22px',
             marginBottom: '70px'
           }}>
-            {filteredProducts.map((p) => {
+            {filteredProducts.map((p, pIdx) => {
               const brandName = p.brand?.name || 'Seramik';
               const productSlug = slugify(`${brandName} ${p.name}`);
 
@@ -402,6 +402,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
                         imageUrl={p.imageUrl}
                         productName={p.name}
                         brandName={brandName}
+                        priority={pIdx < 6}
                       />
                     </div>
 

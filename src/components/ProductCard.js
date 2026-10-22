@@ -36,6 +36,7 @@ export default function ProductCard({
           imageUrl={product.imageUrl}
           productName={product.name}
           brandName={product.brand?.name}
+          priority={idx !== undefined && idx < 6}
         />
         
         {/* Compare button overlay */}

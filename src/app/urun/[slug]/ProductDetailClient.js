@@ -432,6 +432,10 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 src={currentDisplayImage}
                 alt={`${brandName} ${product.name}`}
                 className="sb-stage-photo"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                referrerPolicy="no-referrer"
                 style={{
                   objectFit: activeView === 'image' ? 'contain' : 'cover'
                 }}
@@ -815,7 +819,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   return (
                     <Link key={rel.id} href={`/urun/${relSlug}`} className="sb-rel-tile">
                       <div className="sb-rel-thumb">
-                        <img src={rel.imageUrl} alt={rel.name} className="sb-rel-pic" />
+                        <img src={rel.imageUrl} alt={rel.name} className="sb-rel-pic" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
                       </div>
                       <div className="sb-rel-caption">
                         <span className="sb-rel-b">{brandName}</span>
@@ -837,7 +841,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
       <div className="sb-bottom-bar">
         <div className="sb-bar-left">
           <div className="sb-bar-thumb">
-            <img src={currentDisplayImage} alt={product.name} className="sb-bar-pic" />
+            <img src={currentDisplayImage} alt={product.name} className="sb-bar-pic" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
           </div>
           <div className="sb-bar-meta">
             <span className="sb-bar-brand">{brandName}</span>
