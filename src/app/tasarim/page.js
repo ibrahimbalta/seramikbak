@@ -383,6 +383,9 @@ export default function BrandConsumerStudioPage() {
           setProducts(sanitized);
 
           let initial = sanitized[0];
+          const queryTexture = urlParams.get('texture') || urlParams.get('tile') || urlParams.get('imageUrl');
+          const queryName = urlParams.get('name') || urlParams.get('title');
+
           if (queryProduct) {
             const match = sanitized.find(p => 
               String(p.id) === queryProduct || 
@@ -390,6 +393,28 @@ export default function BrandConsumerStudioPage() {
               p.name?.toLowerCase().includes(queryProduct.toLowerCase())
             );
             if (match) initial = match;
+          }
+
+          if (queryTexture && (!initial || initial.textureUrl !== queryTexture)) {
+            const matchTex = sanitized.find(p => p.textureUrl === queryTexture || p.imageUrl === queryTexture);
+            if (matchTex) {
+              initial = matchTex;
+            } else {
+              const customTile = {
+                id: queryProduct || 'custom-tile',
+                name: queryName || (matchedBrand?.name ? `${matchedBrand.name} Seçili Karo` : 'Seçili Karo'),
+                code: queryProduct || 'CAT-SPEC-3D',
+                width: parseInt(urlParams.get('width')) || 60,
+                height: parseInt(urlParams.get('height')) || 120,
+                style: 'Porselen',
+                finish: urlParams.get('finish') || 'Rektifiye',
+                imageUrl: queryTexture,
+                textureUrl: queryTexture,
+                brand: { id: matchedBrand.id, name: matchedBrand.name }
+              };
+              sanitized.unshift(customTile);
+              initial = customTile;
+            }
           }
 
           setSelectedProduct(initial);

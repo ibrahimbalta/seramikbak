@@ -78,6 +78,7 @@ export default function HtmlLookbookViewer({
   const brandName = brand.name || catalog?.brandName || 'Bien Seramik';
   const brandLogo = catalog?.customLogoUrl || brand.logoUrl;
   const brandParts = brandName.trim().split(/\s+/);
+  const brandSlug = brand.slug || catalog?.brandSlug || (brandName ? brandName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-') : 'bien-seramik');
 
   // Active color template
   const [activeThemeId, setActiveThemeId] = useState(catalog?.template || 'terra-traverten');
@@ -987,6 +988,30 @@ export default function HtmlLookbookViewer({
           border-color: var(--accent);
           color: var(--accent);
         }
+        .seramikbak-lookbook-app .card-3d-btn {
+          background: rgba(18, 22, 19, 0.88);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          color: #ffffff;
+          height: 32px;
+          padding: 0 10px;
+          border-radius: 16px;
+          font-size: 10px;
+          font-weight: 700;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          transition: all .2s;
+          text-decoration: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        }
+        .seramikbak-lookbook-app .card-3d-btn:hover {
+          background: var(--accent);
+          border-color: var(--accent);
+          color: #ffffff;
+          transform: scale(1.05);
+        }
 
         .seramikbak-lookbook-app .product-info {
           padding: 18px 18px 16px;
@@ -1385,6 +1410,16 @@ export default function HtmlLookbookViewer({
               </div>
             )}
           </div>
+
+          {/* 3D Modeling Studio shortcut */}
+          <Link
+            href={`/tasarim?brand=${encodeURIComponent(brandSlug)}`}
+            className="outlinebtn hidden md:inline-flex items-center gap-1.5"
+            title="3D Mimari Mekan & Modelleme Stüdyosunu Aç"
+          >
+            <Box size={13} style={{ color: 'var(--accent)' }} />
+            <span>3D Stüdyo ↗</span>
+          </Link>
 
           {/* Download PDF button */}
           <button
@@ -1904,6 +1939,16 @@ export default function HtmlLookbookViewer({
                   <span className="product-label">{label}</span>
 
                   <div className="card-floating-actions">
+                    {/* 3D Modeling Quick Action */}
+                    <Link
+                      href={`/tasarim?brand=${encodeURIComponent(brandSlug)}&product=${encodeURIComponent(p.code || p.id || '')}&texture=${encodeURIComponent(pImage)}&name=${encodeURIComponent(p.name || '')}`}
+                      className="card-3d-btn"
+                      title="Bu ürünü 3D Mekân ve Modelleme Stüdyosunda Gör"
+                    >
+                      <Box size={12} className="text-amber-400" />
+                      <span>3D</span>
+                    </Link>
+
                     {/* Pin to moodboard button */}
                     <button
                       type="button"
@@ -1978,17 +2023,16 @@ export default function HtmlLookbookViewer({
                     </button>
                   </div>
 
-                  {p.slug && (
-                    <div className="pt-2 text-center border-t border-[var(--line)] mt-2">
-                      <Link
-                        href={`/mekan-dene?product=${p.slug}`}
-                        className="text-[10px] font-bold text-[var(--accent)] hover:underline inline-flex items-center gap-1"
-                      >
-                        <Sparkles size={11} />
-                        <span>Mekânında Gör (3D) ↗</span>
-                      </Link>
-                    </div>
-                  )}
+                  <div className="pt-2.5 text-center border-t border-[var(--line)] mt-2.5">
+                    <Link
+                      href={`/tasarim?brand=${encodeURIComponent(brandSlug)}&product=${encodeURIComponent(p.code || p.id || '')}&texture=${encodeURIComponent(pImage)}&name=${encodeURIComponent(p.name || '')}`}
+                      className="w-full py-2 px-3 rounded text-[11px] font-bold text-[var(--accent)] hover:bg-[var(--accent-light)] transition inline-flex items-center justify-center gap-1.5 group"
+                      title="Bu seramiği 3D banyo, mutfak veya salonda döşeyin"
+                    >
+                      <Box size={13} className="text-[var(--accent)] group-hover:scale-110 transition-transform" />
+                      <span>3D Modellemede Gör & Döşe ↗</span>
+                    </Link>
+                  </div>
                 </div>
               </article>
             );
@@ -2357,29 +2401,39 @@ export default function HtmlLookbookViewer({
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const p = activeDetailProduct;
-                      setActiveDetailProduct(null);
-                      handleOpenLead(p, 'quote');
-                    }}
-                    className="primarybtn flex-1 justify-center text-xs"
+                <div className="pt-2 space-y-2">
+                  <Link
+                    href={`/tasarim?brand=${encodeURIComponent(brandSlug)}&product=${encodeURIComponent(activeDetailProduct.code || activeDetailProduct.id || '')}&texture=${encodeURIComponent(activeDetailProduct.imageUrl || activeDetailProduct.textureUrl || '')}&name=${encodeURIComponent(activeDetailProduct.name || '')}`}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-[var(--ink)] text-white font-bold text-xs hover:brightness-110 transition shadow-md"
                   >
-                    Fiyat Teklifi Al ↗
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const p = activeDetailProduct;
-                      setActiveDetailProduct(null);
-                      handleOpenLead(p, 'sample');
-                    }}
-                    className="outlinebtn flex-1 justify-center text-xs"
-                  >
-                    Numune İste ↗
-                  </button>
+                    <Box size={14} className="text-amber-400" />
+                    <span>Bu Seramiği 3D Modellemede Gör & Mekân Tasarla ↗</span>
+                  </Link>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const p = activeDetailProduct;
+                        setActiveDetailProduct(null);
+                        handleOpenLead(p, 'quote');
+                      }}
+                      className="primarybtn flex-1 justify-center text-xs"
+                    >
+                      Fiyat Teklifi Al ↗
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const p = activeDetailProduct;
+                        setActiveDetailProduct(null);
+                        handleOpenLead(p, 'sample');
+                      }}
+                      className="outlinebtn flex-1 justify-center text-xs"
+                    >
+                      Numune İste ↗
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
