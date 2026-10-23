@@ -400,6 +400,28 @@ export default function AdminPage() {
     }
   };
 
+  const handleUpdateBrandOrder = async (brandId, displayOrder) => {
+    if (isNaN(displayOrder)) return;
+    try {
+      const res = await fetch('/api/admin/brands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: brandId,
+          displayOrder
+        })
+      });
+      if (res.ok) {
+        setBrandActionSuccess('Marka öncelik sırası güncellendi.');
+        setTimeout(() => setBrandActionSuccess(''), 3000);
+        loadAdminBrands();
+        loadBrands();
+      }
+    } catch (err) {
+      console.error('Failed to update brand order:', err);
+    }
+  };
+
   const handleCreateNewBrand = async (e, goToScraper = false) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!newBrandName.trim()) {
@@ -5750,6 +5772,7 @@ export default function AdminPage() {
             <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
               <thead>
                 <tr>
+                  <th style={{ textAlign: 'center', padding: '12px', width: '85px' }} title="Katalog vitrin öncelik sırası (1 = en öncelikli)">Öncelik</th>
                   <th style={{ textAlign: 'left', padding: '12px' }}>Marka Adı</th>
                   <th style={{ textAlign: 'left', padding: '12px' }}>Kullanıcı Adı</th>
                   <th style={{ textAlign: 'left', padding: '12px' }}>Giriş Şifresi</th>
@@ -5760,7 +5783,7 @@ export default function AdminPage() {
               <tbody>
                 {adminBrands.length === 0 ? (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Yükleniyor veya kayıtlı marka bulunamadı.</td>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Yükleniyor veya kayıtlı marka bulunamadı.</td>
                   </tr>
                 ) : (
                   adminBrands.map((b) => {
@@ -5768,6 +5791,38 @@ export default function AdminPage() {
                     const prodCount = b._count?.products || 0;
                     return (
                       <tr key={b.id}>
+                        <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                          <input
+                            type="number"
+                            min="1"
+                            max="999"
+                            defaultValue={b.displayOrder ?? 100}
+                            key={`${b.id}-${b.displayOrder}`}
+                            onBlur={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              if (!isNaN(val) && val !== b.displayOrder) {
+                                handleUpdateBrandOrder(b.id, val);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.target.blur();
+                              }
+                            }}
+                            style={{
+                              width: '56px',
+                              padding: '4px 6px',
+                              borderRadius: '6px',
+                              border: '1px solid #cbd5e1',
+                              textAlign: 'center',
+                              fontWeight: '700',
+                              fontSize: '0.85rem',
+                              background: '#f8fafc',
+                              color: '#0f172a'
+                            }}
+                            title="Ana sayfa vitrin öncelik sırası (1 = en öncelikli)"
+                          />
+                        </td>
                         <td style={{ padding: '12px', fontWeight: '700' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             {b.logoUrl && (

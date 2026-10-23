@@ -12,8 +12,9 @@ model Brand {
   id        String        @id @default(uuid())
   name      String        @unique
   slug      String?       @unique
-  logoUrl   String?
-  username  String?       @unique
+  logoUrl      String?
+  displayOrder Int           @default(100)
+  username     String?       @unique
   password  String
   products  Product[]
   dealers   Dealer[]

@@ -232,6 +232,82 @@ export async function GET(request) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
+    // --- BRAND INTERLEAVING / HARMONIZATION FOR HOMEPAGE CATALOG ---
+    // If browsing general catalog without a specific brand filter or keyword search,
+    // interleave products across brands according to brand displayOrder.
+    const isGeneralCatalog = !brandId && !query && !slug && !productId && (!searchParams.get('sortBy') || searchParams.get('sortBy') === 'default');
+
+    if (isGeneralCatalog && andConditions.length === 0 && !selectSimple) {
+      const limit = take || 24;
+      const offset = skip || 0;
+
+      const rawRows = await prisma.$queryRaw`
+        WITH RankedProducts AS (
+          SELECT 
+            p.id,
+            p.name,
+            p.code,
+            p."brandId",
+            p.width,
+            p.height,
+            p.color,
+            p.finish,
+            p.style,
+            p."imageUrl",
+            p."textureUrl",
+            p."isPremium",
+            p."createdAt",
+            b.name as "brandName",
+            b."logoUrl" as "brandLogoUrl",
+            b."displayOrder" as "brandDisplayOrder",
+            (
+              SELECT json_agg(json_build_object('id', c.id, 'bidAmount', c."bidAmount"))
+              FROM "AdCampaign" c 
+              WHERE c."brandId" = p."brandId" 
+                AND c.status = 'ACTIVE' 
+                AND (c."expiresAt" IS NULL OR c."expiresAt" > NOW())
+            ) as "campaignsJson",
+            ROW_NUMBER() OVER (
+              PARTITION BY p."brandId" 
+              ORDER BY p."isPremium" DESC, p."createdAt" DESC
+            ) as rn
+          FROM "Product" p
+          JOIN "Brand" b ON p."brandId" = b.id
+        )
+        SELECT *
+        FROM RankedProducts
+        ORDER BY 
+          CASE WHEN "campaignsJson" IS NOT NULL AND "isPremium" = true THEN 0 ELSE 1 END ASC,
+          rn ASC,
+          "brandDisplayOrder" ASC
+        LIMIT ${limit} OFFSET ${offset};
+      `;
+
+      const formatted = rawRows.map(row => ({
+        id: row.id,
+        name: row.name,
+        code: row.code,
+        brandId: row.brandId,
+        width: row.width,
+        height: row.height,
+        color: row.color,
+        finish: row.finish,
+        style: row.style,
+        imageUrl: row.imageUrl,
+        textureUrl: row.textureUrl,
+        isPremium: row.isPremium,
+        brand: {
+          id: row.brandId,
+          name: row.brandName,
+          logoUrl: row.brandLogoUrl,
+          displayOrder: row.brandDisplayOrder
+        },
+        campaigns: row.campaignsJson || []
+      }));
+
+      return NextResponse.json(formatted);
+    }
+
     const fullDetail = searchParams.get('fullDetail') === 'true';
     const selectSimple = searchParams.get('selectSimple') === 'true';
 
@@ -266,7 +342,8 @@ export async function GET(request) {
             select: {
               id: true,
               name: true,
-              logoUrl: true
+              logoUrl: true,
+              displayOrder: true
             }
           },
           campaigns: {
@@ -310,7 +387,8 @@ export async function GET(request) {
             select: {
               id: true,
               name: true,
-              logoUrl: true
+              logoUrl: true,
+              displayOrder: true
             }
           },
           campaigns: {
@@ -351,6 +429,38 @@ export async function GET(request) {
 
       return 0; // maintain original order
     });
+
+    // If no single brand was filtered, interleave results so brands alternate smoothly
+    if (!brandId && sortedProducts.length > 2) {
+      const sponsored = sortedProducts.filter(p => p.campaigns && p.campaigns.length > 0);
+      const organic = sortedProducts.filter(p => !p.campaigns || p.campaigns.length === 0);
+
+      const brandBuckets = new Map();
+      organic.forEach(p => {
+        const bId = p.brandId || 'unknown';
+        if (!brandBuckets.has(bId)) brandBuckets.set(bId, []);
+        brandBuckets.get(bId).push(p);
+      });
+
+      const sortedBuckets = Array.from(brandBuckets.entries()).sort((a, b) => {
+        const orderA = a[1][0]?.brand?.displayOrder ?? 100;
+        const orderB = b[1][0]?.brand?.displayOrder ?? 100;
+        return orderA - orderB;
+      });
+
+      const diversified = [...sponsored];
+      let hasMore = true;
+      while (hasMore) {
+        hasMore = false;
+        for (const [_, bucket] of sortedBuckets) {
+          if (bucket.length > 0) {
+            diversified.push(bucket.shift());
+            if (bucket.length > 0) hasMore = true;
+          }
+        }
+      }
+      return NextResponse.json(diversified);
+    }
 
     return NextResponse.json(sortedProducts);
   } catch (error) {

@@ -15,6 +15,7 @@ export async function GET(request) {
         id: true,
         name: true,
         logoUrl: true,
+        displayOrder: true,
         username: true,
         createdAt: true,
         _count: {
@@ -24,9 +25,10 @@ export async function GET(request) {
           }
         }
       },
-      orderBy: {
-        name: 'asc'
-      }
+      orderBy: [
+        { displayOrder: 'asc' },
+        { name: 'asc' }
+      ]
     });
     return NextResponse.json(brands);
   } catch (error) {
@@ -143,6 +145,7 @@ export async function POST(request) {
     const updateData = {};
     if (name) updateData.name = name.trim();
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl ? logoUrl.trim() : null;
+    if (body.displayOrder !== undefined) updateData.displayOrder = parseInt(body.displayOrder, 10) || 100;
     if (username) updateData.username = username.trim();
     if (password) {
       updateData.password = password.includes(':') ? password : hashPassword(password);
