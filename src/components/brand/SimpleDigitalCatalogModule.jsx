@@ -252,6 +252,42 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     }
   };
 
+  // AI Assistant: Auto-fill editorial text
+  const handleAiAutoFill = async () => {
+    setAiGenerating(true);
+    try {
+      const selected = brandProducts.filter((p) => formData.selectedProductIds.includes(p.id));
+      const res = await fetch('/api/ai/catalog-autofill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandName: brandInfo?.name || 'Marka',
+          products: selected.slice(0, 5).map((p) => ({
+            name: p.name,
+            finish: p.finish,
+            color: p.color
+          })),
+          theme: formData.template === 'obsidian-gold' ? 'luxury' : 'architectural'
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success && (data.preset || data.data)) {
+        const ai = data.preset || data.data;
+        setFormData((prev) => ({
+          ...prev,
+          title: ai.title || prev.title,
+          coverSubtitle: ai.coverSubtitle || prev.coverSubtitle,
+          introText: ai.introText || prev.introText,
+          primaryColor: ai.primaryColor || prev.primaryColor
+        }));
+      }
+    } catch (err) {
+      console.error('AI autofill hatası:', err);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
   // Save Catalog
   const handleSaveCatalog = async (publishNow = false) => {
     if (!formData.title.trim()) {
