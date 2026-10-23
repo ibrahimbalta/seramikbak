@@ -1,18 +1,18 @@
 /**
- * SeramikBak Dijital Katalog & Lookbook Renk Şablonları Kütüphanesi
- * Kullanıcının sağladığı mimari editoryal tasarım sistemine dayalı,
- * 6 farklı renk harmonisi ve CSS değişken seti.
+ * SeramikBak Dijital Katalog & Lookbook Şablon Kütüphanesi
+ * 6 Farklı Mimari Tasarım, HTML Düzeni ve Renk Paleti Seti
  */
 
 export const LOOKBOOK_COLOR_TEMPLATES = [
   {
     id: 'terra-traverten',
     aliasIds: ['terra-luxe', 'traverten', 'default'],
-    name: 'Terra & Traverten (Toprak Tonları)',
-    badge: 'KULLANICI SEÇİMİ',
+    name: 'Terra & Traverten (Editoryal Doğal Taş)',
+    badge: 'EDİTORYAL DOĞAL TAŞ',
     tag: 'Sıcak Traverten & Altın Bronz',
-    style: 'Doğal Taş & Editoryal',
-    description: 'Doğal taş ve mermerin sıcaklığını yansıtan fildişi/krem zemin, zengin toprak ve altın bronz vurguları.',
+    style: 'Asimetrik Editoryal',
+    layoutType: 'editorial-asymmetric',
+    description: 'Doğal taş ve mermerin sıcaklığını yansıtan fildişi/krem zemin, asimetrik 2 sütunlu editoryal mizanpaj ve altın bronz vurguları.',
     previewImg: '/renders/luxury_bathroom_natural_oak.jpg',
     colorSample: {
       primary: '#a87943',
@@ -52,53 +52,55 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
     id: 'obsidian-gold',
     aliasIds: ['milano', 'dark-luxury', 'obsidian'],
     name: 'Obsidian & Altın (Milano Gece)',
-    badge: 'LÜKS MİLANO',
-    tag: 'Obsidian Siyah & Şampanya Altını',
-    style: 'Dramatik Kontrast & Gece',
-    description: 'Büyük tam ekran görseller, derin antrasit-siyah arka plan ve ışıldayan altın dokunuşlarla yüksek prestijli monograf.',
-    previewImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
+    badge: 'MİLANO CERSAIE',
+    tag: 'Tam Ekran Sinematik & Dev Slab',
+    style: 'Sinematik Monolitik',
+    layoutType: 'cinema-fullwidth',
+    description: 'Dev ebat seramik ve porselen slablar için tam ekran sinematik kapak, obsidian cam kartlar ve ışıltılı altın detaylar.',
+    previewImg: '/renders/luxury_bathroom_albatros_antrasit.jpg',
     colorSample: {
       primary: '#c5a059',
       secondary: '#0a0c10',
-      background: '#0e1117',
-      paper: '#151922',
+      background: '#0a0d14',
+      paper: '#131822',
       accent: '#c5a059'
     },
     vars: {
       '--site-primary': '#c5a059',
-      '--site-secondary': '#0a0c10',
-      '--site-background': '#0e1117',
-      '--site-on-primary': '#0a0c10',
+      '--site-secondary': '#07090e',
+      '--site-background': '#0a0d14',
+      '--site-on-primary': '#07090e',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#f4f4f5',
       '--ink': '#f4f4f5',
       '--muted': '#9ca3af',
-      '--line': '#262d3d',
-      '--paper': '#151922',
+      '--line': '#222938',
+      '--paper': '#131822',
       '--accent': '#c5a059',
-      '--accent-light': '#2b2416',
-      '--hero-bg': '#07090d',
+      '--accent-light': '#2b2314',
+      '--hero-bg': '#06080c',
       '--hero-text': '#f4f4f5',
       '--hero-eyebrow': '#c5a059',
       '--hero-em': '#e6cb8f',
-      '--hero-stamp-bg': 'rgba(14, 17, 23, 0.82)',
+      '--hero-stamp-bg': 'rgba(19, 24, 34, 0.85)',
       '--hero-stamp-border': 'rgba(197, 160, 89, 0.45)',
-      '--editorial-bg': '#141821',
-      '--editorial-caption-bg': 'rgba(7, 9, 13, 0.88)',
-      '--cta-bg': '#151922',
+      '--editorial-bg': '#10141d',
+      '--editorial-caption-bg': 'rgba(6, 8, 12, 0.9)',
+      '--cta-bg': '#131822',
       '--cta-text': '#f4f4f5',
       '--product-hover-border': '#c5a059',
-      '--product-img-bg': '#11141c'
+      '--product-img-bg': '#0d1017'
     }
   },
   {
     id: 'nordic-loft',
-    aliasIds: ['nordic', 'beton', 'loft'],
+    aliasIds: ['nordic', 'beton', 'loft', 'swiss'],
     name: 'Nordic Loft (Kuzey Grisi & Beton)',
-    badge: 'ÇAĞDAŞ LOFT',
-    tag: 'Soğuk Çimento & Mavi-Gri',
-    style: 'İskandinav Minimal',
-    description: 'Beton, çimento ve modern mimari karolar için temiz soğuk gri tonları, antrasit çizgiler ve havadar beyaz alan.',
+    badge: 'BAUHAUS LOFT',
+    tag: 'İsviçre Izgarası & Ham Çimento',
+    style: 'Endüstriyel Minimal',
+    layoutType: 'swiss-industrial',
+    description: 'Beton ve çimento dokuları için brütist Bauhaus mizanpajı, net geometrik çizgiler, teknik koordinatlar ve milimetrik şartname.',
     previewImg: '/renders/luxury_bathroom_loft_beton.jpg',
     colorSample: {
       primary: '#475569',
@@ -124,25 +126,26 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--hero-text': '#f8fafc',
       '--hero-eyebrow': '#94a3b8',
       '--hero-em': '#cbd5e1',
-      '--hero-stamp-bg': 'rgba(30, 41, 59, 0.78)',
-      '--hero-stamp-border': 'rgba(255, 255, 255, 0.4)',
+      '--hero-stamp-bg': 'rgba(30, 41, 59, 0.85)',
+      '--hero-stamp-border': 'rgba(255, 255, 255, 0.35)',
       '--editorial-bg': '#e2e8f0',
-      '--editorial-caption-bg': 'rgba(15, 23, 42, 0.86)',
+      '--editorial-caption-bg': 'rgba(15, 23, 42, 0.88)',
       '--cta-bg': '#0f172a',
       '--cta-text': '#ffffff',
-      '--product-hover-border': '#94a3b8',
+      '--product-hover-border': '#64748b',
       '--product-img-bg': '#e2e8f0'
     }
   },
   {
     id: 'sage-forest',
-    aliasIds: ['sage', 'forest', 'botanic', 'doga'],
-    name: 'Adaçayı & Koyu Orman (Doğa)',
-    badge: 'DOĞAL & BOTANİK',
-    tag: 'Adaçayı Yeşili & Koyu Orman',
-    style: 'Huzurlu Spa & Wellness',
-    description: 'Doğadan ilham alan yeşil seramikler, spa ve wellness mekanları için ferah adaçayı yeşili ve organik orman tonları.',
-    previewImg: '/renders/luxury_bathroom_albatros_antrasit.jpg',
+    aliasIds: ['sage', 'forest', 'botanic', 'doga', 'wellness'],
+    name: 'Adaçayı & Koyu Orman (Doğa & Spa)',
+    badge: 'BİOFİLİK & SPA',
+    tag: 'Organik Eğriler & Wellness',
+    style: 'Doğal & Sağlık',
+    layoutType: 'organic-wellness',
+    description: 'Yeşil tonlu karolar ve spa alanları için yuvarlatılmış organik kartlar, biophilic mimari felsefe ve ferah adaçayı harmonisi.',
+    previewImg: '/images/showroom_hero_flagship.jpg',
     colorSample: {
       primary: '#4d6b53',
       secondary: '#1c2820',
@@ -167,7 +170,7 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--hero-text': '#f2f7f3',
       '--hero-eyebrow': '#92b69a',
       '--hero-em': '#b8d7bf',
-      '--hero-stamp-bg': 'rgba(28, 40, 32, 0.78)',
+      '--hero-stamp-bg': 'rgba(28, 40, 32, 0.82)',
       '--hero-stamp-border': 'rgba(255, 255, 255, 0.4)',
       '--editorial-bg': '#e6ede7',
       '--editorial-caption-bg': 'rgba(20, 30, 23, 0.88)',
@@ -179,12 +182,13 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
   },
   {
     id: 'terracotta-sun',
-    aliasIds: ['terracotta', 'deco', 'mediterranean', 'akdeniz'],
+    aliasIds: ['terracotta', 'deco', 'mediterranean', 'akdeniz', 'villa'],
     name: 'Terracotta & Akdeniz Taşı',
-    badge: 'SICAK AKDENİZ',
-    tag: 'Pişmiş Toprak & Sıcak Kiremit',
-    style: 'Artisan & Butik Yaşam',
-    description: 'Sıcak Akdeniz güneşi, pişmiş kil ve zanaatkar seramikler için sıcak kiremit, kum taşı ve tarçın tonları.',
+    badge: 'AKDENİZ VİLLASI',
+    tag: 'Pişmiş Kil & Kitap Mizanpajı',
+    style: 'Artisan & Butik',
+    layoutType: 'mediterranean-book',
+    description: 'Sıcak Akdeniz güneşi, pişmiş toprak ve zanaatkar seramikler için çift sayfalı kitap düzeni, kiremit ve sıcak kum rengi tonları.',
     previewImg: '/renders/modern_living_natural_oak.jpg',
     colorSample: {
       primary: '#b85d38',
@@ -210,7 +214,7 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--hero-text': '#faf4ef',
       '--hero-eyebrow': '#e0906e',
       '--hero-em': '#f3b295',
-      '--hero-stamp-bg': 'rgba(45, 27, 21, 0.78)',
+      '--hero-stamp-bg': 'rgba(45, 27, 21, 0.82)',
       '--hero-stamp-border': 'rgba(255, 255, 255, 0.4)',
       '--editorial-bg': '#f3e7df',
       '--editorial-caption-bg': 'rgba(38, 20, 15, 0.88)',
@@ -222,53 +226,50 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
   },
   {
     id: 'carrara-pure',
-    aliasIds: ['carrara', 'monochrome', 'pure-white', 'marble'],
-    name: 'Carrara & Saf Monokrom',
-    badge: 'SAF MERMER',
-    tag: 'Arı Beyaz & Grafit Kontrast',
-    style: 'Ultra Minimal & Saf',
-    description: 'Beyaz mermer, calacatta ve parlak porselen karolar için arı beyaz, açık gümüş ve derin kömür zıtlığı.',
+    aliasIds: ['carrara', 'monochrome', 'pure-white', 'marble', 'gallery'],
+    name: 'Carrara & Saf Monokrom (Galeri)',
+    badge: 'BEYAZ KÜP GALERİ',
+    tag: 'Müze Sergisi & Beyaz Mermer',
+    style: 'Ultra Minimalist',
+    layoutType: 'gallery-minimal',
+    description: 'Beyaz mermer, calacatta ve parlak porselen karolar için müze galerisi formatı, geniş negatif beyaz alan ve saf grafit hatlar.',
     previewImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
     colorSample: {
       primary: '#18181b',
       secondary: '#09090b',
-      background: '#f9f9fa',
-      paper: '#ffffff',
+      background: '#ffffff',
+      paper: '#fafafa',
       accent: '#18181b'
     },
     vars: {
       '--site-primary': '#18181b',
       '--site-secondary': '#09090b',
-      '--site-background': '#f9f9fa',
+      '--site-background': '#ffffff',
       '--site-on-primary': '#ffffff',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#18181b',
       '--ink': '#18181b',
       '--muted': '#71717a',
       '--line': '#e4e4e7',
-      '--paper': '#ffffff',
+      '--paper': '#fafafa',
       '--accent': '#18181b',
       '--accent-light': '#f4f4f5',
-      '--hero-bg': '#111113',
+      '--hero-bg': '#09090b',
       '--hero-text': '#fafafa',
       '--hero-eyebrow': '#a1a1aa',
       '--hero-em': '#e4e4e7',
-      '--hero-stamp-bg': 'rgba(24, 24, 27, 0.78)',
+      '--hero-stamp-bg': 'rgba(24, 24, 27, 0.85)',
       '--hero-stamp-border': 'rgba(255, 255, 255, 0.4)',
-      '--editorial-bg': '#f0f0f2',
+      '--editorial-bg': '#f4f4f6',
       '--editorial-caption-bg': 'rgba(17, 17, 19, 0.88)',
       '--cta-bg': '#09090b',
       '--cta-text': '#ffffff',
-      '--product-hover-border': '#a1a1aa',
-      '--product-img-bg': '#ececed'
+      '--product-hover-border': '#18181b',
+      '--product-img-bg': '#f4f4f5'
     }
   }
 ];
 
-/**
- * ID veya alias eşleşmesi ile aktif tema nesnesini döndürür.
- * Eşleşmezse varsayılan 'terra-traverten' şablonunu seçer.
- */
 export function getLookbookTheme(themeId) {
   if (!themeId) return LOOKBOOK_COLOR_TEMPLATES[0];
   const normalized = String(themeId).toLowerCase().trim();
@@ -278,9 +279,6 @@ export function getLookbookTheme(themeId) {
   return found || LOOKBOOK_COLOR_TEMPLATES[0];
 }
 
-/**
- * Tema değişkenlerini inline style objesine dönüştürür.
- */
 export function getLookbookCssVars(themeId) {
   const theme = getLookbookTheme(themeId);
   return { ...theme.vars };
