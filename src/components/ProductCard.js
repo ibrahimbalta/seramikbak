@@ -84,20 +84,20 @@ export default function ProductCard({
       {/* Card Meta Content */}
       <div className="card-text-details-new">
         <div className="card-badges-row-new">
-          {hasAd && (
-            <span className="card-badge-tag-new gold animate-pulse" style={{ animationDuration: '1.2s' }}>
-              SPONSOR
-            </span>
-          )}
-          {(() => {
-            const badge = getProductBadge(product, idx);
+          {hasAd ? (
+            <span className="card-badge-tag-new gold">SPONSOR</span>
+          ) : (() => {
+            const badge = getProductBadge ? getProductBadge(product, idx) : null;
+            if (!badge) return null;
             return (
               <span className={`card-badge-tag-new ${badge.className}`}>
                 {badge.text}
               </span>
             );
           })()}
-          <span className="card-badge-tag-new grey">{translateFinish(product.finish) || product.finish}</span>
+          {product.finish && (
+            <span className="card-badge-tag-new grey">{translateFinish(product.finish) || product.finish}</span>
+          )}
         </div>
         
         <h4 className="card-title-new">{product.name}</h4>

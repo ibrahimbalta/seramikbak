@@ -21,32 +21,28 @@ export function LanguageProvider({ children }) {
   };
 
   useEffect(() => {
-    // Detect saved language or automatic browser/country locale
+    // Detect saved language, explicit URL parameter, or default to Turkish
     if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        if (urlLang && dictionaries[urlLang]) {
+          setLangState(urlLang);
+          applyLanguageSettings(urlLang);
+          return;
+        }
+      } catch (e) {
+        // ignore URL search params parse error
+      }
+
       const savedLang = localStorage.getItem('seramikbak_lang');
       if (savedLang && dictionaries[savedLang]) {
         setLangState(savedLang);
         applyLanguageSettings(savedLang);
       } else {
-        // Smart Country & Browser Auto-Detection
-        const userLanguages = Array.from(navigator.languages || [navigator.language || '']);
-        let detected = 'tr';
-
-        for (const fullLang of userLanguages) {
-          const code = fullLang.toLowerCase().split('-')[0];
-          if (code === 'de' || code === 'at' || code === 'ch') { detected = 'de'; break; }
-          if (code === 'ar' || code === 'sa' || code === 'ae' || code === 'qa' || code === 'eg' || code === 'kw') { detected = 'ar'; break; }
-          if (code === 'ru' || code === 'by' || code === 'kz') { detected = 'ru'; break; }
-          if (code === 'fr' || code === 'be' || code === 'ma' || code === 'dz' || code === 'tn') { detected = 'fr'; break; }
-          if (code === 'es' || code === 'mx' || code === 'ar' || code === 'co') { detected = 'es'; break; }
-          if (code === 'en' || code === 'gb' || code === 'us' || code === 'ca' || code === 'au') { detected = 'en'; break; }
-          if (code === 'tr') { detected = 'tr'; break; }
-        }
-
-        if (dictionaries[detected]) {
-          setLangState(detected);
-          applyLanguageSettings(detected);
-        }
+        // Default canonical language is Turkish (prevent crawler header from overriding root Turkish metadata)
+        setLangState('tr');
+        applyLanguageSettings('tr');
       }
     }
   }, []);

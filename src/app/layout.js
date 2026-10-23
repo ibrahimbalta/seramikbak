@@ -3,10 +3,10 @@ import "./globals.css";
 export const metadata = {
   metadataBase: new URL("https://www.seramikbak.com"),
   title: {
-    default: "SeramikBak | Global Ceramic Tile Engine, 3D Room Visualizer & B2B Portal",
-    template: "%s | SeramikBak Global"
+    default: "Seramik Arama Motoru, 3D Mekân Görselleştirme | SeramikBak",
+    template: "%s | SeramikBak"
   },
-  description: "Türkiye'nin ve dünyanın önde gelen seramik markalarını (Çanakkale Seramik, NG Kütahya, VitrA, Bien, Yurtbay, Seramiksan, Ege Seramik, Qua Granite, DuraTiles, Decovita, Graniser, Güral, Hitit, Seranit, Termal, Uşak Seramik) tek çatı altında buluşturan, Web 3D Sanal Stüdyo ve WebAR destekli uluslararası seramik arama motoru.",
+  description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin ve 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın. SeramikBak ile kolayca arayın.",
   keywords: [
     // 16 Dev Türk Seramik Markası
     "çanakkale seramik", "ng kütahya seramik", "vitra seramik", "bien seramik", "yurtbay seramik",
@@ -59,10 +59,10 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: "SeramikBak | Global Ceramic Tile Engine & 3D Visualizer",
-    description: "Discover Turkish ceramic tile collections worldwide. Interactive 3D room visualizer, AR preview, and direct authorized dealer network.",
+    title: "Seramik Arama Motoru, 3D Mekân Görselleştirme | SeramikBak",
+    description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin ve 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.",
     url: "https://www.seramikbak.com",
-    siteName: "SeramikBak Global",
+    siteName: "SeramikBak",
     locale: "tr_TR",
     alternateLocale: ["en_US", "de_DE", "fr_FR", "es_ES", "ar_SA", "ru_RU"],
     type: "website",
@@ -71,15 +71,15 @@ export const metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "SeramikBak Global - Ceramic Tile Search Engine & 3D Studio",
+        alt: "SeramikBak - Seramik Arama Motoru & 3D Stüdyo",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SeramikBak Global | Ceramic Tile Search Engine",
-    description: "Explore top ceramic & porcelain tile brands worldwide with 3D Room Visualizer and AR portal.",
+    title: "Seramik Arama Motoru, 3D Mekân Görselleştirme | SeramikBak",
+    description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin ve 81 ildeki yetkili bayilerden ücretsiz fiyat teklifi alın.",
     images: ["/og-image.png"],
     creator: "@seramikbak",
   },

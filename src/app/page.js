@@ -114,6 +114,7 @@ import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
+import HomeTrustFaqSection from '@/components/HomeTrustFaqSection';
 
 const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
@@ -142,10 +143,8 @@ function getProductBadge(product, idx) {
     return { text: `%${product.similarityScore} Uyum`, className: "gold" };
   }
   if (product.isPremium) return { text: "Premium", className: "gold" };
-  const val = product.name.charCodeAt(0) + product.name.charCodeAt(product.name.length - 1) + idx;
-  if (val % 3 === 0) return { text: "Çok Satan", className: "red" };
-  if (val % 3 === 1) return { text: "Haftanın Trendi", className: "orange" };
-  return { text: "Mimarın Seçimi", className: "blue" };
+  if (product.featured || idx === 0) return { text: "Öne Çıkan", className: "gold" };
+  return null;
 }
 
 function generateMoodboardFromProduct(product, index) {
@@ -814,7 +813,7 @@ export default function Home() {
       }
     };
     fetchLiveStats();
-    const interval = setInterval(fetchLiveStats, 5000); // Live poll every 5 seconds
+    const interval = setInterval(fetchLiveStats, 60000); // Live poll gently every 60 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -3739,17 +3738,22 @@ export default function Home() {
 
   return (
     <main className="main-layout">
-      {/* Live Platform Activity & Ticker Bar */}
-      <div className="live-analytics-top-bar">
-        {liveActivities && liveActivities.length > 0 && (
-          <div className="live-ticker-capsule">
-            <span className="ticker-capsule-badge">⚡ ANLIK AKIŞ</span>
-            <span className="ticker-capsule-text animate-fade-in">
-              {liveActivities[activeActivityIdx % liveActivities.length]?.text} 
-              <span className="ticker-time-ago">• {liveActivities[activeActivityIdx % liveActivities.length]?.time}</span>
-            </span>
-          </div>
-        )}
+      {/* Platform Trust & Reassurance Bar */}
+      <div className="live-analytics-top-bar" style={{ background: '#0b1120', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '7px 16px' }}>
+        <div className="trust-reassurance-strip" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#94a3b8' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>17 Lider Seramik Markası</strong> Tek Çatı Altında
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>81 İlde Yetkili Bayi Ağı</strong>
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>%100 Ücretsiz</strong> Fiyat Teklifi
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> <strong>3D Sanal Stüdyo & AR</strong>
+          </span>
+        </div>
       </div>
 
       {/* Premium Collections Banner (Dynamically loaded with Brand Showcase Ads + Fallback) */}
@@ -5691,6 +5695,9 @@ export default function Home() {
                 )}
               </div>
             </div>
+
+            {/* NASIL ÇALIŞIR & SIKÇA SORULAN SORULAR (TRUST & FAQ SCHEMA) */}
+            <HomeTrustFaqSection onNavigateToStudio={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </div>
         )}
 
