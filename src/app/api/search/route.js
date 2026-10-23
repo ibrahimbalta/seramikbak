@@ -232,6 +232,9 @@ export async function GET(request) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
+    const fullDetail = searchParams.get('fullDetail') === 'true';
+    const selectSimple = searchParams.get('selectSimple') === 'true';
+
     // --- BRAND INTERLEAVING / HARMONIZATION FOR HOMEPAGE CATALOG ---
     // If browsing general catalog without a specific brand filter or keyword search,
     // interleave products across brands according to brand displayOrder.
@@ -307,9 +310,6 @@ export async function GET(request) {
 
       return NextResponse.json(formatted);
     }
-
-    const fullDetail = searchParams.get('fullDetail') === 'true';
-    const selectSimple = searchParams.get('selectSimple') === 'true';
 
     if (selectSimple) {
       const simpleProducts = await prisma.product.findMany({
