@@ -3918,3 +3918,19 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
   display: none;
 }
 
+
+/* Top Reassurance Trust Strip Responsive Behavior */
+.desktop-trust-strip {
+  display: flex;
+}
+.mobile-trust-strip {
+  display: none;
+}
+@media (max-width: 768px) {
+  .desktop-trust-strip {
+    display: none !important;
+  }
+  .mobile-trust-strip {
+    display: flex !important;
+  }
+}

@@ -796,6 +796,14 @@ export default function Home() {
   });
   const [liveActivities, setLiveActivities] = useState([]);
   const [activeActivityIdx, setActiveActivityIdx] = useState(0);
+  const [topTrustIdx, setTopTrustIdx] = useState(0);
+
+  useEffect(() => {
+    const trustTimer = setInterval(() => {
+      setTopTrustIdx(prev => (prev + 1) % 4);
+    }, 3200);
+    return () => clearInterval(trustTimer);
+  }, []);
 
   useEffect(() => {
     const fetchLiveStats = async () => {
@@ -3739,8 +3747,9 @@ export default function Home() {
   return (
     <main className="main-layout">
       {/* Platform Trust & Reassurance Bar */}
-      <div className="live-analytics-top-bar" style={{ background: '#0b1120', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '7px 16px' }}>
-        <div className="trust-reassurance-strip" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', fontSize: '0.8rem', color: '#94a3b8' }}>
+      <div className="live-analytics-top-bar" style={{ background: '#0b1120', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', minHeight: '32px' }}>
+        {/* Desktop View: All 4 in one row */}
+        <div className="desktop-trust-strip" style={{ alignItems: 'center', justifyContent: 'center', gap: '24px', fontSize: '0.8rem', color: '#94a3b8' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>17 Lider Seramik Markası</strong> Tek Çatı Altında
           </span>
@@ -3753,6 +3762,30 @@ export default function Home() {
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> <strong>3D Sanal Stüdyo & AR</strong>
           </span>
+        </div>
+
+        {/* Mobile View: Single Centered Clean Rotating Line (Apple/Nike style) */}
+        <div className="mobile-trust-strip" style={{ alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', color: '#f1f5f9', textAlign: 'center', width: '100%', minHeight: '20px' }}>
+          {topTrustIdx === 0 && (
+            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>17 Lider Marka</strong> Tek Çatı Altında
+            </span>
+          )}
+          {topTrustIdx === 1 && (
+            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>81 İlde</strong> Yetkili Bayi Ağı
+            </span>
+          )}
+          {topTrustIdx === 2 && (
+            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>%100 Ücretsiz</strong> Fiyat Teklifi
+            </span>
+          )}
+          {topTrustIdx === 3 && (
+            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> <strong>3D Sanal Stüdyo</strong> & AR Deneyimi
+            </span>
+          )}
         </div>
       </div>
 
