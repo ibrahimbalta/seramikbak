@@ -172,8 +172,13 @@ export async function POST(request) {
       }
     }
 
-    // Generate unique slug
-    const baseSlug = slugify(`${brand.name}-${title}`);
+    // Generate clean, unique slug without duplicating brand name if already in title
+    const normalizedTitle = title.trim();
+    const brandNameLower = (brand.name || '').toLowerCase();
+    const slugSource = normalizedTitle.toLowerCase().startsWith(brandNameLower)
+      ? normalizedTitle
+      : `${brand.name} ${normalizedTitle}`;
+    const baseSlug = slugify(slugSource);
     const randomSuffix = crypto.randomBytes(3).toString('hex');
     const publicSlug = `${baseSlug}-${randomSuffix}`;
 

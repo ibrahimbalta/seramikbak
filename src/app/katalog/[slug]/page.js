@@ -401,139 +401,94 @@ export default function PublicCatalogViewerPage() {
 
   return (
     <div className="min-h-screen bg-neutral-900 flex flex-col text-white relative">
-      {/* Top Sticky Header */}
-      <header className="sticky top-0 z-40 bg-neutral-950/95 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 no-print">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      {/* Top Streamlined Architectural Publication Header */}
+      <header className="sticky top-0 z-40 bg-[#0d0f12]/90 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 no-print select-none">
+        {/* Left: Brand & Catalog Title */}
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 flex items-center gap-1.5 transition flex-shrink-0"
+            className="p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 flex items-center gap-1 transition flex-shrink-0"
             title="SeramikBak Ana Sayfa"
           >
             <ArrowLeft size={16} />
-            <span className="hidden sm:inline font-semibold text-xs">SeramikBak</span>
+            <span className="hidden md:inline font-mono text-[11px] text-stone-400">SeramikBak</span>
           </Link>
 
-          <div className="h-4 w-px bg-white/20 hidden sm:block flex-shrink-0" />
+          <div className="h-4 w-px bg-white/20 hidden md:block flex-shrink-0" />
 
           <div className="min-w-0">
-            <h1 className="text-xs sm:text-sm font-bold text-white tracking-wide truncate max-w-[140px] xs:max-w-[180px] sm:max-w-xs md:max-w-md">
-              {catalog.title}
+            <h1 className="text-xs sm:text-sm font-bold text-white tracking-wider uppercase truncate max-w-[150px] xs:max-w-xs md:max-w-md font-sans">
+              {brand.name || 'SERAMİK'} &bull; <span className="font-light text-stone-300">{catalog.title}</span>
             </h1>
-            <p className="text-[10px] sm:text-[11px] text-neutral-400 font-medium truncate flex items-center gap-1.5">
-              <span>{brand.name || 'Marka'}</span>
-              <span>&bull;</span>
-              <span>{products.length > 0 ? `${products.length} Ürün` : 'Katalog'}</span>
-            </p>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-          {/* Format Switcher: HTML Lookbook vs A4 Print Pages */}
-          <div className="flex items-center gap-1 bg-white/10 p-0.5 sm:p-1 rounded-xl text-[11px] sm:text-xs">
+        {/* Center: Subtle Section Navigation (Desktop) */}
+        <nav className="hidden lg:flex items-center gap-6 text-[11px] font-sans font-medium tracking-widest uppercase text-stone-300">
+          <a href="#section-cover" className="hover:text-amber-400 transition">Kapak</a>
+          <span className="text-white/20">&bull;</span>
+          <a href="#section-manifesto" className="hover:text-amber-400 transition">Felsefe</a>
+          <span className="text-white/20">&bull;</span>
+          <a href="#section-spreads" className="hover:text-amber-400 transition">Mekanlar</a>
+          <span className="text-white/20">&bull;</span>
+          <a href="#section-grid" className="hover:text-amber-400 transition">Koleksiyon</a>
+          <span className="text-white/20">&bull;</span>
+          <a href="#section-specs" className="hover:text-amber-400 transition">Standartlar</a>
+          <span className="text-white/20">&bull;</span>
+          <a href="#section-contact" className="hover:text-amber-400 transition">İletişim</a>
+        </nav>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Format Switcher */}
+          <div className="hidden sm:flex items-center gap-1 bg-white/5 border border-white/10 p-0.5 rounded-xl text-[11px]">
             <button
               type="button"
               onClick={() => setViewerMode('lookbook')}
-              className={`px-2.5 sm:px-3 py-1 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
                 viewerMode === 'lookbook'
-                  ? 'bg-amber-500 text-neutral-950 shadow-sm'
-                  : 'text-neutral-300 hover:text-white'
+                  ? 'bg-amber-500 text-neutral-950 shadow-xs'
+                  : 'text-stone-300 hover:text-white'
               }`}
-              title="HTML İnteraktif Lookbook Modu"
             >
-              <BookOpen size={13} />
-              <span className="hidden xs:inline">Lookbook</span>
+              Lookbook
             </button>
             <button
               type="button"
               onClick={() => setViewerMode('pages')}
-              className={`px-2.5 sm:px-3 py-1 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
                 viewerMode === 'pages'
-                  ? 'bg-amber-500 text-neutral-950 shadow-sm'
-                  : 'text-neutral-300 hover:text-white'
+                  ? 'bg-amber-500 text-neutral-950 shadow-xs'
+                  : 'text-stone-300 hover:text-white'
               }`}
-              title="A4 Baskı Sayfası Modu"
             >
-              <FileText size={13} />
-              <span className="hidden xs:inline">A4 Baskı</span>
+              A4 Baskı
             </button>
           </div>
 
-          {/* Table of Contents Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              setShowTocDrawer(!showTocDrawer);
-              setShowProductDrawer(false);
-            }}
-            className={`p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-              showTocDrawer
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                : 'bg-white/10 hover:bg-white/20 text-white'
-            }`}
-            title="Katalog İçindekiler"
-          >
-            <Layers size={14} className="text-amber-400" />
-            <span className="hidden md:inline">İçindekiler</span>
-          </button>
-
-          {/* Quick Product Search inside Catalog */}
-          {products.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                setShowProductDrawer(!showProductDrawer);
-                setShowTocDrawer(false);
-              }}
-              className={`p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-                showProductDrawer
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  : 'bg-white/10 hover:bg-white/20 text-white'
-              }`}
-              title={`Ürün Ara (${products.length})`}
-            >
-              <Search size={14} className="text-amber-400" />
-              <span className="hidden lg:inline">Ürünler ({products.length})</span>
-            </button>
-          )}
-
-          {/* QR Code Modal Trigger */}
-          <button
-            type="button"
-            onClick={() => setShowQrModal(true)}
-            className="p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer flex-shrink-0"
-            title="QR Kod ile Mobil Cihazda Aç"
-          >
-            <QrCode size={15} />
-          </button>
-
-          {/* Enhanced Share Dropdown */}
+          {/* Share Button */}
           <div className="relative flex-shrink-0" ref={shareMenuRef}>
             <button
               type="button"
               onClick={() => setShowShareMenu(!showShareMenu)}
-              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
-              aria-expanded={showShareMenu}
+              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+              title="Kataloğu Paylaş"
             >
               <Share2 size={14} className={showShareMenu ? 'text-amber-400' : ''} />
               <span className="hidden sm:inline">Paylaş</span>
-              <ChevronDown
-                size={12}
-                className={`transition-transform duration-200 ${showShareMenu ? 'rotate-180' : ''}`}
-              />
             </button>
 
             {showShareMenu && (
-              <div className="absolute right-0 mt-2 w-52 sm:w-56 max-w-[calc(100vw-1rem)] rounded-2xl bg-neutral-950 border border-white/15 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-neutral-950 border border-white/15 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
                 <div className="px-3 py-2 border-b border-white/10 mb-1">
-                  <p className="text-[11px] font-bold text-white">Kataloğu Paylaş</p>
-                  <p className="text-[10px] text-neutral-400 truncate">{catalog.title}</p>
+                  <p className="text-[11px] font-bold text-white uppercase tracking-wider">Kataloğu Paylaş</p>
+                  <p className="text-[10px] text-stone-400 truncate">{catalog.title}</p>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleWhatsAppShare}
-                  className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-neutral-200 hover:text-white transition cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-stone-200 hover:text-white transition cursor-pointer"
                 >
                   <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                     <MessageCircle size={14} />
@@ -544,7 +499,7 @@ export default function PublicCatalogViewerPage() {
                 <button
                   type="button"
                   onClick={handleLinkedInShare}
-                  className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-neutral-200 hover:text-white transition cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-stone-200 hover:text-white transition cursor-pointer"
                 >
                   <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
                     <LinkedInIcon size={14} />
@@ -554,30 +509,11 @@ export default function PublicCatalogViewerPage() {
 
                 <button
                   type="button"
-                  onClick={handleEmailShare}
-                  className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-neutral-200 hover:text-white transition cursor-pointer"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                    <Mail size={14} />
-                  </div>
-                  <span>E-posta ile Gönder</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={handleCopyLink}
-                  className={`w-full px-3 py-2 rounded-xl text-xs text-left flex items-center gap-2.5 transition cursor-pointer ${
-                    copied
-                      ? 'bg-emerald-500/20 text-emerald-300 font-bold'
-                      : 'hover:bg-white/10 text-neutral-200 hover:text-white'
-                  }`}
+                  className="w-full px-3 py-2 rounded-xl hover:bg-white/10 text-xs text-left flex items-center gap-2.5 text-stone-200 hover:text-white transition cursor-pointer"
                 >
-                  <div
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${
-                      copied ? 'bg-emerald-500 text-neutral-950' : 'bg-white/10 text-neutral-300'
-                    }`}
-                  >
-                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  <div className="w-6 h-6 rounded-lg bg-white/10 text-stone-300 flex items-center justify-center">
+                    {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                   </div>
                   <span>{copied ? 'Kopyalandı! ✓' : 'Bağlantıyı Kopyala'}</span>
                 </button>
@@ -585,204 +521,34 @@ export default function PublicCatalogViewerPage() {
             )}
           </div>
 
-          {/* PDF Download / Print */}
+          {/* PDF Button */}
           <button
             type="button"
             onClick={handlePrint}
             disabled={isPrinting}
-            className="px-2.5 sm:px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer flex-shrink-0"
-            title="PDF İndir / Yazdır"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+            title="PDF Olarak Yazdır / İndir"
           >
             {isPrinting ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
-            <span className="hidden sm:inline">{isPrinting ? 'Hazırlanıyor...' : 'PDF İndir'}</span>
-            <span className="sm:hidden text-[11px] font-bold">PDF</span>
+            <span className="hidden sm:inline">{isPrinting ? 'Hazırlanıyor...' : 'PDF'}</span>
+          </button>
+
+          {/* Primary Lead CTA Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setLeadType('sample');
+              setLeadSubmitted(false);
+              setShowLeadModal(true);
+            }}
+            className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition cursor-pointer"
+          >
+            <Package size={13} />
+            <span className="hidden xs:inline">Teklif & Numune</span>
+            <span className="xs:hidden">Talep</span>
           </button>
         </div>
       </header>
-
-      {/* Collapsible Table of Contents Navigation Drawer */}
-      {showTocDrawer && (
-        <div className="bg-neutral-950/95 border-b border-white/10 px-4 md:px-8 py-5 no-print animate-in fade-in slide-in-from-top-2 duration-150 max-h-[75vh] overflow-y-auto overscroll-contain">
-          <div className="max-w-5xl mx-auto space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
-                <BookOpen size={16} className="text-amber-400" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Katalog İçindekiler & Bölümler
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowTocDrawer(false)}
-                className="p-1 rounded-lg text-neutral-400 hover:text-white"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-              {/* Section 1: Cover */}
-              <button
-                type="button"
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  setShowTocDrawer(false);
-                }}
-                className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition group cursor-pointer"
-              >
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block mb-1">
-                  Bölüm 01
-                </span>
-                <p className="text-xs font-bold text-white group-hover:text-amber-300 transition">
-                  Katalog Kapağı & Sunum
-                </p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">{catalog.title}</p>
-              </button>
-
-              {/* Section 2: Products */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowProductDrawer(true);
-                  setShowTocDrawer(false);
-                }}
-                className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition group cursor-pointer"
-              >
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block mb-1">
-                  Bölüm 02
-                </span>
-                <p className="text-xs font-bold text-white group-hover:text-amber-300 transition">
-                  Seramik Ürün Koleksiyonu
-                </p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">{products.length} Seçili Model</p>
-              </button>
-
-              {/* Section 3: Surface Finishes / Categories */}
-              <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-left">
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block mb-1">
-                  Yüzey Seçenekleri
-                </span>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {availableFinishes.length > 0 ? (
-                    availableFinishes.map((f) => (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery(f);
-                          setShowProductDrawer(true);
-                          setShowTocDrawer(false);
-                        }}
-                        className="px-2 py-0.5 rounded-md bg-white/10 hover:bg-amber-500/20 text-neutral-300 hover:text-amber-300 text-[10px] font-medium transition cursor-pointer"
-                      >
-                        {f}
-                      </button>
-                    ))
-                  ) : (
-                    <span className="text-[11px] text-neutral-400">Tüm yüzeyler</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Section 4: Lead Generator Quick Jump */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowTocDrawer(false);
-                  setLeadType('quote');
-                  setLeadSubmitted(false);
-                  setShowLeadModal(true);
-                }}
-                className="p-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-left transition group cursor-pointer"
-              >
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block mb-1">
-                  B2B Hızlı İşlem
-                </span>
-                <p className="text-xs font-bold text-amber-300 group-hover:text-amber-200 transition">
-                  Fiyat & Numune Masası
-                </p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">Doğrudan teklif oluşturun &rarr;</p>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Collapsible Product Search & Direct Navigation Drawer */}
-      {showProductDrawer && (
-        <div className="bg-neutral-950 border-b border-white/10 px-4 md:px-8 py-5 no-print animate-in fade-in slide-in-from-top-2 duration-150 max-h-[75vh] overflow-y-auto overscroll-contain">
-          <div className="max-w-5xl mx-auto space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="relative flex-1 max-w-md">
-                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Katalog içindeki seramikleri ad, ebat veya renge göre filtrele..."
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/10 border border-white/15 text-xs text-white placeholder-neutral-400 focus:outline-none focus:border-amber-400"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowProductDrawer(false)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-white"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-64 overflow-y-auto pr-1">
-              {filteredProducts.map((p) => (
-                <div
-                  key={p.id}
-                  className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/50 flex items-center justify-between gap-3 transition"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <img
-                      src={p.imageUrl || p.textureUrl || '/placeholder.png'}
-                      alt={p.name}
-                      className="w-11 h-11 rounded-lg object-cover border border-white/10 flex-shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{p.name}</p>
-                      <p className="text-[10px] text-neutral-400 font-mono">
-                        {p.width && p.height ? `${p.width}x${p.height} cm` : p.finish || ''}
-                      </p>
-                    </div>
-                  </div>
-
-                  {p.slug && (
-                    <div className="flex flex-col gap-1.5 flex-shrink-0">
-                      <Link
-                        href={`/urun/${p.slug}`}
-                        className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-[10px] flex items-center justify-center gap-1"
-                      >
-                        <span>Detay</span>
-                        <ExternalLink size={10} />
-                      </Link>
-                      <div className="flex items-center gap-1">
-                        <Link
-                          href={`/mekan-dene?product=${p.slug}`}
-                          className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-amber-300 text-[9px] font-semibold text-center whitespace-nowrap"
-                        >
-                          Mekânda Gör
-                        </Link>
-                        <Link
-                          href={`/urun/${p.slug}?studio=3d`}
-                          className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[9px] font-bold text-center whitespace-nowrap border border-amber-500/30"
-                        >
-                          3D Studio
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main Lookbook Container */}
       <main className="flex-1 flex justify-center overflow-x-hidden">
@@ -810,85 +576,6 @@ export default function PublicCatalogViewerPage() {
           </div>
         )}
       </main>
-
-      {/* B2B Lead Generation Floating Panel (Bottom-Right) */}
-      <div className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40 no-print flex flex-col items-end" ref={leadPanelRef}>
-        {/* Expandable Action Card */}
-        {showLeadPanel && (
-          <div className="mb-3 w-[calc(100vw-1.5rem)] xs:w-80 max-w-sm rounded-3xl bg-white/95 backdrop-blur-md border border-stone-200/90 shadow-2xl p-4 sm:p-5 text-slate-900 space-y-3.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
-            <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#fbf6ee] text-[#b4823c] border border-[#e8d5b5] flex items-center justify-center">
-                  <Sparkles size={15} />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900">B2B Proje Masası</h4>
-                  <p className="text-[10px] text-[#b4823c] font-bold">Hızlı Kurumsal Servis</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowLeadPanel(false)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-stone-100 transition cursor-pointer"
-                title="Kapat"
-              >
-                <X size={14} />
-              </button>
-            </div>
-
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              Mimari projeler, bayi ve toptan alımlarınız için doğrudan marka temsilcisinden özel fiyat veya fiziksel numune talep edin.
-            </p>
-
-            <div className="space-y-2 pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setLeadType('quote');
-                  setLeadSubmitted(false);
-                  setShowLeadModal(true);
-                  setShowLeadPanel(false);
-                }}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
-              >
-                <Tag size={14} />
-                <span>Fiyat Teklifi İste</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setLeadType('sample');
-                  setLeadSubmitted(false);
-                  setShowLeadModal(true);
-                  setShowLeadPanel(false);
-                }}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-stone-100 hover:bg-stone-200/70 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 border border-stone-200 transition cursor-pointer"
-              >
-                <Package size={14} className="text-[#b4823c]" />
-                <span>Numune Talep Et</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Floating Action Trigger Button with gentle pulse */}
-        <button
-          type="button"
-          onClick={() => setShowLeadPanel(!showLeadPanel)}
-          className="group relative flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#b4823c] to-[#9a6c2d] hover:from-[#a07231] hover:to-[#885f26] text-white font-bold text-xs shadow-2xl shadow-amber-900/30 hover:shadow-amber-900/50 transition-all duration-300 hover:scale-105 cursor-pointer ring-2 ring-amber-300/40"
-          aria-label="B2B Fiyat Teklifi ve Numune Talebi"
-        >
-          {/* Gentle Pulse Dot */}
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
-          </span>
-
-          <Sparkles size={15} className="text-amber-200" />
-          <span className="tracking-wide">B2B Fiyat & Numune</span>
-        </button>
-      </div>
 
       {/* Scroll to Top Floating Button (Bottom-Left) */}
       <button
