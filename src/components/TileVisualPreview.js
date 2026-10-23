@@ -204,17 +204,19 @@ export default function TileVisualPreview({ style, color, finish, width, height,
           }
           .tile-dimension-tag {
             position: absolute;
-            bottom: 6px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.6);
+            bottom: 34px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             color: #fff;
             font-size: 0.55rem;
             font-family: var(--font-title);
             padding: 2px 6px;
             border-radius: 4px;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 0.02em;
-            z-index: 2;
+            z-index: 5;
           }
         `}</style>
       </div>
@@ -365,16 +367,19 @@ export default function TileVisualPreview({ style, color, finish, width, height,
         }
         .tile-dimension-tag {
           position: absolute;
-          bottom: 6px;
-          right: 8px;
-          background: rgba(0, 0, 0, 0.6);
+          bottom: 34px;
+          right: 6px;
+          background: rgba(0, 0, 0, 0.65);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           color: #fff;
           font-size: 0.55rem;
           font-family: var(--font-title);
           padding: 2px 6px;
           border-radius: 4px;
-          font-weight: 500;
+          font-weight: 600;
           letter-spacing: 0.02em;
+          z-index: 5;
         }
       `}</style>
     </div>

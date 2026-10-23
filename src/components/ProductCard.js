@@ -50,7 +50,7 @@ export default function ProductCard({
           <HeartIcon size={15} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Hover Quick Action Buttons (Desktop only overlay) */}
+        {/* Quick Action Buttons (3D, Bayi) on Image */}
         <div className="card-quick-actions-row">
           <button 
             type="button"
@@ -58,7 +58,7 @@ export default function ProductCard({
             className="card-action-btn-new btn-action-3d"
             title="3D Sanal Mekanda Gör"
           >
-            3D Stüdyo
+            3D
           </button>
           <button 
             type="button"
@@ -66,7 +66,7 @@ export default function ProductCard({
             className="card-action-btn-new btn-action-dealer"
             title="Yetkili Bayiler & Fiyat"
           >
-            Bayi Teklifi
+            Bayi
           </button>
         </div>
       </div>
