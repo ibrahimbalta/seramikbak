@@ -38,55 +38,24 @@ import {
   RefreshCw
 } from 'lucide-react';
 import HtmlLookbookViewer from './catalog/templates/HtmlLookbookViewer';
+import { LOOKBOOK_COLOR_TEMPLATES, getLookbookTheme } from './catalog/templates/lookbookThemes';
 
-// 5 Lüks & Hazır HTML Lookbook Şablonu
-export const HTML_CATALOG_TEMPLATES = [
-  {
-    id: 'milano',
-    name: 'Milano Architectural Lookbook',
-    badge: 'En Çok Tercih Edilen',
-    style: 'Lüks & Obsidian',
-    description: 'Büyük tam ekran mekan fotoğrafları, obsidian siyah zemin, altın aksanlar ve asimetrik slab vitrini.',
-    previewImg: '/renders/luxury_bathroom_calacatta_gold.jpg',
-    palette: { primary: '#b4823c', accent: '#0c0e12', bg: '#0c0e12' }
-  },
-  {
-    id: 'terra-luxe',
-    name: 'Terra Luxe & Marble Edition',
-    badge: 'Doğal Taş & Mermer',
-    style: 'Şampanya & Bej',
-    description: 'Doğal taş ve mermer damarlarını öne çıkaran açık krem zemin, zarif editoryal tipografi ve ferah negatif alan.',
-    previewImg: '/renders/luxury_bathroom_natural_oak.jpg',
-    palette: { primary: '#9a6c2d', accent: '#faf8f5', bg: '#faf8f5' }
-  },
-  {
-    id: 'nordic',
-    name: 'Nordic Minimalist & Loft',
-    badge: 'Modern & Şehirli',
-    style: 'Antrasit & Beton',
-    description: 'Beton, çimento ve ahşap dokulu seriler için net çizgiler, antrasit tonları ve çağdaş mimari düzen.',
-    previewImg: '/renders/luxury_bathroom_loft_beton.jpg',
-    palette: { primary: '#475569', accent: '#0f172a', bg: '#0f172a' }
-  },
-  {
-    id: 'spec-sheet',
-    name: 'Lidya Technic & Spec Sheet',
-    badge: 'B2B Şartname',
-    style: 'Mühendislik & Proje',
-    description: 'Mimarlık ofisleri ve şartname hazırlayan müteahhitler için TS EN 14411 standart ve kutu/palet lojistik odaklı.',
-    previewImg: '/renders/luxury_bathroom_albatros_antrasit.jpg',
-    palette: { primary: '#047857', accent: '#0f172a', bg: '#0f172a' }
-  },
-  {
-    id: 'deco',
-    name: 'Artisan Boutique Living',
-    badge: 'Dekor & Butik',
-    style: 'Sıcak & Akdeniz',
-    description: 'Banyo, mutfak ve butik yaşam alanlarına yönelik sıcak toprak ve terracotta tonlarında zarif lookbook.',
-    previewImg: '/renders/modern_living_natural_oak.jpg',
-    palette: { primary: '#c2410c', accent: '#1e293b', bg: '#0f172a' }
+// 6 Lüks & Farklı Renklerde HTML Lookbook Şablonu
+export const HTML_CATALOG_TEMPLATES = LOOKBOOK_COLOR_TEMPLATES.map((t) => ({
+  id: t.id,
+  name: t.name,
+  badge: t.badge,
+  tag: t.tag,
+  style: t.style,
+  description: t.description,
+  previewImg: t.previewImg,
+  colorSample: t.colorSample,
+  palette: {
+    primary: t.colorSample.primary,
+    accent: t.colorSample.secondary,
+    bg: t.colorSample.background
   }
-];
+}));
 
 export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSection }) {
   const brandId = brandInfo?.id;
@@ -883,11 +852,37 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                       </div>
 
                       <div className="p-4 space-y-3">
+                        {/* Renk Paleti Önizleme */}
+                        {tmpl.colorSample && (
+                          <div className="flex items-center gap-1.5 pt-1">
+                            <span className="text-[10px] text-stone-400 font-mono mr-1">Renkler:</span>
+                            <span
+                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                              style={{ backgroundColor: tmpl.colorSample.primary }}
+                              title="Ana Renk"
+                            />
+                            <span
+                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                              style={{ backgroundColor: tmpl.colorSample.secondary }}
+                              title="İkincil Renk"
+                            />
+                            <span
+                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                              style={{ backgroundColor: tmpl.colorSample.background }}
+                              title="Arka Plan"
+                            />
+                            <span
+                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                              style={{ backgroundColor: tmpl.colorSample.accent }}
+                              title="Aksan Vurgu"
+                            />
+                          </div>
+                        )}
                         <p className="text-xs text-stone-600 leading-relaxed font-normal">
                           {tmpl.description}
                         </p>
                         <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
-                          <span className="text-stone-400 font-mono text-[11px]">HTML5 Responsive</span>
+                          <span className="text-stone-400 font-mono text-[11px]">{tmpl.tag || 'HTML5 Responsive'}</span>
                           <span
                             className={`font-bold text-xs ${
                               isSelected ? 'text-amber-700' : 'text-stone-500 group-hover:text-stone-900'
