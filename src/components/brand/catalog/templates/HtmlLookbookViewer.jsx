@@ -331,6 +331,39 @@ export default function HtmlLookbookViewer({
     setShowLeadModal(true);
   };
 
+  const handleOpen3DStudio = (productObj, e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!productObj) {
+      window.location.href = '/?tab=studio#studio';
+      return;
+    }
+    const pImage = productObj.imageUrl || productObj.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
+    const tilePayload = {
+      id: productObj.id || productObj.code || 'tile',
+      code: productObj.code || '',
+      name: productObj.name || 'Seçili Karo',
+      slug: productObj.slug || productObj.code || '',
+      imageUrl: pImage,
+      textureUrl: pImage,
+      width: productObj.width || 60,
+      height: productObj.height || 120,
+      finish: productObj.finish || 'Porselen',
+      brand: { name: brandName }
+    };
+    try {
+      localStorage.setItem('seramikbak_preselected_product', JSON.stringify(tilePayload));
+    } catch {}
+
+    const qs = new URLSearchParams({
+      tab: 'studio',
+      product: productObj.code || productObj.slug || productObj.id || '',
+      name: productObj.name || '',
+      texture: pImage
+    }).toString();
+
+    window.location.href = `/?${qs}#studio`;
+  };
+
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
     if (!leadForm.name || !leadForm.phone) {
@@ -1413,9 +1446,9 @@ export default function HtmlLookbookViewer({
 
           {/* 3D Modeling Studio shortcut */}
           <Link
-            href={`/tasarim?brand=${encodeURIComponent(brandSlug)}`}
+            href="/?tab=studio#studio"
             className="outlinebtn hidden md:inline-flex items-center gap-1.5"
-            title="3D Mimari Mekan & Modelleme Stüdyosunu Aç"
+            title="3D Mekân & Tasarım Stüdyosunu Aç"
           >
             <Box size={13} style={{ color: 'var(--accent)' }} />
             <span>3D Stüdyo ↗</span>
@@ -1940,14 +1973,15 @@ export default function HtmlLookbookViewer({
 
                   <div className="card-floating-actions">
                     {/* 3D Modeling Quick Action */}
-                    <Link
-                      href={`/tasarim?brand=${encodeURIComponent(brandSlug)}&product=${encodeURIComponent(p.code || p.id || '')}&texture=${encodeURIComponent(pImage)}&name=${encodeURIComponent(p.name || '')}`}
+                    <button
+                      type="button"
+                      onClick={(e) => handleOpen3DStudio(p, e)}
                       className="card-3d-btn"
                       title="Bu ürünü 3D Mekân ve Modelleme Stüdyosunda Gör"
                     >
                       <Box size={12} className="text-amber-400" />
                       <span>3D</span>
-                    </Link>
+                    </button>
 
                     {/* Pin to moodboard button */}
                     <button
@@ -2024,14 +2058,15 @@ export default function HtmlLookbookViewer({
                   </div>
 
                   <div className="pt-2.5 text-center border-t border-[var(--line)] mt-2.5">
-                    <Link
-                      href={`/tasarim?brand=${encodeURIComponent(brandSlug)}&product=${encodeURIComponent(p.code || p.id || '')}&texture=${encodeURIComponent(pImage)}&name=${encodeURIComponent(p.name || '')}`}
-                      className="w-full py-2 px-3 rounded text-[11px] font-bold text-[var(--accent)] hover:bg-[var(--accent-light)] transition inline-flex items-center justify-center gap-1.5 group"
+                    <button
+                      type="button"
+                      onClick={(e) => handleOpen3DStudio(p, e)}
+                      className="w-full py-2 px-3 rounded text-[11px] font-bold text-[var(--accent)] hover:bg-[var(--accent-light)] transition inline-flex items-center justify-center gap-1.5 group cursor-pointer"
                       title="Bu seramiği 3D banyo, mutfak veya salonda döşeyin"
                     >
                       <Box size={13} className="text-[var(--accent)] group-hover:scale-110 transition-transform" />
                       <span>3D Modellemede Gör & Döşe ↗</span>
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </article>
@@ -2402,13 +2437,18 @@ export default function HtmlLookbookViewer({
                 </div>
 
                 <div className="pt-2 space-y-2">
-                  <Link
-                    href={`/tasarim?brand=${encodeURIComponent(brandSlug)}&product=${encodeURIComponent(activeDetailProduct.code || activeDetailProduct.id || '')}&texture=${encodeURIComponent(activeDetailProduct.imageUrl || activeDetailProduct.textureUrl || '')}&name=${encodeURIComponent(activeDetailProduct.name || '')}`}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-[var(--ink)] text-white font-bold text-xs hover:brightness-110 transition shadow-md"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const p = activeDetailProduct;
+                      setActiveDetailProduct(null);
+                      handleOpen3DStudio(p, e);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-[var(--ink)] text-white font-bold text-xs hover:brightness-110 transition shadow-md cursor-pointer"
                   >
                     <Box size={14} className="text-amber-400" />
                     <span>Bu Seramiği 3D Modellemede Gör & Mekân Tasarla ↗</span>
-                  </Link>
+                  </button>
 
                   <div className="flex gap-2">
                     <button

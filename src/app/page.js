@@ -1840,7 +1840,38 @@ export default function Home() {
       }
 
       // 2. Direct product parameter in URL
-      if (targetProductParam) {
+      const targetTextureParam = params.get('texture') || params.get('tile');
+      const targetNameParam = params.get('name') || targetProductParam || 'Katalog Karosu';
+
+      if (targetTextureParam && (tabParam === 'studio' || hashStudio || !preselected)) {
+        isProductPreselectedRef.current = true;
+        setActiveTab('studio');
+        const targetRoom = roomParam || 'bathroom';
+        setStudioRoomType(targetRoom);
+        const customTile = {
+          id: targetProductParam || `tile-${Date.now()}`,
+          name: targetNameParam,
+          code: targetProductParam || '3D-SLAB',
+          imageUrl: targetTextureParam,
+          textureUrl: targetTextureParam,
+          finish: params.get('finish') || 'Rektifiye',
+          width: parseInt(params.get('width')) || 60,
+          height: parseInt(params.get('height')) || 120
+        };
+        const enriched = typeof enrichProductData === 'function' ? enrichProductData(customTile) : customTile;
+        setActiveProduct(enriched);
+        setStudioFloorProduct(enriched);
+        setStudioWallProduct(enriched);
+        setStudioApplyFloor(true);
+        setStudioApplyWalls(true);
+        setStudioApplyAccent(false);
+        setStudioApplyShower(false);
+        setStudioApplyShowerFloor(false);
+        setStudioApplyToiletWall(false);
+        setStudioApplyLeftWallAccent(false);
+        setStudioApplyStripeWall(false);
+        showStudioToast(`✨ ${enriched.name} 3D mekana giydirildi`);
+      } else if (targetProductParam) {
         if (tabParam === 'studio' || hashStudio || !preselected) {
           isProductPreselectedRef.current = true;
           setActiveTab('studio');
