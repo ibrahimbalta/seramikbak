@@ -50,6 +50,9 @@ export const HTML_CATALOG_TEMPLATES = LOOKBOOK_COLOR_TEMPLATES.map((t) => ({
   badge: t.badge,
   tag: t.tag,
   style: t.style,
+  idealFor: t.idealFor,
+  brandInspiration: t.brandInspiration,
+  folioNumber: t.folioNumber,
   description: t.description,
   previewImg: t.previewImg,
   colorSample: t.colorSample,
@@ -1429,68 +1432,86 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                     <div
                       key={tmpl.id}
                       onClick={() => setFormData({ ...formData, template: tmpl.id, primaryColor: tmpl.palette.primary })}
-                      className={`group bg-white rounded-2xl border-2 transition-all duration-200 overflow-hidden cursor-pointer flex flex-col justify-between shadow-2xs hover:shadow-md ${
+                      className={`group bg-white rounded-2xl border-2 transition-all duration-200 overflow-hidden cursor-pointer flex flex-col justify-between shadow-2xs hover:shadow-lg ${
                         isSelected
-                          ? 'border-[#b47b3d] ring-2 ring-[#b47b3d]/20 shadow-md'
-                          : 'border-stone-200 hover:border-amber-300'
+                          ? 'border-[#b47b3d] ring-2 ring-[#b47b3d]/30 shadow-md'
+                          : 'border-stone-200 hover:border-stone-400'
                       }`}
                     >
-                      <div className="relative aspect-[16/10] bg-stone-900 overflow-hidden">
+                      <div className="relative aspect-[16/10] bg-stone-950 overflow-hidden">
                         <img
                           src={tmpl.previewImg}
                           alt={tmpl.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                        <div className="absolute top-3 left-3">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/60 text-white backdrop-blur-md border border-white/20">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                        <div className="absolute top-3 left-3 flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/70 text-white backdrop-blur-md border border-white/20">
                             {tmpl.badge}
                           </span>
                         </div>
-                        {isSelected && (
-                          <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#b47b3d] text-white flex items-center justify-center shadow-md">
-                            <Check size={14} strokeWidth={3} />
+                        {tmpl.folioNumber && (
+                          <div className="absolute top-3 right-3">
+                            <span className="px-2 py-0.5 rounded text-[9px] font-mono font-semibold bg-white/10 text-white/90 backdrop-blur-md border border-white/15">
+                              {tmpl.folioNumber}
+                            </span>
                           </div>
                         )}
-                        <div className="absolute bottom-3 left-3 text-white">
-                          <span className="text-[10px] font-mono text-amber-300 uppercase tracking-wider block">
+                        {isSelected && (
+                          <div className="absolute top-10 right-3 w-7 h-7 rounded-full bg-[#b47b3d] text-white flex items-center justify-center shadow-lg ring-2 ring-white">
+                            <Check size={15} strokeWidth={3} />
+                          </div>
+                        )}
+                        <div className="absolute bottom-3 left-3 right-3 text-white">
+                          <span className="text-[10px] font-mono text-amber-300 uppercase tracking-widest block mb-0.5">
                             {tmpl.style}
                           </span>
-                          <h4 className="text-sm font-bold drop-shadow">{tmpl.name}</h4>
+                          <h4 className="text-sm font-bold drop-shadow leading-snug">{tmpl.name}</h4>
                         </div>
                       </div>
 
                       <div className="p-4 space-y-3">
-                        {tmpl.colorSample && (
-                          <div className="flex items-center gap-1.5 pt-1">
-                            <span className="text-[10px] text-stone-400 font-mono mr-1">Renkler:</span>
-                            <span
-                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
-                              style={{ backgroundColor: tmpl.colorSample.primary }}
-                              title="Ana Renk"
-                            />
-                            <span
-                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
-                              style={{ backgroundColor: tmpl.colorSample.secondary }}
-                              title="İkincil Renk"
-                            />
-                            <span
-                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
-                              style={{ backgroundColor: tmpl.colorSample.background }}
-                              title="Arka Plan"
-                            />
-                            <span
-                              className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
-                              style={{ backgroundColor: tmpl.colorSample.accent }}
-                              title="Aksan Vurgu"
-                            />
+                        {tmpl.idealFor && (
+                          <div className="px-2.5 py-1.5 rounded-lg bg-stone-50 border border-stone-200/80 text-[11px] font-medium text-stone-700 flex items-center gap-1.5">
+                            <Sparkles size={12} className="text-[#b47b3d] flex-shrink-0" />
+                            <span className="truncate">{tmpl.idealFor}</span>
                           </div>
                         )}
+
+                        {tmpl.colorSample && (
+                          <div className="flex items-center justify-between pt-0.5 text-[11px]">
+                            <span className="text-stone-400 font-mono text-[10px]">Renk Harmonisi:</span>
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                                style={{ backgroundColor: tmpl.colorSample.primary }}
+                                title="Ana Renk"
+                              />
+                              <span
+                                className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                                style={{ backgroundColor: tmpl.colorSample.secondary }}
+                                title="İkincil Renk"
+                              />
+                              <span
+                                className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                                style={{ backgroundColor: tmpl.colorSample.background }}
+                                title="Arka Plan"
+                              />
+                              <span
+                                className="w-4 h-4 rounded-full border border-stone-300 shadow-2xs"
+                                style={{ backgroundColor: tmpl.colorSample.accent }}
+                                title="Aksan Vurgu"
+                              />
+                            </div>
+                          </div>
+                        )}
+
                         <p className="text-xs text-stone-600 leading-relaxed font-normal">
                           {tmpl.description}
                         </p>
-                        <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
-                          <span className="text-stone-400 font-mono text-[11px]">{tmpl.tag || 'HTML5 Responsive'}</span>
+
+                        <div className="pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs">
+                          <span className="text-stone-400 font-mono text-[10px]">{tmpl.tag || 'HTML5 Responsive'}</span>
                           <span
                             className={`font-bold text-xs ${
                               isSelected ? 'text-[#8f5c29]' : 'text-stone-500 group-hover:text-stone-900'

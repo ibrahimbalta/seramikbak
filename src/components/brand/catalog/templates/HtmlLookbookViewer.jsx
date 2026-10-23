@@ -39,7 +39,8 @@ import {
   Flame,
   Award,
   Box,
-  Building2
+  Building2,
+  Download
 } from 'lucide-react';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 import {
@@ -421,17 +422,20 @@ export default function HtmlLookbookViewer({
         }
 
         /* -------------------------------------------------------------
-           LIGHTING SIMULATOR COLOR GRADING
+           LIGHTING SIMULATOR COLOR GRADING (SURFACES & EDITORIAL ONLY)
         ------------------------------------------------------------- */
-        .seramikbak-lookbook-app.light-natural img {
+        .seramikbak-lookbook-app.light-natural .product-img img,
+        .seramikbak-lookbook-app.light-natural .editorial-photo img {
           filter: saturate(1.02) contrast(1.02);
           transition: filter .4s ease;
         }
-        .seramikbak-lookbook-app.light-warm img {
+        .seramikbak-lookbook-app.light-warm .product-img img,
+        .seramikbak-lookbook-app.light-warm .editorial-photo img {
           filter: sepia(0.18) saturate(1.15) brightness(1.03) contrast(1.02);
           transition: filter .4s ease;
         }
-        .seramikbak-lookbook-app.light-studio img {
+        .seramikbak-lookbook-app.light-studio .product-img img,
+        .seramikbak-lookbook-app.light-studio .editorial-photo img {
           filter: brightness(1.02) contrast(1.12) saturate(1.05);
           transition: filter .4s ease;
         }
@@ -1699,6 +1703,50 @@ export default function HtmlLookbookViewer({
       )}
 
       {/* =========================================================================
+          ARCHITECTURAL MANIFESTO & CURATION RIBBON
+      ========================================================================= */}
+      <section className="border-b border-[var(--line)] bg-[var(--paper)] py-8 px-[5.5%] transition-colors duration-300">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-7xl mx-auto">
+          <div className="lg:col-span-7 space-y-2">
+            <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-[var(--accent)] font-bold">
+              <span>{currentTheme.folioNumber || 'VOL. 26 // ED. 01'}</span>
+              <span>&bull;</span>
+              <span>{currentTheme.brandInspiration || 'MİMARİ KÜRASYON'}</span>
+            </div>
+            <blockquote className="font-serif italic text-base sm:text-lg text-[var(--ink)] leading-relaxed">
+              "{currentTheme.monographQuote || 'Yüzey yalnızca bir kaplama değil; mekânın ışığını, akustik dengesini ve dokusal hafızasını belirleyen temel mimari dildir.'}"
+            </blockquote>
+            <p className="text-[11px] text-[var(--muted)] font-mono">
+              — {brandName} Tasarım & Malzeme İnovasyon Laboratuvarı
+            </p>
+          </div>
+
+          <div className="lg:col-span-5 grid grid-cols-2 gap-3">
+            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Standart</span>
+              <strong className="text-xs text-[var(--ink)] block">EN 14411 BLa</strong>
+              <span className="text-[10px] text-[var(--muted)]">Tam Gövde Porselen</span>
+            </div>
+            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Su Emme</span>
+              <strong className="text-xs text-[var(--ink)] block">E ≤ %0.05</strong>
+              <span className="text-[10px] text-[var(--muted)]">Sıfıra Yakın Geçirgenlik</span>
+            </div>
+            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Kenar Kesimi</span>
+              <strong className="text-xs text-[var(--ink)] block">Lazer Rektifiye</strong>
+              <span className="text-[10px] text-[var(--muted)]">1 mm Monokalibre Derz</span>
+            </div>
+            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Doku Çözünürlüğü</span>
+              <strong className="text-xs text-[var(--ink)] block">4K PBR Master</strong>
+              <span className="text-[10px] text-[var(--muted)]">Ultra HD Mikrotekstür</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
           PRODUCTS SECTION
       ========================================================================= */}
       <section className="section" id="urunler">
@@ -2112,6 +2160,81 @@ export default function HtmlLookbookViewer({
             <p className="text-xs text-[var(--muted)] leading-relaxed">
               Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığıyla kesintisiz yüzey akışı.
             </p>
+          </div>
+        </div>
+
+        {/* ARCHITECTURAL BIM / CAD & SPECIFICATION DOWNLOADS */}
+        <div className="mt-10 p-6 rounded-xl border border-[var(--line)] bg-[var(--paper)] shadow-2xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--line)]">
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent)] font-bold mb-1">
+                BIM & CAD DİJİTAL MİMARİ KÜTÜPHANESİ
+              </div>
+              <h4 className="text-base font-serif font-bold text-[var(--ink)]">
+                Projeleriniz İçin Hazır 3D Model ve Teknik Şartnameler
+              </h4>
+              <p className="text-xs text-[var(--muted)] mt-0.5">
+                Revit (.RFA), AutoCAD (.DWG), SketchUp (.SKP) ve 4K PBR doku haritalarını doğrudan indirin.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="outlinebtn text-xs font-bold whitespace-nowrap self-start md:self-auto"
+            >
+              <Download size={13} />
+              <span>Tüm Şartnameyi İndir (.PDF)</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
+            <button
+              type="button"
+              onClick={() => notify(`${brandName} Autodesk Revit (.RFA) kütüphanesi indirildi.`)}
+              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+            >
+              <div>
+                <strong className="block text-[11px] text-[var(--ink)]">Revit BIM (.RFA)</strong>
+                <span className="text-[10px] text-[var(--muted)]">Parametrik Slab Ailesi</span>
+              </div>
+              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => notify(`${brandName} AutoCAD (.DWG) detay çizimleri indirildi.`)}
+              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+            >
+              <div>
+                <strong className="block text-[11px] text-[var(--ink)]">AutoCAD (.DWG)</strong>
+                <span className="text-[10px] text-[var(--muted)]">1:20 Kesit & Plan Detayı</span>
+              </div>
+              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => notify(`${brandName} SketchUp (.SKP) 3D dokuları indirildi.`)}
+              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+            >
+              <div>
+                <strong className="block text-[11px] text-[var(--ink)]">SketchUp (.SKP)</strong>
+                <span className="text-[10px] text-[var(--muted)]">Ölçekli Doku Haritası</span>
+              </div>
+              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => notify(`${brandName} 4K PBR Doku Paketi indirildi.`)}
+              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+            >
+              <div>
+                <strong className="block text-[11px] text-[var(--ink)]">4K PBR Doku (.ZIP)</strong>
+                <span className="text-[10px] text-[var(--muted)]">Albedo, Roughness, Normal</span>
+              </div>
+              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+            </button>
           </div>
         </div>
       </section>
