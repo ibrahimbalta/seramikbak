@@ -28,6 +28,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--site-on-primary': '#ffffff',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#252b28',
+      '--site-font-heading': "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+      '--site-font-body': "'Plus Jakarta Sans', Inter, -apple-system, sans-serif",
+      '--site-font-mono': "'JetBrains Mono', monospace",
       '--ink': '#242824',
       '--muted': '#777970',
       '--line': '#e5e1d8',
@@ -45,7 +48,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--cta-bg': '#282d29',
       '--cta-text': '#ffffff',
       '--product-hover-border': '#c5b49a',
-      '--product-img-bg': '#ece9e3'
+      '--product-img-bg': '#ece9e3',
+      '--card-radius': '6px',
+      '--card-shadow': '0 20px 45px -15px rgba(36, 40, 36, 0.09)'
     }
   },
   {
@@ -72,6 +77,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--site-on-primary': '#07090e',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#f4f4f5',
+      '--site-font-heading': "'Cinzel', 'Playfair Display', Georgia, serif",
+      '--site-font-body': "'Syne', 'Plus Jakarta Sans', sans-serif",
+      '--site-font-mono': "'JetBrains Mono', monospace",
       '--ink': '#f4f4f5',
       '--muted': '#9ca3af',
       '--line': '#222938',
@@ -89,7 +97,10 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--cta-bg': '#131822',
       '--cta-text': '#f4f4f5',
       '--product-hover-border': '#c5a059',
-      '--product-img-bg': '#0d1017'
+      '--product-img-bg': '#0d1017',
+      '--card-radius': '10px',
+      '--card-shadow': '0 25px 60px -15px rgba(0, 0, 0, 0.95)',
+      '--gold-gradient': 'linear-gradient(135deg, #fae29c 0%, #c5a059 50%, #856422 100%)'
     }
   },
   {
@@ -116,6 +127,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--site-on-primary': '#ffffff',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#0f172a',
+      '--site-font-heading': "'Space Grotesk', -apple-system, sans-serif",
+      '--site-font-body': "'Plus Jakarta Sans', Inter, sans-serif",
+      '--site-font-mono': "'JetBrains Mono', monospace",
       '--ink': '#0f172a',
       '--muted': '#64748b',
       '--line': '#cbd5e1',
@@ -133,7 +147,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--cta-bg': '#0f172a',
       '--cta-text': '#ffffff',
       '--product-hover-border': '#64748b',
-      '--product-img-bg': '#e2e8f0'
+      '--product-img-bg': '#e2e8f0',
+      '--card-radius': '0px',
+      '--card-shadow': '0 12px 30px -10px rgba(15, 23, 42, 0.08)'
     }
   },
   {
@@ -160,6 +176,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--site-on-primary': '#ffffff',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#18251c',
+      '--site-font-heading': "'Newsreader', 'Cormorant Garamond', Georgia, serif",
+      '--site-font-body': "'Plus Jakarta Sans', sans-serif",
+      '--site-font-mono': "'JetBrains Mono', monospace",
       '--ink': '#18251c',
       '--muted': '#5e7264',
       '--line': '#d7e2d9',
@@ -177,7 +196,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--cta-bg': '#152219',
       '--cta-text': '#ffffff',
       '--product-hover-border': '#85a78d',
-      '--product-img-bg': '#e7ece8'
+      '--product-img-bg': '#e7ece8',
+      '--card-radius': '28px',
+      '--card-shadow': '0 24px 50px -15px rgba(28, 40, 32, 0.1)'
     }
   },
   {
@@ -204,6 +225,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--site-on-primary': '#ffffff',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#2d1b15',
+      '--site-font-heading': "'Bodoni Moda', 'Playfair Display', Georgia, serif",
+      '--site-font-body': "'Plus Jakarta Sans', sans-serif",
+      '--site-font-mono': "'JetBrains Mono', monospace",
       '--ink': '#291811',
       '--muted': '#82695e',
       '--line': '#eddcd3',
@@ -221,7 +245,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--cta-bg': '#23140f',
       '--cta-text': '#ffffff',
       '--product-hover-border': '#d98b6b',
-      '--product-img-bg': '#f3e8e1'
+      '--product-img-bg': '#f3e8e1',
+      '--card-radius': '8px',
+      '--card-shadow': '0 20px 45px -15px rgba(45, 27, 21, 0.1)'
     }
   },
   {
@@ -248,6 +274,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--site-on-primary': '#ffffff',
       '--site-on-secondary': '#ffffff',
       '--site-on-background': '#18181b',
+      '--site-font-heading': "'Playfair Display', Didot, Georgia, serif",
+      '--site-font-body': "'Plus Jakarta Sans', Inter, sans-serif",
+      '--site-font-mono': "'JetBrains Mono', monospace",
       '--ink': '#18181b',
       '--muted': '#71717a',
       '--line': '#e4e4e7',
@@ -265,7 +294,9 @@ export const LOOKBOOK_COLOR_TEMPLATES = [
       '--cta-bg': '#09090b',
       '--cta-text': '#ffffff',
       '--product-hover-border': '#18181b',
-      '--product-img-bg': '#f4f4f5'
+      '--product-img-bg': '#f4f4f5',
+      '--card-radius': '0px',
+      '--card-shadow': '0 30px 60px -20px rgba(0, 0, 0, 0.07)'
     }
   }
 ];

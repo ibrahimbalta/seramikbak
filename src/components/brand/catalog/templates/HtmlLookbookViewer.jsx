@@ -26,7 +26,19 @@ import {
   Maximize2,
   Share2,
   Printer,
-  QrCode
+  QrCode,
+  Sun,
+  Lightbulb,
+  Sliders,
+  Bookmark,
+  Pin,
+  PinOff,
+  Scale,
+  Ruler,
+  FileText,
+  Flame,
+  Award,
+  Box
 } from 'lucide-react';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 import {
@@ -69,6 +81,12 @@ export default function HtmlLookbookViewer({
   const [activeThemeId, setActiveThemeId] = useState(catalog?.template || 'terra-traverten');
   const [showThemePicker, setShowThemePicker] = useState(false);
   const themePickerRef = useRef(null);
+
+  // Interactive Lighting Simulation ('natural' 5500K | 'warm' 3000K | 'studio' 4000K)
+  const [lightMode, setLightMode] = useState('natural');
+
+  // Architectural Moodboard Tray (Pinned Slabs)
+  const [pinnedSlabs, setPinnedSlabs] = useState([]);
 
   // Sync if catalog.template changes
   useEffect(() => {
@@ -123,57 +141,6 @@ export default function HtmlLookbookViewer({
     phone: '',
     message: ''
   });
-
-  const handleLeadSubmit = async (e) => {
-    e.preventDefault();
-    if (!leadForm.name || !leadForm.phone) {
-      setSubmitError('Lütfen ad soyad ve telefon numaranızı girin.');
-      return;
-    }
-
-    setIsSubmittingLead(true);
-    setSubmitError('');
-
-    try {
-      const effectiveSlug =
-        catalog?.publicSlug ||
-        catalog?.slug ||
-        (typeof window !== 'undefined'
-          ? window.location.pathname.split('/katalog/')[1]?.split('/')[0]?.split('#')[0]?.split('?')[0]
-          : '');
-
-      const payload = {
-        catalogId: catalog?.id,
-        catalogSlug: effectiveSlug,
-        brandId: catalog?.brandId || catalog?.brand?.id,
-        leadType,
-        name: leadForm.name.trim(),
-        company: (leadForm.company || '').trim(),
-        email: (leadForm.email || '').trim(),
-        phone: leadForm.phone.trim(),
-        selectedProducts: selectedLeadProducts,
-        message: (leadForm.message || '').trim()
-      };
-
-      const res = await fetch('/api/brand/catalogs/inquiries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setLeadSubmitted(true);
-        notify(data.message || 'Talebiniz üretici marka masasına başarıyla iletildi!');
-      } else {
-        setSubmitError(data.error || 'Talep iletilemedi. Lütfen tekrar deneyin.');
-      }
-    } catch (err) {
-      setSubmitError('Bağlantı hatası: ' + err.message);
-    } finally {
-      setIsSubmittingLead(false);
-    }
-  };
 
   // Social Share & Print State
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -269,6 +236,24 @@ export default function HtmlLookbookViewer({
     notify(nextState ? `"${p.name}" favorilere eklendi.` : `"${p.name}" favorilerden çıkarıldı.`);
   };
 
+  // Toggle Pinned Slab for Architectural Moodboard
+  const handleTogglePinSlab = (p, e) => {
+    if (e) e.stopPropagation();
+    const key = p.id || p.code || p.name;
+    const exists = pinnedSlabs.some((s) => (s.id || s.code || s.name) === key);
+    if (exists) {
+      setPinnedSlabs((prev) => prev.filter((s) => (s.id || s.code || s.name) !== key));
+      notify(`"${p.name}" numune masasından kaldırıldı.`);
+    } else {
+      if (pinnedSlabs.length >= 6) {
+        notify('En fazla 6 numune seçebilirsiniz.');
+        return;
+      }
+      setPinnedSlabs((prev) => [...prev, p]);
+      notify(`"${p.name}" mimari numune masasına eklendi! ✓`);
+    }
+  };
+
   // Derive filter options
   const sizeOptions = useMemo(() => {
     const set = new Set();
@@ -330,15 +315,75 @@ export default function HtmlLookbookViewer({
     setShowLeadModal(true);
   };
 
+  const handleOpenLeadForPinned = (type = 'quote') => {
+    if (pinnedSlabs.length === 0) return;
+    setSelectedLeadProducts(pinnedSlabs.map((s) => s.name || s.code));
+    setLeadType(type);
+    setSubmitError('');
+    setLeadSubmitted(false);
+    setShowLeadModal(true);
+  };
+
+  const handleLeadSubmit = async (e) => {
+    e.preventDefault();
+    if (!leadForm.name || !leadForm.phone) {
+      setSubmitError('Lütfen ad soyad ve telefon numaranızı girin.');
+      return;
+    }
+
+    setIsSubmittingLead(true);
+    setSubmitError('');
+
+    try {
+      const effectiveSlug =
+        catalog?.publicSlug ||
+        catalog?.slug ||
+        (typeof window !== 'undefined'
+          ? window.location.pathname.split('/katalog/')[1]?.split('/')[0]?.split('#')[0]?.split('?')[0]
+          : '');
+
+      const payload = {
+        catalogId: catalog?.id,
+        catalogSlug: effectiveSlug,
+        brandId: catalog?.brandId || catalog?.brand?.id,
+        leadType,
+        name: leadForm.name.trim(),
+        company: (leadForm.company || '').trim(),
+        email: (leadForm.email || '').trim(),
+        phone: leadForm.phone.trim(),
+        selectedProducts: selectedLeadProducts,
+        message: (leadForm.message || '').trim()
+      };
+
+      const res = await fetch('/api/brand/catalogs/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLeadSubmitted(true);
+        notify(data.message || 'Talebiniz üretici marka masasına başarıyla iletildi!');
+      } else {
+        setSubmitError(data.error || 'Talep iletilemedi. Lütfen tekrar deneyin.');
+      }
+    } catch (err) {
+      setSubmitError('Bağlantı hatası: ' + err.message);
+    } finally {
+      setIsSubmittingLead(false);
+    }
+  };
+
   const getProductLabel = (p) => {
     const finish = (p.finish || p.surface || '').toLowerCase();
     const name = (p.name || '').toLowerCase();
     if (finish.includes('lappato')) return 'Full Lappato';
-    if (name.includes('ahşap') || name.includes('meşe') || name.includes('ceviz')) return 'Ahşap etkisi';
-    if (name.includes('mermer') || name.includes('zenith')) return 'Mermer etkisi';
-    if (finish.includes('parlak')) return 'Parlak yüzey';
-    if (finish.includes('mat')) return 'Doğal doku';
-    return 'Mimari karo';
+    if (name.includes('ahşap') || name.includes('meşe') || name.includes('ceviz')) return 'Ahşap Dokusu';
+    if (name.includes('mermer') || name.includes('zenith') || name.includes('calacatta')) return 'Mermer Karakteri';
+    if (finish.includes('parlak')) return 'Ayna Parlak';
+    if (finish.includes('mat')) return 'Doğal Mat';
+    return 'Mimari Porselen';
   };
 
   const coverImage =
@@ -353,21 +398,42 @@ export default function HtmlLookbookViewer({
   return (
     <div
       id="seramikbak-lookbook-root"
-      className={`seramikbak-lookbook-app layout-${layoutType} w-full`}
+      className={`seramikbak-lookbook-app layout-${layoutType} light-${lightMode} w-full`}
       style={currentTheme.vars}
     >
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..700&family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@500;700;800&display=swap');
+
         .seramikbak-lookbook-app {
           background-color: var(--site-background);
           color: var(--site-on-background);
-          font-family: var(--site-font-body, Inter, sans-serif);
+          font-family: var(--site-font-body, 'Plus Jakarta Sans', -apple-system, sans-serif);
           font-size: 14px;
-          line-height: 1.5;
-          transition: background-color .3s ease, color .3s ease;
+          line-height: 1.6;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          transition: background-color .4s cubic-bezier(0.16, 1, 0.3, 1), color .4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        /* -------------------------------------------------------------
+           LIGHTING SIMULATOR COLOR GRADING
+        ------------------------------------------------------------- */
+        .seramikbak-lookbook-app.light-natural img {
+          filter: saturate(1.02) contrast(1.02);
+          transition: filter .4s ease;
+        }
+        .seramikbak-lookbook-app.light-warm img {
+          filter: sepia(0.18) saturate(1.15) brightness(1.03) contrast(1.02);
+          transition: filter .4s ease;
+        }
+        .seramikbak-lookbook-app.light-studio img {
+          filter: brightness(1.02) contrast(1.12) saturate(1.05);
+          transition: filter .4s ease;
+        }
+
+        /* TOPLINE */
         .seramikbak-lookbook-app .topline {
-          height: 34px;
+          height: 36px;
           border-bottom: 1px solid var(--line);
           display: flex;
           align-items: center;
@@ -375,16 +441,18 @@ export default function HtmlLookbookViewer({
           padding: 0 5.5%;
           font-size: 11px;
           color: var(--muted);
-          letter-spacing: .04em;
+          letter-spacing: .06em;
           background-color: var(--site-background);
         }
         .seramikbak-lookbook-app .topline strong {
           color: var(--ink);
-          letter-spacing: .12em;
+          letter-spacing: .14em;
+          font-weight: 700;
         }
 
+        /* NAVBAR */
         .seramikbak-lookbook-app .nav {
-          height: 76px;
+          height: 78px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -395,12 +463,14 @@ export default function HtmlLookbookViewer({
           position: sticky;
           top: 0;
           z-index: 30;
+          backdrop-filter: blur(12px);
           transition: background-color .3s, border-color .3s;
         }
         .seramikbak-lookbook-app .brand-title {
-          font-size: 22px;
-          font-weight: 750;
-          letter-spacing: -.07em;
+          font-family: var(--site-font-heading, Georgia, serif);
+          font-size: 24px;
+          font-weight: 700;
+          letter-spacing: -.03em;
           white-space: nowrap;
           color: var(--ink);
           text-decoration: none;
@@ -410,10 +480,12 @@ export default function HtmlLookbookViewer({
         }
         .seramikbak-lookbook-app .navlinks {
           display: flex;
-          gap: 27px;
+          gap: 28px;
           color: var(--muted);
           font-size: 12px;
+          font-weight: 500;
           align-items: center;
+          letter-spacing: .04em;
         }
         .seramikbak-lookbook-app .navlinks a {
           text-decoration: none;
@@ -444,16 +516,17 @@ export default function HtmlLookbookViewer({
         .seramikbak-lookbook-app .iconbtn:hover {
           border-color: var(--accent);
           color: var(--accent);
+          transform: translateY(-1px);
         }
         .seramikbak-lookbook-app .outlinebtn, .seramikbak-lookbook-app .primarybtn {
-          padding: 12px 17px;
-          border-radius: 3px;
+          padding: 12px 18px;
+          border-radius: var(--card-radius, 4px);
           font-size: 11px;
           font-weight: 700;
-          letter-spacing: .04em;
+          letter-spacing: .08em;
           text-transform: uppercase;
           cursor: pointer;
-          transition: all .2s;
+          transition: all .25s ease;
           display: inline-flex;
           align-items: center;
           gap: 6px;
@@ -467,82 +540,118 @@ export default function HtmlLookbookViewer({
         .seramikbak-lookbook-app .outlinebtn:hover {
           border-color: var(--accent);
           color: var(--accent);
+          background: rgba(0,0,0,0.02);
         }
         .seramikbak-lookbook-app .primarybtn {
           border: 1px solid var(--accent);
           background: var(--accent);
           color: var(--site-on-primary, #ffffff);
+          box-shadow: 0 4px 14px -3px var(--accent);
         }
         .seramikbak-lookbook-app .primarybtn:hover {
-          filter: brightness(.94);
+          filter: brightness(.92);
+          transform: translateY(-1px);
         }
 
         /* -------------------------------------------------------------
-           HERO STYLES FOR DIFFERENT LAYOUTS
+           SPECULAR SHEEN / REFLECTION EFFECT ON TILES
         ------------------------------------------------------------- */
-        /* 1. Asymmetric Editorial (terra-traverten) */
+        .seramikbak-lookbook-app .product-img {
+          position: relative;
+          overflow: hidden;
+          background: var(--product-img-bg, #ece9e3);
+        }
+        .seramikbak-lookbook-app .product-img:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -160%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.22) 50%,
+            transparent 100%
+          );
+          transform: skewX(-25deg);
+          transition: left 0.8s ease;
+          pointer-events: none;
+          z-index: 3;
+        }
+        .seramikbak-lookbook-app .product:hover .product-img:after {
+          left: 160%;
+        }
+
+        /* -------------------------------------------------------------
+           HERO 1: Asymmetric Editorial (terra-traverten)
+        ------------------------------------------------------------- */
         .layout-editorial-asymmetric .hero {
           background: var(--hero-bg, #262a27);
           color: var(--hero-text, #f8f5ef);
-          min-height: 520px;
+          min-height: 560px;
           display: grid;
-          grid-template-columns: 1.1fr .9fr;
+          grid-template-columns: 1.15fr .85fr;
           position: relative;
           overflow: hidden;
         }
         .layout-editorial-asymmetric .hero-copy {
-          padding: 78px 0 68px 9%;
+          padding: 85px 0 75px 9%;
           position: relative;
           z-index: 2;
         }
         .layout-editorial-asymmetric .hero h1 {
-          font-family: var(--site-font-heading, Georgia, serif);
-          font-weight: 400;
-          font-size: clamp(40px, 4.8vw, 68px);
-          line-height: 1.05;
-          letter-spacing: -.045em;
-          max-width: 670px;
-          margin: 24px 0 22px;
+          font-family: var(--site-font-heading, 'Cormorant Garamond', serif);
+          font-weight: 300;
+          font-size: clamp(44px, 5.2vw, 76px);
+          line-height: 1.02;
+          letter-spacing: -.03em;
+          max-width: 680px;
+          margin: 20px 0;
           color: var(--hero-text, #f8f5ef);
         }
         .layout-editorial-asymmetric .hero h1 em {
           color: var(--hero-em, #c4a47a);
           font-style: italic;
+          font-weight: 400;
         }
         .layout-editorial-asymmetric .hero-visual {
           position: relative;
-          min-height: 440px;
+          min-height: 480px;
           overflow: hidden;
         }
         .layout-editorial-asymmetric .hero-visual:before {
           content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, var(--hero-bg, #262a27) 0%, rgba(38,42,39,.12) 45%, rgba(38,42,39,.06) 100%);
+          background: linear-gradient(90deg, var(--hero-bg, #262a27) 0%, rgba(38,42,39,.15) 50%, rgba(38,42,39,.04) 100%);
           z-index: 1;
         }
         .layout-editorial-asymmetric .hero-stamp {
           position: absolute;
           z-index: 2;
           right: 9%;
-          bottom: 38px;
+          bottom: 42px;
           border: 1px solid var(--hero-stamp-border, rgba(255, 255, 255, .45));
-          padding: 18px 20px;
-          background: var(--hero-stamp-bg, rgba(30, 33, 30, .62));
-          backdrop-filter: blur(8px);
-          max-width: 230px;
+          padding: 20px 24px;
+          background: var(--hero-stamp-bg, rgba(30, 33, 30, .68));
+          backdrop-filter: blur(12px);
+          max-width: 260px;
+          border-radius: 4px;
         }
 
-        /* 2. Cinema Fullwidth Monolith (obsidian-gold) */
+        /* -------------------------------------------------------------
+           HERO 2: Cinema Fullwidth Monolith (obsidian-gold)
+        ------------------------------------------------------------- */
         .layout-cinema-fullwidth .hero {
-          min-height: 82vh;
+          min-height: 84vh;
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
           text-align: center;
-          padding: 80px 24px;
-          background: #080a0f;
+          padding: 90px 24px;
+          background: #06080c;
           color: #ffffff;
           overflow: hidden;
         }
@@ -555,119 +664,121 @@ export default function HtmlLookbookViewer({
           width: 100%;
           height: 100%;
           object-fit: cover;
-          filter: brightness(0.38) contrast(1.1);
+          filter: brightness(0.32) contrast(1.15);
         }
         .layout-cinema-fullwidth .hero-backdrop:after {
           content: "";
           position: absolute;
           inset: 0;
-          background: radial-gradient(circle at center, transparent 30%, rgba(8,10,15,0.85) 100%), linear-gradient(0deg, #0a0d14 0%, transparent 60%);
+          background: radial-gradient(circle at center, transparent 25%, rgba(6,8,12,0.92) 100%), linear-gradient(0deg, #06080c 0%, transparent 60%);
         }
         .layout-cinema-fullwidth .hero-content-cinema {
           position: relative;
           z-index: 2;
-          max-width: 900px;
+          max-width: 950px;
           margin: 0 auto;
         }
         .layout-cinema-fullwidth .cinema-badge {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 6px 14px;
+          gap: 8px;
+          padding: 7px 18px;
           border-radius: 30px;
-          background: rgba(197, 160, 89, 0.15);
-          border: 1px solid rgba(197, 160, 89, 0.4);
-          color: #c5a059;
+          background: rgba(197, 160, 89, 0.12);
+          border: 1px solid rgba(197, 160, 89, 0.45);
+          color: #fae29c;
           font-size: 10px;
-          font-weight: 800;
-          letter-spacing: .2em;
+          font-weight: 700;
+          letter-spacing: .25em;
           text-transform: uppercase;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
         .layout-cinema-fullwidth .hero h1 {
-          font-family: 'Georgia', serif;
-          font-size: clamp(44px, 5.5vw, 84px);
-          font-weight: 300;
-          letter-spacing: -0.04em;
+          font-family: var(--site-font-heading, 'Cinzel', serif);
+          font-size: clamp(48px, 6vw, 88px);
+          font-weight: 400;
+          letter-spacing: -0.02em;
           line-height: 1.05;
-          color: #ffffff;
-          margin: 0 0 20px;
-        }
-        .layout-cinema-fullwidth .hero h1 em {
-          font-style: italic;
-          color: #c5a059;
+          margin: 0 0 24px;
+          background: linear-gradient(135deg, #ffffff 0%, #fae29c 50%, #c5a059 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
 
-        /* 3. Swiss Bauhaus Industrial (nordic-loft) */
+        /* -------------------------------------------------------------
+           HERO 3: Swiss Bauhaus Industrial (nordic-loft)
+        ------------------------------------------------------------- */
         .layout-swiss-industrial .hero {
           background: var(--hero-bg, #1e293b);
           color: #ffffff;
-          padding: 40px 5.5% 60px;
+          padding: 45px 5.5% 65px;
         }
         .layout-swiss-industrial .swiss-coord-bar {
           border-bottom: 1px solid rgba(255,255,255,0.15);
-          padding-bottom: 12px;
-          margin-bottom: 35px;
+          padding-bottom: 14px;
+          margin-bottom: 40px;
           display: flex;
           justify-content: space-between;
-          font-family: monospace;
+          font-family: var(--site-font-mono, monospace);
           font-size: 11px;
           color: #94a3b8;
-          letter-spacing: .1em;
+          letter-spacing: .12em;
         }
         .layout-swiss-industrial .swiss-grid {
           display: grid;
-          grid-template-columns: 1.2fr 1fr;
-          gap: 40px;
+          grid-template-columns: 1.25fr 1fr;
+          gap: 45px;
           align-items: center;
         }
         .layout-swiss-industrial .hero h1 {
-          font-family: 'Inter', sans-serif;
-          font-weight: 850;
-          font-size: clamp(36px, 4.4vw, 62px);
-          letter-spacing: -0.05em;
+          font-family: var(--site-font-heading, 'Space Grotesk', sans-serif);
+          font-weight: 700;
+          font-size: clamp(38px, 4.6vw, 66px);
+          letter-spacing: -0.04em;
           text-transform: uppercase;
           line-height: 1.02;
-          margin: 0 0 22px;
+          margin: 0 0 24px;
         }
         .layout-swiss-industrial .swiss-frame {
           position: relative;
           border: 1px solid rgba(255,255,255,0.25);
-          padding: 8px;
-          background: rgba(255,255,255,0.05);
+          padding: 10px;
+          background: rgba(255,255,255,0.04);
         }
         .layout-swiss-industrial .swiss-frame img {
           width: 100%;
-          height: 380px;
+          height: 400px;
           object-fit: cover;
           display: block;
         }
 
-        /* 4. Organic Wellness Sanctuary (sage-forest) */
+        /* -------------------------------------------------------------
+           HERO 4: Organic Wellness Sanctuary (sage-forest)
+        ------------------------------------------------------------- */
         .layout-organic-wellness .hero {
           background: #1c2820;
           color: #f2f7f3;
-          padding: 60px 5.5% 70px;
+          padding: 65px 5.5% 75px;
         }
         .layout-organic-wellness .organic-hero-box {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 40px;
+          gap: 45px;
           align-items: center;
         }
         .layout-organic-wellness .hero h1 {
-          font-family: 'Georgia', serif;
-          font-size: clamp(38px, 4.2vw, 60px);
+          font-family: var(--site-font-heading, 'Newsreader', serif);
+          font-size: clamp(40px, 4.4vw, 64px);
           font-weight: 400;
-          line-height: 1.1;
+          line-height: 1.08;
           color: #ffffff;
-          margin: 16px 0;
+          margin: 18px 0;
         }
         .layout-organic-wellness .organic-img-wrap {
           border-radius: 28px;
           overflow: hidden;
-          box-shadow: 0 20px 45px rgba(0,0,0,0.35);
-          height: 420px;
+          box-shadow: 0 25px 55px rgba(0,0,0,0.38);
+          height: 430px;
         }
         .layout-organic-wellness .organic-img-wrap img {
           width: 100%;
@@ -675,120 +786,140 @@ export default function HtmlLookbookViewer({
           object-fit: cover;
         }
 
-        /* 5. Mediterranean Book Spread (terracotta-sun) */
+        /* -------------------------------------------------------------
+           HERO 5: Mediterranean Book Spread (terracotta-sun)
+        ------------------------------------------------------------- */
         .layout-mediterranean-book .hero {
           background: #2d1b15;
           color: #faf4ef;
-          padding: 70px 5.5% 80px;
+          padding: 75px 5.5% 85px;
         }
         .layout-mediterranean-book .book-spread {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 50px;
+          gap: 55px;
           align-items: center;
         }
         .layout-mediterranean-book .hero h1 {
-          font-family: 'Georgia', serif;
-          font-size: clamp(40px, 4.5vw, 64px);
+          font-family: var(--site-font-heading, 'Bodoni Moda', serif);
+          font-size: clamp(42px, 4.8vw, 68px);
           font-weight: 400;
-          line-height: 1.1;
-          margin: 18px 0;
+          line-height: 1.06;
+          margin: 20px 0;
           color: #fff;
         }
         .layout-mediterranean-book .book-card {
           background: rgba(255,255,255,0.06);
-          border: 1px solid rgba(255,255,255,0.15);
-          padding: 30px;
+          border: 1px solid rgba(255,255,255,0.18);
+          padding: 34px;
           border-radius: 8px;
         }
 
-        /* 6. Gallery Minimal White-Cube (carrara-pure) */
+        /* -------------------------------------------------------------
+           HERO 6: Gallery Minimal White-Cube (carrara-pure)
+        ------------------------------------------------------------- */
         .layout-gallery-minimal .hero {
           background: #ffffff;
           color: #18181b;
           border-bottom: 1px solid #e4e4e7;
-          padding: 70px 5.5% 80px;
+          padding: 75px 5.5% 85px;
           text-align: center;
         }
         .layout-gallery-minimal .hero h1 {
-          font-family: 'Georgia', serif;
-          font-size: clamp(42px, 5vw, 72px);
+          font-family: var(--site-font-heading, 'Playfair Display', serif);
+          font-size: clamp(44px, 5.2vw, 76px);
           font-weight: 300;
           letter-spacing: -0.03em;
           color: #18181b;
-          margin: 18px auto 20px;
-          max-width: 800px;
+          margin: 20px auto 24px;
+          max-width: 850px;
         }
         .layout-gallery-minimal .gallery-hero-photo {
-          max-width: 960px;
-          margin: 35px auto 0;
+          max-width: 980px;
+          margin: 40px auto 0;
           border: 1px solid #18181b;
-          padding: 10px;
+          padding: 12px;
           background: #ffffff;
+          box-shadow: 0 30px 60px -20px rgba(0,0,0,0.08);
         }
         .layout-gallery-minimal .gallery-hero-photo img {
           width: 100%;
-          height: 420px;
+          height: 440px;
           object-fit: cover;
           display: block;
         }
 
         /* -------------------------------------------------------------
-           PRODUCTS GRID STYLING PER LAYOUT
+           PRODUCTS GRID & LUXURY CARDS
         ------------------------------------------------------------- */
         .seramikbak-lookbook-app .section {
-          padding: 76px 7%;
+          padding: 85px 7%;
         }
         .seramikbak-lookbook-app .products {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 28px 18px;
+          gap: 32px 22px;
         }
-
-        /* 3-column slab grid for cinema-fullwidth and gallery-minimal */
         .layout-cinema-fullwidth .products,
         .layout-gallery-minimal .products {
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 32px 22px;
+          gap: 36px 26px;
         }
 
         .seramikbak-lookbook-app .product {
           background: var(--paper);
           border: 1px solid var(--line);
+          border-radius: var(--card-radius, 4px);
           min-width: 0;
-          transition: transform .25s, border-color .25s, box-shadow .25s;
+          transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), border-color .3s, box-shadow .3s;
           display: flex;
           flex-direction: column;
+          box-shadow: var(--card-shadow, 0 10px 25px -10px rgba(0,0,0,0.06));
         }
         .seramikbak-lookbook-app .product:hover {
-          transform: translateY(-4px);
-          border-color: var(--product-hover-border, #c5b49a);
-          box-shadow: 0 10px 24px -10px rgba(0,0,0,0.12);
+          transform: translateY(-5px);
+          border-color: var(--product-hover-border, var(--accent));
+          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
         }
 
-        /* Organic wellness rounded cards */
-        .layout-organic-wellness .product {
-          border-radius: 18px;
-          overflow: hidden;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-        }
-
-        /* Obsidian glass cards */
+        /* Cinema Monolith card */
         .layout-cinema-fullwidth .product {
-          background: rgba(19, 24, 34, 0.7);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(197, 160, 89, 0.2);
+          background: rgba(19, 24, 34, 0.85);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(197, 160, 89, 0.25);
         }
         .layout-cinema-fullwidth .product:hover {
-          border-color: #c5a059;
-          box-shadow: 0 12px 30px rgba(197, 160, 89, 0.15);
+          border-color: #fae29c;
+          box-shadow: 0 16px 40px rgba(197, 160, 89, 0.2);
+        }
+
+        /* Swiss Industrial card */
+        .layout-swiss-industrial .product {
+          position: relative;
+        }
+        .layout-swiss-industrial .product:before {
+          content: "+";
+          position: absolute;
+          top: -6px;
+          left: -6px;
+          font-family: var(--site-font-mono, monospace);
+          font-size: 11px;
+          color: var(--accent);
+          z-index: 10;
+        }
+        .layout-swiss-industrial .product:after {
+          content: "+";
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          font-family: var(--site-font-mono, monospace);
+          font-size: 11px;
+          color: var(--accent);
+          z-index: 10;
         }
 
         .seramikbak-lookbook-app .product-img {
-          aspect-ratio: 1.13;
-          background: var(--product-img-bg, #ece9e3);
-          overflow: hidden;
-          position: relative;
+          aspect-ratio: 1.15;
         }
         .layout-cinema-fullwidth .product-img {
           aspect-ratio: 1.35;
@@ -798,10 +929,10 @@ export default function HtmlLookbookViewer({
           height: 100%;
           object-fit: cover;
           display: block;
-          transition: transform .5s ease;
+          transition: transform .6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .seramikbak-lookbook-app .product:hover .product-img img {
-          transform: scale(1.035);
+          transform: scale(1.04);
         }
 
         .seramikbak-lookbook-app .product-label {
@@ -811,36 +942,45 @@ export default function HtmlLookbookViewer({
           background: var(--paper, #fffefa);
           color: var(--ink);
           font-size: 9px;
-          padding: 6px 8px;
-          letter-spacing: .1em;
+          font-weight: 700;
+          padding: 5px 9px;
+          letter-spacing: .12em;
           text-transform: uppercase;
           border: 1px solid var(--line);
-          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-          z-index: 2;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          border-radius: 3px;
+          z-index: 4;
         }
-        .seramikbak-lookbook-app .fav {
+        .seramikbak-lookbook-app .card-floating-actions {
           position: absolute;
           right: 12px;
-          top: 10px;
+          top: 12px;
+          display: flex;
+          gap: 6px;
+          z-index: 4;
+        }
+        .seramikbak-lookbook-app .card-icon-btn {
           background: var(--paper, #fffefa);
           border: 1px solid var(--line);
-          width: 30px;
-          height: 30px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          font-size: 16px;
-          color: #666;
+          color: var(--ink);
           display: inline-flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           transition: all .2s;
-          z-index: 2;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .seramikbak-lookbook-app .fav:hover {
+        .seramikbak-lookbook-app .card-icon-btn:hover {
           transform: scale(1.1);
+          border-color: var(--accent);
+          color: var(--accent);
         }
+
         .seramikbak-lookbook-app .product-info {
-          padding: 16px 15px 14px;
+          padding: 18px 18px 16px;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -848,24 +988,18 @@ export default function HtmlLookbookViewer({
         .seramikbak-lookbook-app .product-series {
           font-size: 9px;
           text-transform: uppercase;
-          letter-spacing: .13em;
+          letter-spacing: .15em;
           color: var(--accent);
-          margin-bottom: 7px;
+          margin-bottom: 6px;
           font-weight: 700;
         }
         .seramikbak-lookbook-app .product h3 {
           font-family: var(--site-font-heading, Georgia, serif);
-          font-weight: 400;
+          font-weight: 500;
           font-size: 20px;
-          margin: 0 0 9px;
+          margin: 0 0 10px;
           line-height: 1.15;
           color: var(--ink);
-        }
-        .layout-swiss-industrial .product h3 {
-          font-family: 'Inter', sans-serif;
-          font-weight: 700;
-          font-size: 17px;
-          letter-spacing: -0.02em;
         }
         .seramikbak-lookbook-app .specs {
           font-size: 11px;
@@ -882,7 +1016,7 @@ export default function HtmlLookbookViewer({
         .seramikbak-lookbook-app .product-actions {
           display: flex;
           border-top: 1px solid var(--line);
-          margin-top: 15px;
+          margin-top: 16px;
         }
         .seramikbak-lookbook-app .product-actions button {
           flex: 1;
@@ -892,6 +1026,8 @@ export default function HtmlLookbookViewer({
           color: var(--ink);
           font-size: 10px;
           font-weight: 700;
+          letter-spacing: .06em;
+          text-transform: uppercase;
           cursor: pointer;
           transition: all .2s;
           text-align: center;
@@ -905,6 +1041,9 @@ export default function HtmlLookbookViewer({
           filter: brightness(.94);
         }
 
+        /* -------------------------------------------------------------
+           EDITORIAL & TECHNICAL SECTIONS
+        ------------------------------------------------------------- */
         .seramikbak-lookbook-app .editorial {
           background: var(--editorial-bg, #eeece5);
           transition: background-color .3s;
@@ -912,13 +1051,14 @@ export default function HtmlLookbookViewer({
         .seramikbak-lookbook-app .editorial-grid {
           display: grid;
           grid-template-columns: 1.12fr .88fr;
-          gap: 5%;
+          gap: 6%;
           align-items: center;
         }
         .seramikbak-lookbook-app .editorial-photo {
           position: relative;
-          min-height: 480px;
+          min-height: 500px;
           overflow: hidden;
+          border-radius: var(--card-radius, 4px);
         }
         .seramikbak-lookbook-app .editorial-photo img {
           position: absolute;
@@ -929,14 +1069,15 @@ export default function HtmlLookbookViewer({
         }
         .seramikbak-lookbook-app .photo-caption {
           position: absolute;
-          left: 22px;
-          bottom: 22px;
-          background: var(--editorial-caption-bg, rgba(31,34,30,.84));
+          left: 24px;
+          bottom: 24px;
+          background: var(--editorial-caption-bg, rgba(31,34,30,.86));
           color: #fff;
-          padding: 13px 16px;
+          padding: 14px 18px;
           font-size: 10px;
-          letter-spacing: .1em;
+          letter-spacing: .12em;
           text-transform: uppercase;
+          border-radius: 3px;
         }
 
         .seramikbak-lookbook-app .technical {
@@ -946,32 +1087,35 @@ export default function HtmlLookbookViewer({
         .seramikbak-lookbook-app .tech-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          margin-top: 32px;
+          gap: 20px;
+          margin-top: 36px;
         }
         .seramikbak-lookbook-app .tech-card {
           border: 1px solid var(--line);
-          padding: 24px;
+          padding: 28px;
           background: var(--paper);
-          transition: border-color .2s;
+          border-radius: var(--card-radius, 4px);
+          transition: border-color .2s, transform .2s;
         }
         .seramikbak-lookbook-app .tech-card:hover {
           border-color: var(--accent);
+          transform: translateY(-2px);
         }
 
         .seramikbak-lookbook-app .cta {
-          margin: 0 7% 70px;
-          padding: 42px 48px;
+          margin: 0 7% 75px;
+          padding: 48px 52px;
           background: var(--cta-bg, #282d29);
           color: var(--cta-text, #ffffff);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 28px;
+          gap: 32px;
+          border-radius: var(--card-radius, 4px);
         }
 
         .seramikbak-lookbook-app .footer {
-          padding: 28px 7%;
+          padding: 32px 7%;
           border-top: 1px solid var(--line);
           display: flex;
           justify-content: space-between;
@@ -984,19 +1128,19 @@ export default function HtmlLookbookViewer({
 
         .seramikbak-lookbook-app .toast {
           position: fixed;
-          bottom: 22px;
+          bottom: 24px;
           left: 50%;
           transform: translate(-50%, 20px);
           background: var(--hero-bg, #262a27);
           color: #ffffff;
-          padding: 14px 22px;
-          z-index: 80;
+          padding: 14px 24px;
+          z-index: 90;
           opacity: 0;
           pointer-events: none;
           transition: all .25s ease;
           font-size: 12px;
-          box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-          border-radius: 4px;
+          box-shadow: 0 16px 36px rgba(0,0,0,0.3);
+          border-radius: 30px;
         }
         .seramikbak-lookbook-app .toast.show {
           opacity: 1;
@@ -1004,8 +1148,8 @@ export default function HtmlLookbookViewer({
           pointer-events: auto;
         }
 
-        @media(max-width:1000px) {
-          .layout-editorial-asymmetric .hero { grid-template-columns: 1fr .72fr; }
+        @media(max-width:1050px) {
+          .layout-editorial-asymmetric .hero { grid-template-columns: 1fr .75fr; }
           .layout-swiss-industrial .swiss-grid { grid-template-columns: 1fr; }
           .layout-organic-wellness .organic-hero-box { grid-template-columns: 1fr; }
           .layout-mediterranean-book .book-spread { grid-template-columns: 1fr; }
@@ -1062,7 +1206,7 @@ export default function HtmlLookbookViewer({
           <a href="#koleksiyon">Koleksiyon</a>
           <a href="#urunler">Ürünler</a>
           <a href="#mekanlar">Mekân İlhamı</a>
-          <a href="#teknik">Teknik Bilgiler</a>
+          <a href="#teknik">Teknik Şartname</a>
         </div>
 
         <div className="navright">
@@ -1077,13 +1221,13 @@ export default function HtmlLookbookViewer({
             <Search size={15} />
           </button>
 
-          {/* COLOR THEME SELECTOR DROPDOWN */}
+          {/* COLOR & LAYOUT THEME SELECTOR DROPDOWN */}
           <div className="relative" ref={themePickerRef}>
             <button
               type="button"
               onClick={() => setShowThemePicker(!showThemePicker)}
               className="outlinebtn flex items-center gap-1.5"
-              title="Şablon Değiştir"
+              title="Mimari Şablon Değiştir"
               style={{ fontSize: '10px' }}
             >
               <Palette size={13} style={{ color: 'var(--accent)' }} />
@@ -1098,10 +1242,10 @@ export default function HtmlLookbookViewer({
               >
                 <div className="px-3 py-2 border-b border-[var(--line)] mb-1">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)]">
-                    Şablon ve Mizanpaj Seçin
+                    Mimari Şablon ve Mizanpaj Seçin
                   </p>
                   <p className="text-[11px] text-[var(--muted)]">
-                    Farklı mimari mizanpaj ve renkleri canlı test edin.
+                    Farklı marka ve atmosfer konseptlerini canlı test edin.
                   </p>
                 </div>
 
@@ -1258,7 +1402,7 @@ export default function HtmlLookbookViewer({
                 catalog?.description ||
                 'Doğal taşın karakteri, mermerin zarafeti ve çağdaş mimarinin yalın çizgileri. Mekânlara değer katan yüzeyleri keşfedin.'}
             </p>
-            <div className="hero-actions">
+            <div className="flex items-center gap-3 mt-8">
               <button
                 type="button"
                 className="primarybtn"
@@ -1266,27 +1410,31 @@ export default function HtmlLookbookViewer({
                   document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Koleksiyonu keşfet&nbsp; ↘
+                Koleksiyonu Keşfet&nbsp; ↘
               </button>
               <button
                 type="button"
                 className="outlinebtn"
+                style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}
                 onClick={() => {
                   document.getElementById('mekanlar')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Mekân ilhamı
+                Mekân İlhamı
               </button>
             </div>
-            <div className="hero-meta">
+            <div className="grid grid-cols-3 gap-6 pt-10 border-t border-white/10 mt-10 text-xs">
               <div>
-                <strong>{year}</strong>Yeni koleksiyon
+                <strong className="block text-base font-serif text-white">{year}</strong>
+                <span className="text-stone-300">Yeni Koleksiyon</span>
               </div>
               <div>
-                <strong>{products.length} seçili yüzey</strong>Örnek ürünler
+                <strong className="block text-base font-serif text-white">{products.length} Karo</strong>
+                <span className="text-stone-300">Seçili Yüzey</span>
               </div>
               <div>
-                <strong>Mimari seçki</strong>İç ve dış mekân
+                <strong className="block text-base font-serif text-white">İtalya & TR</strong>
+                <span className="text-stone-300">Mimari Seçki</span>
               </div>
             </div>
           </div>
@@ -1294,8 +1442,10 @@ export default function HtmlLookbookViewer({
           <div className="hero-visual">
             <img src={coverImage} alt={catalog?.title || 'Katalog Kapağı'} />
             <div className="hero-stamp">
-              <span>Malzemenin dili</span>
-              <strong>
+              <span className="text-[10px] tracking-widest uppercase text-amber-200 block mb-1">
+                MALZEMENİN DİLİ
+              </span>
+              <strong className="text-sm font-serif text-white leading-tight block">
                 Doğadan ilham.<br />
                 Mimariyle hayat bulur.
               </strong>
@@ -1321,38 +1471,32 @@ export default function HtmlLookbookViewer({
               {catalog?.title || 'Milano Architectural Lookbook'}
             </h1>
 
-            <div className="w-16 h-0.5 bg-[var(--accent)] mx-auto mb-6" />
+            <div className="w-20 h-0.5 bg-[var(--accent)] mx-auto mb-6" />
 
-            <p className="max-w-xl mx-auto text-stone-200 text-base leading-relaxed mb-8">
+            <p className="max-w-2xl mx-auto text-stone-200 text-base leading-relaxed mb-8 font-light">
               {catalog?.introText ||
                 catalog?.description ||
-                'Dev ebat porselen karolar ve monolitik yüzey mimarisi. Obsidian taşın derinliği ile şampanya altınının zamansız buluşması.'}
+                'Dev ebat seramik ve porselen slablar için tam ekran sinematik kapak, obsidian cam kartlar ve ışıltılı altın detaylar.'}
             </p>
 
-            <div className="flex items-center justify-center gap-3 flex-wrap">
+            <div className="flex items-center justify-center gap-4 flex-wrap">
               <button
                 type="button"
-                className="primarybtn"
-                style={{ padding: '14px 26px', fontSize: '11px' }}
+                className="primarybtn px-6 py-3"
                 onClick={() => {
                   document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Koleksiyonu Keşfet ↘
+                Koleksiyonu İncele ↘
               </button>
               <button
                 type="button"
-                className="outlinebtn"
-                style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.3)', padding: '14px 24px' }}
+                className="outlinebtn px-6 py-3"
+                style={{ borderColor: 'rgba(197, 160, 89, 0.45)', color: '#fae29c' }}
                 onClick={() => handleOpenLead(null, 'quote')}
               >
-                Proje Teklifi Al +
+                Proje Fiyat Teklifi Al ↗
               </button>
-            </div>
-
-            <div className="mt-12 inline-flex items-center gap-4 text-xs font-mono text-stone-300 border border-white/20 px-4 py-2 rounded-full backdrop-blur-md">
-              <ShieldCheck size={14} style={{ color: 'var(--accent)' }} />
-              <span>TS EN 14411 GRUP BIA &bull; DEV EBAT SLAB SERİSİ &bull; {products.length} KARO</span>
             </div>
           </div>
         </header>
@@ -1362,52 +1506,45 @@ export default function HtmlLookbookViewer({
       {layoutType === 'swiss-industrial' && (
         <header className="hero" id="koleksiyon">
           <div className="swiss-coord-bar">
-            <span>[ NORDIC ARCHITECTURAL SERIES &bull; {brandName.toUpperCase()} ]</span>
-            <span>MİMARİ KOORDİNAT: TS EN 14411 / {year}</span>
+            <span>SPEC: DIN-EN-14411 // BLa PORCELAIN</span>
+            <span>SCALE: 1:20 // RECTIFIED</span>
+            <span>DATE: {year} ARCH-EDITION</span>
           </div>
 
           <div className="swiss-grid">
             <div>
-              <span className="text-[10px] font-mono tracking-widest text-[#94a3b8] uppercase block mb-3">
-                // ENDÜSTRİYEL VE MODÜLER YÜZEY MİMARİSİ
-              </span>
-              <h1>
-                Brüt ve Yalın<br />
-                Mimari Formlar.
-              </h1>
-              <p className="text-stone-300 text-sm leading-relaxed mb-6 max-w-md">
+              <div className="text-[11px] font-mono tracking-widest uppercase text-blue-300 mb-2">
+                INDEX 01 / {brandName} ARCHITECTURAL SLABS
+              </div>
+              <h1>{catalog?.title || 'Nordic Loft & Concrete'}</h1>
+              <p className="text-slate-300 text-sm leading-relaxed mb-8 max-w-lg">
                 {catalog?.introText ||
                   catalog?.description ||
-                  'Çimento, beton ve ham ahşap tonlarıyla kentsel loft projeleri için tasarlanan net ve işlevsel yüzey koleksiyonu.'}
+                  'Beton ve çimento dokuları için brütist Bauhaus mizanpajı, net geometrik çizgiler, teknik koordinatlar ve milimetrik şartname.'}
               </p>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  className="btn btn-primary"
-                  style={{ background: '#ffffff', color: '#0f172a' }}
+                  className="primarybtn"
                   onClick={() => {
                     document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  Karoları İncele
-                  <ArrowRight size={14} />
+                  Plakaları Listele ↘
                 </button>
                 <button
                   type="button"
-                  className="btn btn-outline"
-                  style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.3)' }}
+                  className="outlinebtn"
+                  style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
                   onClick={() => handleOpenLead(null, 'sample')}
                 >
-                  Teknik Şartname & Numune
+                  Numune Talep Et ↗
                 </button>
               </div>
             </div>
 
             <div className="swiss-frame">
-              <img src={coverImage} alt="Nordic Loft" />
-              <div className="p-2 text-right font-mono text-[9px] text-stone-400">
-                FRAME REF: LOFT-CONCRETE-{year}
-              </div>
+              <img src={coverImage} alt="Swiss Frame Hero" />
             </div>
           </div>
         </header>
@@ -1418,42 +1555,39 @@ export default function HtmlLookbookViewer({
         <header className="hero" id="koleksiyon">
           <div className="organic-hero-box">
             <div>
-              <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/10 text-[#92b69a] inline-block mb-3 border border-white/15">
-                BİOFİLİK MİMARİ &bull; DOĞA & WELLNESS
-              </span>
-              <h1>
-                Doğanın Dinginliğiyle<br />
-                Nefes Alan Yüzeyler.
-              </h1>
-              <p className="text-stone-300 text-sm leading-relaxed mb-6 max-w-md">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold tracking-wider uppercase mb-3">
+                <ShieldCheck size={12} />
+                <span>BİYOFİLİK MİMARİ & SPA &bull; %100 DOĞAL KİL</span>
+              </div>
+              <h1>{catalog?.title || 'Doğanın Dinginliği ve Yaşam Alanları'}</h1>
+              <p className="text-emerald-100/80 text-sm leading-relaxed mb-8 max-w-lg">
                 {catalog?.introText ||
                   catalog?.description ||
-                  'Organik mineral sırlar ve doğal taş dokularıyla banyo, spa ve yaşam alanlarına huzur getiren biophilic seramik koleksiyonu.'}
+                  'Yeşil tonlu karolar ve spa alanları için yuvarlatılmış organik kartlar, biophilic mimari felsefe ve ferah adaçayı harmonisi.'}
               </p>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   className="primarybtn"
-                  style={{ borderRadius: '24px', padding: '13px 24px' }}
                   onClick={() => {
                     document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  Doğal Dokuları Keşfet ↘
+                  Yüzeyleri Keşfet ↘
                 </button>
                 <button
                   type="button"
                   className="outlinebtn"
-                  style={{ borderRadius: '24px', color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
+                  style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
                   onClick={() => handleOpenLead(null, 'sample')}
                 >
-                  Numune İste
+                  Numune Paketi İste ↗
                 </button>
               </div>
             </div>
 
             <div className="organic-img-wrap">
-              <img src={coverImage} alt="Wellness Sanctuary" />
+              <img src={coverImage} alt="Organic Sanctuary Hero" />
             </div>
           </div>
         </header>
@@ -1464,28 +1598,24 @@ export default function HtmlLookbookViewer({
         <header className="hero" id="koleksiyon">
           <div className="book-spread">
             <div>
-              <span className="text-[10px] font-bold tracking-widest text-[#e0906e] uppercase block mb-2">
-                AKDENİZ VİLLALARI &bull; ARTISAN LOOKBOOK
-              </span>
-              <h1>
-                Güneşin ve Pişmiş Toprağın<br />
-                Zamansız Sıcaklığı.
-              </h1>
-              <p className="text-stone-300 text-sm leading-relaxed mb-6">
+              <div className="text-[10px] tracking-widest uppercase text-amber-300 font-mono mb-2">
+                [FOLIO I &bull; ARTISAN MONOGRAPH]
+              </div>
+              <h1>{catalog?.title || 'Pişmiş Toprak & Akdeniz Işığı'}</h1>
+              <p className="text-amber-100/80 text-sm leading-relaxed mb-6">
                 {catalog?.introText ||
                   catalog?.description ||
-                  'Geleneksel zanaat ruhu ve pişmiş kil zenginliği. Sıcak avlular, mutfaklar ve yazlık villalar için otantik seramik sanatı.'}
+                  'Sıcak Akdeniz güneşi, pişmiş toprak ve zanaatkar seramikler için çift sayfalı kitap düzeni, kiremit ve sıcak kum rengi tonları.'}
               </p>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   className="primarybtn"
-                  style={{ padding: '13px 22px' }}
                   onClick={() => {
                     document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  Koleksiyonu Aç ↘
+                  Seçkiyi Aç ↘
                 </button>
                 <button
                   type="button"
@@ -1493,19 +1623,17 @@ export default function HtmlLookbookViewer({
                   style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
                   onClick={() => handleOpenLead(null, 'quote')}
                 >
-                  Fiyat & Proje Teklifi
+                  Fiyat Bilgisi Al ↗
                 </button>
               </div>
             </div>
 
             <div className="book-card">
-              <img
-                src={coverImage}
-                alt="Mediterranean Villa"
-                className="w-full h-72 object-cover rounded mb-4"
-              />
-              <p className="text-xs font-serif italic text-stone-300">
-                "Toprak, ışık ve ateşin buluştuğu yüzeyler; mekâna Akdeniz rüzgarının dinginliğini taşır."
+              <div className="aspect-[4/3] overflow-hidden rounded mb-3">
+                <img src={coverImage} alt="Book Spread Hero" className="w-full h-full object-cover" />
+              </div>
+              <p className="text-[11px] text-amber-200/90 font-serif italic text-center">
+                Atölye seramik geleneği ile modern mimarinin sıcak buluşması.
               </p>
             </div>
           </div>
@@ -1515,34 +1643,31 @@ export default function HtmlLookbookViewer({
       {/* LAYOUT 6: Gallery Minimal White-Cube (carrara-pure) */}
       {layoutType === 'gallery-minimal' && (
         <header className="hero" id="koleksiyon">
-          <span className="text-[11px] font-mono tracking-widest text-stone-500 uppercase block mb-2">
-            EXHIBITION NO. 01 &bull; {brandName.toUpperCase()} &bull; {year}
-          </span>
-          <h1>
-            {catalog?.title || 'Carrara Pure Marble Exhibition'}
-          </h1>
-          <p className="text-stone-600 text-sm max-w-lg mx-auto mb-6">
+          <div className="text-[10px] font-mono tracking-widest uppercase text-stone-500 mb-2">
+            BIENNALE CURATION // EXHIBITION CATALOGUE {year}
+          </div>
+          <h1>{catalog?.title || 'Carrara & Pure Architectural Marble'}</h1>
+          <p className="max-w-xl mx-auto text-stone-600 text-sm leading-relaxed mb-8">
             {catalog?.introText ||
               catalog?.description ||
-              'Beyaz mermerin saf heykelsi güzelliği. Calacatta ve statuario damarlarının mimari galeri sunumu.'}
+              'Beyaz mermer, calacatta ve parlak porselen karolar için müze galerisi formatı, geniş negatif beyaz alan ve saf grafit hatlar.'}
           </p>
-
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex justify-center gap-3">
             <button
               type="button"
-              className="btn btn-primary"
+              className="primarybtn"
               onClick={() => {
                 document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Sergiyi İncele
+              Sergiyi İncele ↘
             </button>
             <button
               type="button"
-              className="btn btn-outline"
+              className="outlinebtn"
               onClick={() => handleOpenLead(null, 'sample')}
             >
-              Fiziksel Numune Talep Et
+              Fiziksel Numune İste ↗
             </button>
           </div>
 
@@ -1563,29 +1688,82 @@ export default function HtmlLookbookViewer({
             </div>
             <h2 className="text-3xl font-serif text-[var(--ink)]">Yüzeyleri Yakından Tanıyın</h2>
             <p className="text-xs text-[var(--muted)] mt-1 max-w-md">
-              Her yüzeyin kendine özgü dokusunu, ölçüsünü ve karakterini keşfedin.
+              Her yüzeyin kendine özgü dokusunu, ölçüsünü, aşınma ve kayma direncini keşfedin.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <a href="#teknik" className="text-xs font-bold text-[var(--accent)] hover:underline">
-              Teknik özellikleri incele&nbsp; ↗
+            <a href="#teknik" className="text-xs font-bold text-[var(--accent)] hover:underline inline-flex items-center gap-1">
+              <FileText size={14} />
+              <span>Teknik Şartnameyi İncele&nbsp; ↗</span>
             </a>
           </div>
         </div>
 
-        {/* Collection Bar */}
-        <div className="flex items-center justify-between py-3 border-y border-[var(--line)] mb-6 text-xs text-[var(--muted)] flex-wrap gap-3">
-          <div className="flex items-center gap-4">
+        {/* Collection & Lighting Simulator Bar */}
+        <div className="flex items-center justify-between py-3.5 border-y border-[var(--line)] mb-6 text-xs text-[var(--muted)] flex-wrap gap-4">
+          <div className="flex items-center gap-3 flex-wrap">
             <span><strong>Marka:</strong> {brandName}</span>
             <span>&bull;</span>
             <span><strong>Koleksiyon:</strong> {catalog?.title}</span>
             <span>&bull;</span>
-            <span><strong>Seçki:</strong> {products.length} ürün</span>
+            <span><strong>Seçki:</strong> {products.length} Karo</span>
           </div>
-          <span className="text-[10px] font-mono">
-            Şablon Modeli: {currentTheme.name}
-          </span>
+
+          {/* Interactive Light Mode Selector */}
+          <div className="flex items-center gap-2 bg-[var(--paper)] border border-[var(--line)] p-1 rounded-lg">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] px-2">
+              Işık Modu:
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setLightMode('natural');
+                notify('Doğal Günışığı (5500K) aktif');
+              }}
+              className={`px-2.5 py-1 rounded text-[10px] font-bold transition flex items-center gap-1 ${
+                lightMode === 'natural'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'text-[var(--ink)] hover:bg-black/5'
+              }`}
+              title="5500K Nötr Gün Işığı"
+            >
+              <Sun size={11} />
+              <span>5500K Gün</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLightMode('warm');
+                notify('Sıcak Spot Işığı (3000K) aktif');
+              }}
+              className={`px-2.5 py-1 rounded text-[10px] font-bold transition flex items-center gap-1 ${
+                lightMode === 'warm'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'text-[var(--ink)] hover:bg-black/5'
+              }`}
+              title="3000K Lüks Sıcak Aydınlatma"
+            >
+              <Lightbulb size={11} />
+              <span>3000K Sıcak</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLightMode('studio');
+                notify('Galeri & Stüdyo Işığı (4000K) aktif');
+              }}
+              className={`px-2.5 py-1 rounded text-[10px] font-bold transition flex items-center gap-1 ${
+                lightMode === 'studio'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'text-[var(--ink)] hover:bg-black/5'
+              }`}
+              title="4000K Net Galeri Işığı"
+            >
+              <Sparkles size={11} />
+              <span>4000K Stüdyo</span>
+            </button>
+          </div>
         </div>
 
         {/* Filter Row */}
@@ -1595,19 +1773,19 @@ export default function HtmlLookbookViewer({
             <input
               ref={searchInputRef}
               type="search"
-              placeholder="Ürün adı veya koduyla ara…"
-              className="w-full pl-9 pr-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded"
+              placeholder="Karo adı veya ürün koduyla ara…"
+              className="w-full pl-9 pr-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
           <select
-            className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded min-w-[130px]"
+            className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded min-w-[130px] text-xs"
             value={selectedSize}
             onChange={(e) => setSelectedSize(e.target.value)}
           >
-            <option value="all">Tüm ebatlar</option>
+            <option value="all">Tüm Ebatlar</option>
             {sizeOptions.map((s) => (
               <option key={s} value={s}>
                 {s.replace('x', ' × ')} cm
@@ -1616,18 +1794,18 @@ export default function HtmlLookbookViewer({
           </select>
 
           <select
-            className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded min-w-[130px]"
+            className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded min-w-[130px] text-xs"
             value={selectedSurface}
             onChange={(e) => setSelectedSurface(e.target.value)}
           >
-            <option value="all">Tüm yüzeyler</option>
-            <option value="mat">Mat</option>
-            <option value="parlak">Parlak</option>
+            <option value="all">Tüm Yüzeyler</option>
+            <option value="mat">Doğal Mat</option>
+            <option value="parlak">Ayna Parlak</option>
             <option value="lapato">Full Lappato</option>
           </select>
 
           <span className="text-[11px] text-[var(--muted)] font-semibold ml-auto">
-            {filteredProducts.length} ürün gösteriliyor
+            {filteredProducts.length} karo gösteriliyor
           </span>
         </div>
 
@@ -1636,6 +1814,7 @@ export default function HtmlLookbookViewer({
           {filteredProducts.map((p, idx) => {
             const key = p.id || p.code || p.name || idx;
             const isFav = !!favorites[key];
+            const isPinned = pinnedSlabs.some((s) => (s.id || s.code || s.name) === key);
             const pImage =
               p.imageUrl ||
               p.textureUrl ||
@@ -1652,21 +1831,41 @@ export default function HtmlLookbookViewer({
                 <div className="product-img">
                   <img src={pImage} alt={p.name} />
                   <span className="product-label">{label}</span>
-                  <button
-                    type="button"
-                    className="fav"
-                    aria-label="Favorilere ekle"
-                    onClick={(e) => handleToggleFavorite(p, e)}
-                    style={{ color: isFav ? 'var(--accent)' : '#444' }}
-                    title={isFav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-                  >
-                    {isFav ? '♥' : '♡'}
-                  </button>
+
+                  <div className="card-floating-actions">
+                    {/* Pin to moodboard button */}
+                    <button
+                      type="button"
+                      className="card-icon-btn"
+                      aria-label="Numune tepsisine sabitle"
+                      onClick={(e) => handleTogglePinSlab(p, e)}
+                      title={isPinned ? 'Numune tepsisinden kaldır' : 'Mimari numune tepsisine ekle'}
+                      style={{ color: isPinned ? 'var(--accent)' : 'inherit' }}
+                    >
+                      <Pin size={13} className={isPinned ? 'fill-current' : ''} />
+                    </button>
+
+                    {/* Favorite button */}
+                    <button
+                      type="button"
+                      className="card-icon-btn"
+                      aria-label="Favorilere ekle"
+                      onClick={(e) => handleToggleFavorite(p, e)}
+                      style={{ color: isFav ? 'var(--accent)' : 'inherit' }}
+                      title={isFav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+                    >
+                      {isFav ? '♥' : '♡'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="product-info">
                   <div className="product-series">
-                    {layoutType === 'gallery-minimal' ? `EXHIBIT 0${idx + 1}` : `${brandName} · Mimari seçki`}
+                    {layoutType === 'gallery-minimal'
+                      ? `EXHIBIT 0${idx + 1}`
+                      : layoutType === 'swiss-industrial'
+                      ? `SPEC-REF: #BLa-0${idx + 1}`
+                      : `${brandName} &bull; Mimari Seçki`}
                   </div>
                   <h3>{p.name}</h3>
                   <div className="specs">
@@ -1675,20 +1874,36 @@ export default function HtmlLookbookViewer({
                     {p.code && <span>Kod: {p.code}</span>}
                   </div>
 
+                  {/* Architectural badges strip */}
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--line)] text-[10px] text-[var(--muted)]">
+                    <span className="inline-flex items-center gap-1 font-mono">
+                      <ShieldCheck size={11} className="text-emerald-600" />
+                      <span>PEI IV</span>
+                    </span>
+                    <span>&bull;</span>
+                    <span className="inline-flex items-center gap-1 font-mono">
+                      <span>R10 Kaymaz</span>
+                    </span>
+                    <span>&bull;</span>
+                    <span className="inline-flex items-center gap-1 font-mono">
+                      <span>E ≤ %0.05</span>
+                    </span>
+                  </div>
+
                   <div className="product-actions">
                     <button
                       type="button"
                       onClick={() => setActiveDetailProduct(p)}
                       title="4K Doku Detayını İncele"
                     >
-                      Detayları gör ↗
+                      Doku Detayı ↗
                     </button>
                     <button
                       type="button"
                       onClick={() => handleOpenLead(p, 'quote')}
                       title="Fiyat Teklifi & Numune İste"
                     >
-                      Teklif al&nbsp; +
+                      Teklif Al +
                     </button>
                   </div>
 
@@ -1696,7 +1911,7 @@ export default function HtmlLookbookViewer({
                     <div className="pt-2 text-center border-t border-[var(--line)] mt-2">
                       <Link
                         href={`/mekan-dene?product=${p.slug}`}
-                        className="text-[10px] font-semibold text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+                        className="text-[10px] font-bold text-[var(--accent)] hover:underline inline-flex items-center gap-1"
                       >
                         <Sparkles size={11} />
                         <span>Mekânında Gör (3D) ↗</span>
@@ -1709,12 +1924,70 @@ export default function HtmlLookbookViewer({
           })}
 
           {filteredProducts.length === 0 && (
-            <div className="p-12 text-center border border-dashed border-[var(--line)] col-span-full bg-[var(--paper)]">
-              Aramanızla eşleşen ürün bulunamadı. Filtreleri değiştirip tekrar deneyin.
+            <div className="p-12 text-center border border-dashed border-[var(--line)] col-span-full bg-[var(--paper)] rounded">
+              Aramanızla eşleşen karo bulunamadı. Filtreleri değiştirip tekrar deneyin.
             </div>
           )}
         </div>
       </section>
+
+      {/* =========================================================================
+          FLOATING ARCHITECTURAL MOODBOARD TRAY
+      ========================================================================= */}
+      {pinnedSlabs.length > 0 && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-2xl w-[92%] bg-[var(--paper)] border border-[var(--line)] shadow-2xl rounded-2xl p-3.5 backdrop-blur-xl animate-in slide-in-from-bottom-6 duration-300"
+          style={{ backgroundColor: 'var(--paper)', borderColor: 'var(--line)' }}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] flex items-center justify-center flex-shrink-0" style={{ color: 'var(--accent)' }}>
+                <Pin size={14} className="fill-current" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[var(--ink)] truncate">
+                  Mimari Numune Tepsisi ({pinnedSlabs.length} Karo)
+                </p>
+                <div className="flex items-center gap-1.5 mt-1 overflow-x-auto py-0.5">
+                  {pinnedSlabs.map((s, idx) => (
+                    <div
+                      key={s.id || idx}
+                      className="relative group w-8 h-8 rounded border border-stone-300 overflow-hidden flex-shrink-0 shadow-2xs"
+                      title={s.name}
+                    >
+                      <img src={s.imageUrl || s.textureUrl} alt={s.name} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={(e) => handleTogglePinSlab(s, e)}
+                        className="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] transition"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setPinnedSlabs([])}
+                className="text-[11px] text-[var(--muted)] hover:text-rose-600 px-2 py-1 font-semibold"
+              >
+                Temizle
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenLeadForPinned('quote')}
+                className="primarybtn text-[10px] py-2 px-3"
+              >
+                Tümüne Teklif İste ↗
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* EDITORIAL SECTION */}
       <section className="section editorial" id="mekanlar">
@@ -1724,7 +1997,7 @@ export default function HtmlLookbookViewer({
               src="/renders/modern_living_natural_oak.jpg"
               alt="Mekânda hayat bulan yüzeyler"
             />
-            <div className="photo-caption">Mekânlardan ilham alın &bull; {year}</div>
+            <div className="photo-caption">Mekânlardan İlham Alın &bull; {year}</div>
           </div>
 
           <div className="space-y-4">
@@ -1736,21 +2009,21 @@ export default function HtmlLookbookViewer({
               Daha Fazlası.
             </h2>
             <p className="text-xs text-[var(--muted)] leading-relaxed max-w-md">
-              Doğru yüzey, mekânın ışığını, ölçüsünü ve karakterini değiştirir. Koleksiyonu yalnızca ürün olarak değil, yaşam alanınızın bir parçası olarak keşfedin.
+              Doğru seramik ve porselen, mekânın ışığını, akustik dengesini ve mimari derinliğini belirler. Seçkin serileri yalnızca ürün olarak değil, mekânınızın bir parçası olarak keşfedin.
             </p>
 
             <div className="border-t border-[var(--line)] pt-3 space-y-2 text-xs">
               <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                <strong>01 &nbsp; Banyo ve spa</strong>
-                <span className="text-[var(--muted)]">Doğal dinginlik ↗</span>
+                <strong>01 &nbsp; Banyo ve Spa</strong>
+                <span className="text-[var(--muted)]">Doğal Taş Dinginliği ↗</span>
               </div>
               <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                <strong>02 &nbsp; Yaşam alanları</strong>
-                <span className="text-[var(--muted)]">Sade mimari ↗</span>
+                <strong>02 &nbsp; Yaşam Alanları & Salon</strong>
+                <span className="text-[var(--muted)]">Geniş Ebat Monolitik Slab ↗</span>
               </div>
               <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                <strong>03 &nbsp; Mutfak ve detaylar</strong>
-                <span className="text-[var(--muted)]">Günlük estetik ↗</span>
+                <strong>03 &nbsp; Mutfak ve Ticari Zeminler</strong>
+                <span className="text-[var(--muted)]">Yüksek Trafik Dayanımı (PEI V) ↗</span>
               </div>
             </div>
 
@@ -1772,42 +2045,49 @@ export default function HtmlLookbookViewer({
         <div className="flex items-end justify-between gap-6 mb-8 flex-wrap">
           <div>
             <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)] mb-1">
-              Karar Verirken Güvenle
+              Mimari Şartname & Kalite Güvencesi
             </div>
             <h2 className="text-3xl font-serif text-[var(--ink)]">
-              Güzel Olduğu Kadar Bilinçli Bir Seçim
+              Mükemmel Estetik, Sarsılmaz Standartlar
             </h2>
             <p className="text-xs text-[var(--muted)] mt-1 max-w-md">
-              Teknik detaylar doğru ürünü seçmenize yardımcı olur.
+              Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler.
             </p>
           </div>
-          <a href="#urunler" className="text-xs font-bold text-[var(--accent)] hover:underline">
-            Ürünleri karşılaştır ↗
+          <a href="#urunler" className="text-xs font-bold text-[var(--accent)] hover:underline inline-flex items-center gap-1">
+            <Ruler size={13} />
+            <span>Tüm Karoları Karşılaştır ↗</span>
           </a>
         </div>
 
         <div className="tech-grid">
           <div className="tech-card">
-            <small>01 / Teknik şeffaflık</small>
-            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Doğru ürün bilgisi</h3>
+            <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
+              01 // SU EMME DEĞERİ (E ≤ %0.05)
+            </small>
+            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Sıfıra Yakın Su Emme</h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">
-              Ebat, yüzey, ürün kodu ve teknik değerleri ürün bazında açıkça görüntüleyin.
+              Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunan yüksek yoğunluklu porselen gövde.
             </p>
           </div>
 
           <div className="tech-card">
-            <small>02 / Kolay keşif</small>
-            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">İhtiyacınıza göre filtre</h3>
+            <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
+              02 // R10 / R11 KAYMA DİRENCİ
+            </small>
+            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Islak Hacim Güvenliği</h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">
-              Projenizin ölçüsüne, görünümüne ve kullanım alanına uygun seramik seçeneklerini bulun.
+              Banyo, havuz kenarı ve lüks otel girişleri için mikrotekstür teknolojisiyle güvenli adımlar.
             </p>
           </div>
 
           <div className="tech-card">
-            <small>03 / Sonraki adım</small>
-            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Numune ve teklif</h3>
+            <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
+              03 // REKTİFİYE MİLİMETRİK KESİM
+            </small>
+            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Derzsiz Süreklilik</h3>
             <p className="text-xs text-[var(--muted)] leading-relaxed">
-              Beğendiğiniz ürünü kaydedin, numune veya fiyat teklifi talebine geçin.
+              Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığıyla kesintisiz yüzey akışı.
             </p>
           </div>
         </div>
@@ -1817,7 +2097,7 @@ export default function HtmlLookbookViewer({
       <section className="cta">
         <div>
           <h2 className="text-2xl font-serif font-normal mb-1">Projeniz için doğru yüzeyi bulun.</h2>
-          <p className="text-xs opacity-80">Ürünleri keşfedin, seçeneklerinizi belirleyin ve teklif sürecini başlatın.</p>
+          <p className="text-xs opacity-80">Karoları keşfedin, seçeneklerinizi belirleyin ve teklif sürecini başlatın.</p>
         </div>
         <button
           type="button"
@@ -1826,7 +2106,7 @@ export default function HtmlLookbookViewer({
             document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
           }}
         >
-          Koleksiyonu keşfet&nbsp; ↗
+          Koleksiyonu Keşfet&nbsp; ↗
         </button>
       </section>
 
@@ -1850,70 +2130,111 @@ export default function HtmlLookbookViewer({
             )}
           </div>
         </div>
-        <span>Marka ve ürün bilgileri ilgili veri kaynağından doğrulanmalıdır.</span>
-        <span>© {year} {brandName} &bull; Mimari keşif deneyimi</span>
+
+        <p className="m-0">
+          Bu dijital lookbook <Link href="/" className="font-bold underline text-inherit">SeramikBak</Link> altyapısı ile sunulmaktadır.
+        </p>
+
+        <p className="m-0">© {year} {brandName}. Tüm hakları saklıdır.</p>
       </footer>
 
-      {/* FLOATING TOAST NOTIFICATION */}
-      <div className={`toast ${showToast ? 'show' : ''}`} role="status" aria-live="polite">
+      {/* TOAST NOTIFICATION */}
+      <div className={`toast ${showToast ? 'show' : ''}`}>
         {toastMessage}
       </div>
 
-      {/* DETAIL LIGHTBOX MODAL */}
+      {/* PRODUCT DETAIL MODAL */}
       {activeDetailProduct && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
           onClick={() => setActiveDetailProduct(null)}
         >
           <div
-            className="relative max-w-3xl w-full bg-[var(--paper)] border border-[var(--line)] shadow-2xl p-6"
+            className="relative max-w-2xl w-full bg-[var(--paper)] border border-[var(--line)] shadow-2xl p-6 rounded-xl animate-in zoom-in-95 duration-200 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
             style={{ backgroundColor: 'var(--paper)', borderColor: 'var(--line)' }}
           >
-            <div className="flex items-center justify-between border-b border-[var(--line)] pb-3 mb-4">
-              <h3 className="text-base font-serif font-bold text-[var(--ink)]">
-                {activeDetailProduct.name} &bull; 4K Doku İncelemesi
-              </h3>
-              <button
-                type="button"
-                onClick={() => setActiveDetailProduct(null)}
-                className="iconbtn"
-                aria-label="Kapat"
-              >
-                <X size={16} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setActiveDetailProduct(null)}
+              className="absolute top-4 right-4 iconbtn"
+              aria-label="Kapat"
+            >
+              <X size={15} />
+            </button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="aspect-square bg-stone-100 overflow-hidden border border-[var(--line)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+              <div className="aspect-square bg-[var(--product-img-bg)] border border-[var(--line)] overflow-hidden rounded relative">
                 <img
-                  src={activeDetailProduct.imageUrl || activeDetailProduct.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
+                  src={activeDetailProduct.imageUrl || activeDetailProduct.textureUrl}
                   alt={activeDetailProduct.name}
                   className="w-full h-full object-cover"
                 />
+                <span className="absolute left-2.5 bottom-2.5 bg-black/70 backdrop-blur-xs text-white text-[9px] px-2 py-1 rounded font-mono">
+                  4K SURFACE DETAIL
+                </span>
               </div>
 
-              <div className="flex flex-col justify-between space-y-3">
-                <div className="space-y-2 text-xs">
-                  <p><strong>Ürün Kodu:</strong> {activeDetailProduct.code || 'Standart'}</p>
-                  <p><strong>Ebat:</strong> {activeDetailProduct.width && activeDetailProduct.height ? `${activeDetailProduct.width}x${activeDetailProduct.height} cm` : (activeDetailProduct.size || 'Standart')}</p>
-                  <p><strong>Yüzey:</strong> {activeDetailProduct.finish || 'Mat'}</p>
-                  <p className="text-[var(--muted)] leading-relaxed pt-2">
-                    Yüksek mukavemetli porselen karo yüzeyi. TS EN 14411 standartlarına tam uyumlu.
-                  </p>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)]">
+                    {brandName} Mimari Seçki
+                  </div>
+                  <h3 className="text-xl font-serif font-bold text-[var(--ink)] mt-1">
+                    {activeDetailProduct.name}
+                  </h3>
+                  {activeDetailProduct.code && (
+                    <p className="text-xs text-[var(--muted)] font-mono">Kod: {activeDetailProduct.code}</p>
+                  )}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const p = activeDetailProduct;
-                    setActiveDetailProduct(null);
-                    handleOpenLead(p, 'quote');
-                  }}
-                  className="primarybtn w-full justify-center"
-                >
-                  Bu Ürün İçin Teklif Al
-                </button>
+                <div className="grid grid-cols-2 gap-2 text-xs border-y border-[var(--line)] py-3">
+                  <div>
+                    <span className="text-[10px] uppercase text-[var(--muted)] block">Ebat</span>
+                    <strong>
+                      {activeDetailProduct.width && activeDetailProduct.height
+                        ? `${activeDetailProduct.width} × ${activeDetailProduct.height} cm`
+                        : activeDetailProduct.size || 'Standart Ebat'}
+                    </strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-[var(--muted)] block">Yüzey Bitişi</span>
+                    <strong>{activeDetailProduct.finish || activeDetailProduct.surface || 'Porselen'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-[var(--muted)] block">Aşınma Sınıfı</span>
+                    <strong>PEI IV / V (Yüksek Trafik)</strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-[var(--muted)] block">Kayma Direnci</span>
+                    <strong>R10 Islak Zemin</strong>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const p = activeDetailProduct;
+                      setActiveDetailProduct(null);
+                      handleOpenLead(p, 'quote');
+                    }}
+                    className="primarybtn flex-1 justify-center text-xs"
+                  >
+                    Fiyat Teklifi Al ↗
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const p = activeDetailProduct;
+                      setActiveDetailProduct(null);
+                      handleOpenLead(p, 'sample');
+                    }}
+                    className="outlinebtn flex-1 justify-center text-xs"
+                  >
+                    Numune İste ↗
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1927,7 +2248,7 @@ export default function HtmlLookbookViewer({
           onClick={() => setShowLeadModal(false)}
         >
           <div
-            className="relative max-w-md w-full bg-[var(--paper)] border border-[var(--line)] shadow-2xl p-6"
+            className="relative max-w-md w-full bg-[var(--paper)] border border-[var(--line)] shadow-2xl p-6 rounded-xl"
             onClick={(e) => e.stopPropagation()}
             style={{ backgroundColor: 'var(--paper)', borderColor: 'var(--line)' }}
           >
@@ -2076,6 +2397,7 @@ export default function HtmlLookbookViewer({
           </div>
         </div>
       )}
+
       {/* QR Code Modal */}
       {showQrModal && (
         <div
