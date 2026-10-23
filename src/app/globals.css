@@ -3896,8 +3896,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
   }
 
   .card-quick-actions-row {
-    transform: translateY(0) !important;
-    opacity: 1 !important;
+    display: none !important;
   }
 
   /* Responsive helper utilities */

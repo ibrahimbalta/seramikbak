@@ -26,6 +26,7 @@ export const dictionaries = {
     brandPortal: 'Marka Portalı',
     kioskMode: 'Teşhir Kiosk',
     searchPlaceholder: 'Seramik modeli, ebat (60x120), marka veya renk arayın...',
+    cookieTitle: 'Çerez (Cookie) Kullanımı ve Gizliliğiniz',
     
     // Hero & Banner
     heroTitle: 'Hayalinizdeki Mekanı 3D Sanal Stüdyomuzda Canlı Tasarlayın',

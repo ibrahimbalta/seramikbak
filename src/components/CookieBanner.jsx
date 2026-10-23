@@ -44,7 +44,7 @@ export default function CookieBanner() {
           </div>
           
           <div className="cookie-banner-text">
-            <h4>{t('cookieTitle') || 'Çerez (Cookie) Kullanımı ve Gizliliğiniz'}</h4>
+            <h4>{(t('cookieTitle') && t('cookieTitle') !== 'cookieTitle') ? t('cookieTitle') : 'Çerez (Cookie) Kullanımı ve Gizliliğiniz'}</h4>
             <p>
               SeramikBak olarak deneyiminizi iyileştirmek, Web 3D stüdyo tercihlerini hatırlamak ve anonim site trafiğini analiz etmek amacıyla çerezler kullanmaktayız. 
               Detaylı bilgi için <Link href="/yasal#cerez" className="cookie-link">Çerez Politikamız</Link> ve <Link href="/yasal#kvkk" className="cookie-link">KVKK Aydınlatma Metnimizi</Link> inceleyebilirsiniz.

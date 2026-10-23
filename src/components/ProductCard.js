@@ -19,13 +19,14 @@ export default function ProductCard({
 }) {
   const { t, translateFinish, translateStyle } = useLanguage();
   const hasAd = product.campaigns && product.campaigns.length > 0;
-  
+  const isCompared = comparedProducts.some(p => p.id === product.id);
+
   return (
     <div 
       onClick={() => handleProductCardClick(product)}
       className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
     >
-      {/* Thumbnail Texture Container */}
+      {/* Thumbnail Texture Container - Pure & Unobstructed */}
       <div className="card-texture-container-new">
         <TileVisualPreview 
           style={product.style} 
@@ -39,28 +40,17 @@ export default function ProductCard({
           priority={idx !== undefined && idx < 6}
         />
         
-        {/* Compare button overlay */}
-        <button 
-          className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
-          onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
-          title={t('comparePrices')}
-        >
-          <span className="compare-icon-indicator">
-            {comparedProducts.some(p => p.id === product.id) ? '✓' : '+'}
-          </span>
-          <span>{comparedProducts.some(p => p.id === product.id) ? '✓' : '+'}</span>
-        </button>
-        
-        {/* Heart icon button overlay */}
+        {/* Heart icon button overlay - subtle top right */}
         <button 
           className="card-favorites-heart-btn" 
           onClick={(e) => { e.stopPropagation(); handleToggleFavorite(product.id); }}
           title={t('addToFavorites')}
+          aria-label={t('addToFavorites')}
         >
-          <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
+          <HeartIcon size={15} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Quick Action Buttons (3D, Bayi) */}
+        {/* Hover Quick Action Buttons (Desktop only overlay) */}
         <div className="card-quick-actions-row">
           <button 
             type="button"
@@ -68,7 +58,7 @@ export default function ProductCard({
             className="card-action-btn-new btn-action-3d"
             title="3D Sanal Mekanda Gör"
           >
-            3D
+            3D Stüdyo
           </button>
           <button 
             type="button"
@@ -76,7 +66,7 @@ export default function ProductCard({
             className="card-action-btn-new btn-action-dealer"
             title="Yetkili Bayiler & Fiyat"
           >
-            Bayi
+            Bayi Teklifi
           </button>
         </div>
       </div>
@@ -102,7 +92,30 @@ export default function ProductCard({
         
         <h4 className="card-title-new">{product.name}</h4>
         <p className="card-specs-new">{product.width}x{product.height} cm • {translateStyle(product.style) || product.style}</p>
-        <p className="card-brand-new">{product.brand?.name}</p>
+        
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
+          <p className="card-brand-new" style={{ margin: 0 }}>{product.brand?.name}</p>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
+            title={t('comparePrices')}
+            style={{
+              background: isCompared ? 'var(--accent-gold)' : 'transparent',
+              color: isCompared ? '#ffffff' : 'var(--text-muted)',
+              border: isCompared ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
+              borderRadius: '6px',
+              padding: '2px 7px',
+              fontSize: '0.68rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            <span>{isCompared ? '✓ Kıyas' : '+ Kıyas'}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
