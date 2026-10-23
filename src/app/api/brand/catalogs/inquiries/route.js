@@ -28,16 +28,28 @@ export async function POST(request) {
       );
     }
 
-    // Resolve catalog and brand if brandId is not provided
+    if (catalogSlug && typeof catalogSlug === 'string') {
+      catalogSlug = catalogSlug.split('#')[0].split('?')[0].trim();
+    }
+
+    // Resolve catalog and brand
     let catalog = null;
-    if (catalogSlug || catalogId) {
-      catalog = await prisma.brandCatalog.findFirst({
-        where: catalogSlug ? { publicSlug: catalogSlug } : { id: catalogId },
+    if (catalogId) {
+      catalog = await prisma.brandCatalog.findUnique({
+        where: { id: catalogId },
         select: { id: true, title: true, brandId: true, publicSlug: true }
       });
-      if (catalog && !brandId) {
-        brandId = catalog.brandId;
-      }
+    }
+
+    if (!catalog && catalogSlug) {
+      catalog = await prisma.brandCatalog.findFirst({
+        where: { publicSlug: catalogSlug },
+        select: { id: true, title: true, brandId: true, publicSlug: true }
+      });
+    }
+
+    if (catalog && !brandId) {
+      brandId = catalog.brandId;
     }
 
     // Fallback brandId

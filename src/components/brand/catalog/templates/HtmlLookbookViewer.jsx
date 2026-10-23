@@ -114,6 +114,8 @@ export default function HtmlLookbookViewer({
   const [leadType, setLeadType] = useState('quote');
   const [selectedLeadProducts, setSelectedLeadProducts] = useState([]);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [leadForm, setLeadForm] = useState({
     name: '',
     company: '',
@@ -121,6 +123,57 @@ export default function HtmlLookbookViewer({
     phone: '',
     message: ''
   });
+
+  const handleLeadSubmit = async (e) => {
+    e.preventDefault();
+    if (!leadForm.name || !leadForm.phone) {
+      setSubmitError('Lütfen ad soyad ve telefon numaranızı girin.');
+      return;
+    }
+
+    setIsSubmittingLead(true);
+    setSubmitError('');
+
+    try {
+      const effectiveSlug =
+        catalog?.publicSlug ||
+        catalog?.slug ||
+        (typeof window !== 'undefined'
+          ? window.location.pathname.split('/katalog/')[1]?.split('/')[0]?.split('#')[0]?.split('?')[0]
+          : '');
+
+      const payload = {
+        catalogId: catalog?.id,
+        catalogSlug: effectiveSlug,
+        brandId: catalog?.brandId || catalog?.brand?.id,
+        leadType,
+        name: leadForm.name.trim(),
+        company: (leadForm.company || '').trim(),
+        email: (leadForm.email || '').trim(),
+        phone: leadForm.phone.trim(),
+        selectedProducts: selectedLeadProducts,
+        message: (leadForm.message || '').trim()
+      };
+
+      const res = await fetch('/api/brand/catalogs/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setLeadSubmitted(true);
+        notify(data.message || 'Talebiniz üretici marka masasına başarıyla iletildi!');
+      } else {
+        setSubmitError(data.error || 'Talep iletilemedi. Lütfen tekrar deneyin.');
+      }
+    } catch (err) {
+      setSubmitError('Bağlantı hatası: ' + err.message);
+    } finally {
+      setIsSubmittingLead(false);
+    }
+  };
 
   // Social Share & Print State
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -272,6 +325,7 @@ export default function HtmlLookbookViewer({
       setSelectedLeadProducts(products.slice(0, 3).map((p) => p.name || p.code));
     }
     setLeadType(type);
+    setSubmitError('');
     setLeadSubmitted(false);
     setShowLeadModal(true);
   };
@@ -1888,28 +1942,25 @@ export default function HtmlLookbookViewer({
 
             {leadSubmitted ? (
               <div className="py-8 text-center space-y-3">
-                <CheckCircle2 size={36} className="text-emerald-600 mx-auto" />
+                <CheckCircle2 size={40} className="text-emerald-600 mx-auto" />
                 <h3 className="text-lg font-serif font-bold text-[var(--ink)]">Talebiniz Alındı</h3>
-                <p className="text-xs text-[var(--muted)]">
-                  Talebiniz üretici marka proje masasına iletildi.
+                <p className="text-xs text-[var(--muted)] max-w-xs mx-auto leading-relaxed">
+                  {leadType === 'sample' ? 'Numune talebiniz' : 'Fiyat teklifi talebiniz'} üretici marka proje masasına başarıyla iletildi. Yetkili temsilci en kısa sürede sizinle iletişime geçecektir.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setShowLeadModal(false)}
+                  onClick={() => {
+                    setShowLeadModal(false);
+                    setLeadSubmitted(false);
+                    setLeadForm({ name: '', company: '', email: '', phone: '', message: '' });
+                  }}
                   className="outlinebtn mx-auto mt-4"
                 >
                   Kapat
                 </button>
               </div>
             ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setLeadSubmitted(true);
-                  notify('Talebiniz başarıyla alındı!');
-                }}
-                className="space-y-4"
-              >
+              <form onSubmit={handleLeadSubmit} className="space-y-4">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)]">
                     {brandName} Mimari Masası
@@ -1917,32 +1968,89 @@ export default function HtmlLookbookViewer({
                   <h3 className="text-lg font-serif font-bold text-[var(--ink)]">
                     {leadType === 'sample' ? 'Numune Talep Edin' : 'Fiyat Teklifi İsteyin'}
                   </h3>
+                  {selectedLeadProducts.length > 0 && (
+                    <p className="text-[11px] text-[var(--muted)] mt-0.5 truncate">
+                      İlgilenilen Ürünler: {selectedLeadProducts.join(', ')}
+                    </p>
+                  )}
                 </div>
 
+                {submitError && (
+                  <div className="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                    <span className="font-bold">Hata:</span>
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 <div className="space-y-2.5 text-xs">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Adınız Soyadınız"
-                    className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded"
-                    value={leadForm.name}
-                    onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
-                  />
-                  <input
-                    type="tel"
-                    required
-                    placeholder="Telefon Numaranız"
-                    className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded"
-                    value={leadForm.phone}
-                    onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
-                  />
-                  <textarea
-                    rows={3}
-                    placeholder="Metraj veya proje notlarınız..."
-                    className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded resize-none"
-                    value={leadForm.message}
-                    onChange={(e) => setLeadForm({ ...leadForm, message: e.target.value })}
-                  />
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[var(--muted)] mb-1">
+                      Adınız Soyadınız *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Adınız Soyadınız"
+                      className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs"
+                      value={leadForm.name}
+                      onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[var(--muted)] mb-1">
+                      Telefon Numaranız *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="05XX XXX XX XX"
+                      className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs"
+                      value={leadForm.phone}
+                      onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-[var(--muted)] mb-1">
+                        Şirket / Ofis (Opsiyonel)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Mimarlık Ofisi / Şirket"
+                        className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs"
+                        value={leadForm.company}
+                        onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-[var(--muted)] mb-1">
+                        E-Posta (Opsiyonel)
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="adiniz@example.com"
+                        className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs"
+                        value={leadForm.email}
+                        onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[var(--muted)] mb-1">
+                      {leadType === 'sample' ? 'Teslimat Adresi ve Proje Detayları' : 'Metraj veya Proje Notlarınız'}
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder={
+                        leadType === 'sample'
+                          ? 'Numunenin gönderileceği adres ve teslim alacak kişi bilgileri...'
+                          : 'Örn: Yaklaşık 250 m² salon zemin uygulaması için m² fiyatı rica ederiz...'
+                      }
+                      className="w-full p-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded resize-none text-xs"
+                      value={leadForm.message}
+                      onChange={(e) => setLeadForm({ ...leadForm, message: e.target.value })}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2">
@@ -1950,11 +2058,17 @@ export default function HtmlLookbookViewer({
                     type="button"
                     onClick={() => setShowLeadModal(false)}
                     className="outlinebtn"
+                    disabled={isSubmittingLead}
                   >
                     Vazgeç
                   </button>
-                  <button type="submit" className="primarybtn">
-                    Talebi İlet ↗
+                  <button
+                    type="submit"
+                    className="primarybtn flex items-center gap-1.5"
+                    disabled={isSubmittingLead}
+                  >
+                    {isSubmittingLead && <Loader2 size={13} className="animate-spin" />}
+                    <span>{isSubmittingLead ? 'İletiliyor...' : 'Talebi İlet ↗'}</span>
                   </button>
                 </div>
               </form>

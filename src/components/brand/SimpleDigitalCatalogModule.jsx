@@ -1309,6 +1309,19 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                             .join(', ')}
                         </p>
                       )}
+
+                      {inq.customerMessage && (
+                        <div className="text-xs text-stone-700 bg-stone-50 p-2.5 rounded-xl border border-stone-200 mt-2">
+                          <strong className="text-stone-900 block text-[11px] mb-0.5">Müşteri Notu / Talep:</strong>
+                          <span className="whitespace-pre-line">{inq.customerMessage}</span>
+                        </div>
+                      )}
+
+                      {inq.catalogTitle && (
+                        <p className="text-[11px] text-stone-400 mt-1">
+                          <strong>Kaynak Katalog:</strong> {inq.catalogTitle}
+                        </p>
+                      )}
                     </div>
 
                     {inq.phone && (
