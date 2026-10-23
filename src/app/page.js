@@ -3756,6 +3756,240 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Premium Collections Banner (Dynamically loaded with Brand Showcase Ads + Fallback) */}
+      <div className="project-top-banner">
+        <div className="banner-marquee-wrapper">
+          <div className="banner-marquee-track">
+            {/* First set */}
+            {displayVitrinItems.map((item, idx) => (
+              <div 
+                key={`vitrin-set1-${item.id || item.code}-${idx}`} 
+                className="banner-item" 
+                onClick={() => handleVitrinItemClick(item)}
+                title={`${item.brand} - ${item.name}`}
+              >
+                <div className="banner-img-wrapper">
+                  <img 
+                    src={item.img} 
+                    alt={`${item.brand} ${item.name}`} 
+                    className="banner-img"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/hero/hero_ceramics.jpg';
+                    }} 
+                  />
+                  <span className="banner-img-badge">{item.badge || 'YENİ SEZON'}</span>
+                </div>
+                <div className="banner-item-info">
+                  <span className="banner-brand-name">{item.brand}</span>
+                  <span className="banner-product-name">{item.name}</span>
+                </div>
+              </div>
+            ))}
+            {/* Duplicate set for seamless infinite marquee loop */}
+            {displayVitrinItems.map((item, idx) => (
+              <div 
+                key={`vitrin-set2-${item.id || item.code}-${idx}`} 
+                className="banner-item" 
+                onClick={() => handleVitrinItemClick(item)}
+                title={`${item.brand} - ${item.name}`}
+              >
+                <div className="banner-img-wrapper">
+                  <img 
+                    src={item.img} 
+                    alt={`${item.brand} ${item.name}`} 
+                    className="banner-img"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/hero/hero_ceramics.jpg';
+                    }} 
+                  />
+                  <span className="banner-img-badge">{item.badge || 'YENİ SEZON'}</span>
+                </div>
+                <div className="banner-item-info">
+                  <span className="banner-brand-name">{item.brand}</span>
+                  <span className="banner-product-name">{item.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Top Utility Bar (B2B and Corporate Portal Links) */}
+      {!isKioskMode && (
+        <div className="top-utility-bar">
+          <div className="utility-left">
+            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
+              <HomeIcon size={13} />
+              <span style={{ fontWeight: '800' }}>{t('home')}</span>
+            </Link>
+
+            {/* Kurumsal Dropdown (Nasıl Çalışır? & Hakkımızda) */}
+            <div 
+              className="utility-dropdown-wrapper"
+              onMouseEnter={() => handleUtilityDropdownOpen('kurumsal')}
+              onMouseLeave={handleUtilityDropdownClose}
+            >
+              <button 
+                type="button"
+                className={`utility-item utility-dropdown-btn ${activeUtilityDropdown === 'kurumsal' ? 'active' : ''}`}
+                onClick={() => toggleUtilityDropdown('kurumsal')}
+                aria-haspopup="true"
+                aria-expanded={activeUtilityDropdown === 'kurumsal'}
+              >
+                <Info size={13} />
+                <span>{t('corporate') || 'Kurumsal'}</span>
+                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'kurumsal' ? 'rotated' : ''}`} />
+              </button>
+
+              {activeUtilityDropdown === 'kurumsal' && (
+                <div className="utility-dropdown-menu">
+                  <button 
+                    type="button"
+                    className="utility-dropdown-item"
+                    onClick={() => { 
+                      setShowHowItWorksModal(true); 
+                      setHowItWorksActiveTab('customers'); 
+                      setActiveUtilityDropdown(null); 
+                    }}
+                  >
+                    <div className="dropdown-item-icon gold-icon">
+                      <HelpCircle size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('howItWorks') || 'Nasıl Çalışır?'}</span>
+                        <span className="dropdown-item-badge gold-badge">Rehber</span>
+                      </div>
+                      <span className="dropdown-item-desc">3D stüdyo ve platform kullanım rehberi</span>
+                    </div>
+                  </button>
+
+                  <Link 
+                    href="/hakkimizda" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon">
+                      <Info size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('about')}</span>
+                      </div>
+                      <span className="dropdown-item-desc">SeramikBak vizyonu ve kurumsal bilgiler</span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link href="/proje-talep" className="utility-item b2b-btn-link">
+              <Building2 size={13} />
+              <span>{t('b2bQuotes')}</span>
+            </Link>
+
+            {/* Portallar Dropdown (Bayi Portalı & Marka Portalı) */}
+            <div 
+              className="utility-dropdown-wrapper"
+              onMouseEnter={() => handleUtilityDropdownOpen('portallar')}
+              onMouseLeave={handleUtilityDropdownClose}
+            >
+              <button 
+                type="button"
+                className={`utility-item utility-dropdown-btn ${activeUtilityDropdown === 'portallar' ? 'active' : ''}`}
+                onClick={() => toggleUtilityDropdown('portallar')}
+                aria-haspopup="true"
+                aria-expanded={activeUtilityDropdown === 'portallar'}
+              >
+                <Store size={13} />
+                <span>{t('portals') || 'Portallar'}</span>
+                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'portallar' ? 'rotated' : ''}`} />
+              </button>
+
+              {activeUtilityDropdown === 'portallar' && (
+                <div className="utility-dropdown-menu">
+                  <Link 
+                    href="/bayi" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon blue-icon">
+                      <UserIcon size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('dealerPortal')}</span>
+                        <span className="dropdown-item-badge blue-badge">B2B</span>
+                      </div>
+                      <span className="dropdown-item-desc">Bayi yönetim paneli ve stok borsası</span>
+                    </div>
+                  </Link>
+
+                  <Link 
+                    href="/marka" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon purple-icon">
+                      <TrendingUp size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('brandPortal')}</span>
+                        <span className="dropdown-item-badge purple-badge">Üretici</span>
+                      </div>
+                      <span className="dropdown-item-desc">Üretici marka kataloğu ve analitikler</span>
+                    </div>
+                  </Link>
+
+                  <Link 
+                    href="/mimar" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon gold-icon" style={{ background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37' }}>
+                      <Compass size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Mimar Portalı</span>
+                        <span className="dropdown-item-badge gold-badge" style={{ background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37' }}>ArchStudio</span>
+                      </div>
+                      <span className="dropdown-item-desc">3D BIM, moodboard ve şartname motoru</span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="utility-right">
+            <Link href="/outlet" className="utility-item outlet-btn-link">
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
+              <span className="outlet-small-badge">Fırsat</span>
+            </Link>
+            <Link href="/ustalar" className="utility-item ustalar-btn-link">
+              <Wrench size={13} style={{ color: '#b45309' }} />
+              <span style={{ color: '#b45309', fontWeight: '800' }}>{t('installers')}</span>
+            </Link>
+            <Link href="/ilham" className="utility-item ilham-btn-link">
+              <Sparkles size={13} style={{ color: '#8b5cf6' }} />
+              <span>{t('inspiration')}</span>
+            </Link>
+            <Link 
+              href="/global-tanitim" 
+              className="utility-item global-highlight-btn"
+            >
+              <Globe size={13} style={{ color: '#d4af37' }} />
+              <span style={{ color: '#fef08a', fontWeight: '800' }}>🌍 Global</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Top Header Navigation */}
       <header className="main-header glass-panel">
         <div className="header-brand" onClick={() => setActiveTab('search')} style={{ cursor: 'pointer' }}>
@@ -3786,10 +4020,6 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
-              <Link href="/proje-talep" className="nav-link" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <Building2 size={14} />
-                <span>{t('b2bQuotes') || 'B2B Proje'}</span>
-              </Link>
             </>
           )}
         </nav>
@@ -4149,7 +4379,8 @@ export default function Home() {
         </div>
       )}
 
-      
+      {/* CANLI FIRSAT RADARI & CANLI İNDİRİM ŞERİDİ */}
+      <LiveDealsTicker />
 
       {/* Main Content */}
       <div className="content-container">
@@ -4533,7 +4764,84 @@ export default function Home() {
               )}
             </section>
 
-            
+            {/* Categories & 3D Showcase Section */}
+            <div className="categories-showcase-container">
+              {/* Circular Categories List */}
+              <div className="circular-categories-row">
+                <button 
+                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); setSelectedSize(''); fetchProducts(); }} 
+                  className={`category-circle-btn ${selectedStyle === '' && selectedColor === '' && selectedSize === '' ? 'active' : ''}`}
+                >
+                  <div className="category-circle-icon-wrapper flat-bg-gold">
+                    <Layers2 size={18} />
+                  </div>
+                  <span>Tümü</span>
+                </button>
+
+                <button 
+                  onClick={() => { setSelectedStyle('Mermer'); fetchProducts('style=Mermer'); }} 
+                  className={`category-circle-btn ${selectedStyle === 'Mermer' ? 'active' : ''}`}
+                >
+                  <div className="category-circle-icon-wrapper marble-pattern-bg" />
+                  <span>Mermer</span>
+                </button>
+
+                <button 
+                  onClick={() => { setSelectedStyle('Beton'); fetchProducts('style=Beton'); }} 
+                  className={`category-circle-btn ${selectedStyle === 'Beton' ? 'active' : ''}`}
+                >
+                  <div className="category-circle-icon-wrapper concrete-pattern-bg" />
+                  <span>Beton</span>
+                </button>
+
+                <button 
+                  onClick={() => { setSelectedStyle('Ahşap'); fetchProducts('style=Ahşap'); }} 
+                  className={`category-circle-btn ${selectedStyle === 'Ahşap' ? 'active' : ''}`}
+                >
+                  <div className="category-circle-icon-wrapper wood-pattern-bg" />
+                  <span>Ahşap</span>
+                </button>
+
+                <button 
+                  onClick={() => { setSelectedStyle('Beton'); fetchProducts('style=Beton'); }} 
+                  className="category-circle-btn"
+                >
+                  <div className="category-circle-icon-wrapper stone-pattern-bg" />
+                  <span>Taş</span>
+                </button>
+
+                <button 
+                  onClick={() => { setSelectedColor('Bej'); fetchProducts('color=Bej'); }} 
+                  className="category-circle-btn"
+                >
+                  <div className="category-circle-icon-wrapper travert-pattern-bg" />
+                  <span>Traverten</span>
+                </button>
+
+                <button className="category-circle-btn" onClick={() => alert('Mozaik seriler listeleniyor...')}>
+                  <div className="category-circle-icon-wrapper mosaic-pattern-bg" />
+                  <span>Mozaik</span>
+                </button>
+
+                <button className="category-circle-btn" onClick={() => alert('Dekoratif seriler listeleniyor...')}>
+                  <div className="category-circle-icon-wrapper decor-pattern-bg" />
+                  <span>Dekor</span>
+                </button>
+
+                <button className="category-circle-btn" onClick={() => { setSelectedColor('Gri'); fetchProducts('color=Gri'); }}>
+                  <div className="category-circle-icon-wrapper flat-grey-bg" />
+                  <span>Düz Renk</span>
+                </button>
+
+                <button 
+                  className="category-circle-btn" 
+                  onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                >
+                  <div className="category-circle-icon-wrapper wireframe-bg" />
+                  <span>3D Tasarım</span>
+                </button>
+              </div>
+            </div>
 
             {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
             <ProductSchemaJsonLd product={activeProduct || (products && products[0])} />
