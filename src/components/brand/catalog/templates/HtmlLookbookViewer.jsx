@@ -79,6 +79,7 @@ export default function HtmlLookbookViewer({
   const brandLogo = catalog?.customLogoUrl || brand.logoUrl;
   const brandParts = brandName.trim().split(/\s+/);
   const brandSlug = brand.slug || catalog?.brandSlug || (brandName ? brandName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-') : 'bien-seramik');
+  const sec = catalog?.sectionSettings || {};
 
   // Active color template
   const [activeThemeId, setActiveThemeId] = useState(catalog?.template || 'terra-traverten');
@@ -427,6 +428,7 @@ export default function HtmlLookbookViewer({
   };
 
   const coverImage =
+    sec.coverImageUrl ||
     catalog?.customCoverUrl ||
     catalog?.coverImageUrl ||
     currentTheme.previewImg ||
@@ -1288,8 +1290,8 @@ export default function HtmlLookbookViewer({
         <div className="navlinks">
           <a href="#koleksiyon">Koleksiyon</a>
           <a href="#urunler">Ürünler</a>
-          <a href="#mekanlar">Mekân İlhamı</a>
-          <a href="#teknik">Teknik Şartname</a>
+          {sec.showEditorial !== false && <a href="#mekanlar">Mekân İlhamı</a>}
+          {sec.showTechnical !== false && <a href="#teknik">Teknik Şartname</a>}
         </div>
 
         <div className="navright">
@@ -1536,11 +1538,15 @@ export default function HtmlLookbookViewer({
             <img src={coverImage} alt={catalog?.title || 'Katalog Kapağı'} />
             <div className="hero-stamp">
               <span className="text-[10px] tracking-widest uppercase text-amber-200 block mb-1">
-                MALZEMENİN DİLİ
+                {sec.heroBadgeText || 'MALZEMENİN DİLİ'}
               </span>
-              <strong className="text-sm font-serif text-white leading-tight block">
-                Doğadan ilham.<br />
-                Mimariyle hayat bulur.
+              <strong className="text-sm font-serif text-white leading-tight block whitespace-pre-line">
+                {sec.heroStampText || (
+                  <>
+                    Doğadan ilham.<br />
+                    Mimariyle hayat bulur.
+                  </>
+                )}
               </strong>
             </div>
           </div>
@@ -1557,7 +1563,7 @@ export default function HtmlLookbookViewer({
           <div className="hero-content-cinema">
             <div className="cinema-badge">
               <Sparkles size={12} />
-              <span>MİLANO CERSAIE EDİSYONU &bull; {year}</span>
+              <span>{sec.heroBadgeText || `MİLANO CERSAIE EDİSYONU • ${year}`}</span>
             </div>
 
             <h1>
@@ -1599,9 +1605,9 @@ export default function HtmlLookbookViewer({
       {layoutType === 'swiss-industrial' && (
         <header className="hero" id="koleksiyon">
           <div className="swiss-coord-bar">
-            <span>SPEC: DIN-EN-14411 // BLa PORCELAIN</span>
+            <span>{sec.heroBadgeText || 'SPEC: DIN-EN-14411 // BLa PORCELAIN'}</span>
             <span>SCALE: 1:20 // RECTIFIED</span>
-            <span>DATE: {year} ARCH-EDITION</span>
+            <span>DATE: {sec.heroYear || year} ARCH-EDITION</span>
           </div>
 
           <div className="swiss-grid">
@@ -1650,7 +1656,7 @@ export default function HtmlLookbookViewer({
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold tracking-wider uppercase mb-3">
                 <ShieldCheck size={12} />
-                <span>BİYOFİLİK MİMARİ & SPA &bull; %100 DOĞAL KİL</span>
+                <span>{sec.heroBadgeText || 'BİYOFİLİK MİMARİ & SPA • %100 DOĞAL KİL'}</span>
               </div>
               <h1>{catalog?.title || 'Doğanın Dinginliği ve Yaşam Alanları'}</h1>
               <p className="text-emerald-100/80 text-sm leading-relaxed mb-8 max-w-lg">
@@ -1692,7 +1698,7 @@ export default function HtmlLookbookViewer({
           <div className="book-spread">
             <div>
               <div className="text-[10px] tracking-widest uppercase text-amber-300 font-mono mb-2">
-                [FOLIO I &bull; ARTISAN MONOGRAPH]
+                {sec.heroBadgeText || '[FOLIO I • ARTISAN MONOGRAPH]'}
               </div>
               <h1>{catalog?.title || 'Pişmiş Toprak & Akdeniz Işığı'}</h1>
               <p className="text-amber-100/80 text-sm leading-relaxed mb-6">
@@ -1737,7 +1743,7 @@ export default function HtmlLookbookViewer({
       {layoutType === 'gallery-minimal' && (
         <header className="hero" id="koleksiyon">
           <div className="text-[10px] font-mono tracking-widest uppercase text-stone-500 mb-2">
-            BIENNALE CURATION // EXHIBITION CATALOGUE {year}
+            {sec.heroBadgeText || `BIENNALE CURATION // EXHIBITION CATALOGUE ${sec.heroYear || year}`}
           </div>
           <h1>{catalog?.title || 'Carrara & Pure Architectural Marble'}</h1>
           <p className="max-w-xl mx-auto text-stone-600 text-sm leading-relaxed mb-8">
@@ -1773,46 +1779,48 @@ export default function HtmlLookbookViewer({
       {/* =========================================================================
           ARCHITECTURAL MANIFESTO & CURATION RIBBON
       ========================================================================= */}
-      <section className="border-b border-[var(--line)] bg-[var(--paper)] py-8 px-[5.5%] transition-colors duration-300">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-7xl mx-auto">
-          <div className="lg:col-span-7 space-y-2">
-            <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-[var(--accent)] font-bold">
-              <span>{currentTheme.folioNumber || 'VOL. 26 // ED. 01'}</span>
-              <span>&bull;</span>
-              <span>{currentTheme.brandInspiration || 'MİMARİ KÜRASYON'}</span>
+      {sec.showMonograph !== false && (
+        <section className="border-b border-[var(--line)] bg-[var(--paper)] py-8 px-[5.5%] transition-colors duration-300" id="manifesto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-7xl mx-auto">
+            <div className="lg:col-span-7 space-y-2">
+              <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-[var(--accent)] font-bold">
+                <span>{currentTheme.folioNumber || 'VOL. 26 // ED. 01'}</span>
+                <span>&bull;</span>
+                <span>{sec.heroStampText || currentTheme.brandInspiration || 'MİMARİ KÜRASYON'}</span>
+              </div>
+              <blockquote className="font-serif italic text-base sm:text-lg text-[var(--ink)] leading-relaxed">
+                "{sec.monographQuote || currentTheme.monographQuote || 'Yüzey yalnızca bir kaplama değil; mekânın ışığını, akustik dengesini ve dokusal hafızasını belirleyen temel mimari dildir.'}"
+              </blockquote>
+              <p className="text-[11px] text-[var(--muted)] font-mono">
+                {sec.monographAuthor || `— ${brandName} Tasarım & Malzeme İnovasyon Laboratuvarı`}
+              </p>
             </div>
-            <blockquote className="font-serif italic text-base sm:text-lg text-[var(--ink)] leading-relaxed">
-              "{currentTheme.monographQuote || 'Yüzey yalnızca bir kaplama değil; mekânın ışığını, akustik dengesini ve dokusal hafızasını belirleyen temel mimari dildir.'}"
-            </blockquote>
-            <p className="text-[11px] text-[var(--muted)] font-mono">
-              — {brandName} Tasarım & Malzeme İnovasyon Laboratuvarı
-            </p>
-          </div>
 
-          <div className="lg:col-span-5 grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
-              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Standart</span>
-              <strong className="text-xs text-[var(--ink)] block">EN 14411 BLa</strong>
-              <span className="text-[10px] text-[var(--muted)]">Tam Gövde Porselen</span>
-            </div>
-            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
-              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Su Emme</span>
-              <strong className="text-xs text-[var(--ink)] block">E ≤ %0.05</strong>
-              <span className="text-[10px] text-[var(--muted)]">Sıfıra Yakın Geçirgenlik</span>
-            </div>
-            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
-              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Kenar Kesimi</span>
-              <strong className="text-xs text-[var(--ink)] block">Lazer Rektifiye</strong>
-              <span className="text-[10px] text-[var(--muted)]">1 mm Monokalibre Derz</span>
-            </div>
-            <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
-              <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Doku Çözünürlüğü</span>
-              <strong className="text-xs text-[var(--ink)] block">4K PBR Master</strong>
-              <span className="text-[10px] text-[var(--muted)]">Ultra HD Mikrotekstür</span>
+            <div className="lg:col-span-5 grid grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+                <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Standart</span>
+                <strong className="text-xs text-[var(--ink)] block">{sec.spec1Label || 'EN 14411 BLa'}</strong>
+                <span className="text-[10px] text-[var(--muted)]">{sec.spec1Desc || 'Tam Gövde Porselen'}</span>
+              </div>
+              <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+                <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Su Emme</span>
+                <strong className="text-xs text-[var(--ink)] block">{sec.spec2Label || 'E ≤ %0.05'}</strong>
+                <span className="text-[10px] text-[var(--muted)]">{sec.spec2Desc || 'Sıfıra Yakın Geçirgenlik'}</span>
+              </div>
+              <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+                <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Kenar Kesimi</span>
+                <strong className="text-xs text-[var(--ink)] block">{sec.spec3Label || 'Lazer Rektifiye'}</strong>
+                <span className="text-[10px] text-[var(--muted)]">{sec.spec3Desc || '1 mm Monokalibre Derz'}</span>
+              </div>
+              <div className="p-3.5 rounded-lg border border-[var(--line)] bg-black/2">
+                <span className="text-[10px] font-mono text-[var(--muted)] uppercase block mb-1">Doku Çözünürlüğü</span>
+                <strong className="text-xs text-[var(--ink)] block">{sec.spec4Label || '4K PBR Master'}</strong>
+                <span className="text-[10px] text-[var(--muted)]">{sec.spec4Desc || 'Ultra HD Mikrotekstür'}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* =========================================================================
           PRODUCTS SECTION
@@ -1821,11 +1829,13 @@ export default function HtmlLookbookViewer({
         <div className="flex items-end justify-between gap-6 mb-8 flex-wrap">
           <div>
             <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)] mb-1">
-              Koleksiyondan Seçkiler
+              {sec.productsBadge || 'Koleksiyondan Seçkiler'}
             </div>
-            <h2 className="text-3xl font-serif text-[var(--ink)]">Yüzeyleri Yakından Tanıyın</h2>
+            <h2 className="text-3xl font-serif text-[var(--ink)]">
+              {sec.productsTitle || 'Yüzeyleri Yakından Tanıyın'}
+            </h2>
             <p className="text-xs text-[var(--muted)] mt-1 max-w-md">
-              Her yüzeyin kendine özgü dokusunu, ölçüsünü, aşınma ve kayma direncini keşfedin.
+              {sec.productsSubtitle || 'Her yüzeyin kendine özgü dokusunu, ölçüsünü, aşınma ve kayma direncini keşfedin.'}
             </p>
           </div>
 
@@ -2140,200 +2150,239 @@ export default function HtmlLookbookViewer({
       )}
 
       {/* EDITORIAL SECTION */}
-      <section className="section editorial" id="mekanlar">
-        <div className="editorial-grid">
-          <div className="editorial-photo">
-            <img
-              src="/renders/modern_living_natural_oak.jpg"
-              alt="Mekânda hayat bulan yüzeyler"
-            />
-            <div className="photo-caption">Mekânlardan İlham Alın &bull; {year}</div>
+      {sec.showEditorial !== false && (
+        <section className="section editorial" id="mekanlar">
+          <div className="editorial-grid">
+            <div className="editorial-photo">
+              <img
+                src={sec.editorialImageUrl || '/renders/modern_living_natural_oak.jpg'}
+                alt={sec.editorialTitle || 'Mekânda hayat bulan yüzeyler'}
+              />
+              <div className="photo-caption">{sec.editorialCaption || `Mekânlardan İlham Alın • ${sec.heroYear || year}`}</div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
+                {sec.editorialBadge || 'Mekânda Hayat Bulan Yüzeyler'}
+              </div>
+              <h2 className="text-3xl font-serif text-[var(--ink)] whitespace-pre-line">
+                {sec.editorialTitle || (
+                  <>
+                    Bir Yüzeyden<br />
+                    Daha Fazlası.
+                  </>
+                )}
+              </h2>
+              <p className="text-xs text-[var(--muted)] leading-relaxed max-w-md">
+                {sec.editorialText ||
+                  'Doğru seramik ve porselen, mekânın ışığını, akustik dengesini ve mimari derinliğini belirler. Seçkin serileri yalnızca ürün olarak değil, mekânınızın bir parçası olarak keşfedin.'}
+              </p>
+
+              <div className="border-t border-[var(--line)] pt-3 space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-[var(--line)]">
+                  <strong>{sec.feature1Title || '01   Banyo ve Spa'}</strong>
+                  <span className="text-[var(--muted)]">{sec.feature1Desc || 'Doğal Taş Dinginliği ↗'}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[var(--line)]">
+                  <strong>{sec.feature2Title || '02   Yaşam Alanları & Salon'}</strong>
+                  <span className="text-[var(--muted)]">{sec.feature2Desc || 'Geniş Ebat Monolitik Slab ↗'}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[var(--line)]">
+                  <strong>{sec.feature3Title || '03   Mutfak ve Ticari Zeminler'}</strong>
+                  <span className="text-[var(--muted)]">{sec.feature3Desc || 'Yüksek Trafik Dayanımı (PEI V) ↗'}</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  className="primarybtn"
+                  onClick={() => handleOpenLead(null, 'sample')}
+                >
+                  Mekânında Gör / Numune İste ↗
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div className="space-y-4">
-            <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
-              Mekânda Hayat Bulan Yüzeyler
-            </div>
-            <h2 className="text-3xl font-serif text-[var(--ink)]">
-              Bir Yüzeyden<br />
-              Daha Fazlası.
-            </h2>
-            <p className="text-xs text-[var(--muted)] leading-relaxed max-w-md">
-              Doğru seramik ve porselen, mekânın ışığını, akustik dengesini ve mimari derinliğini belirler. Seçkin serileri yalnızca ürün olarak değil, mekânınızın bir parçası olarak keşfedin.
-            </p>
-
-            <div className="border-t border-[var(--line)] pt-3 space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                <strong>01 &nbsp; Banyo ve Spa</strong>
-                <span className="text-[var(--muted)]">Doğal Taş Dinginliği ↗</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                <strong>02 &nbsp; Yaşam Alanları & Salon</strong>
-                <span className="text-[var(--muted)]">Geniş Ebat Monolitik Slab ↗</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-[var(--line)]">
-                <strong>03 &nbsp; Mutfak ve Ticari Zeminler</strong>
-                <span className="text-[var(--muted)]">Yüksek Trafik Dayanımı (PEI V) ↗</span>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="button"
-                className="primarybtn"
-                onClick={() => handleOpenLead(null, 'sample')}
-              >
-                Mekânında Gör / Numune İste ↗
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* TECHNICAL SECTION */}
-      <section className="section technical" id="teknik">
-        <div className="flex items-end justify-between gap-6 mb-8 flex-wrap">
-          <div>
-            <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)] mb-1">
-              Mimari Şartname & Kalite Güvencesi
-            </div>
-            <h2 className="text-3xl font-serif text-[var(--ink)]">
-              Mükemmel Estetik, Sarsılmaz Standartlar
-            </h2>
-            <p className="text-xs text-[var(--muted)] mt-1 max-w-md">
-              Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler.
-            </p>
-          </div>
-          <a href="#urunler" className="text-xs font-bold text-[var(--accent)] hover:underline inline-flex items-center gap-1">
-            <Ruler size={13} />
-            <span>Tüm Karoları Karşılaştır ↗</span>
-          </a>
-        </div>
-
-        <div className="tech-grid">
-          <div className="tech-card">
-            <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
-              01 // SU EMME DEĞERİ (E ≤ %0.05)
-            </small>
-            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Sıfıra Yakın Su Emme</h3>
-            <p className="text-xs text-[var(--muted)] leading-relaxed">
-              Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunan yüksek yoğunluklu porselen gövde.
-            </p>
-          </div>
-
-          <div className="tech-card">
-            <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
-              02 // R10 / R11 KAYMA DİRENCİ
-            </small>
-            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Islak Hacim Güvenliği</h3>
-            <p className="text-xs text-[var(--muted)] leading-relaxed">
-              Banyo, havuz kenarı ve lüks otel girişleri için mikrotekstür teknolojisiyle güvenli adımlar.
-            </p>
-          </div>
-
-          <div className="tech-card">
-            <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
-              03 // REKTİFİYE MİLİMETRİK KESİM
-            </small>
-            <h3 className="font-serif text-lg my-2 text-[var(--ink)]">Derzsiz Süreklilik</h3>
-            <p className="text-xs text-[var(--muted)] leading-relaxed">
-              Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığıyla kesintisiz yüzey akışı.
-            </p>
-          </div>
-        </div>
-
-        {/* ARCHITECTURAL BIM / CAD & SPECIFICATION DOWNLOADS */}
-        <div className="mt-10 p-6 rounded-xl border border-[var(--line)] bg-[var(--paper)] shadow-2xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--line)]">
+      {sec.showTechnical !== false && (
+        <section className="section technical" id="teknik">
+          <div className="flex items-end justify-between gap-6 mb-8 flex-wrap">
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent)] font-bold mb-1">
-                BIM & CAD DİJİTAL MİMARİ KÜTÜPHANESİ
+              <div className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)] mb-1">
+                {sec.technicalBadge || 'Mimari Şartname & Kalite Güvencesi'}
               </div>
-              <h4 className="text-base font-serif font-bold text-[var(--ink)]">
-                Projeleriniz İçin Hazır 3D Model ve Teknik Şartnameler
-              </h4>
-              <p className="text-xs text-[var(--muted)] mt-0.5">
-                Revit (.RFA), AutoCAD (.DWG), SketchUp (.SKP) ve 4K PBR doku haritalarını doğrudan indirin.
+              <h2 className="text-3xl font-serif text-[var(--ink)]">
+                {sec.technicalTitle || 'Mükemmel Estetik, Sarsılmaz Standartlar'}
+              </h2>
+              <p className="text-xs text-[var(--muted)] mt-1 max-w-md">
+                {sec.technicalSubtitle || 'Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler.'}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="outlinebtn text-xs font-bold whitespace-nowrap self-start md:self-auto"
-            >
-              <Download size={13} />
-              <span>Tüm Şartnameyi İndir (.PDF)</span>
-            </button>
+            <a href="#urunler" className="text-xs font-bold text-[var(--accent)] hover:underline inline-flex items-center gap-1">
+              <Ruler size={13} />
+              <span>Tüm Karoları Karşılaştır ↗</span>
+            </a>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
-            <button
-              type="button"
-              onClick={() => notify(`${brandName} Autodesk Revit (.RFA) kütüphanesi indirildi.`)}
-              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
-            >
-              <div>
-                <strong className="block text-[11px] text-[var(--ink)]">Revit BIM (.RFA)</strong>
-                <span className="text-[10px] text-[var(--muted)]">Parametrik Slab Ailesi</span>
-              </div>
-              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
-            </button>
+          <div className="tech-grid">
+            <div className="tech-card">
+              <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
+                {sec.tech1Title || '01 // SU EMME DEĞERİ (E ≤ %0.05)'}
+              </small>
+              <h3 className="font-serif text-lg my-2 text-[var(--ink)]">{sec.tech1Heading || 'Sıfıra Yakın Su Emme'}</h3>
+              <p className="text-xs text-[var(--muted)] leading-relaxed">
+                {sec.tech1Desc || 'Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunan yüksek yoğunluklu porselen gövde.'}
+              </p>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => notify(`${brandName} AutoCAD (.DWG) detay çizimleri indirildi.`)}
-              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
-            >
-              <div>
-                <strong className="block text-[11px] text-[var(--ink)]">AutoCAD (.DWG)</strong>
-                <span className="text-[10px] text-[var(--muted)]">1:20 Kesit & Plan Detayı</span>
-              </div>
-              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
-            </button>
+            <div className="tech-card">
+              <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
+                {sec.tech2Title || '02 // R10 / R11 KAYMA DİRENCİ'}
+              </small>
+              <h3 className="font-serif text-lg my-2 text-[var(--ink)]">{sec.tech2Heading || 'Islak Hacim Güvenliği'}</h3>
+              <p className="text-xs text-[var(--muted)] leading-relaxed">
+                {sec.tech2Desc || 'Banyo, havuz kenarı ve lüks otel girişleri için mikrotekstür teknolojisiyle güvenli adımlar.'}
+              </p>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => notify(`${brandName} SketchUp (.SKP) 3D dokuları indirildi.`)}
-              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
-            >
-              <div>
-                <strong className="block text-[11px] text-[var(--ink)]">SketchUp (.SKP)</strong>
-                <span className="text-[10px] text-[var(--muted)]">Ölçekli Doku Haritası</span>
-              </div>
-              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => notify(`${brandName} 4K PBR Doku Paketi indirildi.`)}
-              className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
-            >
-              <div>
-                <strong className="block text-[11px] text-[var(--ink)]">4K PBR Doku (.ZIP)</strong>
-                <span className="text-[10px] text-[var(--muted)]">Albedo, Roughness, Normal</span>
-              </div>
-              <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
-            </button>
+            <div className="tech-card">
+              <small className="text-[10px] font-mono uppercase text-[var(--accent)] block mb-1">
+                {sec.tech3Title || '03 // REKTİFİYE MİLİMETRİK KESİM'}
+              </small>
+              <h3 className="font-serif text-lg my-2 text-[var(--ink)]">{sec.tech3Heading || 'Derzsiz Süreklilik'}</h3>
+              <p className="text-xs text-[var(--muted)] leading-relaxed">
+                {sec.tech3Desc || 'Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığıyla kesintisiz yüzey akışı.'}
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+
+          {/* ARCHITECTURAL BIM / CAD & SPECIFICATION DOWNLOADS */}
+          <div className="mt-10 p-6 rounded-xl border border-[var(--line)] bg-[var(--paper)] shadow-2xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[var(--line)]">
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent)] font-bold mb-1">
+                  BIM & CAD DİJİTAL MİMARİ KÜTÜPHANESİ
+                </div>
+                <h4 className="text-base font-serif font-bold text-[var(--ink)]">
+                  Projeleriniz İçin Hazır 3D Model ve Teknik Şartnameler
+                </h4>
+                <p className="text-xs text-[var(--muted)] mt-0.5">
+                  Revit (.RFA), AutoCAD (.DWG), SketchUp (.SKP) ve 4K PBR doku haritalarını doğrudan indirin.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="outlinebtn text-xs font-bold whitespace-nowrap self-start md:self-auto"
+              >
+                <Download size={13} />
+                <span>Tüm Şartnameyi İndir (.PDF)</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
+              <a
+                href={sec.bimCadUrl || '#'}
+                target={sec.bimCadUrl ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!sec.bimCadUrl) {
+                    e.preventDefault();
+                    notify(`${brandName} Autodesk Revit (.RFA) kütüphanesi indirildi.`);
+                  }
+                }}
+                className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+              >
+                <div>
+                  <strong className="block text-[11px] text-[var(--ink)]">Revit BIM (.RFA)</strong>
+                  <span className="text-[10px] text-[var(--muted)]">Parametrik Slab Ailesi</span>
+                </div>
+                <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+              </a>
+
+              <a
+                href={sec.bimCadUrl || '#'}
+                target={sec.bimCadUrl ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!sec.bimCadUrl) {
+                    e.preventDefault();
+                    notify(`${brandName} AutoCAD (.DWG) detay çizimleri indirildi.`);
+                  }
+                }}
+                className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+              >
+                <div>
+                  <strong className="block text-[11px] text-[var(--ink)]">AutoCAD (.DWG)</strong>
+                  <span className="text-[10px] text-[var(--muted)]">1:20 Kesit & Plan Detayı</span>
+                </div>
+                <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+              </a>
+
+              <a
+                href={sec.ceLeedUrl || '#'}
+                target={sec.ceLeedUrl ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!sec.ceLeedUrl) {
+                    e.preventDefault();
+                    notify(`${brandName} CE & LEED Sertifikası indirildi.`);
+                  }
+                }}
+                className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+              >
+                <div>
+                  <strong className="block text-[11px] text-[var(--ink)]">CE & LEED Sertifikası</strong>
+                  <span className="text-[10px] text-[var(--muted)]">Yeşil Bina Uyumluluğu</span>
+                </div>
+                <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+              </a>
+
+              <a
+                href={sec.epdUrl || '#'}
+                target={sec.epdUrl ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!sec.epdUrl) {
+                    e.preventDefault();
+                    notify(`${brandName} EPD Çevresel Ürün Beyanı indirildi.`);
+                  }
+                }}
+                className="p-3.5 rounded-lg border border-[var(--line)] hover:border-[var(--accent)] bg-black/2 text-left transition flex items-center justify-between group cursor-pointer"
+              >
+                <div>
+                  <strong className="block text-[11px] text-[var(--ink)]">EPD Çevresel Beyan</strong>
+                  <span className="text-[10px] text-[var(--muted)]">Sürdürülebilirlik Raporu</span>
+                </div>
+                <Download size={13} className="text-[var(--muted)] group-hover:text-[var(--accent)] transition" />
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA SECTION */}
-      <section className="cta">
-        <div>
-          <h2 className="text-2xl font-serif font-normal mb-1">Projeniz için doğru yüzeyi bulun.</h2>
-          <p className="text-xs opacity-80">Karoları keşfedin, seçeneklerinizi belirleyin ve teklif sürecini başlatın.</p>
-        </div>
-        <button
-          type="button"
-          className="primarybtn"
-          onClick={() => {
-            document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          Koleksiyonu Keşfet&nbsp; ↗
-        </button>
-      </section>
+      {sec.showCta !== false && (
+        <section className="cta">
+          <div>
+            <h2 className="text-2xl font-serif font-normal mb-1">{sec.ctaTitle || 'Projeniz için doğru yüzeyi bulun.'}</h2>
+            <p className="text-xs opacity-80">{sec.ctaSubtitle || 'Karoları keşfedin, seçeneklerinizi belirleyin ve teklif sürecini başlatın.'}</p>
+          </div>
+          <button
+            type="button"
+            className="primarybtn"
+            onClick={() => {
+              document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            {sec.ctaButtonText || 'Koleksiyonu Keşfet ↗'}
+          </button>
+        </section>
+      )}
 
       {/* FOOTER */}
       <footer className="footer">
@@ -2355,6 +2404,27 @@ export default function HtmlLookbookViewer({
             )}
           </div>
         </div>
+
+        {(catalog?.contactPhone || catalog?.contactEmail || catalog?.contactAddress || catalog?.websiteUrl || sec.contactPhone || sec.contactEmail || sec.contactAddress || sec.websiteUrl) && (
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[var(--muted)] border-t border-[var(--line)] pt-3 w-full max-w-2xl my-2">
+            {(sec.contactPhone || catalog?.contactPhone) && <span>📞 {sec.contactPhone || catalog?.contactPhone}</span>}
+            {(sec.contactEmail || catalog?.contactEmail) && <span>✉️ {sec.contactEmail || catalog?.contactEmail}</span>}
+            {(sec.contactAddress || catalog?.contactAddress) && <span>📍 {sec.contactAddress || catalog?.contactAddress}</span>}
+            {(sec.websiteUrl || catalog?.websiteUrl) && (
+              <span>
+                🌐{' '}
+                <a
+                  href={sec.websiteUrl || catalog?.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-[var(--accent)]"
+                >
+                  {(sec.websiteUrl || catalog?.websiteUrl).replace(/^https?:\/\//, '')}
+                </a>
+              </span>
+            )}
+          </div>
+        )}
 
         <p className="m-0">
           Bu dijital lookbook <Link href="/" className="font-bold underline text-inherit">SeramikBak</Link> altyapısı ile sunulmaktadır.

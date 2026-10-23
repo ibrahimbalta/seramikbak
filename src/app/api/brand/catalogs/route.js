@@ -39,16 +39,18 @@ export async function GET(request) {
       }
     });
 
-    // Format catalogs with product count & custom canvas indicator
+    // Format catalogs with product count, custom canvas & section settings indicator
     const formatted = catalogs.map((cat) => {
       let itemCount = 0;
       let hasCustomCanvas = false;
+      let sectionSettings = null;
       try {
         const parsed = JSON.parse(cat.productItems || '[]');
         if (Array.isArray(parsed)) {
           itemCount = parsed.filter(i => (typeof i === 'string' && i) || (i && i.productId)).length;
-          const firstMeta = parsed.find(i => typeof i === 'object' && i._metaCustomCanvasPages);
+          const firstMeta = parsed.find(i => typeof i === 'object' && (i._metaCustomCanvasPages || i._metaSectionSettings));
           hasCustomCanvas = Boolean(Array.isArray(firstMeta?._metaCustomCanvasPages) && firstMeta._metaCustomCanvasPages.length > 0);
+          sectionSettings = firstMeta?._metaSectionSettings || null;
         }
       } catch (e) {
         itemCount = 0;
@@ -56,7 +58,8 @@ export async function GET(request) {
       return {
         ...cat,
         itemCount,
-        hasCustomCanvas
+        hasCustomCanvas,
+        sectionSettings
       };
     });
 
@@ -104,6 +107,7 @@ export async function POST(request) {
       showPageNumbers = true,
       productItems = [],
       customCanvasPages = [],
+      sectionSettings = null,
       isPublished = false,
       isDraft = true,
     } = body;
@@ -150,6 +154,18 @@ export async function POST(request) {
         rawItems[0] = {
           ...rawItems[0],
           _metaCustomCanvasPages: safeCanvasPages
+        };
+      }
+    }
+
+    // Safely embed sectionSettings inside metadata
+    if (sectionSettings && typeof sectionSettings === 'object') {
+      if (rawItems.length === 0) {
+        rawItems = [{ _isMetaOnly: true, _metaSectionSettings: sectionSettings }];
+      } else {
+        rawItems[0] = {
+          ...rawItems[0],
+          _metaSectionSettings: sectionSettings
         };
       }
     }

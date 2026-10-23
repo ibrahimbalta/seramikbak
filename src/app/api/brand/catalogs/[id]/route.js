@@ -194,6 +194,7 @@ export async function PUT(request, { params }) {
       showPageNumbers,
       productItems,
       customCanvasPages,
+      sectionSettings,
       isPublished,
       isDraft,
     } = body;
@@ -228,7 +229,7 @@ export async function PUT(request, { params }) {
     if (isPublished !== undefined) updateData.isPublished = Boolean(isPublished);
     if (isDraft !== undefined) updateData.isDraft = Boolean(isDraft);
 
-    if (productItems !== undefined || customCanvasPages !== undefined) {
+    if (productItems !== undefined || customCanvasPages !== undefined || sectionSettings !== undefined) {
       let rawItems = [];
       if (productItems !== undefined) {
         rawItems = Array.isArray(productItems)
@@ -274,12 +275,24 @@ export async function PUT(request, { params }) {
               rawItems[0] = {
                 ...rawItems[0],
                 ...(oldMeta._metaCustomCanvasPages ? { _metaCustomCanvasPages: oldMeta._metaCustomCanvasPages } : {}),
-                ...(oldMeta._metaSectionSettings ? { _metaSectionSettings: oldMeta._metaSectionSettings } : {})
+                ...(oldMeta._metaSectionSettings && sectionSettings === undefined ? { _metaSectionSettings: oldMeta._metaSectionSettings } : {})
               };
             }
           }
         } catch (e) {
           // Non-fatal
+        }
+      }
+
+      // Safely embed or update sectionSettings inside metadata
+      if (sectionSettings !== undefined) {
+        if (rawItems.length === 0) {
+          rawItems = [{ _isMetaOnly: true, _metaSectionSettings: sectionSettings }];
+        } else {
+          rawItems[0] = {
+            ...rawItems[0],
+            _metaSectionSettings: sectionSettings
+          };
         }
       }
 
