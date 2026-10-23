@@ -542,6 +542,47 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     return changes;
   };
 
+  const [aiGenerating, setAiGenerating] = useState(false);
+
+  const handleAiAutoFill = async (theme = 'luxury') => {
+    try {
+      setAiGenerating(true);
+      const res = await fetch('/api/ai/catalog-autofill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandName: brandInfo?.name || 'Seramik',
+          theme,
+          language: formData.language || 'tr',
+          products: formData.selectedItems || []
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        const ai = data.data;
+        setFormData(prev => ({
+          ...prev,
+          title: ai.title || prev.title,
+          coverTitle: ai.coverTitle || prev.coverTitle,
+          coverSubtitle: ai.coverSubtitle || prev.coverSubtitle,
+          introText: ai.introText || prev.introText,
+          template: ai.template || prev.template,
+          primaryColor: ai.primaryColor || prev.primaryColor,
+          orientation: ai.orientation || prev.orientation,
+          pageSize: ai.pageSize || prev.pageSize
+        }));
+        showToast('success', '✨ Yapay zeka başlıkları, önsözü ve mizanpajı otomatik hazırladı!');
+      } else {
+        showToast('error', data.error || 'Yapay zeka önerileri alınamadı.');
+      }
+    } catch (err) {
+      console.error('AI autofill error:', err);
+      showToast('error', 'Yapay zeka servisine bağlanırken bir hata oluştu.');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
   const handleStartNew = (presetTemplate = 'premium-mimari', initialStep = 1) => {
     setActiveCatalogId(null);
     setStudioMode('easy');
@@ -2620,31 +2661,21 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
               </div>
             </div>
 
-            {/* Center: Mode Switcher (Kolay Mod vs Gelişmiş Studio) */}
-            <div className="flex items-center bg-neutral-100/90 p-1 rounded-xl border border-neutral-200/80 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-start">
+            {/* Center: AI Smart Auto-Design Assistant Button */}
+            <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
               <button
                 type="button"
-                onClick={() => setStudioMode('easy')}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                  studioMode === 'easy'
-                    ? 'bg-white text-neutral-900 shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-800'
-                }`}
+                onClick={() => handleAiAutoFill('luxury')}
+                disabled={aiGenerating}
+                className="w-full sm:w-auto px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-white text-xs font-semibold shadow-xs flex items-center justify-center gap-2 cursor-pointer transition border border-amber-400/40"
+                title="Yapay zeka ile başlık, kapak ve mizanpajı otomatik oluştur"
               >
-                <Sparkles size={13} className="text-amber-500" />
-                <span>Kolay Mod</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setStudioMode('advanced')}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                  studioMode === 'advanced'
-                    ? 'bg-neutral-900 text-white shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-800'
-                }`}
-              >
-                <Wand2 size={13} className="text-amber-400" />
-                <span>Gelişmiş Tuval</span>
+                {aiGenerating ? (
+                  <Loader2 size={13} className="animate-spin text-white" />
+                ) : (
+                  <Sparkles size={13} className="text-amber-200 animate-pulse" />
+                )}
+                <span>✨ AI ile Otomatik Mizanpaj & Metin</span>
               </button>
             </div>
 
@@ -2687,39 +2718,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             </div>
           </div>
 
-          {/* ==================== MODE A: GELİŞMİŞ STUDIO ==================== */}
-          {studioMode === 'advanced' ? (
-            <CatalogVisualCanvasEditor
-              initialPages={formData.customCanvasPages}
-              brandProducts={availableProducts}
-              brandInfo={brandInfo}
-              currentTemplateId={formData.template}
-              onSelectTemplate={(tmplId) => setFormData((prev) => ({ ...prev, template: tmplId }))}
-              onChangePages={(updatedPages) =>
-                setFormData((prev) => ({ ...prev, customCanvasPages: updatedPages }))
-              }
-              onUseProduct={(prod) => {
-                if (!prod || !prod.id) return;
-                setFormData((prev) => {
-                  const exists = (prev.selectedItems || []).some(
-                    (item) => (item.productId || item.id) === prod.id
-                  );
-                  if (exists) return prev;
-                  return {
-                    ...prev,
-                    selectedItems: [
-                      ...(prev.selectedItems || []),
-                      { productId: prod.id, order: (prev.selectedItems || []).length + 1 }
-                    ]
-                  };
-                });
-              }}
-              onSaveDraft={() => handleSaveCatalog(false)}
-              onPublish={() => handleSaveCatalog(true)}
-            />
-          ) : (
-            /* ==================== MODE B: KOLAY MOD (6 ADIMLI SİHİRBAZ) ==================== */
-            <>
+          {/* 6 ADIMLI AKILLI KATALOG SİHİRBAZI */}
               {/* High-End Stepper Navigation */}
               <div className="bg-white rounded-xl border border-neutral-200 shadow-2xs p-3 sm:p-4">
                 {/* Stepper Progress Bar Header */}
@@ -2829,6 +2828,58 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                 {/* STEP 1: KATALOG BİLGİLERİ & ÇOK DİLLİ AYARLAR */}
                 {activeStep === 1 && (
                   <div className="space-y-4 sm:space-y-5">
+                    {/* AI Smart Assistant Banner */}
+                    <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent border border-amber-500/25 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 flex-shrink-0">
+                          <Sparkles size={20} className="animate-pulse" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-neutral-900 flex items-center gap-2">
+                            <span>Yapay Zeka ile Otomatik Mizanpaj & Metin Sihirbazı</span>
+                            <span className="text-[10px] font-semibold bg-amber-500 text-white px-2 py-0.5 rounded-full">YENİ</span>
+                          </h4>
+                          <p className="text-[11px] text-neutral-600 mt-0.5">
+                            Tek tıkla kapak başlıklarını, mimari önsözü ve en uygun mizanpaj şablonunu otomatik oluşturun:
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => handleAiAutoFill('luxury')}
+                          disabled={aiGenerating}
+                          className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-800 text-[11px] font-semibold shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>👑 Lüks Mimari</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAiAutoFill('natural_stone')}
+                          disabled={aiGenerating}
+                          className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-800 text-[11px] font-semibold shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>🌿 Doğal Taş & Mermer</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAiAutoFill('modern_minimal')}
+                          disabled={aiGenerating}
+                          className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-800 text-[11px] font-semibold shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>🏢 Modern & Çimento</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAiAutoFill('technical')}
+                          disabled={aiGenerating}
+                          className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-800 text-[11px] font-semibold shadow-2xs transition flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>📐 Teknik Şartname</span>
+                        </button>
+                      </div>
+                    </div>
                     {/* Header Banner - Compact & Clean CRM style */}
                     <div className="p-3 sm:p-4 rounded-lg bg-neutral-50/80 border border-neutral-200/80 flex items-center justify-between gap-3">
                       <div>
@@ -4485,8 +4536,6 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   )}
                 </div>
               </div>
-            </>
-          )}
         </div>
       )}
 
