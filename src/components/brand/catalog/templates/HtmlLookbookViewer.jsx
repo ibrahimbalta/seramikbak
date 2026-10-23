@@ -1161,15 +1161,31 @@ export default function HtmlLookbookViewer({
           .seramikbak-lookbook-app .products { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }
         @media(max-width:700px) {
-          .seramikbak-lookbook-app .topline { padding: 0 5%; font-size: 9px; }
-          .seramikbak-lookbook-app .nav { height: 64px; padding: 0 5%; }
+          .seramikbak-lookbook-app .topline { padding: 0 4%; font-size: 8.5px; }
+          .seramikbak-lookbook-app .nav { height: 58px; padding: 0 4%; gap: 10px; }
+          .seramikbak-lookbook-app .brand-title { font-size: 16px !important; }
           .seramikbak-lookbook-app .navlinks { display: none; }
+          .seramikbak-lookbook-app .navright { gap: 6px; }
+          .seramikbak-lookbook-app .navright .iconbtn { width: 34px; height: 34px; }
+          .seramikbak-lookbook-app .navright .primarybtn,
+          .seramikbak-lookbook-app .navright .outlinebtn {
+            padding: 8px 11px;
+            font-size: 10px;
+            height: 34px;
+          }
           .layout-editorial-asymmetric .hero { display: flex; flex-direction: column; }
+          .layout-editorial-asymmetric .hero-copy { padding: 36px 5% 30px !important; }
+          .layout-editorial-asymmetric .hero h1 { font-size: clamp(28px, 7vw, 42px) !important; line-height: 1.12 !important; }
+          .layout-editorial-asymmetric .hero-visual { min-height: 240px; height: 260px; }
+          .layout-editorial-asymmetric .hero-stamp { bottom: 14px; right: 4%; left: 4%; max-width: none; padding: 12px 14px; }
+          .layout-cinema-fullwidth .hero { padding: 60px 4% 40px !important; min-height: auto !important; }
+          .layout-cinema-fullwidth .hero h1 { font-size: clamp(26px, 7vw, 38px) !important; }
           .seramikbak-lookbook-app .products { grid-template-columns: 1fr !important; }
           .seramikbak-lookbook-app .editorial-grid { grid-template-columns: 1fr; gap: 28px; }
           .seramikbak-lookbook-app .tech-grid { grid-template-columns: 1fr; }
-          .seramikbak-lookbook-app .cta { margin: 0 5% 40px; padding: 30px 24px; flex-direction: column; align-items: flex-start; }
-          .seramikbak-lookbook-app .footer { padding: 24px 5%; flex-direction: column; align-items: flex-start; }
+          .seramikbak-lookbook-app .cta { margin: 0 4% 40px; padding: 26px 20px; flex-direction: column; align-items: flex-start; }
+          .seramikbak-lookbook-app .cta .primarybtn { width: 100%; justify-content: center; margin-top: 12px; }
+          .seramikbak-lookbook-app .footer { padding: 20px 4%; flex-direction: column; align-items: flex-start; }
         }
       `}</style>
 
@@ -1183,16 +1199,16 @@ export default function HtmlLookbookViewer({
 
       {/* NAVBAR */}
       <nav className="nav">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
             {brandLogo && (
               <img
                 src={brandLogo}
                 alt={brandName}
-                className="h-7 sm:h-8 w-auto object-contain"
+                className="h-6 sm:h-8 w-auto object-contain flex-shrink-0"
               />
             )}
-            <span className="brand-title">
+            <span className="brand-title truncate">
               {brandParts.length > 1 ? (
                 <>
                   {brandParts.slice(0, -1).join(' ')} <span>{brandParts[brandParts.length - 1]}</span>
@@ -1202,7 +1218,7 @@ export default function HtmlLookbookViewer({
               )}
             </span>
           </div>
-          <span style={{ fontSize: '10px', letterSpacing: '.08em', color: 'var(--muted)', fontWeight: 600 }}>
+          <span className="hidden md:inline-block whitespace-nowrap text-[10px] tracking-wider font-semibold text-[var(--muted)]">
             {currentTheme.badge}
           </span>
         </div>
@@ -1407,19 +1423,19 @@ export default function HtmlLookbookViewer({
                 catalog?.description ||
                 'Doğal taşın karakteri, mermerin zarafeti ve çağdaş mimarinin yalın çizgileri. Mekânlara değer katan yüzeyleri keşfedin.'}
             </p>
-            <div className="flex items-center gap-3 mt-8">
+            <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3 mt-6 sm:mt-8 w-full sm:w-auto">
               <button
                 type="button"
-                className="primarybtn"
+                className="primarybtn flex-1 justify-center text-center h-11 text-xs"
                 onClick={() => {
                   document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Koleksiyonu Keşfet&nbsp; ↘
+                Koleksiyonu Keşfet ↘
               </button>
               <button
                 type="button"
-                className="outlinebtn"
+                className="outlinebtn flex-1 justify-center text-center h-11 text-xs"
                 style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}
                 onClick={() => {
                   document.getElementById('mekanlar')?.scrollIntoView({ behavior: 'smooth' });
@@ -1484,10 +1500,10 @@ export default function HtmlLookbookViewer({
                 'Dev ebat seramik ve porselen slablar için tam ekran sinematik kapak, obsidian cam kartlar ve ışıltılı altın detaylar.'}
             </p>
 
-            <div className="flex items-center justify-center gap-4 flex-wrap">
+            <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:justify-center sm:gap-4 max-w-md mx-auto">
               <button
                 type="button"
-                className="primarybtn px-6 py-3"
+                className="primarybtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                 onClick={() => {
                   document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                 }}
@@ -1496,11 +1512,11 @@ export default function HtmlLookbookViewer({
               </button>
               <button
                 type="button"
-                className="outlinebtn px-6 py-3"
+                className="outlinebtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                 style={{ borderColor: 'rgba(197, 160, 89, 0.45)', color: '#fae29c' }}
                 onClick={() => handleOpenLead(null, 'quote')}
               >
-                Proje Fiyat Teklifi Al ↗
+                Fiyat Teklifi Al ↗
               </button>
             </div>
           </div>
@@ -1527,10 +1543,10 @@ export default function HtmlLookbookViewer({
                   catalog?.description ||
                   'Beton ve çimento dokuları için brütist Bauhaus mizanpajı, net geometrik çizgiler, teknik koordinatlar ve milimetrik şartname.'}
               </p>
-              <div className="flex items-center gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3 w-full sm:w-auto">
                 <button
                   type="button"
-                  className="primarybtn"
+                  className="primarybtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                   onClick={() => {
                     document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                   }}
@@ -1539,7 +1555,7 @@ export default function HtmlLookbookViewer({
                 </button>
                 <button
                   type="button"
-                  className="outlinebtn"
+                  className="outlinebtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                   style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
                   onClick={() => handleOpenLead(null, 'sample')}
                 >
@@ -1570,10 +1586,10 @@ export default function HtmlLookbookViewer({
                   catalog?.description ||
                   'Yeşil tonlu karolar ve spa alanları için yuvarlatılmış organik kartlar, biophilic mimari felsefe ve ferah adaçayı harmonisi.'}
               </p>
-              <div className="flex items-center gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3 w-full sm:w-auto">
                 <button
                   type="button"
-                  className="primarybtn"
+                  className="primarybtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                   onClick={() => {
                     document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                   }}
@@ -1582,11 +1598,11 @@ export default function HtmlLookbookViewer({
                 </button>
                 <button
                   type="button"
-                  className="outlinebtn"
+                  className="outlinebtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                   style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
                   onClick={() => handleOpenLead(null, 'sample')}
                 >
-                  Numune Paketi İste ↗
+                  Numune İste ↗
                 </button>
               </div>
             </div>
@@ -1612,10 +1628,10 @@ export default function HtmlLookbookViewer({
                   catalog?.description ||
                   'Sıcak Akdeniz güneşi, pişmiş toprak ve zanaatkar seramikler için çift sayfalı kitap düzeni, kiremit ve sıcak kum rengi tonları.'}
               </p>
-              <div className="flex items-center gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:gap-3 w-full sm:w-auto">
                 <button
                   type="button"
-                  className="primarybtn"
+                  className="primarybtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                   onClick={() => {
                     document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
                   }}
@@ -1624,7 +1640,7 @@ export default function HtmlLookbookViewer({
                 </button>
                 <button
                   type="button"
-                  className="outlinebtn"
+                  className="outlinebtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
                   style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
                   onClick={() => handleOpenLead(null, 'quote')}
                 >
@@ -1657,10 +1673,10 @@ export default function HtmlLookbookViewer({
               catalog?.description ||
               'Beyaz mermer, calacatta ve parlak porselen karolar için müze galerisi formatı, geniş negatif beyaz alan ve saf grafit hatlar.'}
           </p>
-          <div className="flex justify-center gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:flex sm:justify-center sm:gap-3 max-w-md mx-auto">
             <button
               type="button"
-              className="primarybtn"
+              className="primarybtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
               onClick={() => {
                 document.getElementById('urunler')?.scrollIntoView({ behavior: 'smooth' });
               }}
@@ -1669,10 +1685,10 @@ export default function HtmlLookbookViewer({
             </button>
             <button
               type="button"
-              className="outlinebtn"
+              className="outlinebtn flex-1 justify-center text-center h-11 text-xs px-3 sm:px-6"
               onClick={() => handleOpenLead(null, 'sample')}
             >
-              Fiziksel Numune İste ↗
+              Numune İste ↗
             </button>
           </div>
 
@@ -1772,8 +1788,8 @@ export default function HtmlLookbookViewer({
         </div>
 
         {/* Filter Row */}
-        <div className="flex items-center gap-3 flex-wrap mb-8 text-xs">
-          <div className="relative flex-1 min-w-[200px]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8 text-xs">
+          <div className="relative flex-1 w-full min-w-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               ref={searchInputRef}
@@ -1785,31 +1801,33 @@ export default function HtmlLookbookViewer({
             />
           </div>
 
-          <select
-            className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded min-w-[130px] text-xs"
-            value={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-          >
-            <option value="all">Tüm Ebatlar</option>
-            {sizeOptions.map((s) => (
-              <option key={s} value={s}>
-                {s.replace('x', ' × ')} cm
-              </option>
-            ))}
-          </select>
+          <div className="grid grid-cols-2 gap-2.5 w-full sm:w-auto sm:flex sm:items-center">
+            <select
+              className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs w-full sm:w-auto sm:min-w-[130px]"
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+            >
+              <option value="all">Tüm Ebatlar</option>
+              {sizeOptions.map((s) => (
+                <option key={s} value={s}>
+                  {s.replace('x', ' × ')} cm
+                </option>
+              ))}
+            </select>
 
-          <select
-            className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded min-w-[130px] text-xs"
-            value={selectedSurface}
-            onChange={(e) => setSelectedSurface(e.target.value)}
-          >
-            <option value="all">Tüm Yüzeyler</option>
-            <option value="mat">Doğal Mat</option>
-            <option value="parlak">Ayna Parlak</option>
-            <option value="lapato">Full Lappato</option>
-          </select>
+            <select
+              className="px-3 py-2.5 border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] outline-none rounded text-xs w-full sm:w-auto sm:min-w-[130px]"
+              value={selectedSurface}
+              onChange={(e) => setSelectedSurface(e.target.value)}
+            >
+              <option value="all">Tüm Yüzeyler</option>
+              <option value="mat">Doğal Mat</option>
+              <option value="parlak">Ayna Parlak</option>
+              <option value="lapato">Full Lappato</option>
+            </select>
+          </div>
 
-          <span className="text-[11px] text-[var(--muted)] font-semibold ml-auto">
+          <span className="text-[11px] text-[var(--muted)] font-semibold sm:ml-auto">
             {filteredProducts.length} karo gösteriliyor
           </span>
         </div>

@@ -417,7 +417,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           background-color: var(--canvas);
           color: var(--ink);
           font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-          padding: 28px clamp(16px, 3.5vw, 48px) 60px;
+          padding: 24px clamp(14px, 3.5vw, 48px) 100px;
         }
 
         .studio-eyebrow {
@@ -1349,52 +1349,51 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       {currentView === 'editor' && (
         <div className="space-y-6">
           {/* Stepper Navigation */}
-          <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">
+          <div className="bg-white p-3 sm:p-4 rounded-2xl border border-stone-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+            {/* 3 Steps Segmented Tabs */}
+            <div className="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full md:w-auto">
               <button
                 type="button"
                 onClick={() => setEditorStep(1)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
-                  editorStep === 1
-                    ? 'btn-primary'
-                    : 'btn-outline'
+                className={`flex items-center justify-center gap-1.5 px-2 sm:px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-center ${
+                  editorStep === 1 ? 'btn-primary shadow-xs' : 'btn-outline bg-stone-50/60'
                 }`}
               >
-                <span>1. Şablon Seçimi</span>
+                <span className="sm:hidden">1. Şablon</span>
+                <span className="hidden sm:inline">1. Şablon Seçimi</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setEditorStep(2)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
-                  editorStep === 2
-                    ? 'btn-primary'
-                    : 'btn-outline'
+                className={`flex items-center justify-center gap-1.5 px-2 sm:px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-center ${
+                  editorStep === 2 ? 'btn-primary shadow-xs' : 'btn-outline bg-stone-50/60'
                 }`}
               >
-                <span>2. Bilgiler & Karolar ({formData.selectedProductIds.length})</span>
+                <span className="sm:hidden">2. Karolar ({formData.selectedProductIds.length})</span>
+                <span className="hidden sm:inline">2. Bilgiler & Karolar ({formData.selectedProductIds.length})</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setEditorStep(3)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
-                  editorStep === 3
-                    ? 'btn-primary'
-                    : 'btn-outline'
+                className={`flex items-center justify-center gap-1.5 px-2 sm:px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-center ${
+                  editorStep === 3 ? 'btn-primary shadow-xs' : 'btn-outline bg-stone-50/60'
                 }`}
               >
-                <Sparkles size={13} />
-                <span>3. Canlı Önizle & Yayınla</span>
+                <Sparkles size={13} className="hidden sm:inline" />
+                <span className="sm:hidden">3. Önizle</span>
+                <span className="hidden sm:inline">3. Canlı Önizle & Yayınla</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Action Buttons: Taslak Kaydet & Yayına Al */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-stone-100 md:pt-0 md:border-t-0 md:flex md:items-center w-full md:w-auto">
               <button
                 type="button"
                 onClick={() => handleSaveCatalog(false)}
                 disabled={saving}
-                className="btn btn-outline"
+                className="btn btn-outline flex-1 justify-center h-10 text-xs font-bold rounded-xl"
               >
                 <span>Taslak Kaydet</span>
               </button>
@@ -1403,9 +1402,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 type="button"
                 onClick={() => handleSaveCatalog(true)}
                 disabled={saving}
-                className="btn btn-accent"
+                className="btn btn-accent flex-1 justify-center h-10 text-xs font-bold rounded-xl"
               >
-                {saving ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                {saving ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
                 <span>Yayına Al</span>
               </button>
             </div>
@@ -1506,11 +1505,11 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 })}
               </div>
 
-              <div className="flex justify-end pt-4">
+              <div className="flex items-center justify-end pt-4 pb-16 sm:pb-2 border-t border-stone-200 mt-6">
                 <button
                   type="button"
                   onClick={() => setEditorStep(2)}
-                  className="btn btn-primary"
+                  className="btn btn-primary w-full sm:w-auto sm:min-w-[240px] justify-center h-12 text-xs font-bold rounded-xl"
                 >
                   <span>Sonraki Adım: Bilgiler & Ürünler</span>
                   <ArrowRight size={14} />
@@ -1649,22 +1648,22 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-2">
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center sm:justify-between pt-4 pb-16 sm:pb-2 border-t border-stone-200 mt-6">
                 <button
                   type="button"
                   onClick={() => setEditorStep(1)}
-                  className="btn btn-outline"
+                  className="btn btn-outline flex items-center justify-center gap-1.5 h-12 text-xs font-bold rounded-xl w-full sm:w-auto sm:px-6"
                 >
                   <ArrowLeft size={14} />
-                  <span>Şablon Seçimine Dön</span>
+                  <span>Şablon Seçimi</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setEditorStep(3)}
-                  className="btn btn-primary"
+                  className="btn btn-primary flex items-center justify-center gap-1.5 h-12 text-xs font-bold rounded-xl w-full sm:w-auto sm:px-6"
                 >
-                  <span>Sonraki Adım: Canlı Önizle & Yayınla</span>
+                  <span>Önizle & Yayınla</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
@@ -1684,11 +1683,11 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="grid grid-cols-2 gap-2.5 w-full sm:w-auto sm:flex sm:items-center">
                   <button
                     type="button"
                     onClick={() => setEditorStep(2)}
-                    className="btn btn-outline"
+                    className="btn btn-outline flex-1 justify-center h-11 text-xs font-bold rounded-xl"
                   >
                     <Edit size={13} />
                     <span>Bilgileri Düzenle</span>
@@ -1698,7 +1697,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                     type="button"
                     onClick={() => handleSaveCatalog(true)}
                     disabled={saving}
-                    className="btn btn-accent"
+                    className="btn btn-accent flex-1 justify-center h-11 text-xs font-bold rounded-xl"
                   >
                     {saving ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
                     <span>Yayına Al & Link Üret</span>
