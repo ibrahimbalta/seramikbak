@@ -435,7 +435,9 @@ export default function PublicCatalogViewerPage() {
   }
 
   const brand = catalog.brand || {};
-  const brandName = brand.name || 'Bien Seramik';
+  const brandName = brand.name || catalog.brandName || 'Bien Seramik';
+  const brandLogo = catalog.customLogoUrl || brand.logoUrl;
+  const brandParts = brandName.trim().split(/\s+/);
   const coverImage =
     catalog.customCoverUrl ||
     catalog.coverImageUrl ||
@@ -1211,7 +1213,7 @@ export default function PublicCatalogViewerPage() {
       ========================================================================= */}
       <div className="topline">
         <span>
-          SeramikBak <span style={{ padding: '0 8px' }}>/</span> Mimari Koleksiyonlar
+          {brandName} <span style={{ padding: '0 8px' }}>/</span> Mimari Koleksiyonlar
         </span>
         <strong>ÜRÜNÜ KEŞFET · MEKÂNINDA DENE · TEKLİF AL</strong>
       </div>
@@ -1221,8 +1223,27 @@ export default function PublicCatalogViewerPage() {
       ========================================================================= */}
       <nav className="nav">
         <div className="flex items-center gap-3">
-          <Link href="/" className="brand" title="SeramikBak">
-            Seramik<span>Bak</span>
+          <Link
+            href={brand.slug ? `/marka/${brand.slug}` : '/'}
+            className="flex items-center gap-2.5 text-inherit no-underline group"
+            title={brandName}
+          >
+            {brandLogo ? (
+              <img
+                src={brandLogo}
+                alt={brandName}
+                className="h-7 sm:h-8 w-auto object-contain"
+              />
+            ) : null}
+            <span className="brand">
+              {brandParts.length > 1 ? (
+                <>
+                  {brandParts.slice(0, -1).join(' ')} <span>{brandParts[brandParts.length - 1]}</span>
+                </>
+              ) : (
+                <span>{brandName}</span>
+              )}
+            </span>
           </Link>
           <span style={{ fontSize: '10px', letterSpacing: '.08em', color: 'var(--muted)', fontWeight: 600 }}>
             MİMARİ KATALOG
@@ -1856,11 +1877,26 @@ export default function PublicCatalogViewerPage() {
           FOOTER
       ========================================================================= */}
       <footer className="footer">
-        <div className="brand" style={{ fontSize: '18px' }}>
-          Seramik<span>Bak</span>
+        <div className="flex items-center gap-2.5">
+          {brandLogo && (
+            <img
+              src={brandLogo}
+              alt={brandName}
+              className="h-6 w-auto object-contain"
+            />
+          )}
+          <div className="brand" style={{ fontSize: '18px' }}>
+            {brandParts.length > 1 ? (
+              <>
+                {brandParts.slice(0, -1).join(' ')} <span>{brandParts[brandParts.length - 1]}</span>
+              </>
+            ) : (
+              <span>{brandName}</span>
+            )}
+          </div>
         </div>
-        <span>Marka ve ürün bilgileri ilgili veri kaynağından doğrulanmalıdır.</span>
-        <span>© SeramikBak · Mimari keşif deneyimi</span>
+        <span>Marka ve ürün bilgileri ilgili üretici veri kaynağından doğrulanmıştır.</span>
+        <span>© {year} {brandName} · Dijital Mimari Katalog</span>
       </footer>
 
       {/* =========================================================================
