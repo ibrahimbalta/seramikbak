@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import CatalogTemplateRenderer from '@/components/brand/catalog/templates/CatalogTemplateRenderer';
+import HtmlLookbookViewer from '@/components/brand/catalog/templates/HtmlLookbookViewer';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 
 function LinkedInIcon({ size = 16, className = "" }) {
@@ -66,6 +67,7 @@ export default function PublicCatalogViewerPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isPrinting, setIsPrinting] = useState(false);
+  const [viewerMode, setViewerMode] = useState('lookbook'); // 'lookbook' (HTML Luxury Editorial) | 'pages' (A4 Print Simulator)
 
   // Interactive Product Search & QR Modal
   const [searchQuery, setSearchQuery] = useState('');
@@ -427,6 +429,36 @@ export default function PublicCatalogViewerPage() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          {/* Format Switcher: HTML Lookbook vs A4 Print Pages */}
+          <div className="flex items-center gap-1 bg-white/10 p-0.5 sm:p-1 rounded-xl text-[11px] sm:text-xs">
+            <button
+              type="button"
+              onClick={() => setViewerMode('lookbook')}
+              className={`px-2.5 sm:px-3 py-1 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                viewerMode === 'lookbook'
+                  ? 'bg-amber-500 text-neutral-950 shadow-sm'
+                  : 'text-neutral-300 hover:text-white'
+              }`}
+              title="HTML İnteraktif Lookbook Modu"
+            >
+              <BookOpen size={13} />
+              <span className="hidden xs:inline">Lookbook</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewerMode('pages')}
+              className={`px-2.5 sm:px-3 py-1 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                viewerMode === 'pages'
+                  ? 'bg-amber-500 text-neutral-950 shadow-sm'
+                  : 'text-neutral-300 hover:text-white'
+              }`}
+              title="A4 Baskı Sayfası Modu"
+            >
+              <FileText size={13} />
+              <span className="hidden xs:inline">A4 Baskı</span>
+            </button>
+          </div>
+
           {/* Table of Contents Toggle */}
           <button
             type="button"
@@ -753,10 +785,30 @@ export default function PublicCatalogViewerPage() {
       )}
 
       {/* Main Lookbook Container */}
-      <main className="flex-1 p-4 md:p-8 flex justify-center overflow-x-hidden">
-        <div className="w-full max-w-5xl">
-          <CatalogTemplateRenderer catalog={catalog} products={products} mode="preview" />
-        </div>
+      <main className="flex-1 flex justify-center overflow-x-hidden">
+        {viewerMode === 'lookbook' ? (
+          <div className="w-full">
+            <HtmlLookbookViewer
+              catalog={catalog}
+              products={products}
+              mode="preview"
+              onOpenLeadModal={({ product, type }) => {
+                if (product) {
+                  setSelectedProducts([product.name || product.sku || 'Seramik Ürün']);
+                }
+                if (type) {
+                  setLeadType(type);
+                }
+                setLeadSubmitted(false);
+                setShowLeadModal(true);
+              }}
+            />
+          </div>
+        ) : (
+          <div className="w-full max-w-5xl p-4 md:p-8">
+            <CatalogTemplateRenderer catalog={catalog} products={products} mode="preview" />
+          </div>
+        )}
       </main>
 
       {/* B2B Lead Generation Floating Panel (Bottom-Right) */}

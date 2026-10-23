@@ -22,6 +22,7 @@ import DecoExclusiveTemplate from './DecoExclusiveTemplate';
 import ArchitecturalEditorialTemplate from './ArchitecturalEditorialTemplate';
 import MaterialTextureTemplate from './MaterialTextureTemplate';
 import CustomCanvasPageRenderer from './CustomCanvasPageRenderer';
+import HtmlLookbookViewer from './HtmlLookbookViewer';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 
 export default function CatalogTemplateRenderer({
@@ -174,6 +175,11 @@ export default function CatalogTemplateRenderer({
     };
 
     switch (template) {
+      case 'html-lookbook':
+      case 'lookbook':
+      case 'dijital-yayin':
+      case 'lookbook-modern':
+        return <HtmlLookbookViewer catalog={catalog} products={products} mode={mode} />;
       case 'spec-sheet':
       case 'teknik-urun':
       case 'nordic':

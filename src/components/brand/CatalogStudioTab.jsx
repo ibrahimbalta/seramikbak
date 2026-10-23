@@ -60,6 +60,7 @@ import {
   User
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
+import HtmlLookbookViewer from './catalog/templates/HtmlLookbookViewer';
 import CatalogTemplateGallery, { CATALOG_TEMPLATES_DATA } from './catalog/CatalogTemplateGallery';
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
 import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
@@ -230,6 +231,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
 
   // Unsaved changes protection
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [step6ViewMode, setStep6ViewMode] = useState('lookbook'); // 'lookbook' | 'pages'
   const formDataRef = React.useRef(null);
 
   // Active template object derived from formData.template
@@ -4437,14 +4439,44 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Format Switcher */}
+                        <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-xl text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setStep6ViewMode('lookbook')}
+                            className={`px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                              step6ViewMode === 'lookbook'
+                                ? 'bg-amber-600 text-white shadow-xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                            title="İnteraktif Web Lookbook Önizleme"
+                          >
+                            <BookOpen size={13} />
+                            <span>HTML Lookbook</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setStep6ViewMode('pages')}
+                            className={`px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                              step6ViewMode === 'pages'
+                                ? 'bg-amber-600 text-white shadow-xs'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                            }`}
+                            title="A4 Baskı Sayfa Simülatörü"
+                          >
+                            <FileText size={13} />
+                            <span>A4 Baskı</span>
+                          </button>
+                        </div>
+
                         <button
                           type="button"
                           onClick={() => setActiveStep(5)}
-                          className="px-3.5 py-2 rounded-xl border border-[#b4823c] bg-amber-50 hover:bg-amber-100 text-xs font-bold text-[#b4823c] flex items-center gap-1.5 cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl border border-[#b4823c] bg-amber-50 hover:bg-amber-100 text-xs font-bold text-[#b4823c] flex items-center gap-1.5 cursor-pointer"
                         >
-                          <Sliders size={14} />
-                          <span>Alanları & Verileri Düzenle</span>
+                          <Sliders size={13} />
+                          <span>Alanları Düzenle</span>
                         </button>
                         <button
                           type="button"
@@ -4452,53 +4484,92 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                             try {
                               await prepareAndPrintCatalog({ stageId: 'step6-catalog-preview' });
                             } catch (err) {
-                              // Fallback to window.print if prepareAndPrintCatalog fails
                               window.print();
                             }
                           }}
-                          className="px-4 py-2 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-800 flex items-center gap-1.5 cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-800 flex items-center gap-1.5 cursor-pointer"
                         >
-                          <Printer size={14} />
+                          <Printer size={13} />
                           <span>PDF İndir / Yazdır</span>
                         </button>
                       </div>
                     </div>
 
-                    <CatalogTemplateRenderer
-                      catalog={{
-                        ...formData,
-                        brand: brandInfo
-                      }}
-                      products={formData.selectedItems
-                        .map((item, idx) => {
-                          const found = availableProducts.find((p) => p.id === item.productId);
-                          if (!found) return null;
-                          const ov = item.overrides || {};
-                          return {
-                            ...found,
-                            ...(ov.name ? { name: ov.name } : {}),
-                            ...(ov.sku ? { sku: ov.sku } : {}),
-                            ...(ov.width ? { width: Number(ov.width) || ov.width } : {}),
-                            ...(ov.height ? { height: Number(ov.height) || ov.height } : {}),
-                            ...(ov.thickness ? { thickness: ov.thickness } : {}),
-                            ...(ov.finish ? { finish: ov.finish } : {}),
-                            ...(ov.color ? { color: ov.color } : {}),
-                            ...(ov.slipResistance ? { slipResistance: ov.slipResistance } : {}),
-                            ...(ov.peiRating ? { peiRating: ov.peiRating } : {}),
-                            ...(ov.description ? { description: ov.description } : {}),
-                            ...(ov.imageUrl ? { imageUrl: ov.imageUrl } : {}),
-                            ...(ov.badge ? { badge: ov.badge } : {}),
-                            ...(ov.price ? { customPrice: ov.price } : {}),
-                            catalogItemIndex: idx + 1,
-                            customNote: ov.description || item.customNote,
-                            customUsageArea: ov.usageArea || item.usageArea,
-                            productUrl: ov.customUrl || `https://www.seramikbak.com/urun/${found.slug}`,
-                            overrides: ov
-                          };
-                        })
-                        .filter(Boolean)}
-                      mode="preview"
-                    />
+                    {step6ViewMode === 'lookbook' ? (
+                      <div className="rounded-2xl border border-neutral-200 overflow-hidden shadow-sm">
+                        <HtmlLookbookViewer
+                          catalog={{
+                            ...formData,
+                            brand: brandInfo
+                          }}
+                          products={formData.selectedItems
+                            .map((item, idx) => {
+                              const found = availableProducts.find((p) => p.id === item.productId);
+                              if (!found) return null;
+                              const ov = item.overrides || {};
+                              return {
+                                ...found,
+                                ...(ov.name ? { name: ov.name } : {}),
+                                ...(ov.sku ? { sku: ov.sku } : {}),
+                                ...(ov.width ? { width: Number(ov.width) || ov.width } : {}),
+                                ...(ov.height ? { height: Number(ov.height) || ov.height } : {}),
+                                ...(ov.thickness ? { thickness: ov.thickness } : {}),
+                                ...(ov.finish ? { finish: ov.finish } : {}),
+                                ...(ov.color ? { color: ov.color } : {}),
+                                ...(ov.slipResistance ? { slipResistance: ov.slipResistance } : {}),
+                                ...(ov.peiRating ? { peiRating: ov.peiRating } : {}),
+                                ...(ov.description ? { description: ov.description } : {}),
+                                ...(ov.imageUrl ? { imageUrl: ov.imageUrl } : {}),
+                                ...(ov.badge ? { badge: ov.badge } : {}),
+                                ...(ov.price ? { customPrice: ov.price } : {}),
+                                catalogItemIndex: idx + 1,
+                                customNote: ov.description || item.customNote,
+                                customUsageArea: ov.usageArea || item.usageArea,
+                                productUrl: ov.customUrl || `https://www.seramikbak.com/urun/${found.slug}`,
+                                overrides: ov
+                              };
+                            })
+                            .filter(Boolean)}
+                          mode="preview"
+                        />
+                      </div>
+                    ) : (
+                      <CatalogTemplateRenderer
+                        catalog={{
+                          ...formData,
+                          brand: brandInfo
+                        }}
+                        products={formData.selectedItems
+                          .map((item, idx) => {
+                            const found = availableProducts.find((p) => p.id === item.productId);
+                            if (!found) return null;
+                            const ov = item.overrides || {};
+                            return {
+                              ...found,
+                              ...(ov.name ? { name: ov.name } : {}),
+                              ...(ov.sku ? { sku: ov.sku } : {}),
+                              ...(ov.width ? { width: Number(ov.width) || ov.width } : {}),
+                              ...(ov.height ? { height: Number(ov.height) || ov.height } : {}),
+                              ...(ov.thickness ? { thickness: ov.thickness } : {}),
+                              ...(ov.finish ? { finish: ov.finish } : {}),
+                              ...(ov.color ? { color: ov.color } : {}),
+                              ...(ov.slipResistance ? { slipResistance: ov.slipResistance } : {}),
+                              ...(ov.peiRating ? { peiRating: ov.peiRating } : {}),
+                              ...(ov.description ? { description: ov.description } : {}),
+                              ...(ov.imageUrl ? { imageUrl: ov.imageUrl } : {}),
+                              ...(ov.badge ? { badge: ov.badge } : {}),
+                              ...(ov.price ? { customPrice: ov.price } : {}),
+                              catalogItemIndex: idx + 1,
+                              customNote: ov.description || item.customNote,
+                              customUsageArea: ov.usageArea || item.usageArea,
+                              productUrl: ov.customUrl || `https://www.seramikbak.com/urun/${found.slug}`,
+                              overrides: ov
+                            };
+                          })
+                          .filter(Boolean)}
+                        mode="preview"
+                      />
+                    )}
                   </div>
                 )}
 
