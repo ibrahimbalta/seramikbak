@@ -35,7 +35,10 @@ import {
   Share2,
   Sliders,
   Globe,
-  RefreshCw
+  RefreshCw,
+  HelpCircle,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import HtmlLookbookViewer from './catalog/templates/HtmlLookbookViewer';
 import { LOOKBOOK_COLOR_TEMPLATES, getLookbookTheme } from './catalog/templates/lookbookThemes';
@@ -59,14 +62,18 @@ export const HTML_CATALOG_TEMPLATES = LOOKBOOK_COLOR_TEMPLATES.map((t) => ({
 
 export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSection }) {
   const brandId = brandInfo?.id;
+  const brandName = brandInfo?.name || 'Bien Seramik';
 
   // View state: 'list' | 'editor' | 'inquiries'
   const [currentView, setCurrentView] = useState('list');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   // Catalogs & loading
   const [catalogs, setCatalogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [catalogFilter, setCatalogFilter] = useState('all'); // 'all' | 'published' | 'draft'
 
   // Available brand products
   const [brandProducts, setBrandProducts] = useState([]);
@@ -92,8 +99,8 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     title: '',
     coverSubtitle: '',
     introText: '',
-    template: 'milano',
-    primaryColor: '#b4823c',
+    template: 'terra-traverten',
+    primaryColor: '#a87943',
     selectedProductIds: [],
     isPublished: true,
     publicSlug: ''
@@ -116,6 +123,12 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       handleStartNew();
     } else if (externalSubSection === 'all') {
       setCurrentView('list');
+    } else if (externalSubSection === 'published') {
+      setCurrentView('list');
+      setCatalogFilter('published');
+    } else if (externalSubSection === 'drafts') {
+      setCurrentView('list');
+      setCatalogFilter('draft');
     }
   }, [externalSubSection]);
 
@@ -167,46 +180,43 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     }
   };
 
-  // Start new catalog creation
+  // Start creating new catalog
   const handleStartNew = () => {
     setActiveCatalogId(null);
-    setEditorStep(1);
     setFormData({
-      title: `${brandInfo?.name || 'Marka'} ${new Date().getFullYear()} Mimari Koleksiyonu`,
+      title: `${brandName} ${new Date().getFullYear()} Mimari Koleksiyonu`,
       coverSubtitle: 'Yüksek Performanslı Porselen & Seramik Seçkisi',
-      introText: 'Doğal taş, mermer ve beton dokularını en ileri porselen karo teknolojisiyle buluşturan lüks mimari seçki.',
-      template: 'milano',
-      primaryColor: '#b4823c',
-      selectedProductIds: brandProducts.slice(0, 8).map((p) => p.id),
+      introText: `${brandName} markasının doğal taş, mermer ve çağdaş mimarinin yalın çizgilerini buluşturan lüks mimari yüzey seçkisi.`,
+      template: 'terra-traverten',
+      primaryColor: '#a87943',
+      selectedProductIds: brandProducts.slice(0, 12).map((p) => p.id),
       isPublished: true,
       publicSlug: ''
     });
+    setEditorStep(1);
     setCurrentView('editor');
   };
 
   // Edit existing catalog
   const handleEditCatalog = (cat) => {
     setActiveCatalogId(cat.id);
-    setEditorStep(2);
-
     let productIds = [];
     try {
-      const parsed = JSON.parse(cat.productItems || '[]');
-      productIds = parsed.map((item) => (typeof item === 'string' ? item : item.productId)).filter(Boolean);
-    } catch (e) {
-      productIds = [];
-    }
+      const parsed = typeof cat.productItems === 'string' ? JSON.parse(cat.productItems) : cat.productItems;
+      productIds = Array.isArray(parsed) ? parsed.map((item) => item.productId) : [];
+    } catch (_) {}
 
     setFormData({
       title: cat.title || '',
       coverSubtitle: cat.coverSubtitle || '',
       introText: cat.introText || '',
-      template: cat.template || 'milano',
-      primaryColor: cat.primaryColor || '#b4823c',
+      template: cat.template || 'terra-traverten',
+      primaryColor: cat.primaryColor || '#a87943',
       selectedProductIds: productIds,
       isPublished: Boolean(cat.isPublished),
       publicSlug: cat.publicSlug || ''
     });
+    setEditorStep(1);
     setCurrentView('editor');
   };
 
@@ -239,41 +249,6 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       }
     } catch (err) {
       console.error('Katalog silinemedi:', err);
-    }
-  };
-
-  // AI Assistant: Auto-fill editorial text
-  const handleAiAutoFill = async () => {
-    setAiGenerating(true);
-    try {
-      const selected = brandProducts.filter((p) => formData.selectedProductIds.includes(p.id));
-      const res = await fetch('/api/ai/catalog-autofill', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brandName: brandInfo?.name || 'Marka',
-          products: selected.slice(0, 5).map((p) => ({
-            name: p.name,
-            finish: p.finish,
-            color: p.color
-          })),
-          theme: formData.template === 'milano' ? 'luxury' : 'architectural'
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.success && data.preset) {
-        setFormData((prev) => ({
-          ...prev,
-          title: data.preset.title || prev.title,
-          coverSubtitle: data.preset.coverSubtitle || prev.coverSubtitle,
-          introText: data.preset.introText || prev.introText,
-          primaryColor: data.preset.primaryColor || prev.primaryColor
-        }));
-      }
-    } catch (err) {
-      console.error('AI autofill hatası:', err);
-    } finally {
-      setAiGenerating(false);
     }
   };
 
@@ -341,13 +316,13 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
   };
 
   // Filtered products for editor picker
-  const filteredProducts = useMemo(() => {
+  const filteredBrandProducts = useMemo(() => {
     if (!productSearch.trim()) return brandProducts;
     const q = productSearch.toLowerCase();
     return brandProducts.filter(
       (p) =>
         p.name?.toLowerCase().includes(q) ||
-        p.sku?.toLowerCase().includes(q) ||
+        p.code?.toLowerCase().includes(q) ||
         p.finish?.toLowerCase().includes(q)
     );
   }, [brandProducts, productSearch]);
@@ -359,299 +334,886 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       .filter(Boolean);
   }, [formData.selectedProductIds, brandProducts]);
 
+  // Filtered catalogs for list view
+  const filteredCatalogs = useMemo(() => {
+    let list = catalogs;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLocaleLowerCase('tr').trim();
+      list = list.filter((c) => {
+        const title = (c.title || '').toLocaleLowerCase('tr');
+        const desc = (c.description || c.introText || '').toLocaleLowerCase('tr');
+        const tmpl = (c.template || '').toLocaleLowerCase('tr');
+        return title.includes(q) || desc.includes(q) || tmpl.includes(q);
+      });
+    }
+    if (catalogFilter === 'published') {
+      list = list.filter((c) => c.isPublished);
+    } else if (catalogFilter === 'draft') {
+      list = list.filter((c) => !c.isPublished);
+    }
+    return list;
+  }, [catalogs, searchQuery, catalogFilter]);
+
   // KPI calculations
   const totalViews = catalogs.reduce((acc, c) => acc + (c.viewCount || 0), 0);
   const publishedCount = catalogs.filter((c) => c.isPublished).length;
+  const year = new Date().getFullYear();
 
   return (
-    <div className="w-full min-h-screen bg-stone-50/50 p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="studio-root w-full min-h-screen">
       {/* =========================================================================
-          TOP MASTER HEADER
+          EXACT CSS STYLES EMBEDDED FROM USER'S ATTACHED DESIGN FILE
       ========================================================================= */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200/80 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-700">
-              {brandInfo?.name || 'Marka'} &bull; DİJİTAL YAYIN PLATFORMU
-            </span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-serif font-black text-stone-900 tracking-tight mt-1">
-            Dijital Katalog & Lookbook Stüdyosu
-          </h1>
-          <p className="text-xs text-stone-500 mt-0.5">
-            Müşterileriniz ve mimarlar için yüksek çözünürlüklü, mobil uyumlu HTML lookbook katalogları oluşturun.
-          </p>
-        </div>
+      <style jsx global>{`
+        .studio-root {
+          --ink: #202522;
+          --muted: #747c77;
+          --line: #e7eae6;
+          --paper: #ffffff;
+          --canvas: #f5f6f3;
+          --accent: #b47b3d;
+          --accent-dark: #8f5c29;
+          --green: #167653;
+          --green-bg: #e9f6ef;
+          --orange-bg: #fff4e8;
+          --shadow: 0 8px 28px rgba(25, 35, 29, .055);
+          --radius: 18px;
+          background-color: var(--canvas);
+          color: var(--ink);
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+          padding: 28px clamp(16px, 3.5vw, 48px) 60px;
+        }
 
-        {/* View Switchers & Create Button */}
-        <div className="flex flex-wrap items-center gap-2">
-          {currentView !== 'editor' && (
-            <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl text-xs">
-              <button
-                type="button"
-                onClick={() => setCurrentView('list')}
-                className={`px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                  currentView === 'list'
-                    ? 'bg-white text-stone-900 shadow-2xs'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <BookOpen size={13} className="text-amber-600" />
-                <span>Kataloglarım ({catalogs.length})</span>
-              </button>
+        .studio-eyebrow {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          text-transform: uppercase;
+          letter-spacing: 1.7px;
+          font-size: 10px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          margin-bottom: 12px;
+        }
+        .studio-eyebrow:before {
+          content: "";
+          width: 7px;
+          height: 7px;
+          background: #c18b4b;
+          border-radius: 50%;
+          box-shadow: 0 0 0 4px #c18b4b1b;
+        }
 
-              <button
-                type="button"
-                onClick={() => setCurrentView('inquiries')}
-                className={`px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                  currentView === 'inquiries'
-                    ? 'bg-white text-stone-900 shadow-2xs'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                <Tag size={13} className="text-amber-600" />
-                <span>B2B Talepleri ({inquiries.length})</span>
-              </button>
-            </div>
-          )}
+        .studio-hero {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          margin-bottom: 28px;
+        }
+        .studio-hero h1 {
+          font-size: clamp(26px, 2.9vw, 36px);
+          line-height: 1.15;
+          letter-spacing: -1.3px;
+          margin: 0 0 8px;
+          font-weight: 780;
+          color: var(--ink);
+        }
+        .studio-hero .subtitle {
+          font-size: 13.5px;
+          line-height: 1.6;
+          color: var(--muted);
+          margin: 0;
+          max-width: 650px;
+        }
+        .hero-actions {
+          display: flex;
+          gap: 9px;
+          flex-wrap: wrap;
+        }
 
-          {currentView !== 'editor' && (
-            <button
-              type="button"
-              onClick={handleStartNew}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-amber-600/20 transition-all cursor-pointer"
-            >
-              <Plus size={15} />
-              <span>Yeni Katalog Oluştur</span>
-            </button>
-          )}
+        .btn {
+          border: 1px solid transparent;
+          border-radius: 11px;
+          padding: 10px 16px;
+          font-size: 13px;
+          font-weight: 700;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: all .18s ease;
+          cursor: pointer;
+          text-decoration: none;
+        }
+        .btn-primary {
+          background: var(--ink);
+          color: white;
+          box-shadow: 0 4px 12px #20252220;
+        }
+        .btn-primary:hover {
+          background: #343c36;
+          transform: translateY(-1px);
+        }
+        .btn-outline {
+          border-color: var(--line);
+          background: white;
+          color: var(--ink);
+        }
+        .btn-outline:hover {
+          border-color: #c9cec8;
+          background: #fbfcfa;
+        }
+        .btn-accent {
+          background: linear-gradient(145deg, #d6a15e, #98612e);
+          color: white;
+          box-shadow: 0 4px 12px #b47b3d44;
+        }
+        .btn-accent:hover {
+          filter: brightness(1.05);
+          transform: translateY(-1px);
+        }
 
-          {currentView === 'editor' && (
-            <button
-              type="button"
-              onClick={() => setCurrentView('list')}
-              className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <ArrowLeft size={14} />
-              <span>Katalog Listesine Dön</span>
-            </button>
-          )}
-        </div>
-      </header>
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+          margin-bottom: 34px;
+        }
+        .stat-card {
+          background: var(--paper);
+          border: 1px solid var(--line);
+          border-radius: 15px;
+          padding: 19px 20px;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          min-width: 0;
+          box-shadow: 0 2px 5px #20252204;
+        }
+        .stat-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: 13px;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+        }
+        .stat-icon.gold { background: #f8efe3; color: #9a672e; }
+        .stat-icon.green { background: #e7f5ee; color: #167653; }
+        .stat-icon.blue { background: #eaf1f8; color: #3e6c96; }
+        .stat-icon.orange { background: #fff0e5; color: #b55e20; }
+        .stat-label {
+          font-size: 11px;
+          letter-spacing: .5px;
+          text-transform: uppercase;
+          color: var(--muted);
+          font-weight: 750;
+          margin-bottom: 7px;
+        }
+        .stat-value {
+          font-size: 27px;
+          font-weight: 780;
+          letter-spacing: -1px;
+          line-height: 1;
+          color: var(--ink);
+        }
+        .stat-note {
+          font-size: 11px;
+          color: #89908b;
+          margin-top: 6px;
+        }
+
+        .section-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 15px;
+          margin-bottom: 18px;
+        }
+        .section-title {
+          font-size: 18px;
+          letter-spacing: -.45px;
+          font-weight: 760;
+          margin: 0;
+          color: var(--ink);
+        }
+        .section-subtitle {
+          font-size: 12px;
+          color: var(--muted);
+          margin: 5px 0 0;
+        }
+        .section-tools {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        .search-box {
+          position: relative;
+        }
+        .search-box input {
+          width: 220px;
+          max-width: 100%;
+          border: 1px solid var(--line);
+          background: white;
+          border-radius: 10px;
+          padding: 10px 12px 10px 35px;
+          outline: none;
+          font-size: 12px;
+          color: var(--ink);
+          transition: border-color .18s;
+        }
+        .search-box input:focus {
+          border-color: #c4a078;
+          box-shadow: 0 0 0 3px #b47b3d16;
+        }
+        .view-toggle {
+          display: flex;
+          border: 1px solid var(--line);
+          padding: 3px;
+          border-radius: 10px;
+          background: white;
+        }
+        .view-toggle button {
+          width: 31px;
+          height: 29px;
+          border: 0;
+          border-radius: 7px;
+          background: transparent;
+          color: #858d87;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
+          transition: all .15s;
+        }
+        .view-toggle button.active {
+          background: #f0eee9;
+          color: var(--ink);
+        }
+
+        .catalog-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 19px;
+        }
+        .catalog-card {
+          background: white;
+          border: 1px solid var(--line);
+          border-radius: 17px;
+          overflow: hidden;
+          min-width: 0;
+          box-shadow: var(--shadow);
+          transition: transform .2s ease, box-shadow .2s ease;
+          display: flex;
+          flex-direction: column;
+        }
+        .catalog-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 38px #20252210;
+        }
+        .cover {
+          height: 235px;
+          position: relative;
+          overflow: hidden;
+          background: #d7d0c6;
+        }
+        .cover img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform .55s ease;
+        }
+        .catalog-card:hover .cover img {
+          transform: scale(1.035);
+        }
+        .cover:after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(18,22,19,.34) 0%, transparent 34%, rgba(18,22,19,.76) 100%);
+        }
+        .cover-top {
+          position: absolute;
+          z-index: 2;
+          top: 15px;
+          left: 15px;
+          right: 15px;
+          display: flex;
+          justify-content: space-between;
+          gap: 8px;
+          align-items: center;
+        }
+        .collection-tag {
+          background: #202522b8;
+          color: white;
+          backdrop-filter: blur(8px);
+          border: 1px solid #ffffff30;
+          padding: 6px 9px;
+          border-radius: 7px;
+          font-size: 10px;
+          font-weight: 750;
+          letter-spacing: .25px;
+          text-transform: uppercase;
+        }
+        .status-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #e4f8ec;
+          color: #176b49;
+          border-radius: 20px;
+          padding: 6px 9px;
+          font-size: 10px;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+        .status-pill:before {
+          content: "";
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #2ca56c;
+        }
+        .status-pill.draft {
+          background: #fff4e8;
+          color: #9a531f;
+        }
+        .status-pill.draft:before {
+          background: #d67a38;
+        }
+        .cover-content {
+          position: absolute;
+          z-index: 2;
+          bottom: 17px;
+          left: 18px;
+          right: 18px;
+          color: white;
+        }
+        .cover-content h3 {
+          font-size: 20px;
+          letter-spacing: -.65px;
+          line-height: 1.2;
+          margin: 0 0 9px;
+          font-weight: 760;
+          text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .cover-meta {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          color: #f3f3ef;
+          font-size: 11px;
+        }
+        .cover-meta span {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .cover-meta .dot {
+          width: 3px;
+          height: 3px;
+          background: #ffffff9c;
+          border-radius: 50%;
+        }
+        .card-body {
+          padding: 15px 17px 16px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        .card-label {
+          font-size: 10px;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          color: #8b928d;
+          font-weight: 800;
+          margin-bottom: 8px;
+        }
+        .card-description {
+          font-size: 12px;
+          line-height: 1.55;
+          color: #6f7771;
+          margin: 0 0 15px;
+          min-height: 38px;
+        }
+        .card-bottom {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          border-top: 1px solid var(--line);
+          padding-top: 12px;
+        }
+        .updated {
+          font-size: 10px;
+          color: #929993;
+        }
+        .card-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .icon-btn {
+          width: 34px;
+          height: 34px;
+          display: grid;
+          place-items: center;
+          border: 1px solid var(--line);
+          border-radius: 9px;
+          background: white;
+          color: #5c655e;
+          cursor: pointer;
+          transition: all .15s;
+        }
+        .icon-btn:hover {
+          background: #f6f5f1;
+          border-color: #d6d2c9;
+          color: var(--ink);
+        }
+        .btn-small {
+          padding: 8px 12px;
+          border-radius: 9px;
+          font-size: 11px;
+        }
+
+        .catalog-grid.list {
+          grid-template-columns: 1fr;
+        }
+        .catalog-grid.list .catalog-card {
+          display: grid;
+          grid-template-columns: minmax(260px, 32%) 1fr;
+        }
+        .catalog-grid.list .cover {
+          height: 100%;
+          min-height: 220px;
+        }
+        .catalog-grid.list .card-body {
+          padding: 22px 24px;
+        }
+        .catalog-grid.list .card-description {
+          min-height: 0;
+          max-width: 600px;
+        }
+
+        .empty-state {
+          padding: 45px 20px;
+          text-align: center;
+          background: #fff;
+          border: 1px dashed #d8ddd7;
+          border-radius: 15px;
+          color: var(--muted);
+        }
+        .empty-state strong {
+          display: block;
+          color: var(--ink);
+          margin-bottom: 5px;
+        }
+
+        .footer-note {
+          margin-top: 36px;
+          border-top: 1px solid var(--line);
+          padding-top: 18px;
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          color: #929993;
+          font-size: 11px;
+        }
+
+        @media(max-width:1000px) {
+          .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .studio-hero { align-items: flex-start; flex-direction: column; }
+          .hero-actions { width: 100%; }
+        }
+        @media(max-width:680px) {
+          .studio-hero h1 { font-size: 28px; }
+          .stats-grid { gap: 9px; margin-bottom: 25px; }
+          .stat-card { padding: 13px 12px; gap: 10px; border-radius: 13px; }
+          .stat-icon { width: 35px; height: 35px; border-radius: 10px; }
+          .stat-value { font-size: 23px; }
+          .section-head { align-items: flex-start; flex-direction: column; }
+          .section-tools { width: 100%; }
+          .search-box { flex: 1; }
+          .search-box input { width: 100%; }
+          .catalog-grid { grid-template-columns: 1fr; gap: 14px; }
+          .catalog-grid.list .catalog-card { display: block; }
+          .catalog-grid.list .cover { height: 225px; min-height: 0; }
+          .catalog-grid.list .card-body { padding: 15px 17px 16px; }
+          .footer-note { flex-direction: column; }
+        }
+      `}</style>
 
       {/* =========================================================================
-          VIEW 1: CATALOGS LIST (Kataloglarım)
+          VIEW 1: CATALOGS LIST (TÜM KATALOGLAR)
       ========================================================================= */}
       {currentView === 'list' && (
-        <div className="space-y-6">
-          {/* KPI Summary Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs">
-              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                Toplam Katalog
-              </span>
-              <span className="text-2xl font-serif font-black text-stone-900 mt-1 block">
-                {catalogs.length}
-              </span>
+        <div>
+          {/* Eyebrow & Hero Header */}
+          <section className="studio-hero">
+            <div>
+              <div className="studio-eyebrow">
+                {brandName} &bull; DİJİTAL YAYIN PLATFORMU
+              </div>
+              <h1>
+                Dijital Katalog <span style={{ color: '#9b6a36' }}>&</span> Lookbook Studio
+              </h1>
+              <p className="subtitle">
+                Koleksiyonlarınızı güçlü görsellerle anlatın. Markanıza özel, mobil uyumlu ve etkileşimli dijital yayınlar oluşturun.
+              </p>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs">
-              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">
-                Yayındaki Kataloglar
-              </span>
-              <span className="text-2xl font-serif font-black text-emerald-700 mt-1 block">
-                {publishedCount}
-              </span>
+            <div className="hero-actions">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setShowGuideModal(true)}
+              >
+                <HelpCircle size={15} />
+                <span>Studio rehberi</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setCurrentView('inquiries')}
+              >
+                <Tag size={15} style={{ color: 'var(--accent)' }} />
+                <span>B2B Talepleri ({inquiries.length})</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleStartNew}
+              >
+                <Plus size={16} />
+                <span>Yeni katalog oluştur</span>
+              </button>
+            </div>
+          </section>
+
+          {/* KPI Stats Cards */}
+          <section className="stats-grid" aria-label="Katalog istatistikleri">
+            <article className="stat-card">
+              <div className="stat-icon gold">
+                <BookOpen size={19} />
+              </div>
+              <div>
+                <div className="stat-label">Toplam katalog</div>
+                <div className="stat-value">{catalogs.length}</div>
+                <div className="stat-note">Oluşturduğunuz tüm yayınlar</div>
+              </div>
+            </article>
+
+            <article className="stat-card">
+              <div className="stat-icon green">
+                <CheckCircle2 size={19} />
+              </div>
+              <div>
+                <div className="stat-label">Yayındaki kataloglar</div>
+                <div className="stat-value">{publishedCount}</div>
+                <div className="stat-note">Ziyaretçilere açık yayınlar</div>
+              </div>
+            </article>
+
+            <article className="stat-card">
+              <div className="stat-icon blue">
+                <Eye size={19} />
+              </div>
+              <div>
+                <div className="stat-label">Toplam ziyaret</div>
+                <div className="stat-value">{totalViews}</div>
+                <div className="stat-note">Katalog görüntülenmeleri</div>
+              </div>
+            </article>
+
+            <article className="stat-card">
+              <div className="stat-icon orange">
+                <Tag size={19} />
+              </div>
+              <div>
+                <div className="stat-label">Gelen B2B talepleri</div>
+                <div className="stat-value">{inquiries.length}</div>
+                <div className="stat-note">Teklif ve numune talepleri</div>
+              </div>
+            </article>
+          </section>
+
+          {/* Section Head & Filter Tools */}
+          <div className="section-head">
+            <div>
+              <h2 className="section-title">Kataloglarım</h2>
+              <p className="section-subtitle">Yayınlarınızı yönetin, düzenleyin ve paylaşın.</p>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs">
-              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                Toplam Ziyaret
-              </span>
-              <span className="text-2xl font-serif font-black text-stone-900 mt-1 block">
-                {totalViews}
-              </span>
-            </div>
+            <div className="section-tools">
+              {/* Quick Status Filter Tabs */}
+              <div className="view-toggle hidden sm:flex">
+                <button
+                  type="button"
+                  onClick={() => setCatalogFilter('all')}
+                  className={catalogFilter === 'all' ? 'active' : ''}
+                  style={{ width: 'auto', padding: '0 10px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  Tümü
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogFilter('published')}
+                  className={catalogFilter === 'published' ? 'active' : ''}
+                  style={{ width: 'auto', padding: '0 10px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  Yayında
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogFilter('draft')}
+                  className={catalogFilter === 'draft' ? 'active' : ''}
+                  style={{ width: 'auto', padding: '0 10px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  Taslak
+                </button>
+              </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs">
-              <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">
-                Gelen B2B Talepleri
-              </span>
-              <span className="text-2xl font-serif font-black text-amber-700 mt-1 block">
-                {inquiries.length}
-              </span>
+              {/* Search Box */}
+              <div className="search-box">
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                <input
+                  type="search"
+                  placeholder="Kataloglarda ara…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Kataloglarda ara"
+                />
+              </div>
+
+              {/* View Toggle: Grid vs List */}
+              <div className="view-toggle">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  className={viewMode === 'grid' ? 'active' : ''}
+                  title="Kart görünümü"
+                  aria-label="Kart görünümü"
+                >
+                  <LayoutGrid size={15} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className={viewMode === 'list' ? 'active' : ''}
+                  title="Liste görünümü"
+                  aria-label="Liste görünümü"
+                >
+                  <List size={15} />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Catalog Cards Grid */}
+          {/* Catalog Cards Grid / List */}
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-stone-400 space-y-2">
-              <Loader2 size={24} className="animate-spin text-amber-600" />
+            <div className="py-20 flex flex-col items-center justify-center text-stone-400 space-y-2 bg-white rounded-2xl border border-stone-200">
+              <Loader2 size={24} className="animate-spin text-[#b47b3d]" />
               <p className="text-xs font-medium">Kataloglar yükleniyor...</p>
             </div>
-          ) : catalogs.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-stone-200 p-12 text-center max-w-lg mx-auto space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto shadow-xs">
-                <BookOpen size={28} />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-stone-900">Henüz Bir Katalog Oluşturmadınız</h3>
-                <p className="text-xs text-stone-500 max-w-xs mx-auto">
-                  Ürünlerinizi mimarlara ve bayilere prestijli bir HTML lookbook olarak sunmak için hemen başlayın.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleStartNew}
-                className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm transition cursor-pointer"
-              >
-                <Plus size={14} />
-                <span>İlk Kataloğunuzu Oluşturun</span>
-              </button>
+          ) : filteredCatalogs.length === 0 ? (
+            <div className="empty-state">
+              <strong>Katalog bulunamadı</strong>
+              <p className="text-xs mt-1">
+                {searchQuery
+                  ? 'Farklı bir arama terimi deneyin.'
+                  : 'Henüz bu filtrede bir dijital katalog bulunmuyor.'}
+              </p>
+              {!searchQuery && (
+                <button
+                  type="button"
+                  onClick={handleStartNew}
+                  className="btn btn-primary mt-4"
+                >
+                  <Plus size={14} />
+                  <span>İlk Kataloğunuzu Oluşturun</span>
+                </button>
+              )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {catalogs.map((cat) => {
+            <div className={`catalog-grid ${viewMode === 'list' ? 'list' : ''}`}>
+              {filteredCatalogs.map((cat) => {
                 const templateObj =
                   HTML_CATALOG_TEMPLATES.find((t) => t.id === cat.template) || HTML_CATALOG_TEMPLATES[0];
                 const coverImage =
-                  cat.customCoverUrl || templateObj.previewImg || '/renders/luxury_bathroom_calacatta_gold.jpg';
+                  cat.customCoverUrl ||
+                  cat.coverImageUrl ||
+                  templateObj.previewImg ||
+                  '/renders/luxury_bathroom_calacatta_gold.jpg';
                 const publicUrl = `/katalog/${cat.publicSlug}`;
+                const updatedDate = cat.updatedAt
+                  ? new Date(cat.updatedAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+                  : 'Bugün';
 
                 return (
-                  <div
-                    key={cat.id}
-                    className="group bg-white rounded-2xl border border-stone-200/90 shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between"
-                  >
-                    {/* Top Image Preview & Badges */}
-                    <div className="relative aspect-[16/10] bg-stone-900 overflow-hidden">
-                      <img
-                        src={coverImage}
-                        alt={cat.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                      {/* Status & Template Pills */}
-                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono tracking-wider bg-black/60 text-white backdrop-blur-md border border-white/20">
+                  <article key={cat.id} className="catalog-card">
+                    {/* Cover Visual Area */}
+                    <div className="cover">
+                      <img src={coverImage} alt={cat.title} />
+                      <div className="cover-top">
+                        <span className="collection-tag">
                           {templateObj.name}
                         </span>
-
-                        <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 backdrop-blur-md shadow-xs ${
-                            cat.isPublished
-                              ? 'bg-emerald-500/90 text-white'
-                              : 'bg-amber-500/90 text-neutral-950'
-                          }`}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                          <span>{cat.isPublished ? 'Yayında' : 'Taslak'}</span>
+                        <span className={`status-pill ${cat.isPublished ? '' : 'draft'}`}>
+                          {cat.isPublished ? 'Yayında' : 'Taslak'}
                         </span>
                       </div>
 
-                      {/* Title & Count Overlay */}
-                      <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <h3 className="text-sm font-bold truncate drop-shadow">{cat.title}</h3>
-                        <p className="text-[11px] text-stone-300 font-mono flex items-center gap-2 mt-0.5">
-                          <span>{cat.itemCount || 0} Karo Seçili</span>
-                          <span>&bull;</span>
-                          <span>{cat.viewCount || 0} Görüntülenme</span>
+                      <div className="cover-content">
+                        <h3>{cat.title}</h3>
+                        <div className="cover-meta">
+                          <span>
+                            <BookOpen size={13} />
+                            {cat.itemCount || 0} karo seçili
+                          </span>
+                          <span className="dot"></span>
+                          <span>
+                            <Eye size={13} />
+                            {cat.viewCount || 0} görüntülenme
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="card-body">
+                      <div>
+                        <div className="card-label">
+                          Dijital Lookbook &bull; {year}
+                        </div>
+                        <p className="card-description">
+                          {cat.introText ||
+                            cat.description ||
+                            'Mimari projeler için hazırlanan koleksiyon seçkisi. Ürünlerinizi görüntüleyin ve yayınınızı yönetin.'}
                         </p>
                       </div>
-                    </div>
 
-                    {/* Bottom Action Controls */}
-                    <div className="p-3.5 bg-stone-50/70 border-t border-stone-100 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <Link
-                          href={publicUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition"
-                          title="Web Kataloğunu Aç"
-                        >
-                          <Eye size={13} />
-                          <span>Görüntüle</span>
-                        </Link>
+                      <div className="card-bottom">
+                        <span className="updated">
+                          Son güncelleme &bull; {updatedDate}
+                        </span>
 
-                        <button
-                          type="button"
-                          onClick={() => handleEditCatalog(cat)}
-                          className="p-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-semibold transition cursor-pointer"
-                          title="Düzenle"
-                        >
-                          <Edit size={14} />
-                        </button>
+                        <div className="card-actions">
+                          <button
+                            type="button"
+                            className="icon-btn"
+                            title="Düzenle"
+                            aria-label="Düzenle"
+                            onClick={() => handleEditCatalog(cat)}
+                          >
+                            <Edit size={14} />
+                          </button>
 
-                        <button
-                          type="button"
-                          onClick={() => setSharingCatalog(cat)}
-                          className="p-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-semibold transition cursor-pointer"
-                          title="Paylaş & QR Kod"
-                        >
-                          <Share2 size={14} />
-                        </button>
+                          <button
+                            type="button"
+                            className="icon-btn"
+                            title="Paylaş & QR Kod"
+                            aria-label="Paylaş"
+                            onClick={() => setSharingCatalog(cat)}
+                          >
+                            <Share2 size={14} />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="icon-btn"
+                            title={cat.isPublished ? 'Taslağa Al' : 'Yayına Al'}
+                            aria-label={cat.isPublished ? 'Taslağa Al' : 'Yayına Al'}
+                            onClick={() => handleTogglePublish(cat)}
+                          >
+                            <CheckCircle2 size={14} style={{ color: cat.isPublished ? '#167653' : '#888' }} />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="icon-btn"
+                            title="Kataloğu Sil"
+                            aria-label="Sil"
+                            onClick={() => handleDeleteCatalog(cat.id)}
+                          >
+                            <Trash2 size={14} className="hover:text-rose-600" />
+                          </button>
+
+                          <Link
+                            href={publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline btn-small"
+                          >
+                            <span>Ön izle</span>
+                            <ExternalLink size={12} />
+                          </Link>
+                        </div>
                       </div>
-
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleTogglePublish(cat)}
-                          className={`text-[11px] font-bold px-2 py-1 rounded-md transition cursor-pointer ${
-                            cat.isPublished
-                              ? 'text-stone-500 hover:text-amber-700'
-                              : 'text-emerald-700 hover:text-emerald-800 bg-emerald-50'
-                          }`}
-                        >
-                          {cat.isPublished ? 'Taslağa Al' : 'Yayınla'}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteCatalog(cat.id)}
-                          className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                          title="Kataloğu Sil"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
           )}
+
+          {/* Footer Note */}
+          <div className="footer-note">
+            <span>
+              SeramikBak Studio <span style={{ color: '#c0a17b' }}>&bull;</span> Markanızın dijital yayın alanı
+            </span>
+            <span>Kataloglarınızı her cihazda profesyonel biçimde sunun.</span>
+          </div>
         </div>
       )}
 
       {/* =========================================================================
-          VIEW 2: INQUIRIES LIST (Gelen Mimari B2B Talepleri)
+          VIEW 2: INQUIRIES LIST (GELEN B2B TALEPLERİ)
       ========================================================================= */}
       {currentView === 'inquiries' && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-stone-900">Gelen Teklif & Numune Talepleri</h2>
-            <button
-              type="button"
-              onClick={loadInquiries}
-              className="text-xs font-bold text-amber-700 hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <RefreshCw size={12} />
-              <span>Yenile</span>
-            </button>
+            <div>
+              <div className="studio-eyebrow">{brandName} &bull; TİCARİ MASASI</div>
+              <h2 className="text-xl font-bold text-stone-900">Gelen Teklif & Numune Talepleri</h2>
+              <p className="text-xs text-stone-500">
+                Dijital kataloglarınızdan gelen mimari ve ticari talepleri yönetin.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCurrentView('list')}
+                className="btn btn-outline"
+              >
+                <ArrowLeft size={14} />
+                <span>Kataloglarıma Dön</span>
+              </button>
+              <button
+                type="button"
+                onClick={loadInquiries}
+                className="btn btn-primary"
+              >
+                <RefreshCw size={13} />
+                <span>Yenile</span>
+              </button>
+            </div>
           </div>
 
           {inquiriesLoading ? (
-            <div className="py-20 text-center text-stone-400">
-              <Loader2 size={24} className="animate-spin mx-auto text-amber-600 mb-2" />
+            <div className="py-20 text-center text-stone-400 bg-white rounded-2xl border border-stone-200">
+              <Loader2 size={24} className="animate-spin mx-auto text-[#b47b3d] mb-2" />
               <p className="text-xs">Talepler yükleniyor...</p>
             </div>
           ) : inquiries.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-stone-200 p-10 text-center space-y-2">
-              <Tag size={28} className="text-stone-300 mx-auto" />
-              <p className="text-xs text-stone-500">Henüz bu katalog üzerinden bir talep alınmadı.</p>
+            <div className="empty-state">
+              <Tag size={28} className="text-stone-300 mx-auto mb-2" />
+              <strong>Henüz bir talep alınmadı</strong>
+              <p className="text-xs">Kataloglarınız üzerinden iletilen teklif ve numune talepleri burada listelenir.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -660,7 +1222,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 return (
                   <div
                     key={inq.id}
-                    className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
                     <div className="space-y-1.5 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -683,7 +1245,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                         {inq.phone && (
                           <a
                             href={`tel:${inq.phone}`}
-                            className="flex items-center gap-1 hover:text-amber-700 font-mono"
+                            className="flex items-center gap-1 hover:text-[#b47b3d] font-mono"
                           >
                             <Phone size={12} className="text-emerald-600" />
                             <span>{inq.phone}</span>
@@ -692,9 +1254,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                         {inq.email && (
                           <a
                             href={`mailto:${inq.email}`}
-                            className="flex items-center gap-1 hover:text-amber-700"
+                            className="flex items-center gap-1 hover:text-[#b47b3d]"
                           >
-                            <Mail size={12} className="text-amber-600" />
+                            <Mail size={12} className="text-[#b47b3d]" />
                             <span>{inq.email}</span>
                           </a>
                         )}
@@ -718,7 +1280,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                         href={`https://wa.me/${inq.phone.replace(/[^0-9]/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 self-start md:self-center shadow-xs transition"
+                        className="btn btn-primary text-xs"
                       >
                         <MessageCircle size={14} />
                         <span>WhatsApp'tan Yaz</span>
@@ -733,20 +1295,20 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       )}
 
       {/* =========================================================================
-          VIEW 3: SIMPLE 3-STEP CATALOG BUILDER (Sade & Modern Editör)
+          VIEW 3: 3-STEP CATALOG BUILDER (SADE & LÜKS EDİTÖR)
       ========================================================================= */}
       {currentView === 'editor' && (
         <div className="space-y-6">
           {/* Stepper Navigation */}
-          <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto">
+          <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto">
               <button
                 type="button"
                 onClick={() => setEditorStep(1)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
                   editorStep === 1
-                    ? 'bg-amber-600 text-white shadow-2xs'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    ? 'btn-primary'
+                    : 'btn-outline'
                 }`}
               >
                 <span>1. Şablon Seçimi</span>
@@ -755,10 +1317,10 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
               <button
                 type="button"
                 onClick={() => setEditorStep(2)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
                   editorStep === 2
-                    ? 'bg-amber-600 text-white shadow-2xs'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    ? 'btn-primary'
+                    : 'btn-outline'
                 }`}
               >
                 <span>2. Bilgiler & Karolar ({formData.selectedProductIds.length})</span>
@@ -767,10 +1329,10 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
               <button
                 type="button"
                 onClick={() => setEditorStep(3)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap ${
                   editorStep === 3
-                    ? 'bg-amber-600 text-white shadow-2xs'
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    ? 'btn-primary'
+                    : 'btn-outline'
                 }`}
               >
                 <Sparkles size={13} />
@@ -778,14 +1340,13 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
               </button>
             </div>
 
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => handleSaveCatalog(false)}
                 disabled={saving}
-                className="px-3.5 py-2 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                className="btn btn-outline"
               >
-                {saving && <Loader2 size={12} className="animate-spin" />}
                 <span>Taslak Kaydet</span>
               </button>
 
@@ -793,9 +1354,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 type="button"
                 onClick={() => handleSaveCatalog(true)}
                 disabled={saving}
-                className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-600/20 transition cursor-pointer"
+                className="btn btn-accent"
               >
-                <Sparkles size={13} />
+                {saving ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 <span>Yayına Al</span>
               </button>
             </div>
@@ -804,12 +1365,12 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           {/* STEP 1: ŞABLON SEÇİMİ */}
           {editorStep === 1 && (
             <div className="space-y-4">
-              <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-2xs space-y-1">
+              <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs">
                 <h3 className="text-base font-bold text-stone-900">
                   Lüks HTML Dijital Lookbook Şablonunuzu Seçin
                 </h3>
-                <p className="text-xs text-stone-500">
-                  Koleksiyonunuzun tarzına en uygun profesyonel editoryal mizanpajı seçin. Karolarınız bu şablon üzerinde otomatik düzenlenir.
+                <p className="text-xs text-stone-500 mt-1">
+                  Koleksiyonunuzun tarzına en uygun mimari editoryal mizanpajı ve renk harmonisini seçin.
                 </p>
               </div>
 
@@ -822,7 +1383,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                       onClick={() => setFormData({ ...formData, template: tmpl.id, primaryColor: tmpl.palette.primary })}
                       className={`group bg-white rounded-2xl border-2 transition-all duration-200 overflow-hidden cursor-pointer flex flex-col justify-between shadow-2xs hover:shadow-md ${
                         isSelected
-                          ? 'border-amber-600 ring-2 ring-amber-600/20 shadow-md'
+                          ? 'border-[#b47b3d] ring-2 ring-[#b47b3d]/20 shadow-md'
                           : 'border-stone-200 hover:border-amber-300'
                       }`}
                     >
@@ -839,7 +1400,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                           </span>
                         </div>
                         {isSelected && (
-                          <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-md">
+                          <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#b47b3d] text-white flex items-center justify-center shadow-md">
                             <Check size={14} strokeWidth={3} />
                           </div>
                         )}
@@ -852,7 +1413,6 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                       </div>
 
                       <div className="p-4 space-y-3">
-                        {/* Renk Paleti Önizleme */}
                         {tmpl.colorSample && (
                           <div className="flex items-center gap-1.5 pt-1">
                             <span className="text-[10px] text-stone-400 font-mono mr-1">Renkler:</span>
@@ -885,7 +1445,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                           <span className="text-stone-400 font-mono text-[11px]">{tmpl.tag || 'HTML5 Responsive'}</span>
                           <span
                             className={`font-bold text-xs ${
-                              isSelected ? 'text-amber-700' : 'text-stone-500 group-hover:text-stone-900'
+                              isSelected ? 'text-[#8f5c29]' : 'text-stone-500 group-hover:text-stone-900'
                             }`}
                           >
                             {isSelected ? '✓ Seçili Şablon' : 'Bu Şablonu Seç'}
@@ -901,7 +1461,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 <button
                   type="button"
                   onClick={() => setEditorStep(2)}
-                  className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm transition cursor-pointer"
+                  className="btn btn-primary"
                 >
                   <span>Sonraki Adım: Bilgiler & Ürünler</span>
                   <ArrowRight size={14} />
@@ -910,158 +1470,127 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
             </div>
           )}
 
-          {/* STEP 2: BİLGİLER & ÜRÜN SEÇİMİ */}
+          {/* STEP 2: BİLGİLER & KAROLAR */}
           {editorStep === 2 && (
             <div className="space-y-6">
-              {/* Editorial Text & AI Form */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200/80 shadow-2xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900">Katalog Başlığı & Editoryal Metinler</h3>
-                    <p className="text-xs text-stone-500">
-                      Lookbook kapağında ve manifesto bölümünde görüntülenecek metinleri belirleyin.
-                    </p>
-                  </div>
-
+              {/* Meta Inputs Card */}
+              <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                    Katalog Başlığı ve Editoryal Metinler
+                  </h3>
                   <button
                     type="button"
                     onClick={handleAiAutoFill}
                     disabled={aiGenerating}
-                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                    className="btn btn-outline text-xs"
                   >
-                    {aiGenerating ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                    <span>✨ AI ile Otomatik Yaz</span>
+                    {aiGenerating ? <Loader2 size={13} className="animate-spin text-amber-600" /> : <Sparkles size={13} className="text-amber-600" />}
+                    <span>Yapay Zeka ile Metinleri Doldur</span>
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                      Katalog Başlığı *
-                    </label>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-stone-700">Katalog Başlığı *</label>
                     <input
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Örn: 2026 Calacatta & Mermer Koleksiyonu"
-                      className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs font-semibold text-stone-900 focus:bg-white focus:outline-none focus:border-amber-600 transition"
+                      placeholder="Örn: Bien Seramik 2026 Mimari Koleksiyonu"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
                     />
                   </div>
 
-                  <div>
-                    <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                      Alt Başlık / Sezon
-                    </label>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-stone-700">Kapak Alt Başlığı</label>
                     <input
                       type="text"
                       value={formData.coverSubtitle}
                       onChange={(e) => setFormData({ ...formData, coverSubtitle: e.target.value })}
-                      placeholder="Örn: Yüksek Performanslı Porselen & Yüzey Koleksiyonu"
-                      className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-900 focus:bg-white focus:outline-none focus:border-amber-600 transition"
+                      placeholder="Örn: Yüksek Performanslı Porselen & Seramik Seçkisi"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                    Mimari Manifesto / Tanıtım Metni
-                  </label>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-stone-700">Giriş / Manifesto Açıklaması</label>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={formData.introText}
                     onChange={(e) => setFormData({ ...formData, introText: e.target.value })}
-                    placeholder="Koleksiyonun ilham kaynağını ve mimari vizyonunu anlatan editoryal cümle..."
-                    className="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 focus:bg-white focus:outline-none focus:border-amber-600 transition"
+                    placeholder="Koleksiyonunuzun felsefesini, doku zenginliğini ve mimari kullanım vizyonunu açıklayan kısa metin..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition resize-none"
                   />
                 </div>
               </div>
 
-              {/* Product Picker Grid */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200/80 shadow-2xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
+              {/* Product Selection Card */}
+              <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-bold text-stone-900">
-                      Kataloğa Eklenecek Seramik Karolar ({formData.selectedProductIds.length} Seçili)
+                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                      Kataloğa Dahil Edilecek Karolar ({formData.selectedProductIds.length} Seçili)
                     </h3>
-                    <p className="text-xs text-stone-500">
-                      Kataloğunuzda sergilemek istediğiniz ürünleri tıklayarak seçin.
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      Kataloğunuzda sergilenecek ürünleri seçin.
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({
-                          ...formData,
-                          selectedProductIds: brandProducts.map((p) => p.id)
-                        })
-                      }
-                      className="px-2.5 py-1 text-xs font-bold text-amber-700 hover:bg-amber-50 rounded-lg transition cursor-pointer"
-                    >
-                      Tümünü Seç
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, selectedProductIds: [] })}
-                      className="px-2.5 py-1 text-xs font-bold text-stone-500 hover:bg-stone-100 rounded-lg transition cursor-pointer"
-                    >
-                      Temizle
-                    </button>
+                  <div className="search-box">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                    <input
+                      type="text"
+                      placeholder="Ürün adı, kod veya yüzey ara..."
+                      value={productSearch}
+                      onChange={(e) => setProductSearch(e.target.value)}
+                    />
                   </div>
                 </div>
 
-                {/* Search in products */}
-                <div className="relative">
-                  <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-                  <input
-                    type="text"
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                    placeholder="Karo adı, kod veya yüzey tipi ile filtrele..."
-                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:border-amber-600 transition"
-                  />
-                </div>
-
-                {/* Products Grid */}
                 {productsLoading ? (
                   <div className="py-12 text-center text-stone-400">
-                    <Loader2 size={20} className="animate-spin mx-auto text-amber-600 mb-2" />
-                    <p className="text-xs">Ürünler yükleniyor...</p>
+                    <Loader2 size={20} className="animate-spin mx-auto text-[#b47b3d] mb-1" />
+                    <p className="text-xs">Ürünler taranıyor...</p>
                   </div>
-                ) : filteredProducts.length === 0 ? (
-                  <div className="py-8 text-center text-stone-400 text-xs">
-                    Uygun seramik ürünü bulunamadı.
+                ) : filteredBrandProducts.length === 0 ? (
+                  <div className="p-8 text-center bg-stone-50 rounded-xl border border-dashed border-stone-200">
+                    <p className="text-xs text-stone-500">Ürün bulunamadı.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-96 overflow-y-auto p-1">
-                    {filteredProducts.map((p) => {
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-[460px] overflow-y-auto p-1">
+                    {filteredBrandProducts.map((p) => {
                       const isSelected = formData.selectedProductIds.includes(p.id);
-                      const img = p.imageUrl || p.textureUrl || '/placeholder.png';
-
                       return (
                         <div
                           key={p.id}
                           onClick={() => toggleProductSelect(p.id)}
-                          className={`relative rounded-xl border-2 p-2 cursor-pointer transition-all flex flex-col justify-between ${
+                          className={`group p-2 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
                             isSelected
-                              ? 'border-amber-600 bg-amber-50/40 ring-1 ring-amber-600/30'
-                              : 'border-stone-200 bg-stone-50/50 hover:border-stone-300'
+                              ? 'border-[#b47b3d] bg-amber-50/40 ring-1 ring-[#b47b3d]'
+                              : 'border-stone-200 hover:border-stone-400 bg-white'
                           }`}
                         >
-                          <div className="relative aspect-square rounded-lg overflow-hidden bg-stone-200 mb-2">
-                            <img src={img} alt={p.name} className="w-full h-full object-cover" />
+                          <div className="relative aspect-square rounded-lg bg-stone-100 overflow-hidden mb-2">
+                            <img
+                              src={p.imageUrl || p.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
+                              alt={p.name}
+                              className="w-full h-full object-cover"
+                            />
                             {isSelected && (
-                              <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-xs">
+                              <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#b47b3d] text-white flex items-center justify-center shadow-xs">
                                 <Check size={12} strokeWidth={3} />
                               </div>
                             )}
                           </div>
 
-                          <div className="min-w-0">
-                            <h5 className="text-[11px] font-bold text-stone-900 truncate">{p.name}</h5>
-                            <p className="text-[10px] text-stone-500 font-mono truncate">
-                              {p.width && p.height ? `${p.width}x${p.height} cm` : p.finish || ''}
+                          <div>
+                            <h4 className="text-xs font-bold text-stone-900 truncate" title={p.name}>
+                              {p.name}
+                            </h4>
+                            <p className="text-[10px] text-stone-500 truncate">
+                              {p.width && p.height ? `${p.width}x${p.height} cm` : (p.finish || 'Standart')}
                             </p>
                           </div>
                         </div>
@@ -1071,12 +1600,11 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 )}
               </div>
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
                   onClick={() => setEditorStep(1)}
-                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                  className="btn btn-outline"
                 >
                   <ArrowLeft size={14} />
                   <span>Şablon Seçimine Dön</span>
@@ -1085,7 +1613,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 <button
                   type="button"
                   onClick={() => setEditorStep(3)}
-                  className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm transition cursor-pointer"
+                  className="btn btn-primary"
                 >
                   <span>Sonraki Adım: Canlı Önizle & Yayınla</span>
                   <ArrowRight size={14} />
@@ -1097,12 +1625,12 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           {/* STEP 3: CANLI ÖNİZLEME & YAYINLAMA */}
           {editorStep === 3 && (
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs flex items-center justify-between gap-4">
+              <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-sm font-bold text-stone-900">
+                  <h3 className="text-base font-bold text-stone-900">
                     Kataloğunuz Canlı Önizlemede
                   </h3>
-                  <p className="text-xs text-stone-500">
+                  <p className="text-xs text-stone-500 mt-0.5">
                     Aşağıdaki lookbook web yayınınızın birebir canlı önizlemesidir. Kontrol edip 'Yayına Al' butonuna basın.
                   </p>
                 </div>
@@ -1111,7 +1639,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                   <button
                     type="button"
                     onClick={() => setEditorStep(2)}
-                    className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                    className="btn btn-outline"
                   >
                     <Edit size={13} />
                     <span>Bilgileri Düzenle</span>
@@ -1121,7 +1649,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                     type="button"
                     onClick={() => handleSaveCatalog(true)}
                     disabled={saving}
-                    className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-600/20 transition cursor-pointer"
+                    className="btn btn-accent"
                   >
                     {saving ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
                     <span>Yayına Al & Link Üret</span>
@@ -1130,7 +1658,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
               </div>
 
               {/* Live Lookbook Container */}
-              <div className="rounded-3xl border border-stone-300 overflow-hidden shadow-xl">
+              <div className="rounded-2xl border border-stone-300 overflow-hidden shadow-xl">
                 <HtmlLookbookViewer
                   catalog={{
                     title: formData.title,
@@ -1151,11 +1679,11 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       )}
 
       {/* =========================================================================
-          SHARE MODAL (Bağlantı, WhatsApp & QR Kod)
+          SHARE MODAL
       ========================================================================= */}
       {sharingCatalog && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl border border-stone-200 relative animate-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-stone-200 relative animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <h3 className="text-base font-bold text-stone-900">Kataloğu Paylaş</h3>
               <button
@@ -1168,57 +1696,129 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
             </div>
 
             <div className="space-y-4">
-              <div>
-                <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block mb-1">
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">
                   Katalog Başlığı
                 </span>
                 <p className="text-sm font-bold text-stone-900">{sharingCatalog.title}</p>
               </div>
 
-              {/* Direct Link */}
-              <div>
-                <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider block mb-1">
-                  Doğrudan Web Bağlantısı
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">
+                  Web Bağlantısı (URL)
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 p-1 border border-stone-200 rounded-xl bg-stone-50">
                   <input
                     type="text"
                     readOnly
-                    value={
-                      typeof window !== 'undefined'
-                        ? `${window.location.origin}/katalog/${sharingCatalog.publicSlug}`
-                        : `/katalog/${sharingCatalog.publicSlug}`
-                    }
-                    className="flex-1 px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono text-stone-800 select-all"
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/katalog/${sharingCatalog.publicSlug}`}
+                    className="w-full bg-transparent text-xs px-2 text-stone-700 outline-none font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => {
-                      const url = `${window.location.origin}/katalog/${sharingCatalog.publicSlug}`;
-                      navigator.clipboard.writeText(url);
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/katalog/${sharingCatalog.publicSlug}`
+                      );
                       setLinkCopied(true);
                       setTimeout(() => setLinkCopied(false), 2000);
                     }}
-                    className="px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-stone-900 text-white text-xs font-bold transition flex items-center gap-1 flex-shrink-0"
                   >
-                    {linkCopied ? <Check size={14} /> : <Copy size={14} />}
+                    {linkCopied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
                     <span>{linkCopied ? 'Kopyalandı' : 'Kopyala'}</span>
                   </button>
                 </div>
               </div>
 
-              {/* WhatsApp Quick Share */}
+              <div className="pt-2 text-center">
+                <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block mb-2">
+                  Mobil / Kiosk QR Kodu
+                </span>
+                <div className="inline-block p-3 bg-white border border-stone-200 rounded-xl shadow-2xs">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(
+                      `${typeof window !== 'undefined' ? window.location.origin : ''}/katalog/${sharingCatalog.publicSlug}`
+                    )}`}
+                    alt="Katalog QR"
+                    className="w-36 h-36 object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          STUDIO GUIDE MODAL (KULLANIM REHBERİ)
+      ========================================================================= */}
+      {showGuideModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowGuideModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-stone-200 relative animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8f5c29]">
+                  Studio Rehberi
+                </span>
+                <h3 className="text-base font-bold text-stone-900">
+                  3 Adımda Lüks Dijital Lookbook Hazırlama
+                </h3>
+              </div>
               <button
                 type="button"
-                onClick={() => {
-                  const url = `${window.location.origin}/katalog/${sharingCatalog.publicSlug}`;
-                  const text = `Merhaba, "${sharingCatalog.title}" dijital seramik lookbook ve ürün kataloğumuzu inceleyebilirsiniz:\n\n${url}`;
-                  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                }}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer"
+                onClick={() => setShowGuideModal(false)}
+                className="p-1 rounded-full text-stone-400 hover:text-stone-800"
               >
-                <MessageCircle size={15} />
-                <span>WhatsApp ile Gönder</span>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-stone-600">
+              <div className="flex items-start gap-3 p-3 bg-[#f5f6f3] rounded-xl border border-stone-200">
+                <span className="w-6 h-6 rounded-full bg-[#202522] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  1
+                </span>
+                <div>
+                  <strong className="text-stone-900 block text-xs mb-0.5">Şablon ve Renk Harmonisi Seçin</strong>
+                  Doğal taş ve mermer için <em>Terra & Traverten</em>, monolitik lüks için <em>Obsidian & Altın</em> veya kentsel projeler için <em>Nordic Loft</em> gibi 6 mimari şablondan birini seçin.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 bg-[#f5f6f3] rounded-xl border border-stone-200">
+                <span className="w-6 h-6 rounded-full bg-[#202522] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  2
+                </span>
+                <div>
+                  <strong className="text-stone-900 block text-xs mb-0.5">Koleksiyon Başlığı ve Karoları Belirleyin</strong>
+                  Koleksiyonunuzun manifesto metnini yazın ve portföyünüzden bu yayında yer almasını istediğiniz seramikleri tek tıkla işaretleyin.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 bg-[#f5f6f3] rounded-xl border border-stone-200">
+                <span className="w-6 h-6 rounded-full bg-[#202522] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  3
+                </span>
+                <div>
+                  <strong className="text-stone-900 block text-xs mb-0.5">Canlı Önizleyin ve Yayına Alın</strong>
+                  Kataloğunuzun ziyaretçilere nasıl görüneceğini masaüstü ve mobilde birebir test edin; tek tıkla benzersiz paylaşılabilir web bağlantısı ve QR kodu üretin.
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowGuideModal(false)}
+                className="btn btn-primary w-full sm:w-auto"
+              >
+                Anladım
               </button>
             </div>
           </div>
