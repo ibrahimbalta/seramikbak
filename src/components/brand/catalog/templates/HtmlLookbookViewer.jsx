@@ -2032,11 +2032,13 @@ export default function HtmlLookbookViewer({
           <div className="contact-cta-box">
             {brandLogo && (
               <div className="flex justify-center mb-4">
-                <img
-                  src={brandLogo}
-                  alt={brandName}
-                  className="max-h-12 max-w-[200px] object-contain drop-shadow-xs"
-                />
+                <div className="inline-flex items-center justify-center bg-white border border-stone-200/90 rounded-xl px-4 py-2 shadow-xs">
+                  <img
+                    src={brandLogo}
+                    alt={brandName}
+                    className="max-h-12 max-w-[200px] object-contain"
+                  />
+                </div>
               </div>
             )}
             <span className="section-badge-centered">
