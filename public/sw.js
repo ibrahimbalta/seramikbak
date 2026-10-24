@@ -1,12 +1,8 @@
 // SeramikBak Showroom Kiosk Service Worker
-// Version: 2.1.0
-const CACHE_NAME = 'seramikbak-kiosk-v2.1';
+// Version: 2.3.0
+const CACHE_NAME = 'seramikbak-kiosk-v2.3';
 const STATIC_ASSETS = [
   '/kiosk',
-  '/',
-  '/bayi',
-  '/marka',
-  '/outlet',
   '/manifest.json',
   '/favicon.ico',
   '/icon-192.png',
@@ -64,8 +60,15 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests or browser extension requests
-  if (request.method !== 'GET' || !url.protocol.startsWith('http')) {
+  // Skip non-GET, internal Next.js build assets, and dynamic panel pages
+  if (
+    request.method !== 'GET' ||
+    !url.protocol.startsWith('http') ||
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/marka') ||
+    url.pathname.startsWith('/bayi') ||
+    url.pathname.startsWith('/admin')
+  ) {
     return;
   }
 

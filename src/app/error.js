@@ -1,37 +1,98 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, RefreshCw, Home, Mail } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home, Mail, Sparkles } from 'lucide-react';
 
 export default function Error({ error, reset }) {
+  const [isChunkError, setIsChunkError] = useState(false);
+  const [reloading, setReloading] = useState(false);
+
   useEffect(() => {
-    // Log the error to an observability service
     console.error('Unhandled Application Error:', error);
+
+    const errMsg = (error?.message || error?.toString() || '').toLowerCase();
+    const errName = (error?.name || '').toLowerCase();
+    const isChunk =
+      errName === 'chunkloaderror' ||
+      errMsg.includes('loading chunk') ||
+      errMsg.includes('failed to load resource') ||
+      errMsg.includes('chunkloaderror') ||
+      errMsg.includes('refused to execute script');
+
+    if (isChunk) {
+      setIsChunkError(true);
+      // Auto-reload once within a 30-second window to fetch fresh deployment assets
+      const reloadKey = 'sb_chunk_auto_reload';
+      if (typeof window !== 'undefined' && !sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, String(Date.now()));
+        setReloading(true);
+
+        // Unregister service worker and clear stale caches
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const reg of registrations) reg.unregister();
+          });
+        }
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            names.forEach((name) => caches.delete(name));
+          });
+        }
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
+      }
+    }
   }, [error]);
+
+  const handleHardReload = () => {
+    setReloading(true);
+    if (typeof window !== 'undefined') {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const reg of registrations) reg.unregister();
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          names.forEach((name) => caches.delete(name));
+        });
+      }
+      sessionStorage.removeItem('sb_chunk_auto_reload');
+      window.location.reload();
+    } else {
+      reset();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
       {/* Background Decorative Glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-500/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-xl w-full text-center z-10 space-y-8 backdrop-blur-md bg-slate-900/60 p-8 sm:p-12 rounded-3xl border border-slate-800/80 shadow-2xl shadow-red-500/5">
+      <div className="max-w-xl w-full text-center z-10 space-y-8 backdrop-blur-md bg-slate-900/70 p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-2xl">
         
         {/* Error Warning Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-medium tracking-wide">
-          <AlertTriangle className="w-4 h-4 text-red-400" />
-          <span>Sistem Hatası (500)</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs sm:text-sm font-medium tracking-wide">
+          {isChunkError ? <Sparkles className="w-4 h-4 text-amber-400" /> : <AlertTriangle className="w-4 h-4 text-amber-400" />}
+          <span>{isChunkError ? 'Yeni Sürüm Güncellemesi Algılandı' : 'Sistem Hatası (500)'}</span>
         </div>
 
         {/* Error Icon Graphic */}
         <div className="relative flex justify-center items-center my-4">
           <span className="text-8xl sm:text-9xl font-extrabold text-slate-800 tracking-tighter select-none opacity-40">
-            500
+            {isChunkError ? 'NEW' : '500'}
           </span>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-red-500 to-amber-500 p-0.5 shadow-lg shadow-red-500/20">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 p-0.5 shadow-lg shadow-amber-500/20">
               <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 animate-pulse" />
+                {isChunkError ? (
+                  <RefreshCw className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 animate-spin" />
+                ) : (
+                  <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 animate-pulse" />
+                )}
               </div>
             </div>
           </div>
@@ -39,30 +100,33 @@ export default function Error({ error, reset }) {
 
         {/* Title & Description */}
         <div className="space-y-3">
-          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
-            Beklenmeyen Bir Hata Oluştu
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            {isChunkError ? 'Sayfa Güncelleniyor...' : 'Beklenmeyen Bir Hata Oluştu'}
           </h1>
           <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
-            İsteğiniz işlenirken sunucularımızda geçici bir aksaklık yaşandı. Teknik ekibimiz bilgilendirildi.
+            {isChunkError
+              ? 'Sistemde yeni bir sürüm yayınlandı. Tarayıcınızdaki eski önbellek temizlenerek sayfa yenileniyor...'
+              : 'İsteğiniz işlenirken sunucularımızda geçici bir aksaklık yaşandı. Lütfen sayfayı yenileyiniz.'}
           </p>
         </div>
 
         {/* Action Buttons */}
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
-            onClick={() => reset()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-200 shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
+            onClick={handleHardReload}
+            disabled={reloading}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-200 shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className="w-4 h-4" />
-            Yeniden Deneyin
+            <RefreshCw className={`w-4 h-4 ${reloading ? 'animate-spin' : ''}`} />
+            <span>{reloading ? 'Yenileniyor...' : 'Sayfayı Yenile'}</span>
           </button>
           
           <Link
-            href="/"
+            href="/marka"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-200 font-medium hover:bg-slate-800 hover:text-white transition-all duration-200 active:scale-95"
           >
             <Home className="w-4 h-4 text-amber-400" />
-            Ana Sayfaya Dön
+            <span>Marka Paneline Dön</span>
           </Link>
         </div>
 

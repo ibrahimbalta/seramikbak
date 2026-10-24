@@ -241,13 +241,21 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                    console.log('SeramikBak ServiceWorker registered:', reg.scope);
-                  }).catch(function(err) {
-                    console.warn('SeramikBak ServiceWorker registration failed:', err);
+                if (window.location.pathname.startsWith('/marka') || window.location.pathname.startsWith('/bayi') || window.location.pathname.startsWith('/admin')) {
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (var i = 0; i < registrations.length; i++) {
+                      registrations[i].unregister();
+                    }
                   });
-                });
+                } else {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                      reg.update();
+                    }).catch(function(err) {
+                      console.warn('SeramikBak ServiceWorker registration failed:', err);
+                    });
+                  });
+                }
               }
             `,
           }}
