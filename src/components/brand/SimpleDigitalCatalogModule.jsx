@@ -1131,6 +1131,266 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           .catalog-grid.list .card-body { padding: 15px 17px 16px; }
           .footer-note { flex-direction: column; }
         }
+
+        /* =========================================================================
+           MINIMAL INBOX / TALEP YÖNETİMİ (USER TEMPLATE)
+        ========================================================================= */
+        .inbox-container {
+          --primary: #b65b24;
+          --primary-light: #fff3e9;
+          --ink: #202a35;
+          --muted: #77818e;
+          --line: #e8ebef;
+          --surface: #ffffff;
+          --bg: #f4f6f8;
+          --green: #0e9f6e;
+          --green-light: #e8f8f1;
+          --radius: 16px;
+          max-width: 1440px;
+          margin: 0 auto;
+        }
+        .inbox-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          margin-bottom: 24px;
+        }
+        .inbox-brand { display: flex; align-items: center; gap: 12px; }
+        .inbox-brand-mark {
+          display: grid;
+          place-items: center;
+          width: 46px; height: 46px;
+          border-radius: 14px;
+          background: #fff3e9;
+          color: #b65b24;
+          font-size: 22px;
+          flex-shrink: 0;
+        }
+        .inbox-eyebrow {
+          color: #b65b24;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+        }
+        .inbox-topbar h1 {
+          margin: 4px 0 0;
+          font-size: 26px;
+          letter-spacing: -.7px;
+          font-weight: 800;
+          color: #202a35;
+        }
+        .inbox-subtitle { color: #77818e; margin: 7px 0 0; font-size: 13.5px; }
+        .inbox-top-actions { display: flex; gap: 10px; }
+        .inbox-btn {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          border: 1px solid #e8ebef;
+          border-radius: 10px;
+          background: white;
+          color: #202a35;
+          padding: 11px 15px;
+          font-weight: 650;
+          font-size: 13.5px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-decoration: none;
+        }
+        .inbox-btn-dark { background: #202a35; color: white; border-color: #202a35; }
+        .inbox-btn-green { background: #10b981; color: white; border-color: #10b981; }
+        .inbox-btn:hover { filter: brightness(.96); }
+
+        .inbox-stats {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 22px;
+        }
+        .inbox-stat {
+          position: relative;
+          overflow: hidden;
+          padding: 20px;
+          background: #ffffff;
+          border: 1px solid #e8ebef;
+          border-radius: 16px;
+          box-shadow: 0 3px 12px rgba(24, 38, 56, 0.03);
+        }
+        .inbox-stat-top { display:flex; justify-content:space-between; align-items:center; }
+        .inbox-stat-label { color: #77818e; font-size: 13px; font-weight: 600; }
+        .inbox-stat-icon {
+          width: 38px; height: 38px;
+          display: grid; place-items: center;
+          border-radius: 12px;
+          background: #f1f3f6;
+          font-size: 17px;
+        }
+        .inbox-stat-number { font-size: 30px; font-weight: 800; margin-top: 10px; color: #202a35; }
+        .inbox-stat-foot { color: #77818e; font-size: 12px; margin-top: 3px; }
+        .inbox-stat.orange .inbox-stat-icon { background: #fff3e9; color: #b65b24; }
+        .inbox-stat.green .inbox-stat-icon { background: #e8f8f1; color: #0e9f6e; }
+
+        .inbox-section-head {
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap: 12px;
+          margin: 26px 0 12px;
+        }
+        .inbox-section-head h2 { margin:0; font-size:17px; font-weight: 750; color: #202a35; }
+        .inbox-section-head p { margin:5px 0 0; color:#77818e; font-size:12px; }
+        .inbox-count {
+          border-radius: 20px;
+          background: #fff3e9;
+          color: #b65b24;
+          padding: 6px 12px;
+          font-size: 12px;
+          font-weight: 750;
+        }
+
+        .inbox-request-card {
+          background: white;
+          border: 1px solid #e8ebef;
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow: 0 5px 20px rgba(24, 38, 56, 0.03);
+          margin-bottom: 20px;
+        }
+        .inbox-request-header {
+          padding: 20px 22px;
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          gap: 16px;
+          border-bottom: 1px solid #e8ebef;
+        }
+        .inbox-request-title { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .inbox-badge {
+          display:inline-flex;
+          align-items:center;
+          gap:6px;
+          padding: 6px 10px;
+          border-radius: 7px;
+          font-size: 11px;
+          font-weight: 750;
+        }
+        .inbox-badge-orange { background: #fff3e9; color: #b65b24; }
+        .inbox-badge-gray { background: #f0f2f5; color: #596473; }
+        .inbox-badge-green { background: #e8f8f1; color: #0e9f6e; }
+        .inbox-customer-name { font-size: 19px; font-weight: 800; color: #202a35; }
+        .inbox-meta { display:flex; gap:14px; flex-wrap:wrap; margin-top: 10px; color: #77818e; font-size: 12px; }
+        .inbox-meta span { display:flex; align-items:center; gap:6px; }
+        .inbox-request-date { color: #77818e; font-size: 12px; white-space: nowrap; }
+
+        .inbox-contact-row {
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap: 14px;
+          padding: 14px 22px;
+          background: #fcfcfd;
+          border-bottom: 1px solid #e8ebef;
+        }
+        .inbox-contact-info { display:flex; align-items:center; flex-wrap:wrap; gap: 10px; }
+        .inbox-contact-chip {
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+          padding: 9px 12px;
+          border:1px solid #e8ebef;
+          border-radius: 10px;
+          background: white;
+          color: #384454;
+          font-size: 13px;
+          font-weight: 600;
+          text-decoration: none;
+          transition: all 0.15s ease;
+        }
+        .inbox-contact-chip:hover { border-color: #b65b24; color: #b65b24; }
+        .inbox-contact-chip span { color: #b65b24; }
+
+        .inbox-content { padding: 22px; }
+        .inbox-content h3 { font-size:14px; font-weight: 750; margin:0 0 14px; color: #202a35; }
+        .inbox-product-grid {
+          display:grid;
+          grid-template-columns:repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .inbox-product {
+          min-width:0;
+          border:1px solid #e8ebef;
+          border-radius: 13px;
+          padding: 16px;
+          background: #fff;
+          transition: border-color .2s, transform .2s;
+        }
+        .inbox-product:hover { border-color:#e0b294; transform:translateY(-2px); }
+        .inbox-product-top {
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          gap:8px;
+        }
+        .inbox-product-name { font-weight:750; line-height:1.45; color: #202a35; font-size: 13.5px; }
+        .inbox-area {
+          flex-shrink:0;
+          padding:5px 8px;
+          border-radius:7px;
+          background:#fff3e9;
+          color:#b65b24;
+          font-size:11px;
+          font-weight:800;
+        }
+        .inbox-product-code { margin-top:12px; color:#77818e; font-size:11px; font-family: monospace; }
+        .inbox-product-size { margin-top:6px; font-size:12px; color:#4d5866; }
+        .inbox-note {
+          margin-top:20px;
+          padding:17px;
+          border:1px solid #f1dfce;
+          background:#fffaf5;
+          border-radius:12px;
+        }
+        .inbox-note-title { font-size:12px; color:#b65b24; font-weight:800; margin-bottom:7px; }
+        .inbox-note-text { color:#596473; line-height:1.6; font-size: 13.5px; }
+        .inbox-footer {
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:14px;
+          padding:18px 22px;
+          border-top:1px solid #e8ebef;
+          background:#fcfcfd;
+          color:#77818e;
+          font-size:12px;
+        }
+        .inbox-footer strong { color:#202a35; }
+
+        @media (max-width: 850px) {
+          .inbox-topbar { align-items:flex-start; flex-direction:column; }
+          .inbox-top-actions { width:100%; }
+          .inbox-top-actions .inbox-btn { flex:1; }
+          .inbox-stats { gap:10px; }
+          .inbox-stat { padding:14px; }
+          .inbox-request-header { flex-direction:column; }
+          .inbox-request-date { white-space:normal; }
+          .inbox-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+          .inbox-contact-row { align-items:flex-start; flex-direction:column; }
+        }
+        @media (max-width: 540px) {
+          .inbox-topbar h1 { font-size:22px; }
+          .inbox-subtitle { line-height:1.5; }
+          .inbox-stats { grid-template-columns:1fr; }
+          .inbox-stat { padding:15px; }
+          .inbox-stat-number { font-size:25px; }
+          .inbox-product-grid { grid-template-columns:1fr; }
+          .inbox-request-header, .inbox-content { padding:16px; }
+          .inbox-contact-row { padding:14px 16px; }
+          .inbox-customer-name { font-size:17px; }
+          .inbox-footer { align-items:flex-start; flex-direction:column; }
+          .inbox-btn { padding:10px 12px; }
+        }
       `}</style>
 
       {/* =========================================================================
@@ -1459,110 +1719,123 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       )}
 
       {/* =========================================================================
-          VIEW 2: INQUIRIES LIST (GELEN B2B TALEPLERİ)
+          VIEW 2: INQUIRIES LIST (GELEN B2B TALEPLERİ - MİNİMAL TASARIM)
       ========================================================================= */}
       {currentView === 'inquiries' && (
-        <div className="space-y-6">
-          {/* Header & Quick Action Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-xs">
+        <div className="inbox-container">
+          {/* Topbar Header */}
+          <header className="inbox-topbar">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-700 uppercase tracking-widest mb-1">
-                <Building2 size={14} />
-                <span>{brandName} &bull; TİCARİ TALEP MASASI</span>
+              <div className="inbox-brand">
+                <div className="inbox-brand-mark">▧</div>
+                <div>
+                  <div className="inbox-eyebrow">{brandName || 'Marka'} · Ticari Talep Masası</div>
+                  <h1>Gelen Teklif &amp; Numune Talepleri</h1>
+                </div>
               </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight">
-                Gelen Teklif & Numune Talepleri
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                Dijital kataloglarınız üzerinden mimar ve proje yöneticilerinden gelen talepleri inceleyin ve doğrudan yanıtlayın.
+              <p className="inbox-subtitle">
+                Dijital kataloglarınız üzerinden gelen talepleri tek panelden inceleyin ve doğrudan yanıtlayın.
               </p>
             </div>
-
-            <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            <div className="inbox-top-actions">
               <button
                 type="button"
+                className="inbox-btn"
                 onClick={() => setCurrentView('list')}
-                className="h-11 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-semibold flex items-center gap-2 transition shadow-2xs"
               >
-                <ArrowLeft size={15} />
-                <span>Kataloglarıma Dön</span>
+                ← Kataloglarıma Dön
               </button>
               <button
                 type="button"
+                className="inbox-btn inbox-btn-dark"
                 onClick={loadInquiries}
-                className="h-11 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 transition shadow-xs"
               >
-                <RefreshCw size={14} />
-                <span>Yenile</span>
+                ↻ Yenile
               </button>
             </div>
+          </header>
+
+          {/* Minimal 3-Stat Cards */}
+          <section className="inbox-stats">
+            <div className="inbox-stat">
+              <div className="inbox-stat-top">
+                <div className="inbox-stat-label">Toplam Talep</div>
+                <div className="inbox-stat-icon">▤</div>
+              </div>
+              <div className="inbox-stat-number">{inquiries.length}</div>
+              <div className="inbox-stat-foot">Tüm gelen talepler</div>
+            </div>
+            <div className="inbox-stat orange">
+              <div className="inbox-stat-top">
+                <div className="inbox-stat-label">Fiyat Teklifi İstekleri</div>
+                <div className="inbox-stat-icon">▧</div>
+              </div>
+              <div className="inbox-stat-number">
+                {inquiries.filter((i) => i.leadType !== 'sample').length}
+              </div>
+              <div className="inbox-stat-foot">Yanıt bekleyen fiyat talebi</div>
+            </div>
+            <div className="inbox-stat green">
+              <div className="inbox-stat-top">
+                <div className="inbox-stat-label">Fiziksel Numune İstekleri</div>
+                <div className="inbox-stat-icon">◇</div>
+              </div>
+              <div className="inbox-stat-number">
+                {inquiries.filter((i) => i.leadType === 'sample').length}
+              </div>
+              <div className="inbox-stat-foot">Numune gönderim talepleri</div>
+            </div>
+          </section>
+
+          {/* Section Head */}
+          <div className="inbox-section-head">
+            <div>
+              <h2>Talep detayları</h2>
+              <p>Müşteri bilgileri, ilgilenilen ürünler ve talep notu</p>
+            </div>
+            <span className="inbox-count">
+              {inquiries.length} talep listeleniyor
+            </span>
           </div>
 
-          {/* KPI Stats Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between">
-              <div>
-                <span className="text-xs text-stone-500 font-medium">Toplam Talep</span>
-                <p className="text-2xl font-black text-stone-900 mt-0.5">{inquiries.length}</p>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
-                <Tag size={20} />
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between">
-              <div>
-                <span className="text-xs text-amber-700 font-medium">Fiyat Teklifi İstekleri</span>
-                <p className="text-2xl font-black text-amber-900 mt-0.5">
-                  {inquiries.filter((i) => i.leadType !== 'sample').length}
-                </p>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
-                <FileText size={20} />
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between">
-              <div>
-                <span className="text-xs text-emerald-700 font-medium">Fiziksel Numune İstekleri</span>
-                <p className="text-2xl font-black text-emerald-900 mt-0.5">
-                  {inquiries.filter((i) => i.leadType === 'sample').length}
-                </p>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
-                <Box size={20} />
-              </div>
-            </div>
-          </div>
-
-          {/* Inquiries List */}
+          {/* Inquiries Content */}
           {inquiriesLoading ? (
-            <div className="py-24 text-center text-stone-400 bg-white rounded-2xl border border-stone-200">
-              <Loader2 size={28} className="animate-spin mx-auto text-amber-600 mb-3" />
-              <p className="text-sm font-semibold text-stone-600">Talepler yükleniyor...</p>
+            <div className="inbox-request-card" style={{ padding: '60px 24px', textAlign: 'center' }}>
+              <Loader2 size={32} className="animate-spin mx-auto text-[#b65b24] mb-3" />
+              <p style={{ fontSize: '14px', fontWeight: 600, color: '#202a35' }}>Talepler yükleniyor...</p>
             </div>
           ) : inquiries.length === 0 ? (
-            <div className="py-20 text-center bg-white rounded-2xl border border-stone-200 shadow-2xs p-8 space-y-3">
-              <div className="w-16 h-16 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
-                <Tag size={32} />
-              </div>
-              <h3 className="text-base font-bold text-stone-900">Henüz Bir Talep Alınmadı</h3>
-              <p className="text-xs sm:text-sm text-stone-500 max-w-md mx-auto">
+            <div className="inbox-request-card" style={{ padding: '60px 24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '38px', marginBottom: '14px', color: '#b65b24' }}>▤</div>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#202a35', margin: '0 0 8px' }}>
+                Henüz Bir Talep Alınmadı
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#77818e', maxWidth: '440px', margin: '0 auto', lineHeight: 1.6 }}>
                 Dijital kataloglarınız üzerinden müşterilerinizin ilettiği teklif ve numune talepleri anlık olarak bu masada listelenir.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div>
               {inquiries.map((inq) => {
                 const isSample = inq.leadType === 'sample';
 
-                // Parse customer city and message if bundled
+                // Parse customer city and clean message
                 const rawMsg = inq.customerMessage || '';
                 const cityMatch = rawMsg.match(/\[Şehir:\s*([^\]]+)\]/i);
                 const extractedCity = cityMatch ? cityMatch[1].trim() : '';
                 const cleanMessage = rawMsg.replace(/\[Şehir:\s*[^\]]+\]/gi, '').trim();
 
-                // Parse selected products (support both structured objects and legacy strings)
+                // Format phone for WhatsApp
+                const rawPhone = inq.phone || '';
+                const digitsPhone = rawPhone.replace(/[^0-9]/g, '');
+                let waPhone = digitsPhone;
+                if (waPhone.startsWith('0')) {
+                  waPhone = '90' + waPhone.slice(1);
+                } else if (!waPhone.startsWith('90') && waPhone.length === 10) {
+                  waPhone = '90' + waPhone;
+                }
+
+                // Parse selected products (supports array of objects or strings)
                 const parsedProducts = (inq.selectedProducts || []).map((p) => {
                   if (typeof p === 'object' && p !== null) {
                     return {
@@ -1589,161 +1862,109 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                   return { name: String(p), code: '', dimension: '', m2: '', surface: '' };
                 });
 
+                const reqCode = inq.id ? String(inq.id).slice(-4).toUpperCase() : '0001';
+
                 return (
-                  <div
-                    key={inq.id}
-                    className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 hover:border-amber-400/70 shadow-2xs hover:shadow-sm transition-all space-y-4"
-                  >
-                    {/* Top Header: Badge, Customer Name & Actions */}
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 pb-4 border-b border-stone-100">
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                            isSample
-                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-900 border border-amber-200'
-                          }`}
-                        >
-                          {isSample ? <Box size={13} /> : <FileText size={13} />}
-                          <span>{isSample ? 'Fiziksel Numune Talebi' : 'Fiyat Teklifi İsteği'}</span>
-                        </span>
-
-                        <h3 className="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
-                          {inq.customerName}
-                        </h3>
-
-                        {inq.companyName && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 text-xs font-semibold">
-                            <Building2 size={12} className="text-stone-500" />
-                            <span>{inq.companyName}</span>
+                  <article key={inq.id} className="inbox-request-card">
+                    {/* Header */}
+                    <div className="inbox-request-header">
+                      <div>
+                        <div className="inbox-request-title">
+                          <span className={`inbox-badge ${isSample ? 'inbox-badge-green' : 'inbox-badge-orange'}`}>
+                            {isSample ? '◇ Fiziksel Numune Talebi' : '▧ Fiyat Teklifi İsteği'}
                           </span>
-                        )}
-
-                        {extractedCity && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 text-xs font-semibold">
-                            <MapPin size={12} className="text-stone-500" />
-                            <span>{extractedCity}</span>
-                          </span>
-                        )}
+                          <span className="inbox-customer-name">{inq.customerName || 'Müşteri'}</span>
+                          <span className="inbox-badge inbox-badge-gray">İlk talep</span>
+                        </div>
+                        <div className="inbox-meta">
+                          {inq.companyName && (
+                            <span>▣ {inq.companyName}</span>
+                          )}
+                          {extractedCity && (
+                            <span>📍 {extractedCity}</span>
+                          )}
+                        </div>
                       </div>
-
-                      <div className="flex items-center gap-3 text-xs text-stone-400">
-                        <span className="inline-flex items-center gap-1">
-                          <Clock size={13} />
-                          <span>{new Date(inq.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
-                        </span>
-
-                        {inq.catalogTitle && (
-                          <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-50/70 text-amber-900 border border-amber-200/50 text-[11px] font-medium">
-                            <BookOpen size={11} />
-                            <span className="truncate max-w-[220px]">{inq.catalogTitle}</span>
-                          </span>
-                        )}
+                      <div className="inbox-request-date">
+                        ◷ {new Date(inq.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </div>
                     </div>
 
-                    {/* Contact & One-Click Reply Bar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-stone-50/90 border border-stone-200/70">
-                      <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm">
+                    {/* Contact Row */}
+                    <div className="inbox-contact-row">
+                      <div className="inbox-contact-info">
                         {inq.phone && (
-                          <a
-                            href={`tel:${inq.phone}`}
-                            className="flex items-center gap-1.5 font-mono font-semibold text-stone-800 hover:text-emerald-700 transition"
-                            title="Telefonla Ara"
-                          >
-                            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                              <Phone size={13} />
-                            </div>
-                            <span>{inq.phone}</span>
+                          <a className="inbox-contact-chip" href={`tel:${inq.phone}`}>
+                            <span>☎</span> {inq.phone}
                           </a>
                         )}
-
                         {inq.email && (
-                          <a
-                            href={`mailto:${inq.email}`}
-                            className="flex items-center gap-1.5 font-medium text-stone-700 hover:text-amber-700 transition"
-                            title="E-posta Gönder"
-                          >
-                            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
-                              <Mail size={13} />
-                            </div>
-                            <span>{inq.email}</span>
+                          <a className="inbox-contact-chip" href={`mailto:${inq.email}`}>
+                            <span>✉</span> {inq.email}
                           </a>
                         )}
                       </div>
 
-                      {/* Quick Action Button: WhatsApp Direct */}
                       {inq.phone && (
                         <a
-                          href={`https://api.whatsapp.com/send?phone=${inq.phone.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(
-                            `Merhaba ${inq.customerName}, ${brandName} dijital kataloğumuz üzerinden ilettiğiniz ${
+                          className="inbox-btn inbox-btn-green"
+                          href={`https://wa.me/${waPhone}?text=${encodeURIComponent(
+                            `Merhaba ${inq.customerName || ''}, ${brandName || 'Marka'} dijital kataloğumuz üzerinden ilettiğiniz ${
                               isSample ? 'numune' : 'fiyat teklifi'
                             } talebiniz hakkında iletişime geçiyorum.`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="h-10 px-4 bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs sm:text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all self-stretch sm:self-auto"
                         >
-                          <MessageCircle size={16} />
-                          <span>WhatsApp'tan Yanıtla</span>
+                          ◉ WhatsApp'tan Yanıtla
                         </a>
                       )}
                     </div>
 
-                    {/* Selected Products Grid */}
-                    {parsedProducts.length > 0 && (
-                      <div className="space-y-2 pt-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-stone-800 uppercase tracking-wide flex items-center gap-1.5">
-                            <Box size={14} className="text-amber-600" />
-                            <span>İlgilenilen Karolar & Metraj ({parsedProducts.length} Ürün)</span>
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                          {parsedProducts.map((p, pIdx) => (
-                            <div
-                              key={pIdx}
-                              className="p-3 rounded-xl bg-white border border-stone-200/90 shadow-2xs flex items-center justify-between gap-2.5"
-                            >
-                              <div className="min-w-0 flex-1">
-                                <h4 className="text-xs sm:text-sm font-bold text-stone-900 truncate">
-                                  {p.name}
-                                </h4>
-                                <div className="flex items-center gap-1.5 text-[11px] text-stone-500 mt-0.5">
-                                  {p.code && (
-                                    <span className="font-mono bg-stone-100 px-1.5 py-0.2 rounded text-stone-600 text-[10px]">
-                                      {p.code}
+                    {/* Content */}
+                    <div className="inbox-content">
+                      {parsedProducts.length > 0 && (
+                        <>
+                          <h3>▧ İlgilenilen karolar ve metraj ({parsedProducts.length} ürün)</h3>
+                          <div className="inbox-product-grid">
+                            {parsedProducts.map((p, pIdx) => (
+                              <div className="inbox-product" key={pIdx}>
+                                <div className="inbox-product-top">
+                                  <div className="inbox-product-name">{p.name}</div>
+                                  {p.m2 && (
+                                    <span className="inbox-area">
+                                      {p.m2.includes('m²') ? p.m2 : `${p.m2} m²`}
                                     </span>
                                   )}
-                                  {p.dimension && <span>{p.dimension}</span>}
-                                  {p.surface && <span>&bull; {p.surface}</span>}
                                 </div>
+                                {p.code && <div className="inbox-product-code">{p.code}</div>}
+                                {(p.dimension || p.surface) && (
+                                  <div className="inbox-product-size">
+                                    Ölçü: {p.dimension || 'Standart'}{p.surface ? ` · ${p.surface}` : ''}
+                                  </div>
+                                )}
                               </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
 
-                              {p.m2 && (
-                                <div className="flex-shrink-0 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold text-xs shadow-2xs whitespace-nowrap">
-                                  {p.m2.includes('m²') ? p.m2 : `${p.m2} m²`}
-                                </div>
-                              )}
-                            </div>
-                          ))}
+                      {cleanMessage && (
+                        <div className="inbox-note">
+                          <div className="inbox-note-title">✎ Müşteri notu / Özel talep</div>
+                          <div className="inbox-note-text">{cleanMessage}</div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
-                    {/* Customer Message / Special Notes */}
-                    {cleanMessage && (
-                      <div className="text-xs sm:text-sm text-stone-800 bg-amber-500/5 p-3.5 rounded-xl border border-amber-500/20 space-y-1">
-                        <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wide block">
-                          Müşteri Notu / Özel Talep:
-                        </span>
-                        <p className="whitespace-pre-line leading-relaxed font-normal text-stone-700">
-                          {cleanMessage}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                    {/* Footer */}
+                    <footer className="inbox-footer">
+                      <span>Talep numarası: <strong>#SB-{reqCode}</strong></span>
+                      <span>
+                        Kaynak: <strong>{inq.catalogTitle ? `${inq.catalogTitle} dijital kataloğu` : `${brandName || 'Marka'} dijital kataloğu`}</strong>
+                      </span>
+                    </footer>
+                  </article>
                 );
               })}
             </div>
