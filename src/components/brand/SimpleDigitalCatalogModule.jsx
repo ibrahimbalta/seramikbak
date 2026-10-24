@@ -150,6 +150,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
   const [brandProducts, setBrandProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productSearch, setProductSearch] = useState('');
+  const [selectedDimensionFilter, setSelectedDimensionFilter] = useState('all');
+  const [selectionViewFilter, setSelectionViewFilter] = useState('all'); // 'all' | 'selected' | 'unselected'
+  const [productCategoryFilter, setProductCategoryFilter] = useState('all');
 
   // B2B Inquiries (Quotes & Samples)
   const [inquiries, setInquiries] = useState([]);
@@ -291,6 +294,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     });
     setEditorStep(1);
     setActiveContentTab('products');
+    setSelectedDimensionFilter('all');
+    setSelectionViewFilter('all');
+    setProductSearch('');
     setCurrentView('editor');
   };
 
@@ -324,6 +330,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     });
     setEditorStep(1);
     setActiveContentTab('products');
+    setSelectedDimensionFilter('all');
+    setSelectionViewFilter('all');
+    setProductSearch('');
     setCurrentView('editor');
   };
 
@@ -475,17 +484,125 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     }));
   };
 
+  // Dimension extractor helper
+  const getProductDimension = (p) => {
+    if (!p) return 'Diğer';
+    if (p.width && p.height) {
+      return `${p.width}x${p.height}`;
+    }
+    if (p.size) {
+      return p.size.replace(/\s+/g, '').toLowerCase();
+    }
+    const match = (p.name || '').match(/(\d{2,3})\s*[xX×]\s*(\d{2,3})/);
+    if (match) {
+      return `${match[1]}x${match[2]}`;
+    }
+    return 'Diğer';
+  };
+
+  // Available unique dimensions with totals and selected counts
+  const availableDimensions = useMemo(() => {
+    const map = new Map();
+    brandProducts.forEach((p) => {
+      const dim = getProductDimension(p);
+      if (!map.has(dim)) {
+        map.set(dim, {
+          key: dim,
+          label: dim === 'Diğer' ? 'Diğer Ebatlar' : `${dim.replace('x', ' × ')} cm`,
+          total: 0,
+          selected: 0
+        });
+      }
+      const item = map.get(dim);
+      item.total += 1;
+      if (formData.selectedProductIds.includes(p.id)) {
+        item.selected += 1;
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) => b.total - a.total);
+  }, [brandProducts, formData.selectedProductIds]);
+
+  // Batch selection helpers
+  const handleSelectAllInDimension = (dimKey) => {
+    const matchingIds = brandProducts
+      .filter((p) => getProductDimension(p) === dimKey)
+      .map((p) => p.id);
+    setFormData((prev) => ({
+      ...prev,
+      selectedProductIds: Array.from(new Set([...prev.selectedProductIds, ...matchingIds]))
+    }));
+  };
+
+  const handleDeselectAllInDimension = (dimKey) => {
+    const matchingIds = new Set(
+      brandProducts
+        .filter((p) => getProductDimension(p) === dimKey)
+        .map((p) => p.id)
+    );
+    setFormData((prev) => ({
+      ...prev,
+      selectedProductIds: prev.selectedProductIds.filter((id) => !matchingIds.has(id))
+    }));
+  };
+
+  const handleSelectAllFiltered = () => {
+    const filteredIds = filteredBrandProducts.map((p) => p.id);
+    setFormData((prev) => ({
+      ...prev,
+      selectedProductIds: Array.from(new Set([...prev.selectedProductIds, ...filteredIds]))
+    }));
+  };
+
+  const handleDeselectAllFiltered = () => {
+    const filteredIdSet = new Set(filteredBrandProducts.map((p) => p.id));
+    setFormData((prev) => ({
+      ...prev,
+      selectedProductIds: prev.selectedProductIds.filter((id) => !filteredIdSet.has(id))
+    }));
+  };
+
+  const handleClearAllSelections = () => {
+    setFormData((prev) => ({ ...prev, selectedProductIds: [] }));
+  };
+
   // Filtered products for editor picker
   const filteredBrandProducts = useMemo(() => {
-    if (!productSearch.trim()) return brandProducts;
-    const q = productSearch.toLowerCase();
-    return brandProducts.filter(
-      (p) =>
-        p.name?.toLowerCase().includes(q) ||
-        p.code?.toLowerCase().includes(q) ||
-        p.finish?.toLowerCase().includes(q)
-    );
-  }, [brandProducts, productSearch]);
+    const q = productSearch.toLocaleLowerCase('tr').trim();
+
+    return brandProducts.filter((p) => {
+      const pDim = getProductDimension(p);
+      const isSelected = formData.selectedProductIds.includes(p.id);
+
+      // Search Query
+      if (q) {
+        const name = (p.name || '').toLocaleLowerCase('tr');
+        const code = (p.code || '').toLocaleLowerCase('tr');
+        const finish = (p.finish || p.surface || '').toLocaleLowerCase('tr');
+        const dim = pDim.toLowerCase();
+        if (!name.includes(q) && !code.includes(q) && !finish.includes(q) && !dim.includes(q)) {
+          return false;
+        }
+      }
+
+      // Dimension Filter
+      if (selectedDimensionFilter !== 'all' && pDim !== selectedDimensionFilter) {
+        return false;
+      }
+
+      // Selection View Filter
+      if (selectionViewFilter === 'selected' && !isSelected) return false;
+      if (selectionViewFilter === 'unselected' && isSelected) return false;
+
+      // Category / Type Filter
+      if (productCategoryFilter !== 'all') {
+        const cat = (p.categoryName || p.category || (p.type === 'porcelain' ? 'Porselen' : 'Seramik')).toLowerCase();
+        if (!cat.includes(productCategoryFilter.toLowerCase())) return false;
+      }
+
+      return true;
+    });
+  }, [brandProducts, productSearch, selectedDimensionFilter, selectionViewFilter, productCategoryFilter, formData.selectedProductIds]);
 
   // Selected products objects for preview
   const previewProducts = useMemo(() => {
@@ -1780,73 +1897,332 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 </div>
               </div>
 
-              {/* SUB-TAB 1: PRODUCT SELECTION */}
+              {/* SUB-TAB 1: PRODUCT SELECTION & DIMENSION FILTERING */}
               {activeContentTab === 'products' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
+                  {/* 1. Top Header: Title, Search, View Filters */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-stone-100">
                     <div>
-                      <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                        Kataloğa Dahil Edilecek Karolar ({formData.selectedProductIds.length} Seçili)
-                      </h3>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        Kataloğunuzda sergilenecek ürünleri seçin.
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                          Kataloğa Dahil Edilecek Karolar
+                        </h3>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                          <Check size={12} strokeWidth={3} className="text-amber-700" />
+                          <span>{formData.selectedProductIds.length} Seçili</span>
+                        </span>
+                        <span className="text-xs text-stone-400 font-medium">
+                          / {brandProducts.length} Toplam Karo
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500 mt-1">
+                        Kataloğunuzda sergilenecek ürünleri seçin, ebata göre filtreleyin veya tek tıkla toplu ekleyin.
                       </p>
                     </div>
 
-                    <div className="search-box">
-                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
-                      <input
-                        type="text"
-                        placeholder="Ürün adı, kod veya yüzey ara..."
-                        value={productSearch}
-                        onChange={(e) => setProductSearch(e.target.value)}
-                      />
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      {/* Search Input */}
+                      <div className="relative min-w-[240px] flex-1 sm:flex-initial">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                        <input
+                          type="text"
+                          placeholder="Ürün adı, kod veya yüzey ara..."
+                          value={productSearch}
+                          onChange={(e) => setProductSearch(e.target.value)}
+                          className="w-full pl-9 pr-8 py-2 rounded-xl border border-stone-200 text-xs text-stone-900 outline-none focus:border-amber-600 bg-stone-50/50 focus:bg-white transition"
+                        />
+                        {productSearch && (
+                          <button
+                            type="button"
+                            onClick={() => setProductSearch('')}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
+                          >
+                            <X size={13} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* View Filter: All / Selected / Unselected */}
+                      <div className="flex items-center bg-stone-100 p-1 rounded-xl text-xs font-medium text-stone-600">
+                        <button
+                          type="button"
+                          onClick={() => setSelectionViewFilter('all')}
+                          className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                            selectionViewFilter === 'all'
+                              ? 'bg-white text-stone-900 shadow-2xs font-bold'
+                              : 'hover:text-stone-900'
+                          }`}
+                        >
+                          Tümü ({brandProducts.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectionViewFilter('selected')}
+                          className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer ${
+                            selectionViewFilter === 'selected'
+                              ? 'bg-white text-amber-900 shadow-2xs font-bold'
+                              : 'hover:text-stone-900'
+                          }`}
+                        >
+                          <span>Seçilenler</span>
+                          <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
+                            {formData.selectedProductIds.length}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectionViewFilter('unselected')}
+                          className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                            selectionViewFilter === 'unselected'
+                              ? 'bg-white text-stone-900 shadow-2xs font-bold'
+                              : 'hover:text-stone-900'
+                          }`}
+                        >
+                          Seçilmeyenler ({Math.max(0, brandProducts.length - formData.selectedProductIds.length)})
+                        </button>
+                      </div>
                     </div>
                   </div>
 
+                  {/* 2. EBATA GÖRE FİLTRELEME & TOPLU EKLEME BÖLÜMÜ */}
+                  <div className="bg-stone-50/90 rounded-2xl p-4 border border-stone-200/80 space-y-3.5">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <Layers size={15} className="text-amber-700" />
+                        <span className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                          Ebata Göre Filtrele & Toplu Ekle
+                        </span>
+                        <span className="text-[11px] text-stone-500 hidden sm:inline">
+                          — Kataloğunuzu belirli ölçülerdeki serilerden oluşturun
+                        </span>
+                      </div>
+
+                      {/* Toplu İşlem Butonları */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {selectedDimensionFilter !== 'all' ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleSelectAllInDimension(selectedDimensionFilter)}
+                              className="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+                              title={`Tüm ${selectedDimensionFilter} ebatındaki karoları kataloğa ekle`}
+                            >
+                              <Plus size={13} strokeWidth={2.5} />
+                              <span>Bu Ebattaki Tümünü Ekle ({availableDimensions.find((d) => d.key === selectedDimensionFilter)?.total || 0})</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeselectAllInDimension(selectedDimensionFilter)}
+                              className="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                              title={`Tüm ${selectedDimensionFilter} ebatındaki karoları seçimden çıkar`}
+                            >
+                              <X size={13} />
+                              <span>Bu Ebattakileri Kaldır</span>
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={handleSelectAllFiltered}
+                              className="px-3.5 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+                            >
+                              <Check size={13} strokeWidth={2.5} />
+                              <span>Görüntülenen Tümünü Seç ({filteredBrandProducts.length})</span>
+                            </button>
+
+                            {formData.selectedProductIds.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={handleClearAllSelections}
+                                className="px-3 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                              >
+                                <Trash2 size={13} />
+                                <span>Tüm Seçimi Sıfırla</span>
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Ebat Hap Butonları (Dimension Chips) */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDimensionFilter('all')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                          selectedDimensionFilter === 'all'
+                            ? 'bg-amber-600 text-white shadow-2xs ring-1 ring-amber-600'
+                            : 'bg-white hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        }`}
+                      >
+                        <span>Tüm Ebatlar</span>
+                        <span
+                          className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                            selectedDimensionFilter === 'all'
+                              ? 'bg-amber-700/60 text-white'
+                              : 'bg-stone-100 text-stone-600'
+                          }`}
+                        >
+                          {brandProducts.length}
+                        </span>
+                      </button>
+
+                      {availableDimensions.map((dim) => {
+                        const isActive = selectedDimensionFilter === dim.key;
+                        const isFullySelected = dim.selected === dim.total && dim.total > 0;
+                        const isPartiallySelected = dim.selected > 0 && dim.selected < dim.total;
+
+                        return (
+                          <button
+                            key={dim.key}
+                            type="button"
+                            onClick={() => setSelectedDimensionFilter(dim.key)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                              isActive
+                                ? 'bg-amber-600 text-white shadow-2xs ring-1 ring-amber-600'
+                                : 'bg-white hover:bg-stone-100 text-stone-700 border border-stone-200'
+                            }`}
+                          >
+                            <span>{dim.label}</span>
+                            <span
+                              className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold flex items-center gap-1 ${
+                                isActive
+                                  ? 'bg-amber-700/60 text-white'
+                                  : isFullySelected
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : isPartiallySelected
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-stone-100 text-stone-600'
+                              }`}
+                            >
+                              {dim.selected > 0 ? `${dim.selected}/${dim.total}` : dim.total}
+                              {isFullySelected && <Check size={10} strokeWidth={3} />}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Seçilen Karoların Ebat Dağılım Özeti */}
+                    {formData.selectedProductIds.length > 0 && (
+                      <div className="pt-2.5 border-t border-stone-200/70 flex items-center gap-2 text-[11px] text-stone-600 flex-wrap">
+                        <span className="font-bold text-stone-800">Katalog Ebat Dağılımı:</span>
+                        {availableDimensions
+                          .filter((d) => d.selected > 0)
+                          .map((d) => (
+                            <span
+                              key={`summary-${d.key}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-white border border-stone-200 text-stone-800 font-medium shadow-2xs"
+                            >
+                              <span>{d.label}:</span>
+                              <strong className="text-amber-800 font-bold">{d.selected} adet</strong>
+                            </span>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. ÜRÜN IZGARASI (Modern Kartlar) */}
                   {productsLoading ? (
-                    <div className="py-12 text-center text-stone-400">
-                      <Loader2 size={20} className="animate-spin mx-auto text-[#b47b3d] mb-1" />
-                      <p className="text-xs">Ürünler taranıyor...</p>
+                    <div className="py-16 text-center text-stone-400">
+                      <Loader2 size={24} className="animate-spin mx-auto text-amber-600 mb-2" />
+                      <p className="text-xs font-medium">Karolar taranıyor...</p>
                     </div>
                   ) : filteredBrandProducts.length === 0 ? (
-                    <div className="p-8 text-center bg-stone-50 rounded-xl border border-dashed border-stone-200">
-                      <p className="text-xs text-stone-500">Ürün bulunamadı.</p>
+                    <div className="p-12 text-center bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                      <Package size={36} className="mx-auto text-stone-400 mb-2 opacity-60" />
+                      <h4 className="font-bold text-xs text-stone-800 mb-1">Eşleşen Karo Bulunamadı</h4>
+                      <p className="text-xs text-stone-500 max-w-sm mx-auto mb-3">
+                        {selectedDimensionFilter !== 'all'
+                          ? `"${selectedDimensionFilter}" ebatında seçtiğiniz filtrelerle eşleşen ürün bulunamadı.`
+                          : 'Arama kriterlerinize uygun ürün bulunamadı.'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedDimensionFilter('all');
+                          setSelectionViewFilter('all');
+                          setProductSearch('');
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-bold"
+                      >
+                        Filtreleri Sıfırla
+                      </button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-[460px] overflow-y-auto p-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 max-h-[540px] overflow-y-auto p-1">
                       {filteredBrandProducts.map((p) => {
                         const isSelected = formData.selectedProductIds.includes(p.id);
+                        const pDim = getProductDimension(p);
+                        const dimLabel = pDim === 'Diğer' ? 'Standart' : `${pDim.replace('x', ' × ')} cm`;
+
                         return (
                           <div
                             key={p.id}
                             onClick={() => toggleProductSelect(p.id)}
-                            className={`group p-2 rounded-xl border transition cursor-pointer flex flex-col justify-between ${
+                            className={`group p-2.5 rounded-2xl border transition-all duration-150 cursor-pointer flex flex-col justify-between ${
                               isSelected
-                                ? 'border-[#b47b3d] bg-amber-50/40 ring-1 ring-[#b47b3d]'
-                                : 'border-stone-200 hover:border-stone-400 bg-white'
+                                ? 'border-amber-500 bg-amber-50/40 ring-2 ring-amber-500/25 shadow-xs'
+                                : 'border-stone-200 hover:border-stone-300 hover:shadow-xs bg-white'
                             }`}
                           >
-                            <div className="relative aspect-square rounded-lg bg-stone-100 overflow-hidden mb-2">
+                            <div className="relative aspect-square rounded-xl bg-stone-100 overflow-hidden mb-2.5">
                               <img
                                 src={p.imageUrl || p.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
                                 alt={p.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
-                              {isSelected && (
-                                <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#b47b3d] text-white flex items-center justify-center shadow-xs">
-                                  <Check size={12} strokeWidth={3} />
-                                </div>
-                              )}
+
+                              {/* Sol Üst: Ebat Rozeti */}
+                              <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-bold shadow-xs">
+                                {dimLabel}
+                              </div>
+
+                              {/* Sağ Üst: Seçim Rozeti */}
+                              <div
+                                className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                                  isSelected
+                                    ? 'bg-amber-600 text-white shadow-xs ring-2 ring-white scale-105'
+                                    : 'bg-white/80 backdrop-blur-xs text-stone-400 border border-stone-300 group-hover:border-amber-500 group-hover:text-amber-600'
+                                }`}
+                              >
+                                {isSelected ? <Check size={13} strokeWidth={3} /> : <Plus size={12} />}
+                              </div>
                             </div>
 
-                            <div>
-                              <h4 className="text-xs font-bold text-stone-900 truncate" title={p.name}>
-                                {p.name}
-                              </h4>
-                              <p className="text-[10px] text-stone-500 truncate">
-                                {p.width && p.height ? `${p.width}x${p.height} cm` : (p.finish || 'Standart')}
-                              </p>
+                            <div className="flex-1 flex flex-col justify-between">
+                              <div>
+                                <h4 className="text-xs font-bold text-stone-900 truncate" title={p.name}>
+                                  {p.name}
+                                </h4>
+                                <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-stone-500 truncate">
+                                  <span>{dimLabel}</span>
+                                  {p.finish && (
+                                    <>
+                                      <span>&bull;</span>
+                                      <span>{p.finish}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="mt-2.5 pt-2 border-t border-stone-100 flex items-center justify-between">
+                                <span
+                                  className={`text-[10px] font-bold ${
+                                    isSelected ? 'text-amber-800' : 'text-stone-400 group-hover:text-stone-600'
+                                  }`}
+                                >
+                                  {isSelected ? '✓ Kataloğa Eklendi' : '+ Seçmek için tıkla'}
+                                </span>
+                                {p.code && (
+                                  <span className="text-[9px] font-mono text-stone-400 truncate max-w-[70px]">
+                                    {p.code}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
