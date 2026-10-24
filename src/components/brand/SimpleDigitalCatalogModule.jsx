@@ -1462,129 +1462,286 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           VIEW 2: INQUIRIES LIST (GELEN B2B TALEPLERİ)
       ========================================================================= */}
       {currentView === 'inquiries' && (
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
+        <div className="space-y-6">
+          {/* Header & Quick Action Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-xs">
             <div>
-              <div className="studio-eyebrow">{brandName} &bull; TİCARİ MASASI</div>
-              <h2 className="text-xl font-bold text-stone-900">Gelen Teklif & Numune Talepleri</h2>
-              <p className="text-xs text-stone-500">
-                Dijital kataloglarınızdan gelen mimari ve ticari talepleri yönetin.
+              <div className="flex items-center gap-2 text-xs font-bold text-amber-700 uppercase tracking-widest mb-1">
+                <Building2 size={14} />
+                <span>{brandName} &bull; TİCARİ TALEP MASASI</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight">
+                Gelen Teklif & Numune Talepleri
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-500 mt-1">
+                Dijital kataloglarınız üzerinden mimar ve proje yöneticilerinden gelen talepleri inceleyin ve doğrudan yanıtlayın.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-2.5 self-start sm:self-auto">
               <button
                 type="button"
                 onClick={() => setCurrentView('list')}
-                className="btn btn-outline"
+                className="h-11 px-4 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-semibold flex items-center gap-2 transition shadow-2xs"
               >
-                <ArrowLeft size={14} />
+                <ArrowLeft size={15} />
                 <span>Kataloglarıma Dön</span>
               </button>
               <button
                 type="button"
                 onClick={loadInquiries}
-                className="btn btn-primary"
+                className="h-11 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 transition shadow-xs"
               >
-                <RefreshCw size={13} />
+                <RefreshCw size={14} />
                 <span>Yenile</span>
               </button>
             </div>
           </div>
 
+          {/* KPI Stats Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between">
+              <div>
+                <span className="text-xs text-stone-500 font-medium">Toplam Talep</span>
+                <p className="text-2xl font-black text-stone-900 mt-0.5">{inquiries.length}</p>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
+                <Tag size={20} />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between">
+              <div>
+                <span className="text-xs text-amber-700 font-medium">Fiyat Teklifi İstekleri</span>
+                <p className="text-2xl font-black text-amber-900 mt-0.5">
+                  {inquiries.filter((i) => i.leadType !== 'sample').length}
+                </p>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700">
+                <FileText size={20} />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex items-center justify-between">
+              <div>
+                <span className="text-xs text-emerald-700 font-medium">Fiziksel Numune İstekleri</span>
+                <p className="text-2xl font-black text-emerald-900 mt-0.5">
+                  {inquiries.filter((i) => i.leadType === 'sample').length}
+                </p>
+              </div>
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-700">
+                <Box size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Inquiries List */}
           {inquiriesLoading ? (
-            <div className="py-20 text-center text-stone-400 bg-white rounded-2xl border border-stone-200">
-              <Loader2 size={24} className="animate-spin mx-auto text-[#b47b3d] mb-2" />
-              <p className="text-xs">Talepler yükleniyor...</p>
+            <div className="py-24 text-center text-stone-400 bg-white rounded-2xl border border-stone-200">
+              <Loader2 size={28} className="animate-spin mx-auto text-amber-600 mb-3" />
+              <p className="text-sm font-semibold text-stone-600">Talepler yükleniyor...</p>
             </div>
           ) : inquiries.length === 0 ? (
-            <div className="empty-state">
-              <Tag size={28} className="text-stone-300 mx-auto mb-2" />
-              <strong>Henüz bir talep alınmadı</strong>
-              <p className="text-xs">Kataloglarınız üzerinden iletilen teklif ve numune talepleri burada listelenir.</p>
+            <div className="py-20 text-center bg-white rounded-2xl border border-stone-200 shadow-2xs p-8 space-y-3">
+              <div className="w-16 h-16 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+                <Tag size={32} />
+              </div>
+              <h3 className="text-base font-bold text-stone-900">Henüz Bir Talep Alınmadı</h3>
+              <p className="text-xs sm:text-sm text-stone-500 max-w-md mx-auto">
+                Dijital kataloglarınız üzerinden müşterilerinizin ilettiği teklif ve numune talepleri anlık olarak bu masada listelenir.
+              </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {inquiries.map((inq) => {
                 const isSample = inq.leadType === 'sample';
+
+                // Parse customer city and message if bundled
+                const rawMsg = inq.customerMessage || '';
+                const cityMatch = rawMsg.match(/\[Şehir:\s*([^\]]+)\]/i);
+                const extractedCity = cityMatch ? cityMatch[1].trim() : '';
+                const cleanMessage = rawMsg.replace(/\[Şehir:\s*[^\]]+\]/gi, '').trim();
+
+                // Parse selected products (support both structured objects and legacy strings)
+                const parsedProducts = (inq.selectedProducts || []).map((p) => {
+                  if (typeof p === 'object' && p !== null) {
+                    return {
+                      name: p.name || 'Seramik Karo',
+                      code: p.code || '',
+                      dimension: p.dimensionText || p.dimension || '',
+                      m2: p.m2 || '',
+                      surface: p.finishText || p.surface || ''
+                    };
+                  }
+                  if (typeof p === 'string') {
+                    const name = p.split('(')[0].trim() || p;
+                    const codeMatch = p.match(/Kod:\s*([^,\)]+)/i);
+                    const dimMatch = p.match(/Ölçü:\s*([^,\)]+)/i);
+                    const m2Match = p.match(/Miktar:\s*([^,\)]+)/i);
+                    return {
+                      name,
+                      code: codeMatch ? codeMatch[1].trim() : '',
+                      dimension: dimMatch ? dimMatch[1].trim() : '',
+                      m2: m2Match ? m2Match[1].trim() : '',
+                      surface: ''
+                    };
+                  }
+                  return { name: String(p), code: '', dimension: '', m2: '', surface: '' };
+                });
+
                 return (
                   <div
                     key={inq.id}
-                    className="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 hover:border-amber-400/70 shadow-2xs hover:shadow-sm transition-all space-y-4"
                   >
-                    <div className="space-y-1.5 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
+                    {/* Top Header: Badge, Customer Name & Actions */}
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 pb-4 border-b border-stone-100">
+                      <div className="flex items-center gap-2.5 flex-wrap">
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
                             isSample
                               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-800 border border-amber-200'
+                              : 'bg-amber-50 text-amber-900 border border-amber-200'
                           }`}
                         >
-                          {isSample ? 'Fiziksel Numune Talebi' : 'Fiyat Teklifi İsteği'}
+                          {isSample ? <Box size={13} /> : <FileText size={13} />}
+                          <span>{isSample ? 'Fiziksel Numune Talebi' : 'Fiyat Teklifi İsteği'}</span>
                         </span>
-                        <h4 className="text-sm font-bold text-stone-900">{inq.customerName}</h4>
+
+                        <h3 className="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
+                          {inq.customerName}
+                        </h3>
+
                         {inq.companyName && (
-                          <span className="text-xs text-stone-500 font-medium">({inq.companyName})</span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 text-xs font-semibold">
+                            <Building2 size={12} className="text-stone-500" />
+                            <span>{inq.companyName}</span>
+                          </span>
+                        )}
+
+                        {extractedCity && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 text-xs font-semibold">
+                            <MapPin size={12} className="text-stone-500" />
+                            <span>{extractedCity}</span>
+                          </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-stone-600 flex-wrap">
+                      <div className="flex items-center gap-3 text-xs text-stone-400">
+                        <span className="inline-flex items-center gap-1">
+                          <Clock size={13} />
+                          <span>{new Date(inq.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                        </span>
+
+                        {inq.catalogTitle && (
+                          <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-50/70 text-amber-900 border border-amber-200/50 text-[11px] font-medium">
+                            <BookOpen size={11} />
+                            <span className="truncate max-w-[220px]">{inq.catalogTitle}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Contact & One-Click Reply Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-stone-50/90 border border-stone-200/70">
+                      <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm">
                         {inq.phone && (
                           <a
                             href={`tel:${inq.phone}`}
-                            className="flex items-center gap-1 hover:text-[#b47b3d] font-mono"
+                            className="flex items-center gap-1.5 font-mono font-semibold text-stone-800 hover:text-emerald-700 transition"
+                            title="Telefonla Ara"
                           >
-                            <Phone size={12} className="text-emerald-600" />
+                            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                              <Phone size={13} />
+                            </div>
                             <span>{inq.phone}</span>
                           </a>
                         )}
+
                         {inq.email && (
                           <a
                             href={`mailto:${inq.email}`}
-                            className="flex items-center gap-1 hover:text-[#b47b3d]"
+                            className="flex items-center gap-1.5 font-medium text-stone-700 hover:text-amber-700 transition"
+                            title="E-posta Gönder"
                           >
-                            <Mail size={12} className="text-[#b47b3d]" />
+                            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
+                              <Mail size={13} />
+                            </div>
                             <span>{inq.email}</span>
                           </a>
                         )}
-                        <span className="text-[11px] text-stone-400 font-mono">
-                          {new Date(inq.createdAt).toLocaleDateString('tr-TR')}
-                        </span>
                       </div>
 
-                      {inq.selectedProducts && inq.selectedProducts.length > 0 && (
-                        <p className="text-xs text-stone-500">
-                          <strong>İlgilendiği Ürünler:</strong>{' '}
-                          {inq.selectedProducts
-                            .map((p) => (typeof p === 'string' ? p : p.name))
-                            .join(', ')}
-                        </p>
-                      )}
-
-                      {inq.customerMessage && (
-                        <div className="text-xs text-stone-700 bg-stone-50 p-2.5 rounded-xl border border-stone-200 mt-2">
-                          <strong className="text-stone-900 block text-[11px] mb-0.5">Müşteri Notu / Talep:</strong>
-                          <span className="whitespace-pre-line">{inq.customerMessage}</span>
-                        </div>
-                      )}
-
-                      {inq.catalogTitle && (
-                        <p className="text-[11px] text-stone-400 mt-1">
-                          <strong>Kaynak Katalog:</strong> {inq.catalogTitle}
-                        </p>
+                      {/* Quick Action Button: WhatsApp Direct */}
+                      {inq.phone && (
+                        <a
+                          href={`https://api.whatsapp.com/send?phone=${inq.phone.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(
+                            `Merhaba ${inq.customerName}, ${brandName} dijital kataloğumuz üzerinden ilettiğiniz ${
+                              isSample ? 'numune' : 'fiyat teklifi'
+                            } talebiniz hakkında iletişime geçiyorum.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="h-10 px-4 bg-[#25D366] hover:bg-[#20ba5a] text-white text-xs sm:text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all self-stretch sm:self-auto"
+                        >
+                          <MessageCircle size={16} />
+                          <span>WhatsApp'tan Yanıtla</span>
+                        </a>
                       )}
                     </div>
 
-                    {inq.phone && (
-                      <a
-                        href={`https://wa.me/${inq.phone.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-primary text-xs"
-                      >
-                        <MessageCircle size={14} />
-                        <span>WhatsApp'tan Yaz</span>
-                      </a>
+                    {/* Selected Products Grid */}
+                    {parsedProducts.length > 0 && (
+                      <div className="space-y-2 pt-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-stone-800 uppercase tracking-wide flex items-center gap-1.5">
+                            <Box size={14} className="text-amber-600" />
+                            <span>İlgilenilen Karolar & Metraj ({parsedProducts.length} Ürün)</span>
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          {parsedProducts.map((p, pIdx) => (
+                            <div
+                              key={pIdx}
+                              className="p-3 rounded-xl bg-white border border-stone-200/90 shadow-2xs flex items-center justify-between gap-2.5"
+                            >
+                              <div className="min-w-0 flex-1">
+                                <h4 className="text-xs sm:text-sm font-bold text-stone-900 truncate">
+                                  {p.name}
+                                </h4>
+                                <div className="flex items-center gap-1.5 text-[11px] text-stone-500 mt-0.5">
+                                  {p.code && (
+                                    <span className="font-mono bg-stone-100 px-1.5 py-0.2 rounded text-stone-600 text-[10px]">
+                                      {p.code}
+                                    </span>
+                                  )}
+                                  {p.dimension && <span>{p.dimension}</span>}
+                                  {p.surface && <span>&bull; {p.surface}</span>}
+                                </div>
+                              </div>
+
+                              {p.m2 && (
+                                <div className="flex-shrink-0 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold text-xs shadow-2xs whitespace-nowrap">
+                                  {p.m2.includes('m²') ? p.m2 : `${p.m2} m²`}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Customer Message / Special Notes */}
+                    {cleanMessage && (
+                      <div className="text-xs sm:text-sm text-stone-800 bg-amber-500/5 p-3.5 rounded-xl border border-amber-500/20 space-y-1">
+                        <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wide block">
+                          Müşteri Notu / Özel Talep:
+                        </span>
+                        <p className="whitespace-pre-line leading-relaxed font-normal text-stone-700">
+                          {cleanMessage}
+                        </p>
+                      </div>
                     )}
                   </div>
                 );

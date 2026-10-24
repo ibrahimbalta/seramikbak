@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Palette,
   Eye,
+  AlertCircle,
   CheckCircle2,
   Loader2,
   MessageCircle,
@@ -49,7 +50,8 @@ import {
   Heart,
   Store,
   Globe,
-  Menu
+  Menu,
+  User
 } from 'lucide-react';
 import { prepareAndPrintCatalog } from '@/utils/printCatalog';
 import {
@@ -2120,22 +2122,31 @@ export default function HtmlLookbookViewer({
       </footer>
 
       {/* =========================================================================
-          QUOTE CART SLIDE-OVER DRAWER (Showroom Ergonomics)
+          QUOTE CART SLIDE-OVER DRAWER (Showroom Ergonomics & High-Contrast Form)
       ========================================================================= */}
       {showCartDrawer && (
         <div className="quote-drawer-backdrop" onClick={() => setShowCartDrawer(false)}>
           <div className="quote-drawer-content" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
             <div className="quote-drawer-header">
               <div className="quote-drawer-title-row">
-                <ShoppingBag size={20} className="text-[var(--site-primary)]" />
-                <h3 className="quote-drawer-title">
-                  Teklif & Numune Listem ({quoteCart.length})
-                </h3>
+                <div className="w-10 h-10 rounded-xl bg-[var(--site-primary)]/10 text-[var(--site-primary)] flex items-center justify-center flex-shrink-0">
+                  <ShoppingBag size={20} />
+                </div>
+                <div>
+                  <h3 className="quote-drawer-title">
+                    Teklif & Numune Listem
+                  </h3>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">
+                    {quoteCart.length > 0 ? `${quoteCart.length} adet karo seçildi` : 'Listeniz boş'}
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCartDrawer(false)}
-                className="p-1 rounded-full hover:bg-black/5 text-[var(--muted)]"
+                className="w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-[var(--muted)] flex items-center justify-center transition"
+                title="Kapat"
               >
                 <X size={20} />
               </button>
@@ -2143,12 +2154,12 @@ export default function HtmlLookbookViewer({
 
             <div className="quote-drawer-body">
               {cartSuccess ? (
-                <div className="p-8 text-center bg-emerald-50 border border-emerald-200 rounded-2xl my-6">
-                  <CheckCircle2 size={44} className="mx-auto text-emerald-600 mb-3" />
-                  <h4 className="text-base font-extrabold text-emerald-900 mb-1">
+                <div className="p-8 text-center bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl my-6 space-y-3">
+                  <CheckCircle2 size={48} className="mx-auto text-emerald-600 mb-2" />
+                  <h4 className="text-lg font-extrabold text-emerald-950 dark:text-emerald-100">
                     Talebiniz Başarıyla İletildi!
                   </h4>
-                  <p className="text-xs text-emerald-800 leading-relaxed mb-4">
+                  <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed max-w-md mx-auto">
                     {brandName} kurumsal satış ve mimari proje masası ekibimiz, talep ettiğiniz karolar ve metrajlar için en kısa sürede sizinle iletişime geçecektir.
                   </p>
                   <button
@@ -2158,7 +2169,7 @@ export default function HtmlLookbookViewer({
                       setQuoteCart([]);
                       setShowCartDrawer(false);
                     }}
-                    className="px-4 py-2 bg-emerald-700 text-white rounded-lg text-xs font-bold"
+                    className="mt-4 px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition"
                   >
                     Tamam, Kapat
                   </button>
@@ -2166,64 +2177,103 @@ export default function HtmlLookbookViewer({
               ) : (
                 <>
                   {quoteCart.length === 0 ? (
-                    <div className="p-12 text-center text-[var(--muted)]">
-                      <ShoppingBag size={40} className="mx-auto mb-3 opacity-40" />
-                      <p className="text-sm font-bold text-[var(--ink)] mb-1">Listenizde Henüz Karo Yok</p>
-                      <p className="text-xs mb-4">Katalogdaki beğendiğiniz karoların üzerindeki "Teklif Al" butonuna basarak buraya ekleyebilirsiniz.</p>
+                    <div className="py-16 text-center text-[var(--muted)] space-y-3">
+                      <div className="w-16 h-16 rounded-2xl bg-[var(--site-primary)]/10 text-[var(--site-primary)] flex items-center justify-center mx-auto opacity-70">
+                        <ShoppingBag size={32} />
+                      </div>
+                      <h4 className="text-base font-bold text-[var(--ink)]">Listenizde Henüz Karo Yok</h4>
+                      <p className="text-xs max-w-xs mx-auto leading-relaxed">
+                        Katalogdaki beğendiğiniz karoların üzerindeki <strong>"Teklif Masasına Ekle"</strong> butonuna basarak listenizi oluşturabilirsiniz.
+                      </p>
                       <button
                         type="button"
                         onClick={() => setShowCartDrawer(false)}
-                        className="px-4 py-2 rounded-lg bg-[var(--site-primary)] text-white text-xs font-bold"
+                        className="mt-2 px-5 py-2.5 rounded-xl bg-[var(--site-primary)] text-white text-xs sm:text-sm font-bold shadow-md hover:brightness-105 transition"
                       >
-                        Ürünleri İncele
+                        Koleksiyonu Keşfet
                       </button>
                     </div>
                   ) : (
-                    <div>
-                      <p className="text-xs text-[var(--muted)] mb-3">
-                        Eklediğiniz karolar ve yaklaşık metraj ihtiyacınız:
-                      </p>
+                    <div className="space-y-6">
+                      {/* Cart Products List */}
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs font-bold uppercase tracking-wider text-[var(--ink)] flex items-center gap-1.5">
+                            <Box size={14} className="text-[var(--site-primary)]" />
+                            <span>Seçilen Karolar ({quoteCart.length})</span>
+                          </span>
+                          <span className="text-[11px] text-[var(--muted)]">Yaklaşık metraj giriniz</span>
+                        </div>
 
-                      <div className="space-y-2 mb-6">
-                        {quoteCart.map((item) => (
-                          <div key={item.id} className="quote-item-row">
-                            <img src={item.imageUrl} alt={item.name} className="quote-item-thumb" />
-                            <div className="quote-item-details">
-                              <h5 className="quote-item-name">{item.name}</h5>
-                              <span className="quote-item-meta">{item.dimensionText} &bull; {item.finishText}</span>
+                        <div className="space-y-2.5">
+                          {quoteCart.map((item) => (
+                            <div
+                              key={item.id}
+                              className="p-3.5 rounded-2xl border border-[var(--line)] bg-[var(--site-background)] flex items-center justify-between gap-3 shadow-2xs hover:border-[var(--site-primary)]/50 transition"
+                            >
+                              <div className="w-14 h-14 rounded-xl overflow-hidden border border-[var(--line)] bg-[var(--paper)] flex-shrink-0 shadow-2xs">
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <h5 className="text-xs sm:text-sm font-bold text-[var(--ink)] truncate">
+                                  {item.name}
+                                </h5>
+                                <div className="flex items-center gap-2 text-[11px] text-[var(--muted)] mt-0.5 font-mono">
+                                  <span>{item.dimensionText}</span>
+                                  <span>&bull;</span>
+                                  <span>{item.finishText}</span>
+                                </div>
+                              </div>
+
+                              {/* Quantity stepper & delete */}
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <div className="flex items-center gap-1 bg-[var(--paper)] px-2.5 py-1.5 rounded-xl border border-[var(--line)]">
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={item.m2}
+                                    onChange={(e) => handleUpdateCartM2(item.id, e.target.value)}
+                                    className="w-12 text-center text-xs sm:text-sm font-bold text-[var(--ink)] bg-transparent outline-none"
+                                    title="Metraj (m²)"
+                                  />
+                                  <span className="text-xs font-semibold text-[var(--muted)]">m²</span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFromCart(item.id)}
+                                  className="w-8 h-8 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center transition"
+                                  title="Listeden Kaldır"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1.5 flex-shrink-0">
-                              <input
-                                type="number"
-                                min="1"
-                                value={item.m2}
-                                onChange={(e) => handleUpdateCartM2(item.id, e.target.value)}
-                                className="quote-item-m2-input"
-                                title="Tahmini metraj (m²)"
-                              />
-                              <span className="text-xs text-[var(--muted)]">m²</span>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveFromCart(item.id)}
-                                className="p-1.5 text-stone-400 hover:text-rose-600 transition"
-                                title="Listeden Kaldır"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
 
-                      {/* Lead Form */}
-                      <form onSubmit={handleCartSubmit} className="space-y-3 pt-4 border-t border-[var(--line)]">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--ink)] mb-1">
-                          İletişim & Proje Bilgileriniz
-                        </h4>
-
+                      {/* Lead Form - Clean, Spacious, High-Contrast */}
+                      <form onSubmit={handleCartSubmit} className="space-y-4 pt-5 border-t border-[var(--line)]">
                         <div>
-                          <label className="block text-[11px] font-bold text-[var(--ink)] mb-1">
-                            Ad Soyad *
+                          <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[var(--ink)] flex items-center gap-1.5">
+                            <Building2 size={15} className="text-[var(--site-primary)]" />
+                            <span>İletişim & Mimari Proje Bilgileriniz</span>
+                          </h4>
+                          <p className="text-xs text-[var(--muted)] mt-0.5">
+                            Fiyat teklifi ve numune gönderimi için bilgilerinizi eksiksiz giriniz.
+                          </p>
+                        </div>
+
+                        {/* Ad Soyad */}
+                        <div className="space-y-1">
+                          <label className="block text-xs font-bold text-[var(--ink)] uppercase tracking-wide">
+                            Ad Soyad <span className="text-rose-500">*</span>
                           </label>
                           <input
                             type="text"
@@ -2231,14 +2281,15 @@ export default function HtmlLookbookViewer({
                             placeholder="Örn: Mimar Selim Yılmaz"
                             value={quoteForm.name}
                             onChange={(e) => setQuoteForm({ ...quoteForm, name: e.target.value })}
-                            className="w-full px-3 py-2 text-xs border border-[var(--line)] rounded-lg outline-none bg-[var(--site-background)] text-[var(--ink)]"
+                            className="w-full h-11 sm:h-12 px-4 text-xs sm:text-sm font-medium border border-[var(--line)] rounded-xl outline-none bg-[var(--paper)] text-[var(--ink)] placeholder-[var(--muted)] focus:border-[var(--site-primary)] focus:ring-4 focus:ring-[var(--site-primary)]/10 transition shadow-2xs"
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="block text-[11px] font-bold text-[var(--ink)] mb-1">
-                              Telefon *
+                        {/* Telefon & Şehir Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-[var(--ink)] uppercase tracking-wide">
+                              Telefon Numarası <span className="text-rose-500">*</span>
                             </label>
                             <input
                               type="tel"
@@ -2246,85 +2297,98 @@ export default function HtmlLookbookViewer({
                               placeholder="05XX XXX XX XX"
                               value={quoteForm.phone}
                               onChange={(e) => setQuoteForm({ ...quoteForm, phone: e.target.value })}
-                              className="w-full px-3 py-2 text-xs border border-[var(--line)] rounded-lg outline-none bg-[var(--site-background)] text-[var(--ink)]"
+                              className="w-full h-11 sm:h-12 px-4 text-xs sm:text-sm font-medium border border-[var(--line)] rounded-xl outline-none bg-[var(--paper)] text-[var(--ink)] placeholder-[var(--muted)] focus:border-[var(--site-primary)] focus:ring-4 focus:ring-[var(--site-primary)]/10 transition shadow-2xs font-mono"
                             />
                           </div>
-                          <div>
-                            <label className="block text-[11px] font-bold text-[var(--ink)] mb-1">
+
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-[var(--ink)] uppercase tracking-wide">
                               Proje Şehri
                             </label>
                             <input
                               type="text"
-                              placeholder="İstanbul, Ankara..."
+                              placeholder="İstanbul, Ankara, İzmir..."
                               value={quoteForm.city}
                               onChange={(e) => setQuoteForm({ ...quoteForm, city: e.target.value })}
-                              className="w-full px-3 py-2 text-xs border border-[var(--line)] rounded-lg outline-none bg-[var(--site-background)] text-[var(--ink)]"
+                              className="w-full h-11 sm:h-12 px-4 text-xs sm:text-sm font-medium border border-[var(--line)] rounded-xl outline-none bg-[var(--paper)] text-[var(--ink)] placeholder-[var(--muted)] focus:border-[var(--site-primary)] focus:ring-4 focus:ring-[var(--site-primary)]/10 transition shadow-2xs"
                             />
                           </div>
                         </div>
 
-                        <div>
-                          <label className="block text-[11px] font-bold text-[var(--ink)] mb-1">
-                            E-posta Adresi
-                          </label>
-                          <input
-                            type="email"
-                            placeholder="mimar@proje.com"
-                            value={quoteForm.email}
-                            onChange={(e) => setQuoteForm({ ...quoteForm, email: e.target.value })}
-                            className="w-full px-3 py-2 text-xs border border-[var(--line)] rounded-lg outline-none bg-[var(--site-background)] text-[var(--ink)]"
-                          />
+                        {/* E-posta & Firma Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-[var(--ink)] uppercase tracking-wide">
+                              E-posta Adresi
+                            </label>
+                            <input
+                              type="email"
+                              placeholder="mimar@proje.com"
+                              value={quoteForm.email}
+                              onChange={(e) => setQuoteForm({ ...quoteForm, email: e.target.value })}
+                              className="w-full h-11 sm:h-12 px-4 text-xs sm:text-sm font-medium border border-[var(--line)] rounded-xl outline-none bg-[var(--paper)] text-[var(--ink)] placeholder-[var(--muted)] focus:border-[var(--site-primary)] focus:ring-4 focus:ring-[var(--site-primary)]/10 transition shadow-2xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-[var(--ink)] uppercase tracking-wide">
+                              Firma / Mimarlık Ofisi
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Örn: Kolektif Mimarlık"
+                              value={quoteForm.company}
+                              onChange={(e) => setQuoteForm({ ...quoteForm, company: e.target.value })}
+                              className="w-full h-11 sm:h-12 px-4 text-xs sm:text-sm font-medium border border-[var(--line)] rounded-xl outline-none bg-[var(--paper)] text-[var(--ink)] placeholder-[var(--muted)] focus:border-[var(--site-primary)] focus:ring-4 focus:ring-[var(--site-primary)]/10 transition shadow-2xs"
+                            />
+                          </div>
                         </div>
 
-                        <div>
-                          <label className="block text-[11px] font-bold text-[var(--ink)] mb-1">
-                            Firma / Mimarlık Ofisi
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="Örn: Kolektif Mimarlık"
-                            value={quoteForm.company}
-                            onChange={(e) => setQuoteForm({ ...quoteForm, company: e.target.value })}
-                            className="w-full px-3 py-2 text-xs border border-[var(--line)] rounded-lg outline-none bg-[var(--site-background)] text-[var(--ink)]"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] font-bold text-[var(--ink)] mb-1">
-                            Proje Notları / Özel Talepler
+                        {/* Proje Notu */}
+                        <div className="space-y-1">
+                          <label className="block text-xs font-bold text-[var(--ink)] uppercase tracking-wide">
+                            Proje Notları & Özel Talepler
                           </label>
                           <textarea
-                            rows={2}
-                            placeholder="Örn: 2026 son çeyreği teslim villa projesi için fiziki numune ve iskonto tablosu rica ediyoruz."
+                            rows={3}
+                            placeholder="Örn: 2026 son çeyreği teslim konut projesi için fiziki numune ve iskonto tablosu rica ediyoruz."
                             value={quoteForm.message}
                             onChange={(e) => setQuoteForm({ ...quoteForm, message: e.target.value })}
-                            className="w-full px-3 py-2 text-xs border border-[var(--line)] rounded-lg outline-none bg-[var(--site-background)] text-[var(--ink)]"
+                            className="w-full px-4 py-3 text-xs sm:text-sm font-medium border border-[var(--line)] rounded-xl outline-none bg-[var(--paper)] text-[var(--ink)] placeholder-[var(--muted)] focus:border-[var(--site-primary)] focus:ring-4 focus:ring-[var(--site-primary)]/10 transition shadow-2xs resize-none leading-relaxed"
                           />
                         </div>
 
                         {cartError && (
-                          <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
-                            {cartError}
+                          <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-200 text-xs flex items-center gap-2">
+                            <AlertCircle size={15} className="flex-shrink-0" />
+                            <span>{cartError}</span>
                           </div>
                         )}
 
-                        <button
-                          type="submit"
-                          disabled={cartSubmitting}
-                          className="w-full py-3 rounded-lg bg-[var(--site-primary)] text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md hover:brightness-105 transition"
-                        >
-                          {cartSubmitting ? (
-                            <>
-                              <Loader2 size={15} className="animate-spin" />
-                              <span>İletiliyor...</span>
-                            </>
-                          ) : (
-                            <>
-                              <FileText size={15} />
-                              <span>Teklif & Numune Talebini Gönder ({quoteCart.length} Ürün)</span>
-                            </>
-                          )}
-                        </button>
+                        {/* Submit Button */}
+                        <div className="pt-2 space-y-2">
+                          <button
+                            type="submit"
+                            disabled={cartSubmitting}
+                            className="w-full h-13 sm:h-14 rounded-2xl bg-[var(--site-primary)] hover:brightness-105 active:scale-[0.99] text-[var(--site-on-primary,white)] text-sm sm:text-base font-extrabold flex items-center justify-center gap-2.5 cursor-pointer shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                          >
+                            {cartSubmitting ? (
+                              <>
+                                <Loader2 size={18} className="animate-spin" />
+                                <span>Talebiniz İletiliyor...</span>
+                              </>
+                            ) : (
+                              <>
+                                <FileText size={18} />
+                                <span>Teklif & Numune Talebini Gönder ({quoteCart.length} Ürün)</span>
+                              </>
+                            )}
+                          </button>
+
+                          <p className="text-[11px] text-center text-[var(--muted)]">
+                            🔒 Talebiniz doğrudan {brandName} mimari proje masasına iletilir ve gizlilikle korunur.
+                          </p>
+                        </div>
                       </form>
                     </div>
                   )}
