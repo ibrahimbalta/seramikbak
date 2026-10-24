@@ -43,7 +43,12 @@ import {
   Image as ImageIcon,
   PhoneCall,
   MapPin,
-  EyeOff
+  EyeOff,
+  Award,
+  Compass,
+  Box,
+  Ruler,
+  Droplets
 } from 'lucide-react';
 import HtmlLookbookViewer from './catalog/templates/HtmlLookbookViewer';
 import { LOOKBOOK_COLOR_TEMPLATES, getLookbookTheme } from './catalog/templates/lookbookThemes';
@@ -1781,117 +1786,121 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           {editorStep === 2 && (
             <div className="space-y-6">
               {/* Informative Sub-Tabs Bar */}
-              <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider flex items-center gap-2">
-                      <Sliders size={16} className="text-amber-600" />
-                      <span>Katalog İçerik, Metin ve Görsel Özelleştirme</span>
-                    </h3>
-                    <p className="text-xs text-stone-500 mt-0.5">
-                      İstediğiniz bölümleri açıp kapatabilir, tüm başlık, metin, teknik şartname ve görselleri markanıza özel güncelleyebilirsiniz.
-                    </p>
+              <div className="bg-white p-5 md:p-6 rounded-2xl border border-stone-200/90 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-700 flex-shrink-0 shadow-2xs">
+                      <Sliders size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-stone-900 tracking-tight">
+                        Katalog İçerik, Metin ve Görsel Özelleştirme
+                      </h3>
+                      <p className="text-xs sm:text-sm text-stone-500 mt-0.5">
+                        İstediğiniz bölümleri açıp kapatabilir, tüm başlık, metin, teknik şartname ve görselleri markanıza özel güncelleyebilirsiniz.
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleAiAutoFill}
                     disabled={aiGenerating}
-                    className="btn btn-outline text-xs whitespace-nowrap self-start sm:self-auto"
+                    className="btn btn-outline text-xs sm:text-sm font-bold whitespace-nowrap self-start sm:self-auto px-4 py-2.5 rounded-xl border-amber-300 bg-amber-50/60 hover:bg-amber-100/80 text-amber-900 shadow-2xs transition flex items-center gap-2 cursor-pointer"
                   >
-                    {aiGenerating ? <Loader2 size={13} className="animate-spin text-amber-600" /> : <Sparkles size={13} className="text-amber-600" />}
+                    {aiGenerating ? <Loader2 size={15} className="animate-spin text-amber-700" /> : <Sparkles size={15} className="text-amber-700" />}
                     <span>Yapay Zeka ile Doldur</span>
                   </button>
                 </div>
 
-                {/* Sub-Tabs Grid/Scroll */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-stone-100">
+                {/* Sub-Tabs Grid / Segmented Control */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                   <button
                     type="button"
                     onClick={() => setActiveContentTab('products')}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center sm:justify-start gap-2 cursor-pointer border ${
                       activeContentTab === 'products'
-                        ? 'bg-amber-600 text-white shadow-xs'
-                        : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200'
                     }`}
                   >
-                    <Package size={13} />
-                    <span>1. Karolar ({formData.selectedProductIds.length})</span>
+                    <Package size={16} className={activeContentTab === 'products' ? 'text-white' : 'text-stone-500'} />
+                    <span className="truncate">1. Karolar ({formData.selectedProductIds.length})</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveContentTab('cover')}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center sm:justify-start gap-2 cursor-pointer border ${
                       activeContentTab === 'cover'
-                        ? 'bg-amber-600 text-white shadow-xs'
-                        : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200'
                     }`}
                   >
-                    <BookOpen size={13} />
-                    <span>2. Kapak & Giriş</span>
+                    <BookOpen size={16} className={activeContentTab === 'cover' ? 'text-white' : 'text-stone-500'} />
+                    <span className="truncate">2. Kapak & Giriş</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveContentTab('monograph')}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center sm:justify-start gap-2 cursor-pointer border ${
                       activeContentTab === 'monograph'
-                        ? 'bg-amber-600 text-white shadow-xs'
-                        : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200'
                     }`}
                   >
-                    <Tag size={13} />
-                    <span>3. Kürasyon & Standartlar</span>
+                    <Tag size={16} className={activeContentTab === 'monograph' ? 'text-white' : 'text-stone-500'} />
+                    <span className="truncate">3. Kürasyon</span>
                     {formData.sectionSettings?.showMonograph === false && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-normal">Gizli</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold ml-auto">Gizli</span>
                     )}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveContentTab('editorial')}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center sm:justify-start gap-2 cursor-pointer border ${
                       activeContentTab === 'editorial'
-                        ? 'bg-amber-600 text-white shadow-xs'
-                        : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200'
                     }`}
                   >
-                    <Layers size={13} />
-                    <span>4. Mekânlar & Editoryal</span>
+                    <Layers size={16} className={activeContentTab === 'editorial' ? 'text-white' : 'text-stone-500'} />
+                    <span className="truncate">4. Mekânlar</span>
                     {formData.sectionSettings?.showEditorial === false && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-normal">Gizli</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold ml-auto">Gizli</span>
                     )}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveContentTab('technical')}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center sm:justify-start gap-2 cursor-pointer border ${
                       activeContentTab === 'technical'
-                        ? 'bg-amber-600 text-white shadow-xs'
-                        : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200'
                     }`}
                   >
-                    <ShieldCheck size={13} />
-                    <span>5. Teknik Şartname & BIM</span>
+                    <ShieldCheck size={16} className={activeContentTab === 'technical' ? 'text-white' : 'text-stone-500'} />
+                    <span className="truncate">5. Şartname & BIM</span>
                     {formData.sectionSettings?.showTechnical === false && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-normal">Gizli</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold ml-auto">Gizli</span>
                     )}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveContentTab('cta')}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center sm:justify-start gap-2 cursor-pointer border ${
                       activeContentTab === 'cta'
-                        ? 'bg-amber-600 text-white shadow-xs'
-                        : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border border-stone-200'
+                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm ring-2 ring-amber-600/20'
+                        : 'bg-stone-50/80 hover:bg-stone-100 text-stone-700 border-stone-200'
                     }`}
                   >
-                    <Phone size={13} />
-                    <span>6. İletişim & Teklif</span>
+                    <Phone size={16} className={activeContentTab === 'cta' ? 'text-white' : 'text-stone-500'} />
+                    <span className="truncate">6. İletişim & Teklif</span>
                     {formData.sectionSettings?.showCta === false && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-normal">Gizli</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold ml-auto">Gizli</span>
                     )}
                   </button>
                 </div>
@@ -1899,55 +1908,55 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
 
               {/* SUB-TAB 1: PRODUCT SELECTION & DIMENSION FILTERING */}
               {activeContentTab === 'products' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
+                <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-6">
                   {/* 1. Top Header: Title, Search, View Filters */}
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-stone-100">
                     <div>
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-base sm:text-lg font-bold text-stone-900 tracking-tight">
                           Kataloğa Dahil Edilecek Karolar
                         </h3>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                          <Check size={12} strokeWidth={3} className="text-amber-700" />
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200 shadow-2xs">
+                          <Check size={13} strokeWidth={3} className="text-amber-700" />
                           <span>{formData.selectedProductIds.length} Seçili</span>
                         </span>
-                        <span className="text-xs text-stone-400 font-medium">
+                        <span className="text-xs font-semibold text-stone-400">
                           / {brandProducts.length} Toplam Karo
                         </span>
                       </div>
-                      <p className="text-xs text-stone-500 mt-1">
+                      <p className="text-xs sm:text-sm text-stone-500 mt-1">
                         Kataloğunuzda sergilenecek ürünleri seçin, ebata göre filtreleyin veya tek tıkla toplu ekleyin.
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2.5 flex-wrap">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                       {/* Search Input */}
-                      <div className="relative min-w-[240px] flex-1 sm:flex-initial">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                      <div className="relative min-w-[240px] sm:w-72">
+                        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                         <input
                           type="text"
                           placeholder="Ürün adı, kod veya yüzey ara..."
                           value={productSearch}
                           onChange={(e) => setProductSearch(e.target.value)}
-                          className="w-full pl-9 pr-8 py-2 rounded-xl border border-stone-200 text-xs text-stone-900 outline-none focus:border-amber-600 bg-stone-50/50 focus:bg-white transition"
+                          className="w-full h-11 pl-10 pr-9 rounded-xl border border-stone-300 text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 bg-white transition shadow-2xs"
                         />
                         {productSearch && (
                           <button
                             type="button"
                             onClick={() => setProductSearch('')}
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer"
                           >
-                            <X size={13} />
+                            <X size={14} />
                           </button>
                         )}
                       </div>
 
-                      {/* View Filter: All / Selected / Unselected */}
-                      <div className="flex items-center bg-stone-100 p-1 rounded-xl text-xs font-medium text-stone-600">
+                      {/* View Filter Segmented Bar */}
+                      <div className="flex items-center bg-stone-100 p-1 rounded-xl text-xs font-bold text-stone-600 border border-stone-200/80">
                         <button
                           type="button"
                           onClick={() => setSelectionViewFilter('all')}
-                          className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                          className={`px-3 py-2 rounded-lg transition cursor-pointer ${
                             selectionViewFilter === 'all'
                               ? 'bg-white text-stone-900 shadow-2xs font-bold'
                               : 'hover:text-stone-900'
@@ -1958,21 +1967,21 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                         <button
                           type="button"
                           onClick={() => setSelectionViewFilter('selected')}
-                          className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer ${
+                          className={`px-3 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer ${
                             selectionViewFilter === 'selected'
                               ? 'bg-white text-amber-900 shadow-2xs font-bold'
                               : 'hover:text-stone-900'
                           }`}
                         >
                           <span>Seçilenler</span>
-                          <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
+                          <span className="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
                             {formData.selectedProductIds.length}
                           </span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setSelectionViewFilter('unselected')}
-                          className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
+                          className={`px-3 py-2 rounded-lg transition cursor-pointer ${
                             selectionViewFilter === 'unselected'
                               ? 'bg-white text-stone-900 shadow-2xs font-bold'
                               : 'hover:text-stone-900'
@@ -1984,17 +1993,21 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                     </div>
                   </div>
 
-                  {/* 2. EBATA GÖRE FİLTRELEME & TOPLU EKLEME BÖLÜMÜ */}
-                  <div className="bg-stone-50/90 rounded-2xl p-4 border border-stone-200/80 space-y-3.5">
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <Layers size={15} className="text-amber-700" />
-                        <span className="text-xs font-bold text-stone-800 uppercase tracking-wide">
-                          Ebata Göre Filtrele & Toplu Ekle
-                        </span>
-                        <span className="text-[11px] text-stone-500 hidden sm:inline">
-                          — Kataloğunuzu belirli ölçülerdeki serilerden oluşturun
-                        </span>
+                  {/* 2. EBATA GÖRE FİLTRELEME & TOPLU EKLEME KARTI */}
+                  <div className="bg-gradient-to-r from-amber-50/40 via-stone-50/80 to-white rounded-2xl p-5 border border-amber-200/80 space-y-4 shadow-2xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-amber-600/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                          <Layers size={16} />
+                        </div>
+                        <div>
+                          <span className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wide block">
+                            Ebata Göre Filtrele & Toplu Ekle
+                          </span>
+                          <span className="text-xs text-stone-500">
+                            Kataloğunuzu belirli ölçülerdeki serilerden oluşturun
+                          </span>
+                        </div>
                       </div>
 
                       {/* Toplu İşlem Butonları */}
@@ -2004,20 +2017,20 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                             <button
                               type="button"
                               onClick={() => handleSelectAllInDimension(selectedDimensionFilter)}
-                              className="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+                              className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
                               title={`Tüm ${selectedDimensionFilter} ebatındaki karoları kataloğa ekle`}
                             >
-                              <Plus size={13} strokeWidth={2.5} />
+                              <Plus size={14} strokeWidth={2.5} />
                               <span>Bu Ebattaki Tümünü Ekle ({availableDimensions.find((d) => d.key === selectedDimensionFilter)?.total || 0})</span>
                             </button>
 
                             <button
                               type="button"
                               onClick={() => handleDeselectAllInDimension(selectedDimensionFilter)}
-                              className="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                              className="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer"
                               title={`Tüm ${selectedDimensionFilter} ebatındaki karoları seçimden çıkar`}
                             >
-                              <X size={13} />
+                              <X size={14} />
                               <span>Bu Ebattakileri Kaldır</span>
                             </button>
                           </>
@@ -2026,9 +2039,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                             <button
                               type="button"
                               onClick={handleSelectAllFiltered}
-                              className="px-3.5 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+                              className="px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
                             >
-                              <Check size={13} strokeWidth={2.5} />
+                              <Check size={14} strokeWidth={2.5} />
                               <span>Görüntülenen Tümünü Seç ({filteredBrandProducts.length})</span>
                             </button>
 
@@ -2036,9 +2049,9 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                               <button
                                 type="button"
                                 onClick={handleClearAllSelections}
-                                className="px-3 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                                className="px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer"
                               >
-                                <Trash2 size={13} />
+                                <Trash2 size={14} />
                                 <span>Tüm Seçimi Sıfırla</span>
                               </button>
                             )}
@@ -2047,22 +2060,22 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                       </div>
                     </div>
 
-                    {/* Ebat Hap Butonları (Dimension Chips) */}
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    {/* Ebat Butonları (Dimension Chips) */}
+                    <div className="flex items-center gap-2 flex-wrap pt-1">
                       <button
                         type="button"
                         onClick={() => setSelectedDimensionFilter('all')}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                        className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer border ${
                           selectedDimensionFilter === 'all'
-                            ? 'bg-amber-600 text-white shadow-2xs ring-1 ring-amber-600'
-                            : 'bg-white hover:bg-stone-100 text-stone-700 border border-stone-200'
+                            ? 'bg-amber-600 text-white border-amber-600 shadow-2xs ring-2 ring-amber-600/20'
+                            : 'bg-white hover:bg-stone-100 text-stone-700 border-stone-200'
                         }`}
                       >
                         <span>Tüm Ebatlar</span>
                         <span
-                          className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                             selectedDimensionFilter === 'all'
-                              ? 'bg-amber-700/60 text-white'
+                              ? 'bg-amber-700 text-white'
                               : 'bg-stone-100 text-stone-600'
                           }`}
                         >
@@ -2080,17 +2093,17 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                             key={dim.key}
                             type="button"
                             onClick={() => setSelectedDimensionFilter(dim.key)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                            className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer border ${
                               isActive
-                                ? 'bg-amber-600 text-white shadow-2xs ring-1 ring-amber-600'
-                                : 'bg-white hover:bg-stone-100 text-stone-700 border border-stone-200'
+                                ? 'bg-amber-600 text-white border-amber-600 shadow-2xs ring-2 ring-amber-600/20'
+                                : 'bg-white hover:bg-stone-100 text-stone-700 border-stone-200'
                             }`}
                           >
                             <span>{dim.label}</span>
                             <span
-                              className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold flex items-center gap-1 ${
+                              className={`px-2 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 ${
                                 isActive
-                                  ? 'bg-amber-700/60 text-white'
+                                  ? 'bg-amber-700 text-white'
                                   : isFullySelected
                                   ? 'bg-emerald-100 text-emerald-800'
                                   : isPartiallySelected
@@ -2099,7 +2112,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                               }`}
                             >
                               {dim.selected > 0 ? `${dim.selected}/${dim.total}` : dim.total}
-                              {isFullySelected && <Check size={10} strokeWidth={3} />}
+                              {isFullySelected && <Check size={11} strokeWidth={3} />}
                             </span>
                           </button>
                         );
@@ -2108,14 +2121,14 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
 
                     {/* Seçilen Karoların Ebat Dağılım Özeti */}
                     {formData.selectedProductIds.length > 0 && (
-                      <div className="pt-2.5 border-t border-stone-200/70 flex items-center gap-2 text-[11px] text-stone-600 flex-wrap">
-                        <span className="font-bold text-stone-800">Katalog Ebat Dağılımı:</span>
+                      <div className="pt-3 border-t border-amber-200/60 flex items-center gap-2 text-xs text-stone-600 flex-wrap">
+                        <span className="font-bold text-stone-900">Katalog Ebat Dağılımı:</span>
                         {availableDimensions
                           .filter((d) => d.selected > 0)
                           .map((d) => (
                             <span
                               key={`summary-${d.key}`}
-                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-white border border-stone-200 text-stone-800 font-medium shadow-2xs"
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-stone-200 text-stone-800 font-medium shadow-2xs text-xs"
                             >
                               <span>{d.label}:</span>
                               <strong className="text-amber-800 font-bold">{d.selected} adet</strong>
@@ -2234,733 +2247,958 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
 
               {/* SUB-TAB 2: COVER & HERO EDIT */}
               {activeContentTab === 'cover' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
-                  <div className="flex items-center justify-between pb-3 border-b border-stone-100">
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                        Kapak & Hero Alanı Özelleştirme
-                      </h3>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        Kataloğunuzun ilk açılış ekranındaki başlık, alt başlık, giriş metni ve özel kapak görseli.
+                <div className="space-y-6">
+                  {/* Kart 1: Başlık & Sezon Bilgileri */}
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
+                    <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                        <BookOpen size={18} />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-stone-900">
+                          1. Başlık ve Kimlik Bilgileri
+                        </h3>
+                        <p className="text-xs text-stone-500 mt-0.5">
+                          Katalog kapağının ilk açılışında ziyaretçileri karşılayacak olan resmi marka ve koleksiyon başlıkları.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                          Katalog Başlığı <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          placeholder="Örn: Güral Seramik 2026 Mimari Koleksiyonu"
+                          className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm font-semibold text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                          Kapak Alt Başlığı
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.coverSubtitle}
+                          onChange={(e) => setFormData({ ...formData, coverSubtitle: e.target.value })}
+                          placeholder="Örn: Yüksek Performanslı Porselen & Seramik Seçkisi"
+                          className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                          Kapak Damga / Rozet Metni
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.sectionSettings?.heroBadgeText || ''}
+                          onChange={(e) => updateSectionSetting('heroBadgeText', e.target.value)}
+                          placeholder="Örn: MALZEMENİN DİLİ veya 2026 MİMARİ SEÇKİSİ"
+                          className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                          Yıl / Sezon Etiketi
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.sectionSettings?.heroYear || ''}
+                          onChange={(e) => updateSectionSetting('heroYear', e.target.value)}
+                          placeholder="Örn: 2026"
+                          className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                          Kapak Damga Alt Başlığı (Vurgu / Slogan)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.sectionSettings?.heroStampText || ''}
+                          onChange={(e) => updateSectionSetting('heroStampText', e.target.value)}
+                          placeholder="Örn: Doğadan ilham. Mimariyle hayat bulur."
+                          className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Kart 2: Özel Kapak Görseli */}
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-4">
+                    <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                        <ImageIcon size={18} />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-stone-900">
+                          2. Özel Kapak Görseli & Showroom Medyası
+                        </h3>
+                        <p className="text-xs text-stone-500 mt-0.5">
+                          Markanıza ait showroom, fabrika veya prestij proje fotoğrafı URL'si yapıştırarak kapağı kişiselleştirin.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                        Özel Kapak Görseli URL'si
+                      </label>
+                      <div className="flex items-center gap-3.5">
+                        <input
+                          type="text"
+                          value={formData.sectionSettings?.coverImageUrl || ''}
+                          onChange={(e) => updateSectionSetting('coverImageUrl', e.target.value)}
+                          placeholder="https://... (Boş bırakılırsa şablonun varsayılan kapağı veya ilk ürün görseli kullanılır)"
+                          className="flex-1 h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                        />
+                        {formData.sectionSettings?.coverImageUrl && (
+                          <div className="w-14 h-14 rounded-xl overflow-hidden border border-stone-300 flex-shrink-0 bg-stone-100 shadow-xs">
+                            <img
+                              src={formData.sectionSettings.coverImageUrl}
+                              alt="Kapak Önizleme"
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-stone-400">
+                        💡 İpucu: Boş bıraktığınızda sistem seçtiğiniz şablonun mimari atmosferine uygun görseli otomatik atar.
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-700">Katalog Başlığı *</label>
-                      <input
-                        type="text"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        placeholder="Örn: Bien Seramik 2026 Mimari Koleksiyonu"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                      />
+                  {/* Kart 3: Giriş / Manifesto Açıklaması */}
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-4">
+                    <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                        <FileText size={18} />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-stone-900">
+                          3. Giriş & Manifesto Metni
+                        </h3>
+                        <p className="text-xs text-stone-500 mt-0.5">
+                          Koleksiyonunuzun felsefesini, mimari duruşunu ve zanaatkar vizyonunu anlatan editoryal giriş paragrafı.
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-700">Kapak Alt Başlığı</label>
-                      <input
-                        type="text"
-                        value={formData.coverSubtitle}
-                        onChange={(e) => setFormData({ ...formData, coverSubtitle: e.target.value })}
-                        placeholder="Örn: Yüksek Performanslı Porselen & Seramik Seçkisi"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
+                    <div className="space-y-2">
+                      <textarea
+                        rows={4}
+                        value={formData.introText}
+                        onChange={(e) => setFormData({ ...formData, introText: e.target.value })}
+                        placeholder="Koleksiyonunuzun felsefesini, doku zenginliğini ve mimari kullanım vizyonunu açıklayan metin..."
+                        className="w-full px-4 py-3.5 rounded-xl border border-stone-300 bg-white text-sm leading-relaxed text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs resize-none"
                       />
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-700">Kapak Damga / Rozet Metni</label>
-                      <input
-                        type="text"
-                        value={formData.sectionSettings?.heroBadgeText || ''}
-                        onChange={(e) => updateSectionSetting('heroBadgeText', e.target.value)}
-                        placeholder="Örn: MALZEMENİN DİLİ veya 2026 MİMARİ SERİSİ"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-700">Yıl / Sezon Etiketi</label>
-                      <input
-                        type="text"
-                        value={formData.sectionSettings?.heroYear || ''}
-                        onChange={(e) => updateSectionSetting('heroYear', e.target.value)}
-                        placeholder="Örn: 2026"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-700">Özel Kapak Görseli URL'si</label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="text"
-                        value={formData.sectionSettings?.coverImageUrl || ''}
-                        onChange={(e) => updateSectionSetting('coverImageUrl', e.target.value)}
-                        placeholder="https://... (Boş bırakılırsa şablonun varsayılan kapağı veya ilk ürün görseli kullanılır)"
-                        className="flex-1 px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                      />
-                      {formData.sectionSettings?.coverImageUrl && (
-                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-stone-200 flex-shrink-0 bg-stone-100">
-                          <img
-                            src={formData.sectionSettings.coverImageUrl}
-                            alt="Kapak Önizleme"
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-[10px] text-stone-400 block mt-0.5">
-                      Markanıza ait showroom, katalog kapağı veya proje fotoğrafı URL'si yapıştırabilirsiniz.
-                    </span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-700">Kapak Damga Alt Başlığı (Vurgu)</label>
-                    <input
-                      type="text"
-                      value={formData.sectionSettings?.heroStampText || ''}
-                      onChange={(e) => updateSectionSetting('heroStampText', e.target.value)}
-                      placeholder="Örn: Doğadan ilham. Mimariyle hayat bulur."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-700">Giriş / Manifesto Açıklaması</label>
-                    <textarea
-                      rows={3}
-                      value={formData.introText}
-                      onChange={(e) => setFormData({ ...formData, introText: e.target.value })}
-                      placeholder="Koleksiyonunuzun felsefesini, doku zenginliğini ve mimari kullanım vizyonunu açıklayan metin..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition resize-none"
-                    />
                   </div>
                 </div>
               )}
 
               {/* SUB-TAB 3: MONOGRAPH & STANDARDS EDIT */}
               {activeContentTab === 'monograph' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                        Kürasyon & Mimari Standartlar Şeridi
-                      </h3>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        Kapak altında yer alan mimari felsefe alıntısı ve 4 teknik performans kutusu.
-                      </p>
-                    </div>
-
-                    <label className="inline-flex items-center gap-2 cursor-pointer self-start sm:self-auto bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
-                      <input
-                        type="checkbox"
-                        checked={formData.sectionSettings?.showMonograph !== false}
-                        onChange={(e) => updateSectionSetting('showMonograph', e.target.checked)}
-                        className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                      />
-                      <span className="text-xs font-bold text-stone-800">
-                        {formData.sectionSettings?.showMonograph !== false ? 'Bölüm Açık' : 'Bölüm Gizli'}
-                      </span>
-                    </label>
-                  </div>
-
-                  {formData.sectionSettings?.showMonograph === false ? (
-                    <div className="p-6 bg-rose-50/60 rounded-xl border border-rose-200 text-center">
-                      <EyeOff size={24} className="mx-auto text-rose-500 mb-2" />
-                      <h4 className="text-xs font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
-                      <p className="text-[11px] text-rose-600 mt-1 max-w-md mx-auto">
-                        Kürasyon & standartlar şeridi yayında tamamen gizlenecektir. İhtiyacınız olduğunda yukarıdaki anahtardan dilediğiniz zaman tekrar açabilirsiniz.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 animate-in fade-in duration-150">
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-700">Manifesto / Küratöryel Alıntı Metni</label>
-                        <textarea
-                          rows={2}
-                          value={formData.sectionSettings?.monographQuote || ''}
-                          onChange={(e) => updateSectionSetting('monographQuote', e.target.value)}
-                          placeholder="Yüzey yalnızca bir kaplama değil; mekânın ışığını, akustik dengesini ve dokusal hafızasını belirleyen temel mimari dildir."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition resize-none"
-                        />
+                <div className="space-y-6">
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                          <Tag size={18} />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-bold text-stone-900">
+                            Kürasyon & Mimari Standartlar Şeridi
+                          </h3>
+                          <p className="text-xs text-stone-500 mt-0.5">
+                            Kapak altında yer alan mimari felsefe alıntısı ve 4 teknik performans kutusu.
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-700">Alıntı İmzası / Laboratuvar Adı</label>
+                      <label className="inline-flex items-center gap-3 cursor-pointer self-start sm:self-auto bg-stone-50 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-300 transition shadow-2xs">
                         <input
-                          type="text"
-                          value={formData.sectionSettings?.monographAuthor || ''}
-                          onChange={(e) => updateSectionSetting('monographAuthor', e.target.value)}
-                          placeholder={`— ${brandName} Tasarım & Malzeme İnovasyon Laboratuvarı`}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
+                          type="checkbox"
+                          checked={formData.sectionSettings?.showMonograph !== false}
+                          onChange={(e) => updateSectionSetting('showMonograph', e.target.checked)}
+                          className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
                         />
+                        <span className="text-xs sm:text-sm font-bold text-stone-900">
+                          {formData.sectionSettings?.showMonograph !== false ? '✓ Bölüm Açık' : '✕ Bölüm Gizli'}
+                        </span>
+                      </label>
+                    </div>
+
+                    {formData.sectionSettings?.showMonograph === false ? (
+                      <div className="p-8 bg-rose-50/60 rounded-2xl border border-rose-200 text-center">
+                        <EyeOff size={28} className="mx-auto text-rose-500 mb-2" />
+                        <h4 className="text-sm font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
+                        <p className="text-xs text-rose-600 mt-1 max-w-md mx-auto">
+                          Kürasyon & standartlar şeridi yayında tamamen gizlenecektir. Dilediğiniz zaman yukarıdaki anahtardan açabilirsiniz.
+                        </p>
                       </div>
-
-                      <div className="pt-2">
-                        <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2">
-                          4 Teknik Standart / Özellik Kutusu
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">1. Kutu: Standart</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec1Label || 'EN 14411 BLa'}
-                              onChange={(e) => updateSectionSetting('spec1Label', e.target.value)}
-                              placeholder="EN 14411 BLa"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec1Desc || 'Tam Gövde Porselen'}
-                              onChange={(e) => updateSectionSetting('spec1Desc', e.target.value)}
-                              placeholder="Tam Gövde Porselen"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
+                    ) : (
+                      <div className="space-y-6 animate-in fade-in duration-150">
+                        {/* Manifesto Alıntı Alanı */}
+                        <div className="bg-stone-50/70 p-5 rounded-2xl border border-stone-200 space-y-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Manifesto / Küratöryel Alıntı Metni
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={formData.sectionSettings?.monographQuote || ''}
+                              onChange={(e) => updateSectionSetting('monographQuote', e.target.value)}
+                              placeholder="Yüzey yalnızca bir kaplama değil; mekânın ışığını, akustik dengesini ve dokusal hafızasını belirleyen temel mimari dildir."
+                              className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white text-sm font-serif italic text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs resize-none"
                             />
                           </div>
 
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">2. Kutu: Su Emme</span>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Alıntı İmzası / Laboratuvar veya Tasarımcı Adı
+                            </label>
                             <input
                               type="text"
-                              value={formData.sectionSettings?.spec2Label || 'E ≤ %0.05'}
-                              onChange={(e) => updateSectionSetting('spec2Label', e.target.value)}
-                              placeholder="E ≤ %0.05"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec2Desc || 'Sıfıra Yakın Geçirgenlik'}
-                              onChange={(e) => updateSectionSetting('spec2Desc', e.target.value)}
-                              placeholder="Sıfıra Yakın Geçirgenlik"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
-                            />
-                          </div>
-
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">3. Kutu: Kenar Kesimi</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec3Label || 'Lazer Rektifiye'}
-                              onChange={(e) => updateSectionSetting('spec3Label', e.target.value)}
-                              placeholder="Lazer Rektifiye"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec3Desc || '1 mm Monokalibre Derz'}
-                              onChange={(e) => updateSectionSetting('spec3Desc', e.target.value)}
-                              placeholder="1 mm Monokalibre Derz"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
-                            />
-                          </div>
-
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">4. Kutu: Doku Çözünürlüğü</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec4Label || '4K PBR Master'}
-                              onChange={(e) => updateSectionSetting('spec4Label', e.target.value)}
-                              placeholder="4K PBR Master"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.spec4Desc || 'Ultra HD Mikrotekstür'}
-                              onChange={(e) => updateSectionSetting('spec4Desc', e.target.value)}
-                              placeholder="Ultra HD Mikrotekstür"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
+                              value={formData.sectionSettings?.monographAuthor || ''}
+                              onChange={(e) => updateSectionSetting('monographAuthor', e.target.value)}
+                              placeholder={`— ${brandName} Tasarım & Malzeme İnovasyon Laboratuvarı`}
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                             />
                           </div>
                         </div>
+
+                        {/* 4 Teknik Performans Kartı */}
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <ShieldCheck size={16} className="text-amber-600" />
+                            <span>4 Teknik Standart / Özellik Kutusu</span>
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {/* Kutu 1 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <div className="flex items-center gap-2 text-amber-700">
+                                <ShieldCheck size={16} />
+                                <span className="text-xs font-bold uppercase tracking-wider">1. Kutu: Standart</span>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Norm / Standart Kodu</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec1Label || 'EN 14411 BLa'}
+                                  onChange={(e) => updateSectionSetting('spec1Label', e.target.value)}
+                                  placeholder="EN 14411 BLa"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Açıklama / Detay</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec1Desc || 'Tam Gövde Porselen'}
+                                  onChange={(e) => updateSectionSetting('spec1Desc', e.target.value)}
+                                  placeholder="Tam Gövde Porselen"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Kutu 2 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <div className="flex items-center gap-2 text-amber-700">
+                                <Droplets size={16} />
+                                <span className="text-xs font-bold uppercase tracking-wider">2. Kutu: Su Emme</span>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Değer / Sınıf</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec2Label || 'E ≤ %0.05'}
+                                  onChange={(e) => updateSectionSetting('spec2Label', e.target.value)}
+                                  placeholder="E ≤ %0.05"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Açıklama / Detay</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec2Desc || 'Sıfıra Yakın Geçirgenlik'}
+                                  onChange={(e) => updateSectionSetting('spec2Desc', e.target.value)}
+                                  placeholder="Sıfıra Yakın Geçirgenlik"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Kutu 3 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <div className="flex items-center gap-2 text-amber-700">
+                                <Ruler size={16} />
+                                <span className="text-xs font-bold uppercase tracking-wider">3. Kutu: Kenar Kesimi</span>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Kesim Teknolojisi</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec3Label || 'Lazer Rektifiye'}
+                                  onChange={(e) => updateSectionSetting('spec3Label', e.target.value)}
+                                  placeholder="Lazer Rektifiye"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Derz Aralığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec3Desc || '1 mm Monokalibre Derz'}
+                                  onChange={(e) => updateSectionSetting('spec3Desc', e.target.value)}
+                                  placeholder="1 mm Monokalibre Derz"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Kutu 4 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <div className="flex items-center gap-2 text-amber-700">
+                                <Sparkles size={16} />
+                                <span className="text-xs font-bold uppercase tracking-wider">4. Kutu: Doku Kalitesi</span>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Çözünürlük Seviyesi</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec4Label || '4K PBR Master'}
+                                  onChange={(e) => updateSectionSetting('spec4Label', e.target.value)}
+                                  placeholder="4K PBR Master"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknoloji Adı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.spec4Desc || 'Ultra HD Mikrotekstür'}
+                                  onChange={(e) => updateSectionSetting('spec4Desc', e.target.value)}
+                                  placeholder="Ultra HD Mikrotekstür"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* SUB-TAB 4: EDITORIAL & LIVING SPACES EDIT */}
               {activeContentTab === 'editorial' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                        Mekânlar & Editoryal Yaşam Alanı Bölümü
-                      </h3>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        Mimari yaşam alanları, ilham veren mekan fotoğrafları ve kullanım alanları listesi.
-                      </p>
-                    </div>
-
-                    <label className="inline-flex items-center gap-2 cursor-pointer self-start sm:self-auto bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
-                      <input
-                        type="checkbox"
-                        checked={formData.sectionSettings?.showEditorial !== false}
-                        onChange={(e) => updateSectionSetting('showEditorial', e.target.checked)}
-                        className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                      />
-                      <span className="text-xs font-bold text-stone-800">
-                        {formData.sectionSettings?.showEditorial !== false ? 'Bölüm Açık' : 'Bölüm Gizli'}
-                      </span>
-                    </label>
-                  </div>
-
-                  {formData.sectionSettings?.showEditorial === false ? (
-                    <div className="p-6 bg-rose-50/60 rounded-xl border border-rose-200 text-center">
-                      <EyeOff size={24} className="mx-auto text-rose-500 mb-2" />
-                      <h4 className="text-xs font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
-                      <p className="text-[11px] text-rose-600 mt-1 max-w-md mx-auto">
-                        Mekânlar & editoryal bölümü ve fotoğrafı yayında tamamen gizlenecektir.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 animate-in fade-in duration-150">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-stone-700">Bölüm Üst Rozeti</label>
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.editorialBadge || ''}
-                            onChange={(e) => updateSectionSetting('editorialBadge', e.target.value)}
-                            placeholder="Mekânda Hayat Bulan Yüzeyler"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
+                <div className="space-y-6">
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                          <Layers size={18} />
                         </div>
-
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-stone-700">Bölüm Ana Başlığı</label>
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.editorialTitle || ''}
-                            onChange={(e) => updateSectionSetting('editorialTitle', e.target.value)}
-                            placeholder="Bir Yüzeyden Daha Fazlası."
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
+                        <div>
+                          <h3 className="text-base font-bold text-stone-900">
+                            Mekânlar & Editoryal Yaşam Alanı Bölümü
+                          </h3>
+                          <p className="text-xs text-stone-500 mt-0.5">
+                            Mimari yaşam alanları, ilham veren mekan fotoğrafları ve kullanım alanları listesi.
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-700">Mekân / Uygulama Fotoğrafı URL'si</label>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.editorialImageUrl || ''}
-                            onChange={(e) => updateSectionSetting('editorialImageUrl', e.target.value)}
-                            placeholder="https://... (Markanıza ait salon, banyo veya dış cephe mimari uygulama fotoğrafı)"
-                            className="flex-1 px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
-                          {formData.sectionSettings?.editorialImageUrl && (
-                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-stone-200 flex-shrink-0 bg-stone-100">
-                              <img
-                                src={formData.sectionSettings.editorialImageUrl}
-                                alt="Mekan Önizleme"
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-700">Editoryal Açıklama Metni</label>
-                        <textarea
-                          rows={2}
-                          value={formData.sectionSettings?.editorialText || ''}
-                          onChange={(e) => updateSectionSetting('editorialText', e.target.value)}
-                          placeholder="Doğru seramik ve porselen, mekânın ışığını, akustik dengesini ve mimari derinliğini belirler..."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition resize-none"
+                      <label className="inline-flex items-center gap-3 cursor-pointer self-start sm:self-auto bg-stone-50 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-300 transition shadow-2xs">
+                        <input
+                          type="checkbox"
+                          checked={formData.sectionSettings?.showEditorial !== false}
+                          onChange={(e) => updateSectionSetting('showEditorial', e.target.checked)}
+                          className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
                         />
+                        <span className="text-xs sm:text-sm font-bold text-stone-900">
+                          {formData.sectionSettings?.showEditorial !== false ? '✓ Bölüm Açık' : '✕ Bölüm Gizli'}
+                        </span>
+                      </label>
+                    </div>
+
+                    {formData.sectionSettings?.showEditorial === false ? (
+                      <div className="p-8 bg-rose-50/60 rounded-2xl border border-rose-200 text-center">
+                        <EyeOff size={28} className="mx-auto text-rose-500 mb-2" />
+                        <h4 className="text-sm font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
+                        <p className="text-xs text-rose-600 mt-1 max-w-md mx-auto">
+                          Mekânlar & editoryal bölümü ve fotoğrafı yayında tamamen gizlenecektir.
+                        </p>
                       </div>
-
-                      <div className="pt-2">
-                        <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2">
-                          3 Öne Çıkan Yaşam Alanı Satırı
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">01 Alan</span>
+                    ) : (
+                      <div className="space-y-6 animate-in fade-in duration-150">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Bölüm Üst Rozeti
+                            </label>
                             <input
                               type="text"
-                              value={formData.sectionSettings?.feature1Title || '01   Banyo ve Spa'}
-                              onChange={(e) => updateSectionSetting('feature1Title', e.target.value)}
-                              placeholder="01   Banyo ve Spa"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.feature1Desc || 'Doğal Taş Dinginliği ↗'}
-                              onChange={(e) => updateSectionSetting('feature1Desc', e.target.value)}
-                              placeholder="Doğal Taş Dinginliği ↗"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
+                              value={formData.sectionSettings?.editorialBadge || ''}
+                              onChange={(e) => updateSectionSetting('editorialBadge', e.target.value)}
+                              placeholder="Mekânda Hayat Bulan Yüzeyler"
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                             />
                           </div>
 
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">02 Alan</span>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Bölüm Ana Başlığı
+                            </label>
                             <input
                               type="text"
-                              value={formData.sectionSettings?.feature2Title || '02   Yaşam Alanları & Salon'}
-                              onChange={(e) => updateSectionSetting('feature2Title', e.target.value)}
-                              placeholder="02   Yaşam Alanları & Salon"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.feature2Desc || 'Geniş Ebat Monolitik Slab ↗'}
-                              onChange={(e) => updateSectionSetting('feature2Desc', e.target.value)}
-                              placeholder="Geniş Ebat Monolitik Slab ↗"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
-                            />
-                          </div>
-
-                          <div className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">03 Alan</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.feature3Title || '03   Mutfak ve Ticari Zeminler'}
-                              onChange={(e) => updateSectionSetting('feature3Title', e.target.value)}
-                              placeholder="03   Mutfak ve Ticari Zeminler"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.feature3Desc || 'Yüksek Trafik Dayanımı (PEI V) ↗'}
-                              onChange={(e) => updateSectionSetting('feature3Desc', e.target.value)}
-                              placeholder="Yüksek Trafik Dayanımı (PEI V) ↗"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px]"
+                              value={formData.sectionSettings?.editorialTitle || ''}
+                              onChange={(e) => updateSectionSetting('editorialTitle', e.target.value)}
+                              placeholder="Bir Yüzeyden Daha Fazlası."
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                             />
                           </div>
                         </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                            Mekân / Uygulama Fotoğrafı URL'si
+                          </label>
+                          <div className="flex items-center gap-3.5">
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.editorialImageUrl || ''}
+                              onChange={(e) => updateSectionSetting('editorialImageUrl', e.target.value)}
+                              placeholder="https://... (Markanıza ait salon, banyo veya dış cephe mimari uygulama fotoğrafı)"
+                              className="flex-1 h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                            />
+                            {formData.sectionSettings?.editorialImageUrl && (
+                              <div className="w-14 h-14 rounded-xl overflow-hidden border border-stone-300 flex-shrink-0 bg-stone-100 shadow-xs">
+                                <img
+                                  src={formData.sectionSettings.editorialImageUrl}
+                                  alt="Mekan Önizleme"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                            Editoryal Açıklama Metni
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={formData.sectionSettings?.editorialText || ''}
+                            onChange={(e) => updateSectionSetting('editorialText', e.target.value)}
+                            placeholder="Doğru seramik ve porselen, mekânın ışığını, akustik dengesini ve mimari derinliğini belirler..."
+                            className="w-full px-4 py-3 rounded-xl border border-stone-300 bg-white text-sm leading-relaxed text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs resize-none"
+                          />
+                        </div>
+
+                        {/* 3 Öne Çıkan Yaşam Alanı Satırı */}
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Compass size={16} className="text-amber-600" />
+                            <span>3 Öne Çıkan Yaşam Alanı Kriteri</span>
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Alan 1 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">01 // Islak Hacim & Banyo</span>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Alan Başlığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.feature1Title || '01 Banyo ve Spa'}
+                                  onChange={(e) => updateSectionSetting('feature1Title', e.target.value)}
+                                  placeholder="01 Banyo ve Spa"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Vurgu / Açıklama</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.feature1Desc || 'Doğal Taş Dinginliği ↗'}
+                                  onChange={(e) => updateSectionSetting('feature1Desc', e.target.value)}
+                                  placeholder="Doğal Taş Dinginliği ↗"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Alan 2 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">02 // Yaşam Alanları & Salon</span>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Alan Başlığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.feature2Title || '02 Yaşam Alanları & Salon'}
+                                  onChange={(e) => updateSectionSetting('feature2Title', e.target.value)}
+                                  placeholder="02 Yaşam Alanları & Salon"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Vurgu / Açıklama</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.feature2Desc || 'Geniş Ebat Monolitik Slab ↗'}
+                                  onChange={(e) => updateSectionSetting('feature2Desc', e.target.value)}
+                                  placeholder="Geniş Ebat Monolitik Slab ↗"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Alan 3 */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">03 // Mutfak & Ticari</span>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Alan Başlığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.feature3Title || '03 Mutfak ve Ticari Zeminler'}
+                                  onChange={(e) => updateSectionSetting('feature3Title', e.target.value)}
+                                  placeholder="03 Mutfak ve Ticari Zeminler"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Vurgu / Açıklama</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.feature3Desc || 'Yüksek Trafik Dayanımı (PEI V) ↗'}
+                                  onChange={(e) => updateSectionSetting('feature3Desc', e.target.value)}
+                                  placeholder="Yüksek Trafik Dayanımı (PEI V) ↗"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* SUB-TAB 5: TECHNICAL SPECIFICATIONS & BIM EDIT */}
               {activeContentTab === 'technical' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                        Teknik Şartname, Laboratuvar Değerleri & BIM
-                      </h3>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        EN 14411 standart uyumluluğu, teknik performans kartları ve indirilebilir mimari BIM / CAD / Sertifika bağlantıları.
-                      </p>
-                    </div>
-
-                    <label className="inline-flex items-center gap-2 cursor-pointer self-start sm:self-auto bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
-                      <input
-                        type="checkbox"
-                        checked={formData.sectionSettings?.showTechnical !== false}
-                        onChange={(e) => updateSectionSetting('showTechnical', e.target.checked)}
-                        className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                      />
-                      <span className="text-xs font-bold text-stone-800">
-                        {formData.sectionSettings?.showTechnical !== false ? 'Bölüm Açık' : 'Bölüm Gizli'}
-                      </span>
-                    </label>
-                  </div>
-
-                  {formData.sectionSettings?.showTechnical === false ? (
-                    <div className="p-6 bg-rose-50/60 rounded-xl border border-rose-200 text-center">
-                      <EyeOff size={24} className="mx-auto text-rose-500 mb-2" />
-                      <h4 className="text-xs font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
-                      <p className="text-[11px] text-rose-600 mt-1 max-w-md mx-auto">
-                        Teknik şartname tablosu ve BIM indirme alanı yayında tamamen gizlenecektir.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 animate-in fade-in duration-150">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-stone-700">Bölüm Üst Rozeti</label>
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.technicalBadge || ''}
-                            onChange={(e) => updateSectionSetting('technicalBadge', e.target.value)}
-                            placeholder="Mimari Şartname & Kalite Güvencesi"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
+                <div className="space-y-6">
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                          <ShieldCheck size={18} />
                         </div>
-
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-stone-700">Bölüm Ana Başlığı</label>
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.technicalTitle || ''}
-                            onChange={(e) => updateSectionSetting('technicalTitle', e.target.value)}
-                            placeholder="Mükemmel Estetik, Sarsılmaz Standartlar"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
+                        <div>
+                          <h3 className="text-base font-bold text-stone-900">
+                            Teknik Şartname, Laboratuvar Değerleri & BIM
+                          </h3>
+                          <p className="text-xs text-stone-500 mt-0.5">
+                            EN 14411 standart uyumluluğu, teknik performans kartları ve indirilebilir mimari BIM / CAD / Sertifika bağlantıları.
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-700">Alt Açıklama / Standart Metni</label>
+                      <label className="inline-flex items-center gap-3 cursor-pointer self-start sm:self-auto bg-stone-50 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-300 transition shadow-2xs">
                         <input
-                          type="text"
-                          value={formData.sectionSettings?.technicalSubtitle || ''}
-                          onChange={(e) => updateSectionSetting('technicalSubtitle', e.target.value)}
-                          placeholder="Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
+                          type="checkbox"
+                          checked={formData.sectionSettings?.showTechnical !== false}
+                          onChange={(e) => updateSectionSetting('showTechnical', e.target.checked)}
+                          className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
                         />
-                      </div>
-
-                      <div className="pt-2">
-                        <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2">
-                          3 Teknik Kriter Kartı
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <div className="p-3.5 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">1. Su Emme</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.tech1Title || '01 // SU EMME DEĞERİ (E ≤ %0.05)'}
-                              onChange={(e) => updateSectionSetting('tech1Title', e.target.value)}
-                              placeholder="01 // SU EMME DEĞERİ"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] font-mono"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.tech1Heading || 'Sıfıra Yakın Su Emme'}
-                              onChange={(e) => updateSectionSetting('tech1Heading', e.target.value)}
-                              placeholder="Sıfıra Yakın Su Emme"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <textarea
-                              rows={2}
-                              value={formData.sectionSettings?.tech1Desc || 'Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunan porselen gövde.'}
-                              onChange={(e) => updateSectionSetting('tech1Desc', e.target.value)}
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] resize-none"
-                            />
-                          </div>
-
-                          <div className="p-3.5 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">2. Kayma Direnci</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.tech2Title || '02 // R10 / R11 KAYMA DİRENCİ'}
-                              onChange={(e) => updateSectionSetting('tech2Title', e.target.value)}
-                              placeholder="02 // KAYMA DİRENCİ"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] font-mono"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.tech2Heading || 'Islak Hacim Güvenliği'}
-                              onChange={(e) => updateSectionSetting('tech2Heading', e.target.value)}
-                              placeholder="Islak Hacim Güvenliği"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <textarea
-                              rows={2}
-                              value={formData.sectionSettings?.tech2Desc || 'Banyo, havuz kenarı ve otel girişleri için mikrotekstür teknolojisi.'}
-                              onChange={(e) => updateSectionSetting('tech2Desc', e.target.value)}
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] resize-none"
-                            />
-                          </div>
-
-                          <div className="p-3.5 rounded-xl border border-stone-200 bg-stone-50 space-y-1.5">
-                            <span className="text-[10px] font-bold text-stone-500 uppercase block">3. Rektifiye Kesim</span>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.tech3Title || '03 // REKTİFİYE MİLİMETRİK KESİM'}
-                              onChange={(e) => updateSectionSetting('tech3Title', e.target.value)}
-                              placeholder="03 // REKTİFİYE KESİM"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] font-mono"
-                            />
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.tech3Heading || 'Derzsiz Süreklilik'}
-                              onChange={(e) => updateSectionSetting('tech3Heading', e.target.value)}
-                              placeholder="Derzsiz Süreklilik"
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-bold"
-                            />
-                            <textarea
-                              rows={2}
-                              value={formData.sectionSettings?.tech3Desc || 'Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığı.'}
-                              onChange={(e) => updateSectionSetting('tech3Desc', e.target.value)}
-                              className="w-full px-2 py-1.5 rounded-lg border border-stone-200 bg-white text-[11px] resize-none"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2">
-                          Özel İndirme Dosyaları & Bağlantılar (Opsiyonel)
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">BIM & CAD Dosya Linki</label>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.bimCadUrl || ''}
-                              onChange={(e) => updateSectionSetting('bimCadUrl', e.target.value)}
-                              placeholder="https://... (.ZIP / .RFA)"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">CE & LEED Sertifika Linki</label>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.ceLeedUrl || ''}
-                              onChange={(e) => updateSectionSetting('ceLeedUrl', e.target.value)}
-                              placeholder="https://... (.PDF)"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">EPD Çevresel Beyan Linki</label>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.epdUrl || ''}
-                              onChange={(e) => updateSectionSetting('epdUrl', e.target.value)}
-                              placeholder="https://... (.PDF)"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                        <span className="text-xs sm:text-sm font-bold text-stone-900">
+                          {formData.sectionSettings?.showTechnical !== false ? '✓ Bölüm Açık' : '✕ Bölüm Gizli'}
+                        </span>
+                      </label>
                     </div>
-                  )}
+
+                    {formData.sectionSettings?.showTechnical === false ? (
+                      <div className="p-8 bg-rose-50/60 rounded-2xl border border-rose-200 text-center">
+                        <EyeOff size={28} className="mx-auto text-rose-500 mb-2" />
+                        <h4 className="text-sm font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
+                        <p className="text-xs text-rose-600 mt-1 max-w-md mx-auto">
+                          Teknik şartname tablosu ve BIM indirme alanı yayında tamamen gizlenecektir.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6 animate-in fade-in duration-150">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Bölüm Üst Rozeti
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.technicalBadge || ''}
+                              onChange={(e) => updateSectionSetting('technicalBadge', e.target.value)}
+                              placeholder="Mimari Şartname & Kalite Güvencesi"
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Bölüm Ana Başlığı
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.technicalTitle || ''}
+                              onChange={(e) => updateSectionSetting('technicalTitle', e.target.value)}
+                              placeholder="Mükemmel Estetik, Sarsılmaz Standartlar"
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5 md:col-span-2">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Alt Açıklama / Standart Metni
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.technicalSubtitle || ''}
+                              onChange={(e) => updateSectionSetting('technicalSubtitle', e.target.value)}
+                              placeholder="Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler."
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 3 Teknik Kriter Kartı */}
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Award size={16} className="text-amber-600" />
+                            <span>3 Laboratuvar Performans Kartı</span>
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* 1. Su Emme */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">1. Su Emme Normu</span>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknik Kod</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.tech1Title || '01 // SU EMME DEĞERİ (E ≤ %0.05)'}
+                                  onChange={(e) => updateSectionSetting('tech1Title', e.target.value)}
+                                  placeholder="01 // SU EMME DEĞERİ"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs font-mono font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Performans Başlığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.tech1Heading || 'Sıfıra Yakın Su Emme'}
+                                  onChange={(e) => updateSectionSetting('tech1Heading', e.target.value)}
+                                  placeholder="Sıfıra Yakın Su Emme"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknik Açıklama</span>
+                                <textarea
+                                  rows={2}
+                                  value={formData.sectionSettings?.tech1Desc || 'Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunan porselen gövde.'}
+                                  onChange={(e) => updateSectionSetting('tech1Desc', e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs resize-none"
+                                />
+                              </div>
+                            </div>
+
+                            {/* 2. Kayma Direnci */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">2. Kayma Direnci (R10/R11)</span>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknik Kod</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.tech2Title || '02 // R10 / R11 KAYMA DİRENCİ'}
+                                  onChange={(e) => updateSectionSetting('tech2Title', e.target.value)}
+                                  placeholder="02 // KAYMA DİRENCİ"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs font-mono font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Performans Başlığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.tech2Heading || 'Islak Hacim Güvenliği'}
+                                  onChange={(e) => updateSectionSetting('tech2Heading', e.target.value)}
+                                  placeholder="Islak Hacim Güvenliği"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknik Açıklama</span>
+                                <textarea
+                                  rows={2}
+                                  value={formData.sectionSettings?.tech2Desc || 'Banyo, havuz kenarı ve otel girişleri için mikrotekstür teknolojisi.'}
+                                  onChange={(e) => updateSectionSetting('tech2Desc', e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs resize-none"
+                                />
+                              </div>
+                            </div>
+
+                            {/* 3. Rektifiye Kesim */}
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
+                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">3. Kenar Kesim Hassasiyeti</span>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknik Kod</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.tech3Title || '03 // REKTİFİYE MİLİMETRİK KESİM'}
+                                  onChange={(e) => updateSectionSetting('tech3Title', e.target.value)}
+                                  placeholder="03 // REKTİFİYE KESİM"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs font-mono font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Performans Başlığı</span>
+                                <input
+                                  type="text"
+                                  value={formData.sectionSettings?.tech3Heading || 'Derzsiz Süreklilik'}
+                                  onChange={(e) => updateSectionSetting('tech3Heading', e.target.value)}
+                                  placeholder="Derzsiz Süreklilik"
+                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-semibold text-stone-500">Teknik Açıklama</span>
+                                <textarea
+                                  rows={2}
+                                  value={formData.sectionSettings?.tech3Desc || 'Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığı.'}
+                                  onChange={(e) => updateSectionSetting('tech3Desc', e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs resize-none"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Özel İndirme Dosyaları (Opsiyonel) */}
+                        <div className="pt-2">
+                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <Box size={16} className="text-amber-600" />
+                            <span>Özel İndirme Dosyaları & Bağlantılar (Opsiyonel)</span>
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-1.5">
+                              <label className="text-xs font-bold text-stone-800 flex items-center gap-2">
+                                <Box size={14} className="text-amber-700" />
+                                <span>BIM & CAD Dosya Linki</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.sectionSettings?.bimCadUrl || ''}
+                                onChange={(e) => updateSectionSetting('bimCadUrl', e.target.value)}
+                                placeholder="https://... (.ZIP / .RFA)"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 shadow-2xs"
+                              />
+                            </div>
+
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-1.5">
+                              <label className="text-xs font-bold text-stone-800 flex items-center gap-2">
+                                <Award size={14} className="text-amber-700" />
+                                <span>CE & LEED Sertifika Linki</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.sectionSettings?.ceLeedUrl || ''}
+                                onChange={(e) => updateSectionSetting('ceLeedUrl', e.target.value)}
+                                placeholder="https://... (.PDF)"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 shadow-2xs"
+                              />
+                            </div>
+
+                            <div className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-1.5">
+                              <label className="text-xs font-bold text-stone-800 flex items-center gap-2">
+                                <Globe size={14} className="text-amber-700" />
+                                <span>EPD Çevresel Beyan Linki</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.sectionSettings?.epdUrl || ''}
+                                onChange={(e) => updateSectionSetting('epdUrl', e.target.value)}
+                                placeholder="https://... (.PDF)"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 shadow-2xs"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* SUB-TAB 6: CTA & CONTACT EDIT */}
               {activeContentTab === 'cta' && (
-                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                        İletişim & Teklif Çağrısı (CTA)
-                      </h3>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        Kataloğun altındaki eylem çağrısı şeridi ve alt bilgi (footer) kurumsal iletişim detayları.
-                      </p>
-                    </div>
-
-                    <label className="inline-flex items-center gap-2 cursor-pointer self-start sm:self-auto bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200">
-                      <input
-                        type="checkbox"
-                        checked={formData.sectionSettings?.showCta !== false}
-                        onChange={(e) => updateSectionSetting('showCta', e.target.checked)}
-                        className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                      />
-                      <span className="text-xs font-bold text-stone-800">
-                        {formData.sectionSettings?.showCta !== false ? 'Bölüm Açık' : 'Bölüm Gizli'}
-                      </span>
-                    </label>
-                  </div>
-
-                  {formData.sectionSettings?.showCta === false ? (
-                    <div className="p-6 bg-rose-50/60 rounded-xl border border-rose-200 text-center">
-                      <EyeOff size={24} className="mx-auto text-rose-500 mb-2" />
-                      <h4 className="text-xs font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
-                      <p className="text-[11px] text-rose-600 mt-1 max-w-md mx-auto">
-                        Teklif çağrısı şeridi yayında tamamen gizlenecektir.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 animate-in fade-in duration-150">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-stone-700">Teklif Çağrısı Başlığı</label>
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.ctaTitle || ''}
-                            onChange={(e) => updateSectionSetting('ctaTitle', e.target.value)}
-                            placeholder="Projeniz için doğru yüzeyi bulun."
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
+                <div className="space-y-6">
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
+                          <Phone size={18} />
                         </div>
-
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-stone-700">Buton Metni</label>
-                          <input
-                            type="text"
-                            value={formData.sectionSettings?.ctaButtonText || ''}
-                            onChange={(e) => updateSectionSetting('ctaButtonText', e.target.value)}
-                            placeholder="Koleksiyonu Keşfet ↗"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
-                          />
+                        <div>
+                          <h3 className="text-base font-bold text-stone-900">
+                            İletişim & Teklif Çağrısı (CTA)
+                          </h3>
+                          <p className="text-xs text-stone-500 mt-0.5">
+                            Kataloğun altındaki eylem çağrısı şeridi ve alt bilgi (footer) kurumsal iletişim detayları.
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-stone-700">Teklif Çağrısı Alt Açıklaması</label>
+                      <label className="inline-flex items-center gap-3 cursor-pointer self-start sm:self-auto bg-stone-50 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-300 transition shadow-2xs">
                         <input
-                          type="text"
-                          value={formData.sectionSettings?.ctaSubtitle || ''}
-                          onChange={(e) => updateSectionSetting('ctaSubtitle', e.target.value)}
-                          placeholder="Karoları keşfedin, seçeneklerinizi belirleyin ve teklif sürecini başlatın."
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 transition"
+                          type="checkbox"
+                          checked={formData.sectionSettings?.showCta !== false}
+                          onChange={(e) => updateSectionSetting('showCta', e.target.checked)}
+                          className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
                         />
+                        <span className="text-xs sm:text-sm font-bold text-stone-900">
+                          {formData.sectionSettings?.showCta !== false ? '✓ Bölüm Açık' : '✕ Bölüm Gizli'}
+                        </span>
+                      </label>
+                    </div>
+
+                    {formData.sectionSettings?.showCta === false ? (
+                      <div className="p-8 bg-rose-50/60 rounded-2xl border border-rose-200 text-center">
+                        <EyeOff size={28} className="mx-auto text-rose-500 mb-2" />
+                        <h4 className="text-sm font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
+                        <p className="text-xs text-rose-600 mt-1 max-w-md mx-auto">
+                          Teklif çağrısı şeridi yayında tamamen gizlenecektir.
+                        </p>
                       </div>
-
-                      <div className="pt-2">
-                        <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2">
-                          Kurumsal İletişim Bilgileri (Alt Bilgide Görünür)
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">Telefon</label>
+                    ) : (
+                      <div className="space-y-6 animate-in fade-in duration-150">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Teklif Çağrısı Başlığı
+                            </label>
                             <input
                               type="text"
-                              value={formData.contactPhone || ''}
-                              onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
-                              placeholder="+90 216 000 00 00"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
+                              value={formData.sectionSettings?.ctaTitle || ''}
+                              onChange={(e) => updateSectionSetting('ctaTitle', e.target.value)}
+                              placeholder="Projeniz için doğru yüzeyi belirleyin."
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                             />
                           </div>
 
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">E-Posta</label>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Buton Metni
+                            </label>
                             <input
-                              type="email"
-                              value={formData.contactEmail || ''}
-                              onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                              placeholder="proje@marka.com"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
+                              type="text"
+                              value={formData.sectionSettings?.ctaButtonText || ''}
+                              onChange={(e) => updateSectionSetting('ctaButtonText', e.target.value)}
+                              placeholder="Teklif Masasına Ürün Ekle ↗"
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                             />
                           </div>
 
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">Showroom / Genel Merkez Adresi</label>
+                          <div className="space-y-1.5 md:col-span-2">
+                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
+                              Teklif Çağrısı Alt Açıklaması
+                            </label>
                             <input
                               type="text"
-                              value={formData.contactAddress || ''}
-                              onChange={(e) => setFormData({ ...formData, contactAddress: e.target.value })}
-                              placeholder="Bilecik / İstanbul Showroom"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-stone-700">Web Sitesi</label>
-                            <input
-                              type="text"
-                              value={formData.websiteUrl || ''}
-                              onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
-                              placeholder="https://www.marka.com"
-                              className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs"
+                              value={formData.sectionSettings?.ctaSubtitle || ''}
+                              onChange={(e) => updateSectionSetting('ctaSubtitle', e.target.value)}
+                              placeholder="Kataloğumuzdaki tüm ürünler için doğrudan mimari satış ekibimizden proje bazlı fiyatlandırma ve fiziki numune talep edebilirsiniz."
+                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
                             />
                           </div>
                         </div>
+
+                        <div className="pt-2">
+                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <PhoneCall size={16} className="text-amber-600" />
+                            <span>Kurumsal İletişim Bilgileri (Katalog Altında Görünür)</span>
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
+                                <Phone size={14} className="text-amber-600" />
+                                <span>Kurumsal Telefon</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.contactPhone || ''}
+                                onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
+                                placeholder="+90 216 000 00 00"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs sm:text-sm text-stone-900 shadow-2xs"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
+                                <Mail size={14} className="text-amber-600" />
+                                <span>E-Posta Adresi</span>
+                              </label>
+                              <input
+                                type="email"
+                                value={formData.contactEmail || ''}
+                                onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                                placeholder="proje@marka.com"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs sm:text-sm text-stone-900 shadow-2xs"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
+                                <MapPin size={14} className="text-amber-600" />
+                                <span>Showroom / Genel Merkez Adresi</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.contactAddress || ''}
+                                onChange={(e) => setFormData({ ...formData, contactAddress: e.target.value })}
+                                placeholder="Bilecik / İstanbul Showroom"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs sm:text-sm text-stone-900 shadow-2xs"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
+                                <Globe size={14} className="text-amber-600" />
+                                <span>Resmi Web Sitesi</span>
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.websiteUrl || ''}
+                                onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                                placeholder="https://www.marka.com"
+                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs sm:text-sm text-stone-900 shadow-2xs"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
 
