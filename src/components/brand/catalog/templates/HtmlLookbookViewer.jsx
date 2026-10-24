@@ -2030,6 +2030,15 @@ export default function HtmlLookbookViewer({
       <footer id="iletisim" className="showroom-contact-strip">
         <div className="contact-strip-container">
           <div className="contact-cta-box">
+            {brandLogo && (
+              <div className="flex justify-center mb-4">
+                <img
+                  src={brandLogo}
+                  alt={brandName}
+                  className="max-h-12 max-w-[200px] object-contain drop-shadow-xs"
+                />
+              </div>
+            )}
             <span className="section-badge-centered">
               {brandName.toUpperCase()} PROJE MERKEZİ
             </span>

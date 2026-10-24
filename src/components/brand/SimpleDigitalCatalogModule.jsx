@@ -52,6 +52,7 @@ import {
 } from 'lucide-react';
 import HtmlLookbookViewer from './catalog/templates/HtmlLookbookViewer';
 import { LOOKBOOK_COLOR_TEMPLATES, getLookbookTheme } from './catalog/templates/lookbookThemes';
+import ImageUploadWithCutout from './catalog/ImageUploadWithCutout';
 
 export const DEFAULT_SECTION_SETTINGS = {
   // 1. Kapak & Rozet
@@ -180,6 +181,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
     introText: '',
     template: 'terra-traverten',
     primaryColor: '#a87943',
+    customLogoUrl: '',
     selectedProductIds: [],
     isPublished: true,
     publicSlug: '',
@@ -285,6 +287,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       introText: `${brandName} markasının doğal taş, mermer ve çağdaş mimarinin yalın çizgilerini buluşturan lüks mimari yüzey seçkisi.`,
       template: 'terra-traverten',
       primaryColor: '#a87943',
+      customLogoUrl: brandInfo?.logoUrl || '',
       selectedProductIds: brandProducts.slice(0, 12).map((p) => p.id),
       isPublished: true,
       publicSlug: '',
@@ -320,6 +323,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       introText: cat.introText || '',
       template: cat.template || 'terra-traverten',
       primaryColor: cat.primaryColor || '#a87943',
+      customLogoUrl: cat.customLogoUrl || brandInfo?.logoUrl || '',
       selectedProductIds: productIds,
       isPublished: Boolean(cat.isPublished),
       publicSlug: cat.publicSlug || '',
@@ -442,6 +446,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
         introText: formData.introText,
         template: formData.template,
         primaryColor: formData.primaryColor,
+        customLogoUrl: formData.customLogoUrl || null,
         contactPhone: formData.contactPhone || null,
         contactEmail: formData.contactEmail || null,
         contactAddress: formData.contactAddress || null,
@@ -2249,20 +2254,33 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
               {activeContentTab === 'cover' && (
                 <div className="space-y-6">
                   {/* Kart 1: Başlık & Sezon Bilgileri */}
-                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
+                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-6">
                     <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
                       <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
                         <BookOpen size={18} />
                       </div>
                       <div>
                         <h3 className="text-base font-bold text-stone-900">
-                          1. Başlık ve Kimlik Bilgileri
+                          1. Başlık, Marka Kimliği ve Logo
                         </h3>
                         <p className="text-xs text-stone-500 mt-0.5">
-                          Katalog kapağının ilk açılışında ziyaretçileri karşılayacak olan resmi marka ve koleksiyon başlıkları.
+                          Katalog kapağının ilk açılışında ziyaretçileri karşılayacak olan resmi marka ve koleksiyon başlıkları ile logo.
                         </p>
                       </div>
                     </div>
+
+                    {/* KATALOG LOGOSU & ARKA PLAN TEMİZLEME ALANI */}
+                    <ImageUploadWithCutout
+                      label="Katalog Marka Logosu (Şeffaf / Cutout)"
+                      description="Kataloğun üst menü çubuğunda ve kapağında yer alacak logonuz. Bilgisayarınızdan yerel JPG veya PNG yüklediğinizde sistem arka planı otomatik kaldırarak şeffaf hale getirir."
+                      value={formData.customLogoUrl}
+                      onChange={(url) => setFormData((prev) => ({ ...prev, customLogoUrl: url }))}
+                      defaultUrl={brandInfo?.logoUrl || ''}
+                      defaultLabel="Marka Profil Logosunu Getir"
+                      isLogo={true}
+                      folder="seramikbak/catalogs/logos"
+                      recommendedAspect="Yatay veya Kare Vektör / PNG"
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div className="space-y-1.5">
@@ -2343,38 +2361,20 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                           2. Özel Kapak Görseli & Showroom Medyası
                         </h3>
                         <p className="text-xs text-stone-500 mt-0.5">
-                          Markanıza ait showroom, fabrika veya prestij proje fotoğrafı URL'si yapıştırarak kapağı kişiselleştirin.
+                          Markanıza ait showroom, fabrika veya prestij proje fotoğrafınızı bilgisayarınızdan yükleyin veya URL ekleyin.
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
-                        Özel Kapak Görseli URL'si
-                      </label>
-                      <div className="flex items-center gap-3.5">
-                        <input
-                          type="text"
-                          value={formData.sectionSettings?.coverImageUrl || ''}
-                          onChange={(e) => updateSectionSetting('coverImageUrl', e.target.value)}
-                          placeholder="https://... (Boş bırakılırsa şablonun varsayılan kapağı veya ilk ürün görseli kullanılır)"
-                          className="flex-1 h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                        />
-                        {formData.sectionSettings?.coverImageUrl && (
-                          <div className="w-14 h-14 rounded-xl overflow-hidden border border-stone-300 flex-shrink-0 bg-stone-100 shadow-xs">
-                            <img
-                              src={formData.sectionSettings.coverImageUrl}
-                              alt="Kapak Önizleme"
-                              className="w-full h-full object-cover"
-                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-xs text-stone-400">
-                        💡 İpucu: Boş bıraktığınızda sistem seçtiğiniz şablonun mimari atmosferine uygun görseli otomatik atar.
-                      </p>
-                    </div>
+                    <ImageUploadWithCutout
+                      label="Kapak Görseli Dosyası veya Bağlantısı"
+                      description="Boş bırakırsanız seçtiğiniz şablonun atmosferik mimari kapağı otomatik kullanılır. Yüklenen görsel şablon oranına uygun optimize edilir."
+                      value={formData.sectionSettings?.coverImageUrl || ''}
+                      onChange={(url) => updateSectionSetting('coverImageUrl', url)}
+                      isLogo={false}
+                      folder="seramikbak/catalogs/covers"
+                      recommendedAspect="16:9 Yatay Mimari Fotoğraf"
+                    />
                   </div>
 
                   {/* Kart 3: Giriş / Manifesto Açıklaması */}
@@ -2673,30 +2673,15 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
-                            Mekân / Uygulama Fotoğrafı URL'si
-                          </label>
-                          <div className="flex items-center gap-3.5">
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.editorialImageUrl || ''}
-                              onChange={(e) => updateSectionSetting('editorialImageUrl', e.target.value)}
-                              placeholder="https://... (Markanıza ait salon, banyo veya dış cephe mimari uygulama fotoğrafı)"
-                              className="flex-1 h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                            />
-                            {formData.sectionSettings?.editorialImageUrl && (
-                              <div className="w-14 h-14 rounded-xl overflow-hidden border border-stone-300 flex-shrink-0 bg-stone-100 shadow-xs">
-                                <img
-                                  src={formData.sectionSettings.editorialImageUrl}
-                                  alt="Mekan Önizleme"
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        <ImageUploadWithCutout
+                          label="Mekân / Mimari Uygulama Fotoğrafı"
+                          description="Markanıza ait salon, banyo veya dış cephe mimari uygulama fotoğrafını bilgisayarınızdan yükleyin veya bağlantı ekleyin."
+                          value={formData.sectionSettings?.editorialImageUrl || ''}
+                          onChange={(url) => updateSectionSetting('editorialImageUrl', url)}
+                          isLogo={false}
+                          folder="seramikbak/catalogs/editorials"
+                          recommendedAspect="Geniş Yatay Mimari Fotoğraf"
+                        />
 
                         <div className="space-y-1.5">
                           <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
@@ -3270,6 +3255,7 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                     introText: formData.introText,
                     template: formData.template,
                     primaryColor: formData.primaryColor,
+                    customLogoUrl: formData.customLogoUrl,
                     contactPhone: formData.contactPhone,
                     contactEmail: formData.contactEmail,
                     contactAddress: formData.contactAddress,

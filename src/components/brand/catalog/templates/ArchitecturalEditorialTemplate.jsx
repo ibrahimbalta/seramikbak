@@ -246,7 +246,7 @@ export default function ArchitecturalEditorialTemplate({
             {/* Center Background Artwork */}
             <div className="absolute inset-0 z-0">
               <img
-                src={catalog?.coverImageUrl || safeProducts[0]?.imageUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
+                src={catalog?.sectionSettings?.coverImageUrl || catalog?.coverImageUrl || safeProducts[0]?.imageUrl || '/renders/luxury_bathroom_calacatta_gold.jpg'}
                 alt="Architectural Cover"
                 className="w-full h-full object-cover opacity-60 filter brightness-90"
               />

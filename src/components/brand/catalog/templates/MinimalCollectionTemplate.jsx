@@ -172,7 +172,7 @@ export default function MinimalCollectionTemplate({
             <div className="md:col-span-5 flex justify-center">
               <div className="w-56 sm:w-64 h-80 sm:h-96 rounded-xs overflow-hidden shadow-xl border border-neutral-200/80 relative">
                 <img
-                  src={catalog?.coverImageUrl || safeProducts[0]?.imageUrl || '/renders/modern_living_natural_oak.jpg'}
+                  src={catalog?.sectionSettings?.coverImageUrl || catalog?.coverImageUrl || safeProducts[0]?.imageUrl || '/renders/modern_living_natural_oak.jpg'}
                   alt="Kapak Görseli"
                   className="w-full h-full object-cover grayscale-20 contrast-95 hover:scale-105 transition-transform duration-700"
                   onError={() => handleImgError('cover-img')}

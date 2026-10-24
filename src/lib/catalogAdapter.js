@@ -114,6 +114,8 @@ export function normalizeCatalogForLookbook(catalog, products = []) {
     coverTitle: catalog.coverTitle || catalog.title || 'MİMARİ KOLEKSİYON',
     coverSubtitle: catalog.coverSubtitle || 'Yüksek Performanslı Porselen ve Seramik Çözümleri',
     introText: catalog.introText || 'Doğadan ilham alan dokular, en ileri seramik teknolojisi ve mimari mekanlara hayat veren zamansız tasarımlar.',
+    customLogoUrl: catalog.customLogoUrl || brand.logoUrl || null,
+    coverImageUrl: catalog.coverImageUrl || catalog.sectionSettings?.coverImageUrl || null,
     brand: {
       id: brand.id,
       name: brand.name || 'Seramik Üreticisi',
