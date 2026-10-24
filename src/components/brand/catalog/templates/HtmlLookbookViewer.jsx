@@ -488,11 +488,549 @@ export default function HtmlLookbookViewer({
     '/renders/luxury_bathroom_calacatta_gold.jpg';
 
   const year = sec.heroYear || new Date().getFullYear();
+  const layoutType = currentTheme?.layoutType || 'editorial-asymmetric';
+
+  // ---------------------------------------------------------------------------
+  // 6 BESPOKE ARCHITECTURAL HERO LAYOUT RENDERERS
+  // ---------------------------------------------------------------------------
+  const renderBespokeHero = () => {
+    switch (layoutType) {
+      case 'cinema-fullwidth':
+        return (
+          <section id="koleksiyon" className="flagship-showroom-hero hero-layout-cinema-fullwidth">
+            <div className="flagship-hero-bg-wrapper">
+              <img
+                src={coverImage}
+                alt={catalog?.title || 'Kapak'}
+                className="flagship-hero-bg-img"
+                style={{ opacity: 0.22, filter: 'brightness(0.7) contrast(1.2)' }}
+              />
+              <div className="flagship-hero-gradient-overlay" />
+            </div>
+
+            <div className="flagship-hero-inner">
+              <div className="cinema-top-pill">
+                <Sparkles size={13} className="text-[#fae29c]" />
+                <span>{sec.heroBadgeText || `${brandName.toUpperCase()} MONOLITHIC SLABS // CERSAIE ED.`}</span>
+                <Sparkles size={13} className="text-[#fae29c]" />
+              </div>
+
+              <h1 className="cinema-hero-h1">
+                {catalog?.title ? (
+                  <>
+                    {catalog.title} <span className="cinema-gold-glow">MONOLITHIC SLABS</span>
+                  </>
+                ) : (
+                  <>
+                    Işığın ve Gölgenin <br />
+                    <span className="cinema-gold-glow">Monolitik Dansı</span>
+                  </>
+                )}
+              </h1>
+
+              <p className="cinema-hero-desc">
+                {catalog?.introText ||
+                  catalog?.description ||
+                  'Büyük ebat porselen plakalarla mekânlarınıza derzsiz heykelsi bir kimlik, mimari derinlik ve monolitik asalet kazandırıyoruz.'}
+              </p>
+
+              {/* Central Monolithic Slab Showcase Stage */}
+              <div className="cinema-slab-stage">
+                <div className="cinema-slab-img-wrap">
+                  <img src={coverImage} alt="Monolithic Slab" className="cinema-slab-img" />
+                  <div className="cinema-slab-overlay-dim">
+                    <span>SLAB SPEC: 160×320 CM // BLa PORCELAIN</span>
+                  </div>
+                </div>
+
+                <div className="cinema-slab-metrics-grid">
+                  <div className="cinema-metric-box">
+                    <span className="cinema-metric-val">160×320</span>
+                    <span className="cinema-metric-label">Dev Ebat Slab</span>
+                  </div>
+                  <div className="cinema-metric-box">
+                    <span className="cinema-metric-val">MOHS 9</span>
+                    <span className="cinema-metric-label">Elmas Sertlik</span>
+                  </div>
+                  <div className="cinema-metric-box">
+                    <span className="cinema-metric-val">&lt; 0.05%</span>
+                    <span className="cinema-metric-label">Su Emme Oranı</span>
+                  </div>
+                  <div className="cinema-metric-box">
+                    <span className="cinema-metric-val">1200°C</span>
+                    <span className="cinema-metric-label">Sinterlenmiş Gövde</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flagship-cta-row justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="flagship-btn-primary"
+                  style={{
+                    background: 'linear-gradient(135deg, #fae29c 0%, #c5a059 100%)',
+                    color: '#07090e',
+                    fontWeight: 700,
+                    boxShadow: '0 10px 30px rgba(197, 160, 89, 0.4)'
+                  }}
+                >
+                  <span>Monolitik Kataloğu Keşfet</span>
+                  <ArrowRight size={16} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowCartDrawer(true)}
+                  className="flagship-btn-video"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    borderColor: 'rgba(197, 160, 89, 0.4)',
+                    color: '#fae29c'
+                  }}
+                >
+                  <FileText size={15} />
+                  <span>{sec.ctaButtonText || 'Teklif & Numune İste'}</span>
+                </button>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'swiss-industrial':
+        return (
+          <section id="koleksiyon" className="flagship-showroom-hero hero-layout-swiss-industrial">
+            <div className="swiss-blueprint-header">
+              <div className="swiss-header-tag">
+                <span>NORM:</span> <span className="val">DIN EN 14411 (BLa)</span>
+              </div>
+              <div className="swiss-header-tag">
+                <span>SCALE:</span> <span className="val">1:20 RECTIFIED</span>
+              </div>
+              <div className="swiss-header-tag">
+                <span>GRID:</span> <span className="val">BAUHAUS MODULAR</span>
+              </div>
+              <div className="swiss-header-tag">
+                <span>CALIBER:</span> <span className="val">0.0 MM JOINTS</span>
+              </div>
+            </div>
+
+            <div className="flagship-hero-inner">
+              <div className="swiss-content-pane">
+                <div className="swiss-corner-mark swiss-corner-tl" />
+                <div className="swiss-corner-mark swiss-corner-tr" />
+                <div className="swiss-corner-mark swiss-corner-bl" />
+                <div className="swiss-corner-mark swiss-corner-br" />
+
+                <span className="swiss-code-index">
+                  {sec.heroBadgeText || `[INDEX: ${brandName.toUpperCase()} // BRUTALIST LOFT SPEC. ${year}]`}
+                </span>
+
+                <h1 className="swiss-hero-h1">
+                  {catalog?.title ? (
+                    catalog.title
+                  ) : (
+                    <>BRÜT BETON &amp; ENDÜSTRİYEL MİMARİ</>
+                  )}
+                </h1>
+
+                <p className="swiss-hero-desc">
+                  {catalog?.introText ||
+                    catalog?.description ||
+                    'Form işlevi takip eder. Ham çimento, mikrobeton dokuları ve milimetrik rektifiye hassasiyetle modern kentsel yaşam alanları.'}
+                </p>
+
+                <div className="swiss-blueprint-dimension-bar">
+                  <span>&larr; 1200 mm &rarr;</span>
+                  <span>TOLERANS: &plusmn;0.2 mm</span>
+                  <span>&uarr; 2800 mm &darr;</span>
+                </div>
+
+                <div className="swiss-params-matrix">
+                  <div className="swiss-param-cell">
+                    <span className="swiss-param-title">YANGIN NORMU</span>
+                    <span className="swiss-param-val">A1 Yanmaz</span>
+                  </div>
+                  <div className="swiss-param-cell">
+                    <span className="swiss-param-title">KAYMA DİRENCİ</span>
+                    <span className="swiss-param-val">DIN R10 / B</span>
+                  </div>
+                  <div className="swiss-param-cell">
+                    <span className="swiss-param-title">YÜK DAYANIMI</span>
+                    <span className="swiss-param-val">&gt; 2200 N</span>
+                  </div>
+                </div>
+
+                <div className="flagship-cta-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="flagship-btn-primary"
+                    style={{ borderRadius: 0, fontFamily: 'monospace', textTransform: 'uppercase' }}
+                  >
+                    <span>Teknik Kataloğu Aç</span>
+                    <ArrowRight size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCartDrawer(true)}
+                    className="flagship-btn-video"
+                    style={{ borderRadius: 0, fontFamily: 'monospace', textTransform: 'uppercase' }}
+                  >
+                    <FileText size={15} />
+                    <span>{sec.ctaButtonText || 'Şartname & Fiyat Al'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="swiss-visual-pane">
+                <span className="swiss-blueprint-crosshair cross-tl">+</span>
+                <span className="swiss-blueprint-crosshair cross-tr">+</span>
+                <span className="swiss-blueprint-crosshair cross-bl">+</span>
+                <span className="swiss-blueprint-crosshair cross-br">+</span>
+
+                <img src={coverImage} alt="Bauhaus Concrete" className="swiss-visual-img" />
+
+                <div className="swiss-bottom-meta-box">
+                  <span>SPEC-SERIES // {brandName.toUpperCase()}</span>
+                  <span>CALC: 22.4 KG/M&sup2;</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'organic-wellness':
+        return (
+          <section id="koleksiyon" className="flagship-showroom-hero hero-layout-organic-wellness">
+            <div className="organic-sanctuary-card">
+              <div className="organic-content-col">
+                <div className="organic-leaf-badge">
+                  <Sparkles size={14} />
+                  <span>{sec.heroBadgeText || 'BİYOFİLİK YAŞAM & WELLNESS SANCTUARY'}</span>
+                </div>
+
+                <h1 className="organic-hero-h1">
+                  {catalog?.title ? (
+                    catalog.title
+                  ) : (
+                    <>Doğanın Dingin Ritmini <br />Mekânlarınıza Taşıyın</>
+                  )}
+                </h1>
+
+                <p className="organic-hero-desc">
+                  {catalog?.introText ||
+                    catalog?.description ||
+                    'Doğal kil mineralleri, dinlendirici yeşil tonları ve yumuşak dokularla evinizi yenileyen spa ve huzur alanları.'}
+                </p>
+
+                <div className="organic-eco-chips-row">
+                  <span className="organic-eco-chip">🍃 %100 Doğal Kil &amp; Mineral</span>
+                  <span className="organic-eco-chip">💧 Su İtici &amp; Anti-Bakteriyel</span>
+                  <span className="organic-eco-chip">☀️ Sıfır Kimyasal Salınım</span>
+                </div>
+
+                <div className="flagship-cta-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="flagship-btn-primary"
+                    style={{ borderRadius: '9999px', background: '#4d6b53', color: '#ffffff' }}
+                  >
+                    <span>Doğal Koleksiyonu Keşfet</span>
+                    <ArrowRight size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCartDrawer(true)}
+                    className="flagship-btn-video"
+                    style={{ borderRadius: '9999px', background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
+                  >
+                    <FileText size={15} />
+                    <span>{sec.ctaButtonText || 'Wellness Teklifi İste'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="organic-arched-portal">
+                <img src={coverImage} alt="Organic Nature" className="organic-arched-img" />
+                <div className="organic-wellness-seal">
+                  <span className="seal-badge-text">{brandName}</span>
+                  <span className="seal-sub-text">100% Organik Kil Dokusu</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'mediterranean-book':
+        return (
+          <section id="koleksiyon" className="flagship-showroom-hero hero-layout-mediterranean-book">
+            <div className="mediterranean-book-spread">
+              <div className="book-gutter-spine" />
+
+              <div className="mediterranean-left-page">
+                <span className="mediterranean-chapter-mark">
+                  {sec.heroBadgeText || 'CAPITOLO V // TERRACOTTA & AKDENİZ SEÇKİSİ'}
+                </span>
+
+                <h1 className="mediterranean-hero-h1">
+                  {catalog?.title ? (
+                    catalog.title
+                  ) : (
+                    <>Pişmiş Toprak &amp; Akdeniz Güneşi</>
+                  )}
+                </h1>
+
+                <div className="mediterranean-ornament-line">
+                  <span className="orn-bar" />
+                  <span>✦ ─── ❖ ─── ✦</span>
+                  <span className="orn-bar" />
+                </div>
+
+                <p className="mediterranean-hero-desc">
+                  {catalog?.introText ||
+                    catalog?.description ||
+                    'Güneşte kurutulmuş toprağın kadim sıcaklığı. El yapımı zanaatkar ruhu ile çağdaş villa mimarisinin sıcak buluşması.'}
+                </p>
+
+                <div className="mediterranean-atelier-stamp">
+                  <Bookmark size={20} className="text-[#b85d38] flex-shrink-0" />
+                  <div className="atelier-stamp-text">
+                    <strong>BOTTEGA ARTIGIANA // TOSCANA 1928</strong>
+                    <span>Geleneksel fırınlama ve doğal kil zanaatı sertifikalı seçki.</span>
+                  </div>
+                </div>
+
+                <div className="flagship-cta-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="flagship-btn-primary"
+                    style={{ background: '#b85d38', borderColor: '#b85d38', color: '#ffffff' }}
+                  >
+                    <span>Monografiyi Aç</span>
+                    <ArrowRight size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCartDrawer(true)}
+                    className="flagship-btn-video"
+                    style={{ borderColor: '#b85d38', color: '#b85d38' }}
+                  >
+                    <FileText size={15} />
+                    <span>{sec.ctaButtonText || 'Numune & Fiyat Talep Et'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="mediterranean-right-page">
+                <div className="artisan-tile-matting">
+                  <img src={coverImage} alt="Terracotta Artisan" className="artisan-tile-img" />
+                  <div className="wax-seal-badge">
+                    <span className="wax-seal-top">ATELIER</span>
+                    <span className="wax-seal-year">{year}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'gallery-minimal':
+        return (
+          <section id="koleksiyon" className="flagship-showroom-hero hero-layout-gallery-minimal">
+            <div className="gallery-curatorial-wrapper">
+              <div className="gallery-content-col">
+                <span className="gallery-room-index">
+                  {sec.heroBadgeText || 'ROOM 06 // BIENNALE ARCHITECTURAL MARBLE SELECTION'}
+                </span>
+
+                <h1 className="gallery-hero-h1">
+                  {catalog?.title ? (
+                    catalog.title
+                  ) : (
+                    <>Saf Mermer &amp; <br />Heykelsi Monokrom</>
+                  )}
+                </h1>
+
+                <p className="gallery-hero-desc">
+                  {catalog?.introText ||
+                    catalog?.description ||
+                    'Gereksiz her şeyden arındırılmış saf zarafet. Kusursuz beyaz mermerin heykelsi dokusu, mimari sükûnet ve çağdaş sanat mekânları.'}
+                </p>
+
+                <div className="gallery-curatorial-table">
+                  <div className="gallery-cur-row">
+                    <span className="gallery-cur-label">KÜRATÖR SEÇKİSİ</span>
+                    <span className="gallery-cur-val">{brandName} Arşivi</span>
+                  </div>
+                  <div className="gallery-cur-row">
+                    <span className="gallery-cur-label">MALZEME TÜRÜ</span>
+                    <span className="gallery-cur-val">Porselen &amp; Sinterlenmiş Taş</span>
+                  </div>
+                  <div className="gallery-cur-row">
+                    <span className="gallery-cur-label">YÜZEY DERİNLİĞİ</span>
+                    <span className="gallery-cur-val">Calacatta &amp; Statuario Damar</span>
+                  </div>
+                </div>
+
+                <div className="flagship-cta-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="flagship-btn-primary"
+                    style={{ background: '#18181b', color: '#ffffff', borderRadius: 0 }}
+                  >
+                    <span>Sergiyi Gez</span>
+                    <ArrowRight size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCartDrawer(true)}
+                    className="flagship-btn-video"
+                    style={{ borderColor: '#18181b', color: '#18181b', borderRadius: 0 }}
+                  >
+                    <FileText size={15} />
+                    <span>{sec.ctaButtonText || 'Küratör Teklifi Al'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="gallery-art-frame">
+                <img src={coverImage} alt="White Marble" className="gallery-art-img" />
+                <div className="gallery-wall-plaque">
+                  <span className="plaque-num">EXHIBIT // NO. 06</span>
+                  <h4 className="plaque-title">{catalog?.title || 'Calacatta Pure'}</h4>
+                  <p className="plaque-meta">{brandName} &bull; Sinterlenmiş Mermer Levha &bull; {year}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'editorial-asymmetric':
+      default:
+        return (
+          <section id="koleksiyon" className="flagship-showroom-hero hero-layout-editorial-asymmetric">
+            <div className="flagship-hero-bg-wrapper">
+              <img
+                src={coverImage}
+                alt={catalog?.title || 'Kapak'}
+                className="flagship-hero-bg-img"
+                style={{ opacity: 0.2 }}
+              />
+              <div className="flagship-hero-gradient-overlay" />
+            </div>
+
+            <div className="flagship-hero-inner">
+              <div className="flagship-hero-content-col">
+                <div className="editorial-folio-header">
+                  <span className="folio-stamp">{currentTheme.folioNumber || 'VOL. 26 // ED. 01'}</span>
+                  <span className="folio-subline">
+                    {sec.heroBadgeText || `${brandName.toUpperCase()} &bull; MİLANO EDİTORYAL SEÇKİSİ`}
+                  </span>
+                </div>
+
+                <h1 className="editorial-hero-h1">
+                  {catalog?.title ? (
+                    <>
+                      {catalog.title} <em className="editorial-italic-em">Koleksiyonu</em>
+                    </>
+                  ) : (
+                    <>
+                      Doğal Taş &amp; <br />
+                      <em className="editorial-italic-em">Traverten Dokuları</em>
+                    </>
+                  )}
+                </h1>
+
+                <p className="editorial-hero-desc">
+                  {catalog?.introText ||
+                    catalog?.description ||
+                    'En seçkin porselen ve seramik karo serileri, mimari projelendirme desteği ve kişiselleştirilmiş 3D mekan deneyimiyle mekanlarınıza değer katıyoruz.'}
+                </p>
+
+                <div className="editorial-spec-strip">
+                  <div className="editorial-spec-item">
+                    <span className="editorial-spec-label">MENŞEİ / FORMAT</span>
+                    <span className="editorial-spec-val">İtalyan Seçkisi</span>
+                  </div>
+                  <div className="editorial-spec-item">
+                    <span className="editorial-spec-label">YÜZEY DOKUSU</span>
+                    <span className="editorial-spec-val">Honlu &amp; Doğal Mat</span>
+                  </div>
+                  <div className="editorial-spec-item">
+                    <span className="editorial-spec-label">STANDART</span>
+                    <span className="editorial-spec-val">EN 14411 BLa</span>
+                  </div>
+                </div>
+
+                <div className="flagship-cta-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="flagship-btn-primary"
+                  >
+                    <span>Koleksiyonu İncele</span>
+                    <ArrowRight size={16} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCartDrawer(true)}
+                    className="flagship-btn-video"
+                  >
+                    <FileText size={15} />
+                    <span>{sec.ctaButtonText || 'Teklif & Numune İste'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="editorial-hero-visual-col">
+                <div className="editorial-mag-frame">
+                  <img src={coverImage} alt="Magazine Cut" className="editorial-mag-img" />
+                  <div className="editorial-brass-seal">
+                    <span className="brass-seal-top">CERTIFICATO</span>
+                    <span className="brass-seal-sub">{brandName} &bull; Orijinal Taş</span>
+                  </div>
+                </div>
+
+                <div className="editorial-floating-swatch">
+                  <img src={coverImage} alt="Swatch" className="swatch-thumb" />
+                  <div className="swatch-info">
+                    <span className="swatch-label">{brandName} SEÇKİSİ</span>
+                    <span className="swatch-name">{catalog?.title || 'Travertino Navona'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+    }
+  };
 
   return (
     <div
       id="seramikbak-showroom-catalog-root"
-      className="corporate-showroom-page"
+      className={`corporate-showroom-page layout-${layoutType}`}
       style={currentTheme.vars}
     >
       {/* Toast Notification */}
@@ -742,121 +1280,14 @@ export default function HtmlLookbookViewer({
       </header>
 
       {/* =========================================================================
-          FLAGSHIP SHOWROOM HERO BANNER
+          BESPOKE ARCHITECTURAL HERO BANNER (6 DISTINCT LAYOUT STRUCTURES)
       ========================================================================= */}
-      <section id="koleksiyon" className="flagship-showroom-hero">
-        <div className="flagship-hero-bg-wrapper">
-          <img
-            src={coverImage}
-            alt={catalog?.title || 'Katalog Kapağı'}
-            className="flagship-hero-bg-img"
-          />
-          <div className="flagship-hero-gradient-overlay" />
-        </div>
-
-        <div className="flagship-hero-inner">
-          <div className="flagship-hero-content-col">
-            <span className="flagship-hero-overline">
-              {sec.heroBadgeText || `${brandName.toUpperCase()} RESMİ DİJİTAL KATALOĞU // ${year}`}
-            </span>
-
-            <h1 className="flagship-hero-h1">
-              {catalog?.title ? (
-                <>
-                  {catalog.title} <span className="flagship-gold-text">Koleksiyonu</span>
-                </>
-              ) : (
-                <>
-                  Hayalinizdeki Mekanlar <br />
-                  <span className="flagship-gold-text">Burada Başlıyor</span>
-                </>
-              )}
-            </h1>
-
-            <p className="flagship-hero-desc">
-              {catalog?.introText ||
-                catalog?.description ||
-                'En seçkin porselen ve seramik karo serileri, mimari projelendirme desteği ve kişiselleştirilmiş 3D mekan deneyimiyle mekanlarınıza değer katıyoruz.'}
-            </p>
-
-            {/* 4 Feature Badges Row */}
-            <div className="flagship-badges-row">
-              <div className="flagship-badge-item">
-                <Sparkles size={14} className="badge-gold-ico" />
-                <span>{products.length}+ Seçkin Seri</span>
-              </div>
-              <div className="flagship-badge-item">
-                <Compass size={14} className="badge-gold-ico" />
-                <span>3D Mekân Görselleştirme</span>
-              </div>
-              <div className="flagship-badge-item">
-                <Box size={14} className="badge-gold-ico" />
-                <span>Gerçek Doku & Numune</span>
-              </div>
-              <div className="flagship-badge-item">
-                <FileText size={14} className="badge-gold-ico" />
-                <span>Hızlı Fiyat & Şartname</span>
-              </div>
-            </div>
-
-            {/* Hero CTA Row */}
-            <div className="flagship-cta-row">
-              <button
-                type="button"
-                onClick={() => {
-                  document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="flagship-btn-primary"
-              >
-                <span>Kataloğu Keşfet</span>
-                <ArrowRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowCartDrawer(true)}
-                className="flagship-btn-video"
-              >
-                <FileText size={15} />
-                <span>{sec.ctaButtonText || 'Teklif & Numune İste'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 3D Frosted Glass Corner Badge */}
-          <div className="flagship-hero-dealer-corner-badge">
-            {brandLogo ? (
-              <div className="hero-corner-logo-wrap">
-                <img
-                  src={brandLogo}
-                  alt={brandName}
-                  className="hero-corner-logo-img"
-                />
-              </div>
-            ) : (
-              <div className="hero-corner-avatar-fallback">
-                {brandName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="hero-corner-text-wrap">
-              <div className="hero-corner-name-row">
-                <span className="hero-corner-dealer-name">{brandName}</span>
-                <span className="hero-corner-verified-icon" title="Onaylı Üretici Marka">
-                  <Check size={11} strokeWidth={3} />
-                </span>
-              </div>
-              <span className="hero-corner-dealer-sub">
-                {sec.heroStampText || `${currentTheme.badge} // RESMİ SEÇKİ`}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {renderBespokeHero()}
 
       {/* =========================================================================
           FLOATING CATEGORIES BAR (OVERLAPPING HERO BOTTOM)
       ========================================================================= */}
-      <div className="flagship-categories-bar-wrapper" id="kategoriler">
+      <div className={`flagship-categories-bar-wrapper categories-bar-${layoutType.split('-')[0]}`} id="kategoriler">
         <div className="flagship-categories-card">
           <div
             onClick={() => handleFloatingCategoryClick('Seramik')}
@@ -965,7 +1396,7 @@ export default function HtmlLookbookViewer({
               const finish = p.finish || p.surface || 'Porselen';
 
               return (
-                <div key={`featured-${key}`} className="catalog-product-card showroom-luxury-card">
+                <div key={`featured-${key}`} className={`catalog-product-card showroom-luxury-card layout-card-${layoutType}`}>
                   <div className="product-card-media">
                     <div className="card-top-badges">
                       <span className="badge-featured">
@@ -1307,7 +1738,7 @@ export default function HtmlLookbookViewer({
                 const finish = p.finish || p.surface || 'Porselen';
 
                 return (
-                  <div key={key} className="catalog-product-card showroom-luxury-card">
+                  <div key={key} className={`catalog-product-card showroom-luxury-card layout-card-${layoutType}`}>
                     <div className="product-card-media">
                       <div className="card-top-badges">
                         <span className="badge-featured">
@@ -1420,7 +1851,7 @@ export default function HtmlLookbookViewer({
           MİMARİ STANDARTLAR & KALİTE GÜVENCESİ (#standartlar)
       ========================================================================= */}
       {sec.showMonograph !== false && (
-        <section id="standartlar" className="showroom-standards-section">
+        <section id="standartlar" className={`showroom-standards-section layout-standards-${layoutType}`}>
           <div className="standards-container">
             <div className="section-header-centered">
               <span className="section-badge-centered">
