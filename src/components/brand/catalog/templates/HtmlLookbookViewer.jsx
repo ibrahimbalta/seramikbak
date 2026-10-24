@@ -2400,93 +2400,130 @@ export default function HtmlLookbookViewer({
       )}
 
       {/* =========================================================================
-          4K TEXTURE DETAIL MODAL
+          4K TEXTURE DETAIL MODAL (GENİŞLETİLMİŞ & OKUNAKLI MODERN TASARIM)
       ========================================================================= */}
       {activeDetailProduct && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 md:p-6 animate-in fade-in duration-200 overflow-y-auto"
           onClick={() => setActiveDetailProduct(null)}
         >
           <div
-            className="bg-[var(--paper)] border border-[var(--line)] rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl relative"
+            className="bg-[var(--paper)] border border-[var(--line)] rounded-2xl sm:rounded-3xl max-w-4xl lg:max-w-5xl w-full overflow-hidden shadow-2xl relative my-auto"
             onClick={(e) => e.stopPropagation()}
             style={{ backgroundColor: 'var(--paper)', borderColor: 'var(--line)' }}
           >
+            {/* Close Button */}
             <button
               type="button"
               onClick={() => setActiveDetailProduct(null)}
-              className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition"
+              className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-lg hover:scale-105 active:scale-95 cursor-pointer"
+              aria-label="Kapat"
             >
-              <X size={16} />
+              <X size={20} strokeWidth={2.2} />
             </button>
 
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="p-6 bg-[var(--site-background)] flex items-center justify-center relative min-h-[300px]">
-                <img
-                  src={activeDetailProduct.imageUrl || activeDetailProduct.textureUrl}
-                  alt={activeDetailProduct.name}
-                  className="max-h-72 max-w-full object-contain rounded-lg shadow-lg"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-12 min-h-[460px] md:min-h-[520px]">
+              {/* Image Preview Area */}
+              <div className="md:col-span-5 lg:col-span-6 bg-black/[0.03] dark:bg-black/30 p-6 sm:p-8 md:p-10 flex flex-col items-center justify-center relative border-b md:border-b-0 md:border-r border-[var(--line)]">
+                <div className="relative w-full aspect-square max-w-[320px] sm:max-w-[380px] md:max-w-[420px] rounded-2xl overflow-hidden shadow-xl border border-[var(--line)] bg-white/5 flex items-center justify-center group">
+                  <img
+                    src={activeDetailProduct.imageUrl || activeDetailProduct.textureUrl}
+                    alt={activeDetailProduct.name}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-lg bg-black/65 backdrop-blur-md text-white text-xs font-mono font-semibold flex items-center gap-1.5 shadow-md">
+                    <Maximize2 size={13} />
+                    <span>4K Doku Detayı</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="p-6 flex flex-col justify-between">
+              {/* Product Info & Action Buttons */}
+              <div className="md:col-span-7 lg:col-span-6 p-6 sm:p-8 md:p-9 flex flex-col justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--site-primary)] block mb-1">
-                    {activeDetailProduct.categoryName || 'MİMARİ PORSELEN'}
-                  </span>
-                  <h3 className="text-xl font-serif font-bold text-[var(--ink)] mb-2">
+                  {/* Category Eyebrow */}
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-[var(--site-primary)] flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[var(--site-primary)] inline-block" />
+                      {activeDetailProduct.categoryName || 'MİMARİ PORSELEN'}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-2xl sm:text-3xl font-serif font-extrabold text-[var(--ink)] leading-snug mb-2.5 tracking-tight">
                     {activeDetailProduct.name}
                   </h3>
+
+                  {/* Product Code */}
                   {activeDetailProduct.code && (
-                    <p className="text-xs text-[var(--muted)] font-mono mb-4">
-                      Ürün Kodu: {activeDetailProduct.code}
-                    </p>
+                    <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[var(--muted)] font-mono mb-6 bg-black/[0.04] dark:bg-white/[0.06] px-3 py-1.5 rounded-lg border border-[var(--line)]">
+                      <span className="font-sans font-bold text-[11px] uppercase tracking-wider text-[var(--muted)]">Ürün Kodu:</span>
+                      <strong className="text-[var(--ink)] tracking-wider">{activeDetailProduct.code}</strong>
+                    </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-3 mb-6 text-xs">
-                    <div className="p-2.5 rounded-lg border border-[var(--line)] bg-black/2">
-                      <span className="text-[10px] text-[var(--muted)] block">Ebat</span>
-                      <strong className="text-[var(--ink)]">
+                  {/* 2x2 Technical Specifications Grid */}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-7">
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-[var(--line)] bg-black/[0.02] dark:bg-white/[0.03] transition-all hover:border-[var(--site-primary)]/40">
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[var(--muted)] block mb-1">
+                        Ebat
+                      </span>
+                      <strong className="text-sm sm:text-base font-extrabold text-[var(--ink)] block">
                         {activeDetailProduct.width && activeDetailProduct.height
                           ? `${activeDetailProduct.width} × ${activeDetailProduct.height} cm`
                           : activeDetailProduct.size || 'Standart'}
                       </strong>
                     </div>
-                    <div className="p-2.5 rounded-lg border border-[var(--line)] bg-black/2">
-                      <span className="text-[10px] text-[var(--muted)] block">Yüzey</span>
-                      <strong className="text-[var(--ink)]">
+
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-[var(--line)] bg-black/[0.02] dark:bg-white/[0.03] transition-all hover:border-[var(--site-primary)]/40">
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[var(--muted)] block mb-1">
+                        Yüzey Dokusu
+                      </span>
+                      <strong className="text-sm sm:text-base font-extrabold text-[var(--ink)] block">
                         {activeDetailProduct.finish || activeDetailProduct.surface || 'Mat'}
                       </strong>
                     </div>
-                    <div className="p-2.5 rounded-lg border border-[var(--line)] bg-black/2">
-                      <span className="text-[10px] text-[var(--muted)] block">Su Emme</span>
-                      <strong className="text-[var(--ink)]">E ≤ %0.05</strong>
+
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-[var(--line)] bg-black/[0.02] dark:bg-white/[0.03] transition-all hover:border-[var(--site-primary)]/40">
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[var(--muted)] block mb-1">
+                        Su Emme Normu
+                      </span>
+                      <strong className="text-sm sm:text-base font-extrabold text-[var(--ink)] block">
+                        E ≤ %0.05
+                      </strong>
                     </div>
-                    <div className="p-2.5 rounded-lg border border-[var(--line)] bg-black/2">
-                      <span className="text-[10px] text-[var(--muted)] block">Kenar</span>
-                      <strong className="text-[var(--ink)]">Rektifiye (1 mm)</strong>
+
+                    <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-[var(--line)] bg-black/[0.02] dark:bg-white/[0.03] transition-all hover:border-[var(--site-primary)]/40">
+                      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[var(--muted)] block mb-1">
+                        Kenar Kesimi
+                      </span>
+                      <strong className="text-sm sm:text-base font-extrabold text-[var(--ink)] block">
+                        Rektifiye (1 mm)
+                      </strong>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-4 border-t border-[var(--line)]">
+                {/* Bottom Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-5 border-t border-[var(--line)] mt-auto">
                   <Link
                     href={`/?tab=studio&product=${encodeURIComponent(activeDetailProduct.slug || activeDetailProduct.code || activeDetailProduct.name || activeDetailProduct.id)}#studio`}
                     onClick={(e) => handleOpen3DStudio(activeDetailProduct, e)}
-                    className="flex-1 py-2.5 rounded-lg border border-[var(--line)] text-center text-xs font-bold text-[var(--ink)] hover:border-[var(--site-primary)] flex items-center justify-center gap-1.5"
+                    className="flex-1 h-12 sm:h-13 px-5 rounded-xl border-2 border-[var(--line)] hover:border-[var(--site-primary)] hover:bg-[var(--site-primary)]/10 text-center text-sm sm:text-base font-extrabold text-[var(--ink)] flex items-center justify-center gap-2.5 transition-all shadow-xs active:scale-[0.99] cursor-pointer"
                   >
-                    <Box size={14} />
-                    <span>3D Gör & Döşe</span>
+                    <Box size={18} strokeWidth={2.2} />
+                    <span>3D Gör &amp; Döşe</span>
                   </Link>
+
                   <button
                     type="button"
                     onClick={(e) => {
                       handleAddToQuoteCart(activeDetailProduct, e);
                       setActiveDetailProduct(null);
                     }}
-                    className="flex-1 py-2.5 rounded-lg bg-[var(--site-primary)] text-white text-center text-xs font-bold flex items-center justify-center gap-1.5"
+                    className="flex-1 h-12 sm:h-13 px-5 rounded-xl bg-[var(--site-primary)] hover:brightness-110 active:scale-[0.99] text-white text-center text-sm sm:text-base font-extrabold flex items-center justify-center gap-2.5 transition-all shadow-md cursor-pointer"
                   >
-                    <Plus size={14} />
+                    <Plus size={20} strokeWidth={2.4} />
                     <span>Teklif Listeme Ekle</span>
                   </button>
                 </div>
