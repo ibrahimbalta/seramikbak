@@ -1571,6 +1571,319 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           .guide-modal-foot { padding: 13px 17px 17px; }
           .guide-modal-note { max-width: 145px; }
         }
+
+        /* =========================================================================
+           TEKNİK ŞARTNAME & BIM PANEL (USER TEMPLATE)
+        ========================================================================= */
+        .spec-panel {
+          background: #ffffff;
+          border: 1px solid #e3e8ef;
+          border-radius: 16px;
+          box-shadow: 0 12px 35px rgba(22, 32, 51, 0.06);
+          overflow: hidden;
+          transition: all 0.2s ease;
+        }
+        .spec-panel-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          padding: 20px 24px;
+          border-bottom: 1px solid #e3e8ef;
+          background: #ffffff;
+        }
+        .spec-title-wrap {
+          display: flex;
+          gap: 14px;
+          align-items: flex-start;
+        }
+        .spec-title-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: 12px;
+          background: #fff3e9;
+          color: #b65b24;
+          display: grid;
+          place-items: center;
+          flex: none;
+          box-shadow: 0 4px 12px rgba(182, 91, 36, 0.12);
+        }
+        .spec-panel-head h2 {
+          font-size: 17px;
+          font-weight: 800;
+          color: #172033;
+          margin: 0 0 4px;
+          letter-spacing: -0.3px;
+        }
+        .spec-panel-head p {
+          font-size: 12px;
+          color: #687386;
+          margin: 0;
+          line-height: 1.5;
+        }
+        .spec-switch {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 12px;
+          font-weight: 750;
+          color: #445066;
+          cursor: pointer;
+          user-select: none;
+          background: #f8fafc;
+          padding: 8px 14px;
+          border-radius: 12px;
+          border: 1px solid #e3e8ef;
+          transition: all 0.15s ease;
+        }
+        .spec-switch:hover {
+          background: #f1f4f9;
+        }
+        .spec-switch input {
+          display: none;
+        }
+        .spec-toggle {
+          width: 38px;
+          height: 22px;
+          border-radius: 20px;
+          background: #cbd2dc;
+          position: relative;
+          transition: background 0.2s ease;
+          display: inline-block;
+          flex-shrink: 0;
+        }
+        .spec-toggle:after {
+          content: "";
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #fff;
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        }
+        .spec-switch input:checked + .spec-toggle {
+          background: #b65b24;
+        }
+        .spec-switch input:checked + .spec-toggle:after {
+          left: 19px;
+        }
+        .spec-content {
+          padding: 22px 24px 28px;
+        }
+        .spec-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+        .spec-grid-3 {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+        .spec-field {
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+        }
+        .spec-field label {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #687386;
+          font-weight: 800;
+        }
+        .spec-field input,
+        .spec-field textarea {
+          width: 100%;
+          border: 1px solid #dfe5ed;
+          background: #fff;
+          border-radius: 10px;
+          padding: 11px 13px;
+          outline: none;
+          color: #172033;
+          transition: border-color 0.15s, box-shadow 0.15s;
+          font-size: 13px;
+        }
+        .spec-field input {
+          height: 42px;
+        }
+        .spec-field textarea {
+          min-height: 72px;
+          resize: vertical;
+          line-height: 1.45;
+        }
+        .spec-field input:focus,
+        .spec-field textarea:focus {
+          border-color: #b65b24;
+          box-shadow: 0 0 0 4px rgba(182, 91, 36, 0.09);
+        }
+        .spec-section-title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 26px 0 14px;
+          padding-top: 10px;
+        }
+        .spec-section-title h3 {
+          font-size: 12px;
+          font-weight: 800;
+          margin: 0;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: #172033;
+        }
+        .spec-section-title span {
+          font-size: 11px;
+          color: #687386;
+        }
+        .spec-metric {
+          border: 1px solid #e3e8ef;
+          border-radius: 14px;
+          background: #ffffff;
+          padding: 16px;
+          position: relative;
+          box-shadow: 0 5px 16px rgba(22, 32, 51, 0.035);
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .spec-metric:hover {
+          border-color: #e0b294;
+          box-shadow: 0 8px 24px rgba(182, 91, 36, 0.07);
+        }
+        .spec-metric:before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 14px;
+          bottom: 14px;
+          width: 3px;
+          border-radius: 3px;
+          background: #b65b24;
+        }
+        .spec-metric-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 14px;
+          padding-left: 8px;
+        }
+        .spec-metric-number {
+          font-size: 11px;
+          font-weight: 900;
+          color: #b65b24;
+        }
+        .spec-metric-name {
+          font-size: 12px;
+          font-weight: 800;
+          color: #172033;
+          margin-top: 1px;
+        }
+        .spec-metric .spec-field {
+          margin-top: 10px;
+        }
+        .spec-metric .spec-field label {
+          font-size: 9.5px;
+          font-weight: 750;
+        }
+        .spec-metric input {
+          height: 38px;
+          font-size: 12px;
+        }
+        .spec-metric textarea {
+          min-height: 64px;
+          font-size: 11.5px;
+        }
+        .spec-badge {
+          font-size: 9.5px;
+          background: #eef3ff;
+          color: #3578f6;
+          border-radius: 20px;
+          padding: 4px 8px;
+          font-weight: 800;
+          letter-spacing: 0.3px;
+        }
+        .spec-links {
+          margin-top: 14px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+        }
+        .spec-link-card {
+          border: 1px dashed #cfd7e2;
+          border-radius: 12px;
+          padding: 14px;
+          background: #f8fafc;
+          transition: border-color 0.15s, background 0.15s;
+        }
+        .spec-link-card:hover {
+          border-color: #b65b24;
+          background: #fffdfb;
+        }
+        .spec-link-title {
+          font-size: 11px;
+          font-weight: 800;
+          margin-bottom: 8px;
+          color: #202a35;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .spec-link-title span {
+          color: #b65b24;
+        }
+        .spec-link-card input {
+          height: 38px;
+          background: #fff;
+          font-size: 12px;
+        }
+        .spec-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          margin-top: 24px;
+          padding-top: 18px;
+          border-top: 1px solid #e3e8ef;
+        }
+        .spec-status {
+          font-size: 11.5px;
+          color: #687386;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .spec-status strong {
+          color: #10b981;
+        }
+        .spec-footer-actions {
+          display: flex;
+          gap: 10px;
+        }
+
+        @media (max-width: 900px) {
+          .spec-grid-2,
+          .spec-grid-3,
+          .spec-links {
+            grid-template-columns: 1fr;
+          }
+          .spec-panel-head {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+          .spec-footer {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .spec-footer-actions {
+            width: 100%;
+          }
+          .spec-footer-actions button {
+            flex: 1;
+          }
+        }
       `}</style>
 
       {/* =========================================================================
@@ -3343,253 +3656,274 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
                 </div>
               )}
 
-              {/* SUB-TAB 5: TECHNICAL SPECIFICATIONS & BIM EDIT */}
+              {/* SUB-TAB 5: TECHNICAL SPECIFICATIONS & BIM EDIT (MODERN USER TEMPLATE) */}
               {activeContentTab === 'technical' && (
-                <div className="space-y-6">
-                  <div className="bg-white p-6 md:p-7 rounded-2xl border border-stone-200 shadow-xs space-y-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 flex-shrink-0">
-                          <ShieldCheck size={18} />
-                        </div>
-                        <div>
-                          <h3 className="text-base font-bold text-stone-900">
-                            Teknik Şartname, Laboratuvar Değerleri & BIM
-                          </h3>
-                          <p className="text-xs text-stone-500 mt-0.5">
-                            EN 14411 standart uyumluluğu, teknik performans kartları ve indirilebilir mimari BIM / CAD / Sertifika bağlantıları.
-                          </p>
-                        </div>
+                <div className="spec-panel">
+                  {/* Panel Head */}
+                  <div className="spec-panel-head">
+                    <div className="spec-title-wrap">
+                      <div className="spec-title-icon">
+                        <ShieldCheck size={22} />
                       </div>
-
-                      <label className="inline-flex items-center gap-3 cursor-pointer self-start sm:self-auto bg-stone-50 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-300 transition shadow-2xs">
-                        <input
-                          type="checkbox"
-                          checked={formData.sectionSettings?.showTechnical !== false}
-                          onChange={(e) => updateSectionSetting('showTechnical', e.target.checked)}
-                          className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                        />
-                        <span className="text-xs sm:text-sm font-bold text-stone-900">
-                          {formData.sectionSettings?.showTechnical !== false ? '✓ Bölüm Açık' : '✕ Bölüm Gizli'}
-                        </span>
-                      </label>
-                    </div>
-
-                    {formData.sectionSettings?.showTechnical === false ? (
-                      <div className="p-8 bg-rose-50/60 rounded-2xl border border-rose-200 text-center">
-                        <EyeOff size={28} className="mx-auto text-rose-500 mb-2" />
-                        <h4 className="text-sm font-bold text-rose-900">Bu Bölüm Katalogda Gösterilmeyecek</h4>
-                        <p className="text-xs text-rose-600 mt-1 max-w-md mx-auto">
-                          Teknik şartname tablosu ve BIM indirme alanı yayında tamamen gizlenecektir.
+                      <div>
+                        <h2>Teknik Şartname, Laboratuvar Değerleri &amp; BIM</h2>
+                        <p>
+                          EN 14411 standardına uyumlu teknik değerler, performans kartları ve indirilebilir BIM / CAD / sertifika bağlantıları.
                         </p>
                       </div>
-                    ) : (
-                      <div className="space-y-6 animate-in fade-in duration-150">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
-                              Bölüm Üst Rozeti
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.technicalBadge || ''}
-                              onChange={(e) => updateSectionSetting('technicalBadge', e.target.value)}
-                              placeholder="Mimari Şartname & Kalite Güvencesi"
-                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                            />
-                          </div>
+                    </div>
 
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
-                              Bölüm Ana Başlığı
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.technicalTitle || ''}
-                              onChange={(e) => updateSectionSetting('technicalTitle', e.target.value)}
-                              placeholder="Mükemmel Estetik, Sarsılmaz Standartlar"
-                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                            />
-                          </div>
+                    <label className="spec-switch">
+                      <input
+                        type="checkbox"
+                        checked={formData.sectionSettings?.showTechnical !== false}
+                        onChange={(e) => updateSectionSetting('showTechnical', e.target.checked)}
+                      />
+                      <span className="spec-toggle"></span>
+                      <span>{formData.sectionSettings?.showTechnical !== false ? 'Bölüm Açık' : 'Bölüm Gizli'}</span>
+                    </label>
+                  </div>
 
-                          <div className="space-y-1.5 md:col-span-2">
-                            <label className="text-xs font-bold text-stone-800 uppercase tracking-wide">
-                              Alt Açıklama / Standart Metni
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.sectionSettings?.technicalSubtitle || ''}
-                              onChange={(e) => updateSectionSetting('technicalSubtitle', e.target.value)}
-                              placeholder="Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler."
-                              className="w-full h-11 px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-sm text-stone-900 outline-none focus:border-amber-600 focus:ring-4 focus:ring-amber-500/10 transition shadow-2xs"
-                            />
-                          </div>
+                  {formData.sectionSettings?.showTechnical === false ? (
+                    <div className="p-8 md:p-10 bg-stone-50 text-center m-5 rounded-2xl border border-stone-200">
+                      <EyeOff size={32} className="mx-auto text-stone-400 mb-2" />
+                      <h4 className="text-sm font-bold text-stone-800">Bu Bölüm Katalogda Gösterilmeyecek</h4>
+                      <p className="text-xs text-stone-500 mt-1 max-w-md mx-auto">
+                        Teknik şartname tablosu ve BIM indirme alanı yayında tamamen gizlenecektir. Açmak için yukarıdaki anahtarı etkinleştirin.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="spec-content">
+                      {/* Top Fields */}
+                      <div className="spec-grid-2">
+                        <div className="spec-field">
+                          <label>Bölüm Üst Rozeti</label>
+                          <input
+                            type="text"
+                            value={formData.sectionSettings?.technicalBadge || ''}
+                            onChange={(e) => updateSectionSetting('technicalBadge', e.target.value)}
+                            placeholder="Mimari Şartname & Kalite Güvencesi"
+                          />
                         </div>
-
-                        {/* 3 Teknik Kriter Kartı */}
-                        <div>
-                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <Award size={16} className="text-amber-600" />
-                            <span>3 Laboratuvar Performans Kartı</span>
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {/* 1. Su Emme */}
-                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
-                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">1. Su Emme Normu</span>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Teknik Kod</span>
-                                <input
-                                  type="text"
-                                  value={formData.sectionSettings?.tech1Title || '01 // SU EMME DEĞERİ (E ≤ %0.05)'}
-                                  onChange={(e) => updateSectionSetting('tech1Title', e.target.value)}
-                                  placeholder="01 // SU EMME DEĞERİ"
-                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs font-mono font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Performans Başlığı</span>
-                                <input
-                                  type="text"
-                                  value={formData.sectionSettings?.tech1Heading || 'Sıfıra Yakın Su Emme'}
-                                  onChange={(e) => updateSectionSetting('tech1Heading', e.target.value)}
-                                  placeholder="Sıfıra Yakın Su Emme"
-                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Teknik Açıklama</span>
-                                <textarea
-                                  rows={2}
-                                  value={formData.sectionSettings?.tech1Desc || 'Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunan porselen gövde.'}
-                                  onChange={(e) => updateSectionSetting('tech1Desc', e.target.value)}
-                                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs resize-none"
-                                />
-                              </div>
-                            </div>
-
-                            {/* 2. Kayma Direnci */}
-                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
-                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">2. Kayma Direnci (R10/R11)</span>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Teknik Kod</span>
-                                <input
-                                  type="text"
-                                  value={formData.sectionSettings?.tech2Title || '02 // R10 / R11 KAYMA DİRENCİ'}
-                                  onChange={(e) => updateSectionSetting('tech2Title', e.target.value)}
-                                  placeholder="02 // KAYMA DİRENCİ"
-                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs font-mono font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Performans Başlığı</span>
-                                <input
-                                  type="text"
-                                  value={formData.sectionSettings?.tech2Heading || 'Islak Hacim Güvenliği'}
-                                  onChange={(e) => updateSectionSetting('tech2Heading', e.target.value)}
-                                  placeholder="Islak Hacim Güvenliği"
-                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Teknik Açıklama</span>
-                                <textarea
-                                  rows={2}
-                                  value={formData.sectionSettings?.tech2Desc || 'Banyo, havuz kenarı ve otel girişleri için mikrotekstür teknolojisi.'}
-                                  onChange={(e) => updateSectionSetting('tech2Desc', e.target.value)}
-                                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs resize-none"
-                                />
-                              </div>
-                            </div>
-
-                            {/* 3. Rektifiye Kesim */}
-                            <div className="p-4 rounded-2xl border border-stone-200 bg-white shadow-2xs space-y-3 hover:border-amber-300 transition">
-                              <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">3. Kenar Kesim Hassasiyeti</span>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Teknik Kod</span>
-                                <input
-                                  type="text"
-                                  value={formData.sectionSettings?.tech3Title || '03 // REKTİFİYE MİLİMETRİK KESİM'}
-                                  onChange={(e) => updateSectionSetting('tech3Title', e.target.value)}
-                                  placeholder="03 // REKTİFİYE KESİM"
-                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs font-mono font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Performans Başlığı</span>
-                                <input
-                                  type="text"
-                                  value={formData.sectionSettings?.tech3Heading || 'Derzsiz Süreklilik'}
-                                  onChange={(e) => updateSectionSetting('tech3Heading', e.target.value)}
-                                  placeholder="Derzsiz Süreklilik"
-                                  className="w-full h-10 px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-sm font-bold text-stone-900 focus:bg-white focus:border-amber-600 shadow-2xs"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <span className="text-[11px] font-semibold text-stone-500">Teknik Açıklama</span>
-                                <textarea
-                                  rows={2}
-                                  value={formData.sectionSettings?.tech3Desc || 'Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığı.'}
-                                  onChange={(e) => updateSectionSetting('tech3Desc', e.target.value)}
-                                  className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-amber-600 shadow-2xs resize-none"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Özel İndirme Dosyaları (Opsiyonel) */}
-                        <div className="pt-2">
-                          <h4 className="text-xs sm:text-sm font-bold text-stone-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <Box size={16} className="text-amber-600" />
-                            <span>Özel İndirme Dosyaları & Bağlantılar (Opsiyonel)</span>
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-1.5">
-                              <label className="text-xs font-bold text-stone-800 flex items-center gap-2">
-                                <Box size={14} className="text-amber-700" />
-                                <span>BIM & CAD Dosya Linki</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={formData.sectionSettings?.bimCadUrl || ''}
-                                onChange={(e) => updateSectionSetting('bimCadUrl', e.target.value)}
-                                placeholder="https://... (.ZIP / .RFA)"
-                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 shadow-2xs"
-                              />
-                            </div>
-
-                            <div className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-1.5">
-                              <label className="text-xs font-bold text-stone-800 flex items-center gap-2">
-                                <Award size={14} className="text-amber-700" />
-                                <span>CE & LEED Sertifika Linki</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={formData.sectionSettings?.ceLeedUrl || ''}
-                                onChange={(e) => updateSectionSetting('ceLeedUrl', e.target.value)}
-                                placeholder="https://... (.PDF)"
-                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 shadow-2xs"
-                              />
-                            </div>
-
-                            <div className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-1.5">
-                              <label className="text-xs font-bold text-stone-800 flex items-center gap-2">
-                                <Globe size={14} className="text-amber-700" />
-                                <span>EPD Çevresel Beyan Linki</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={formData.sectionSettings?.epdUrl || ''}
-                                onChange={(e) => updateSectionSetting('epdUrl', e.target.value)}
-                                placeholder="https://... (.PDF)"
-                                className="w-full h-10 px-3.5 py-2 rounded-xl border border-stone-300 bg-white text-xs text-stone-900 outline-none focus:border-amber-600 shadow-2xs"
-                              />
-                            </div>
-                          </div>
+                        <div className="spec-field">
+                          <label>Bölüm Ana Başlığı</label>
+                          <input
+                            type="text"
+                            value={formData.sectionSettings?.technicalTitle || ''}
+                            onChange={(e) => updateSectionSetting('technicalTitle', e.target.value)}
+                            placeholder="Mükemmel Estetik, Sarsılmaz Standartlar"
+                          />
                         </div>
                       </div>
-                    )}
-                  </div>
+
+                      <div className="spec-field" style={{ marginTop: '16px' }}>
+                        <label>Alt Açıklama / Standart Metni</label>
+                        <input
+                          type="text"
+                          value={formData.sectionSettings?.technicalSubtitle || ''}
+                          onChange={(e) => updateSectionSetting('technicalSubtitle', e.target.value)}
+                          placeholder="Avrupa Birliği EN 14411 standardına tam uyumlu teknik değerler."
+                        />
+                      </div>
+
+                      {/* Section Title 1 */}
+                      <div className="spec-section-title">
+                        <h3>03 · Laboratuvar Performans Kartı</h3>
+                        <span>Teknik değerleri ürününüzün gerçek verileriyle güncelleyin.</span>
+                      </div>
+
+                      {/* 3 Metric Cards */}
+                      <div className="spec-grid-3">
+                        {/* 1. Su Emme */}
+                        <article className="spec-metric">
+                          <div className="spec-metric-head">
+                            <div>
+                              <div className="spec-metric-number">01</div>
+                              <div className="spec-metric-name">Su Emme Normu</div>
+                            </div>
+                            <span className="spec-badge">EN 14411</span>
+                          </div>
+                          <div className="spec-field">
+                            <label>Teknik Kod</label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.tech1Title || '01 // SU EMME DEĞERİ (E ≤ %0.5)'}
+                              onChange={(e) => updateSectionSetting('tech1Title', e.target.value)}
+                              placeholder="01 // SU EMME DEĞERİ (E ≤ %0.5)"
+                              style={{ fontFamily: 'monospace', fontWeight: 700 }}
+                            />
+                          </div>
+                          <div className="spec-field">
+                            <label>Performans Başlığı</label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.tech1Heading || 'Sıfıra Yakın Su Emme'}
+                              onChange={(e) => updateSectionSetting('tech1Heading', e.target.value)}
+                              placeholder="Sıfıra Yakın Su Emme"
+                              style={{ fontWeight: 750 }}
+                            />
+                          </div>
+                          <div className="spec-field">
+                            <label>Teknik Açıklama</label>
+                            <textarea
+                              rows={2}
+                              value={formData.sectionSettings?.tech1Desc || 'Donmaya, lekelenmeye ve kimyasallara karşı maksimum direnç sunar; yüksek yoğunluklu porselen gövdedir.'}
+                              onChange={(e) => updateSectionSetting('tech1Desc', e.target.value)}
+                              placeholder="Teknik detay ve avantaj açıklaması..."
+                            />
+                          </div>
+                        </article>
+
+                        {/* 2. Kayma Direnci */}
+                        <article className="spec-metric">
+                          <div className="spec-metric-head">
+                            <div>
+                              <div className="spec-metric-number">02</div>
+                              <div className="spec-metric-name">Kayma Direnci (R10/R11)</div>
+                            </div>
+                            <span className="spec-badge">R10 / R11</span>
+                          </div>
+                          <div className="spec-field">
+                            <label>Teknik Kod</label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.tech2Title || '02 // R10 / R11 KAYMA DİRENCİ'}
+                              onChange={(e) => updateSectionSetting('tech2Title', e.target.value)}
+                              placeholder="02 // R10 / R11 KAYMA DİRENCİ"
+                              style={{ fontFamily: 'monospace', fontWeight: 700 }}
+                            />
+                          </div>
+                          <div className="spec-field">
+                            <label>Performans Başlığı</label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.tech2Heading || 'Islak Hacim Güvenliği'}
+                              onChange={(e) => updateSectionSetting('tech2Heading', e.target.value)}
+                              placeholder="Islak Hacim Güvenliği"
+                              style={{ fontWeight: 750 }}
+                            />
+                          </div>
+                          <div className="spec-field">
+                            <label>Teknik Açıklama</label>
+                            <textarea
+                              rows={2}
+                              value={formData.sectionSettings?.tech2Desc || 'Banyo, havuz kenarı ve ıslak otel girişleri için mikro-doku teknolojisiyle güvenli kullanım.'}
+                              onChange={(e) => updateSectionSetting('tech2Desc', e.target.value)}
+                              placeholder="Teknik detay ve avantaj açıklaması..."
+                            />
+                          </div>
+                        </article>
+
+                        {/* 3. Kenar Kesim Hassasiyeti */}
+                        <article className="spec-metric">
+                          <div className="spec-metric-head">
+                            <div>
+                              <div className="spec-metric-number">03</div>
+                              <div className="spec-metric-name">Kenar Kesim Hassasiyeti</div>
+                            </div>
+                            <span className="spec-badge">RECTIFY</span>
+                          </div>
+                          <div className="spec-field">
+                            <label>Teknik Kod</label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.tech3Title || '03 // REKTİFİYE MİLİMETRİK KESİM'}
+                              onChange={(e) => updateSectionSetting('tech3Title', e.target.value)}
+                              placeholder="03 // REKTİFİYE MİLİMETRİK KESİM"
+                              style={{ fontFamily: 'monospace', fontWeight: 700 }}
+                            />
+                          </div>
+                          <div className="spec-field">
+                            <label>Performans Başlığı</label>
+                            <input
+                              type="text"
+                              value={formData.sectionSettings?.tech3Heading || 'Dersiz Süreklilik'}
+                              onChange={(e) => updateSectionSetting('tech3Heading', e.target.value)}
+                              placeholder="Dersiz Süreklilik"
+                              style={{ fontWeight: 750 }}
+                            />
+                          </div>
+                          <div className="spec-field">
+                            <label>Teknik Açıklama</label>
+                            <textarea
+                              rows={2}
+                              value={formData.sectionSettings?.tech3Desc || 'Lazer kontrollü rektifiye kenarlar sayesinde 1 mm minimum derz aralığıyla kesintisiz yüzey akışı.'}
+                              onChange={(e) => updateSectionSetting('tech3Desc', e.target.value)}
+                              placeholder="Teknik detay ve avantaj açıklaması..."
+                            />
+                          </div>
+                        </article>
+                      </div>
+
+                      {/* Section Title 2 */}
+                      <div className="spec-section-title">
+                        <h3>Özel İndirme Dosyaları &amp; Bağlantılar</h3>
+                        <span>İsteğe bağlı · PDF, ZIP, RFA ve çevresel beyan bağlantıları</span>
+                      </div>
+
+                      {/* Links Grid */}
+                      <div className="spec-links">
+                        <div className="spec-link-card">
+                          <div className="spec-link-title">
+                            <span>▣</span> BIM &amp; CAD Dosya Linki
+                          </div>
+                          <input
+                            type="text"
+                            value={formData.sectionSettings?.bimCadUrl || ''}
+                            onChange={(e) => updateSectionSetting('bimCadUrl', e.target.value)}
+                            placeholder="https://... (.ZIP / .RFA)"
+                          />
+                        </div>
+
+                        <div className="spec-link-card">
+                          <div className="spec-link-title">
+                            <span>♧</span> CE &amp; LEED Sertifika Linki
+                          </div>
+                          <input
+                            type="text"
+                            value={formData.sectionSettings?.ceLeedUrl || ''}
+                            onChange={(e) => updateSectionSetting('ceLeedUrl', e.target.value)}
+                            placeholder="https://... (.PDF)"
+                          />
+                        </div>
+
+                        <div className="spec-link-card">
+                          <div className="spec-link-title">
+                            <span>◉</span> EPD Çevresel Beyan Linki
+                          </div>
+                          <input
+                            type="text"
+                            value={formData.sectionSettings?.epdUrl || ''}
+                            onChange={(e) => updateSectionSetting('epdUrl', e.target.value)}
+                            placeholder="https://... (.PDF)"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Footer Info & Actions */}
+                      <div className="spec-footer">
+                        <div className="spec-status">
+                          <span>●</span> <strong>Otomatik senkronizasyon açık</strong> · Değişiklikler anında kataloğa işlenir
+                        </div>
+                        <div className="spec-footer-actions">
+                          <button
+                            type="button"
+                            className="btn btn-outline"
+                            onClick={() => setActiveContentTab('rooms')}
+                          >
+                            ← Önceki: Mekânlar
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => setActiveContentTab('cta')}
+                          >
+                            Sonraki: İletişim &amp; Teklif →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
