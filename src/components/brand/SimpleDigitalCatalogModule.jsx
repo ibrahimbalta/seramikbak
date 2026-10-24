@@ -1391,6 +1391,186 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
           .inbox-footer { align-items:flex-start; flex-direction:column; }
           .inbox-btn { padding:10px 12px; }
         }
+
+        /* =========================================================================
+           STUDIO REHBERİ MODAL (USER TEMPLATE)
+        ========================================================================= */
+        .guide-modal-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 100;
+          background: rgba(23, 25, 20, 0.57);
+          backdrop-filter: blur(7px);
+          -webkit-backdrop-filter: blur(7px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          animation: guideFadeIn 0.2s ease-out;
+        }
+        @keyframes guideFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .guide-modal-card {
+          width: min(540px, 100%);
+          background: #fffefa;
+          border: 1px solid rgba(255, 255, 255, 0.66);
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 28px 90px rgba(18, 20, 15, 0.27);
+          animation: guideScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes guideScaleIn {
+          from { transform: translateY(9px) scale(0.985); }
+          to { transform: translateY(0) scale(1); }
+        }
+        .guide-modal-head {
+          position: relative;
+          padding: 25px 26px 20px;
+          background: radial-gradient(circle at 100% 0%, #eee5d5, transparent 42%), #fffefa;
+          border-bottom: 1px solid #e8e7e1;
+        }
+        .guide-modal-eyebrow {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #87552e;
+          font-size: 10px;
+          font-weight: 850;
+          letter-spacing: 1.7px;
+          text-transform: uppercase;
+          margin-bottom: 11px;
+        }
+        .guide-modal-eyebrow:before {
+          content: "";
+          width: 7px;
+          height: 7px;
+          background: #c58a51;
+          border-radius: 50%;
+          box-shadow: 0 0 0 4px rgba(197, 138, 81, 0.1);
+        }
+        .guide-modal-head h2 {
+          font-size: 23px;
+          line-height: 1.2;
+          letter-spacing: -0.8px;
+          margin: 0;
+          max-width: 420px;
+          font-weight: 780;
+          color: #24251f;
+        }
+        .guide-modal-subtitle {
+          font-size: 12px;
+          color: #74766d;
+          line-height: 1.65;
+          margin: 9px 0 0;
+          max-width: 430px;
+        }
+        .guide-modal-close {
+          position: absolute;
+          right: 17px;
+          top: 17px;
+          width: 34px;
+          height: 34px;
+          border: 1px solid #e8e5dc;
+          border-radius: 50%;
+          background: #fffefa;
+          color: #77786e;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .guide-modal-close:hover {
+          background: #f0ece3;
+          transform: rotate(90deg);
+        }
+        .guide-modal-steps {
+          padding: 8px 20px 12px;
+          background: #fffefa;
+        }
+        .guide-modal-step {
+          display: grid;
+          grid-template-columns: 37px minmax(0, 1fr);
+          gap: 13px;
+          padding: 15px 6px;
+        }
+        .guide-modal-step + .guide-modal-step {
+          border-top: 1px solid #eeece5;
+        }
+        .guide-modal-num {
+          width: 31px;
+          height: 31px;
+          border-radius: 11px;
+          background: #30352a;
+          color: white;
+          display: grid;
+          place-items: center;
+          font-size: 12px;
+          font-weight: 850;
+          box-shadow: 0 3px 7px rgba(48, 53, 42, 0.11);
+        }
+        .guide-modal-step h3 {
+          font-size: 12px;
+          font-weight: 800;
+          margin: 1px 0 5px;
+          color: #24251f;
+        }
+        .guide-modal-step p {
+          font-size: 11.5px;
+          line-height: 1.65;
+          color: #6f7168;
+          margin: 0;
+        }
+        .guide-modal-step strong {
+          color: #3e4235;
+        }
+        .guide-modal-foot {
+          padding: 14px 24px 22px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          border-top: 1px solid #e8e7e1;
+          background: #fcfbf7;
+        }
+        .guide-modal-note {
+          font-size: 10px;
+          color: #8b8b80;
+          line-height: 1.5;
+        }
+        .guide-modal-done {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          border: 0;
+          border-radius: 10px;
+          background: #a96f3e;
+          color: white;
+          padding: 12px 17px;
+          font-size: 11px;
+          font-weight: 850;
+          white-space: nowrap;
+          box-shadow: 0 5px 12px rgba(169, 111, 62, 0.14);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .guide-modal-done:hover {
+          background: #87552e;
+          transform: translateY(-1px);
+        }
+        @media (max-width: 520px) {
+          .guide-modal-overlay { padding: 12px; }
+          .guide-modal-card { border-radius: 16px; }
+          .guide-modal-head { padding: 22px 20px 17px; }
+          .guide-modal-head h2 { font-size: 20px; padding-right: 20px; }
+          .guide-modal-steps { padding: 4px 15px 8px; }
+          .guide-modal-step { grid-template-columns: 32px minmax(0, 1fr); gap: 10px; padding: 13px 3px; }
+          .guide-modal-num { width: 28px; height: 28px; border-radius: 9px; }
+          .guide-modal-step p { font-size: 11px; }
+          .guide-modal-foot { padding: 13px 17px 17px; }
+          .guide-modal-note { max-width: 145px; }
+        }
       `}</style>
 
       {/* =========================================================================
@@ -3723,77 +3903,91 @@ export default function SimpleDigitalCatalogModule({ brandInfo, externalSubSecti
       )}
 
       {/* =========================================================================
-          STUDIO GUIDE MODAL (KULLANIM REHBERİ)
+          STUDIO GUIDE MODAL (KULLANIM REHBERİ - MODERN TEMPLATE)
       ========================================================================= */}
       {showGuideModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="guide-modal-overlay"
           onClick={() => setShowGuideModal(false)}
         >
-          <div
-            className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-stone-200 relative animate-in zoom-in-95 duration-200"
+          <section
+            className="guide-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guide-title"
+            aria-describedby="guide-desc"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8f5c29]">
-                  Studio Rehberi
-                </span>
-                <h3 className="text-base font-bold text-stone-900">
-                  3 Adımda Lüks Dijital Lookbook Hazırlama
-                </h3>
+            <header className="guide-modal-head">
+              <div className="guide-modal-eyebrow">
+                Studio rehberi <span style={{ color: '#c8c2b5' }}>/</span> 01—03
               </div>
+              <h2 id="guide-title">3 adımda lüks dijital lookbook hazırlama</h2>
+              <p className="guide-modal-subtitle" id="guide-desc">
+                Koleksiyonunuzu markanızın karakterini yansıtan profesyonel bir dijital yayına dönüştürün.
+              </p>
               <button
                 type="button"
+                className="guide-modal-close"
                 onClick={() => setShowGuideModal(false)}
-                className="p-1 rounded-full text-stone-400 hover:text-stone-800"
+                aria-label="Kapat"
               >
-                <X size={18} />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-[15px] h-[15px]">
+                  <path d="m6 6 12 12M18 6 6 18" />
+                </svg>
               </button>
+            </header>
+
+            <div className="guide-modal-steps">
+              <article className="guide-modal-step">
+                <div className="guide-modal-num">01</div>
+                <div>
+                  <h3>Şablon ve renk harmonisini seçin</h3>
+                  <p>
+                    Doğal taş ve mermer için <strong>Terra &amp; Traverten</strong>, monolitik lüks için{' '}
+                    <strong>Obsidian &amp; Altın</strong> veya kentsel projeler için <strong>Nordic Loft</strong>{' '}
+                    gibi 6 mimari tasarım dilinden birini seçin.
+                  </p>
+                </div>
+              </article>
+
+              <article className="guide-modal-step">
+                <div className="guide-modal-num">02</div>
+                <div>
+                  <h3>Koleksiyon başlığı ve karoları belirleyin</h3>
+                  <p>
+                    Koleksiyonunuzun manifestosunu, metnini ve portföyünüzden yayında yer almasını istediğiniz seramikleri tek tek işaretleyin.
+                  </p>
+                </div>
+              </article>
+
+              <article className="guide-modal-step">
+                <div className="guide-modal-num">03</div>
+                <div>
+                  <h3>Canlı ön izleyin ve yayına alın</h3>
+                  <p>
+                    Kataloğunuzun masaüstü ve mobil görünümünü test edin; tek tıkla paylaşılabilir web bağlantısı ve QR kodu oluşturun.
+                  </p>
+                </div>
+              </article>
             </div>
 
-            <div className="space-y-4 text-xs text-stone-600">
-              <div className="flex items-start gap-3 p-3 bg-[#f5f6f3] rounded-xl border border-stone-200">
-                <span className="w-6 h-6 rounded-full bg-[#202522] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-                  1
-                </span>
-                <div>
-                  <strong className="text-stone-900 block text-xs mb-0.5">Şablon ve Renk Harmonisi Seçin</strong>
-                  Doğal taş ve mermer için <em>Terra & Traverten</em>, monolitik lüks için <em>Obsidian & Altın</em> veya kentsel projeler için <em>Nordic Loft</em> gibi 6 mimari şablondan birini seçin.
-                </div>
+            <footer className="guide-modal-foot">
+              <div className="guide-modal-note">
+                Dilediğiniz zaman Studio içinden bu rehbere tekrar ulaşabilirsiniz.
               </div>
-
-              <div className="flex items-start gap-3 p-3 bg-[#f5f6f3] rounded-xl border border-stone-200">
-                <span className="w-6 h-6 rounded-full bg-[#202522] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-                  2
-                </span>
-                <div>
-                  <strong className="text-stone-900 block text-xs mb-0.5">Koleksiyon Başlığı ve Karoları Belirleyin</strong>
-                  Koleksiyonunuzun manifesto metnini yazın ve portföyünüzden bu yayında yer almasını istediğiniz seramikleri tek tıkla işaretleyin.
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-3 bg-[#f5f6f3] rounded-xl border border-stone-200">
-                <span className="w-6 h-6 rounded-full bg-[#202522] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-                  3
-                </span>
-                <div>
-                  <strong className="text-stone-900 block text-xs mb-0.5">Canlı Önizleyin ve Yayına Alın</strong>
-                  Kataloğunuzun ziyaretçilere nasıl görüneceğini masaüstü ve mobilde birebir test edin; tek tıkla benzersiz paylaşılabilir web bağlantısı ve QR kodu üretin.
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
               <button
                 type="button"
+                className="guide-modal-done"
                 onClick={() => setShowGuideModal(false)}
-                className="btn btn-primary w-full sm:w-auto"
               >
                 Anladım
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-[15px] h-[15px]">
+                  <path d="m5 12 4 4L19 6" />
+                </svg>
               </button>
-            </div>
-          </div>
+            </footer>
+          </section>
         </div>
       )}
     </div>
