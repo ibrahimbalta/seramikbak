@@ -1,17 +1,21 @@
 export const metadata = {
-  title: "Yetkili Seramik Bayileri ve Showroom Rehberi | SeramikBak",
+  title: "81 İl Yetkili Seramik Bayileri & Showroom Rehberi | SeramikBak",
+  description: "Türkiye genelindeki yetkili seramik bayilerini haritada bulun. Vitra, Kütahya, Çanakkale, Bien ve tüm markalardan anında güncel stok ve fiyat teklifi alın.",
   alternates: {
     canonical: 'https://www.seramikbak.com/bayiler',
   },
   openGraph: {
-    title: "Yetkili Seramik Bayileri ve Showroom Rehberi | SeramikBak",
-    description: "Türkiye genelindeki yetkili seramik bayilerini keşfedin. Showroom ziyareti, stok sorgulama ve fiyat teklifi alın.",
+    title: "81 İl Yetkili Seramik Bayileri & Showroom Rehberi | SeramikBak",
+    description: "Türkiye genelindeki yetkili seramik bayilerini haritada bulun. Vitra, Kütahya, Çanakkale, Bien ve tüm markalardan anında güncel stok ve fiyat teklifi alın.",
     url: 'https://www.seramikbak.com/bayiler',
+    siteName: 'SeramikBak',
+    locale: 'tr_TR',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Yetkili Seramik Bayileri | SeramikBak',
-    description: 'Türkiye genelindeki yetkili seramik bayilerini keşfedin.',
+    title: '81 İl Yetkili Seramik Bayileri | SeramikBak',
+    description: 'Türkiye genelindeki yetkili seramik bayilerini haritada bulun ve güncel teklif alın.',
   },
 };
 

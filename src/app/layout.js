@@ -3,10 +3,10 @@ import "./globals.css";
 export const metadata = {
   metadataBase: new URL("https://www.seramikbak.com"),
   title: {
-    default: "Seramik Arama Motoru, 3D Mekân Görselleştirme | SeramikBak",
+    default: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Bayi Ağı",
     template: "%s | SeramikBak"
   },
-  description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin ve 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın. SeramikBak ile kolayca arayın.",
+  description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili seramik bayilerinden anında ücretsiz fiyat teklifi ve usta desteği alın.",
   keywords: [
     // 16 Dev Türk Seramik Markası
     "çanakkale seramik", "ng kütahya seramik", "vitra seramik", "bien seramik", "yurtbay seramik",
@@ -59,8 +59,8 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: "Seramik Arama Motoru, 3D Mekân Görselleştirme | SeramikBak",
-    description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin ve 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.",
+    title: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Bayi Ağı",
+    description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili seramik bayilerinden anında ücretsiz fiyat teklifi ve usta desteği alın.",
     url: "https://www.seramikbak.com",
     siteName: "SeramikBak",
     locale: "tr_TR",
@@ -78,8 +78,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Seramik Arama Motoru, 3D Mekân Görselleştirme | SeramikBak",
-    description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin ve 81 ildeki yetkili bayilerden ücretsiz fiyat teklifi alın.",
+    title: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Bayi Ağı",
+    description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili bayilerden anında teklif alın.",
     images: ["/og-image.png"],
     creator: "@seramikbak",
   },
@@ -111,6 +111,9 @@ export const metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "SeramikBak"
+  },
+  verification: {
+    google: "lzFkAOZfa_Y-zaO3BIE_v9ZJIuwdjiFCbx0HapjNy0Y",
   },
 };
 
@@ -188,6 +191,48 @@ const breadcrumbJsonLd = {
   ]
 };
 
+const siteNavigationJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Seramik & Karo Kataloğu",
+      "description": "Binlerce banyo, mutfak ve zemin seramik modelini filtreleyin ve keşfedin.",
+      "url": "https://www.seramikbak.com/kategori/banyo-seramikleri"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "3D Mekânımda Gör",
+      "description": "Odanızın fotoğrafını yükleyin veya 3D sanal banyoda seramik modellerini canlı deneyin.",
+      "url": "https://www.seramikbak.com/mekanimda-gor"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Yetkili Seramik Bayileri",
+      "description": "81 ildeki en yakın yetkili seramik bayilerini haritada bulun ve fiyat teklifi alın.",
+      "url": "https://www.seramikbak.com/bayiler"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Seramik Ustaları Rehberi",
+      "description": "Bölgenizdeki sertifikalı ve puanlanmış seramik ve fayans ustalarıyla iletişime geçin.",
+      "url": "https://www.seramikbak.com/ustalar"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "B2B Proje & Teklif Al",
+      "description": "Mimar ve müteahhitler için toptan seramik ve özel proje fiyat teklifleri oluşturun.",
+      "url": "https://www.seramikbak.com/proje-talep"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "name": "Üretici Marka Portalı",
+      "description": "Türkiye'nin lider seramik markaları, fabrika katalogları ve bayi ağı.",
+      "url": "https://www.seramikbak.com/marka"
+    }
+  ]
+};
+
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -218,6 +263,7 @@ export default function RootLayout({ children }) {
         <meta name="geo.region" content="TR" />
         <meta name="geo.placename" content="Türkiye" />
         <meta name="content-language" content="tr" />
+        <meta name="google-site-verification" content="lzFkAOZfa_Y-zaO3BIE_v9ZJIuwdjiFCbx0HapjNy0Y" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -236,6 +282,10 @@ export default function RootLayout({ children }) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteNavigationJsonLd) }}
         />
         <script
           dangerouslySetInnerHTML={{

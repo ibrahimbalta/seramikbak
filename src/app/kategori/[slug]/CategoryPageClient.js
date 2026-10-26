@@ -358,14 +358,57 @@ export default function CategoryPageClient({ category, products = [], otherCateg
         {/* Product Cards Grid */}
         {filteredProducts.length === 0 ? (
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-            padding: '60px 20px',
-            borderRadius: '16px',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            padding: '60px 24px',
+            borderRadius: '20px',
             textAlign: 'center',
-            color: '#94a3b8'
+            color: '#cbd5e1'
           }}>
-            Bu filtreye uygun seramik modeli bulunamadı. Lütfen filtreleri sıfırlayın.
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px', color: '#f8fafc' }}>
+              {category?.title || 'Seramik Koleksiyonları'}
+            </h3>
+            <p style={{ maxWidth: '540px', margin: '0 auto 20px', color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
+              Seçilen filtre kombinasyonundaki seramik modelleri güncelleniyor. Türkiye genelindeki yetkili bayilerden anında özel katalog veya teklif talep edebilirsiniz.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => {
+                  setSelectedFinish('all');
+                  setSelectedSize('all');
+                  setSelectedColor('all');
+                }}
+                style={{
+                  background: '#2563eb',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  fontWeight: '600',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Tüm Modelleri Göster
+              </button>
+              <Link
+                href="/proje-talep"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  color: '#f8fafc',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  fontWeight: '600',
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center'
+                }}
+              >
+                Bayiden Teklif İste
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="category-products-grid" style={{
