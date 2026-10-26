@@ -146,11 +146,20 @@
   display: inline;
 }
 
-/* 2. HERO COMMAND CENTER */
+/* 2. HERO COMMAND CENTER WITH BESPOKE ARTISAN WORKSHOP BACKDROP */
 .ustalar-hero-section {
-  padding: 48px 16px 28px 16px;
-  text-align: center;
   position: relative;
+  max-width: 1320px;
+  margin: 16px auto 32px auto;
+  padding: 52px 20px 36px 20px;
+  border-radius: 28px;
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.95) 100%),
+    url('/images/bg-artisan-craftsman.jpg') center 20% / cover no-repeat;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.04);
+  text-align: center;
+  overflow: hidden;
 }
 
 .ustalar-hero-container {
@@ -1549,7 +1558,9 @@
   }
 
   .ustalar-hero-section {
-    padding: 28px 12px 20px 12px;
+    margin: 12px 14px 20px 14px;
+    padding: 28px 14px 22px 14px;
+    border-radius: 20px;
   }
 
   .hero-metrics-deck {
