@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function GET(request) {
   try {
+    // Query rate limit: Max 30 status queries per minute per IP
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`proj_status_${clientIp}`, 30, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Çok sık sorgulama yapıldı. Lütfen 1 dakika bekleyin.' },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || searchParams.get('code') || searchParams.get('id') || '';
 

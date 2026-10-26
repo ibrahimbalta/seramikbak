@@ -3946,3 +3946,15 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
     display: flex !important;
   }
 }
+
+/* Prevent FOUC and raw code flashes */
+style[jsx], style[data-jsx], style[data-styled-jsx] {
+  display: none !important;
+}
+
+/* Hardware accelerated smooth page rendering */
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}

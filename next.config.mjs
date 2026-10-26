@@ -1,5 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Security: Hide Next.js fingerprint
+  poweredByHeader: false,
+
+  // Performance: Brotli & Gzip compression
+  compress: true,
+
+  // Performance & Security: Strip console logs in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
+
+  // Performance: Instant page transitions with tree-shaken icons
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'date-fns'],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

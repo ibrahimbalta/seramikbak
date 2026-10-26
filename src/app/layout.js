@@ -250,7 +250,7 @@ import Script from "next/script";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="tr">
+    <html lang="tr" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
@@ -311,7 +311,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
         <LanguageProvider>
           {children}
