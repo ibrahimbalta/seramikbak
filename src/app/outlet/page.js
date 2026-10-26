@@ -50,7 +50,7 @@ const CATEGORIES = [
   { id: 'ALL', label: 'Tüm Fırsatlar', icon: Flame },
   { id: 'PROJE_FAZLASI', label: 'Proje Fazlası', icon: Layers },
   { id: 'SERI_SONU', label: 'Seri Sonu', icon: Package },
-  { id: 'IKINCI_KALITE', label: '2. Kalite Palet', icon: Tag },
+  { id: 'IKINCI_KALITE', label: '2. Kalite', icon: Tag },
   { id: 'OUTLET', label: 'Depo Outlet', icon: Sparkles }
 ];
 
@@ -203,7 +203,7 @@ export default function OutletMarketplacePage() {
   const categoryLabelMap = {
     PROJE_FAZLASI: 'Proje Fazlası',
     SERI_SONU: 'Seri Sonu',
-    IKINCI_KALITE: '2. Kalite Palet',
+    IKINCI_KALITE: '2. Kalite',
     OUTLET: 'Depo Outlet'
   };
 
@@ -406,7 +406,7 @@ export default function OutletMarketplacePage() {
                 <option value="ALL">Kategori (Tümü)</option>
                 <option value="PROJE_FAZLASI">Proje Fazlası</option>
                 <option value="SERI_SONU">Seri Sonu</option>
-                <option value="IKINCI_KALITE">2. Kalite Palet</option>
+                <option value="IKINCI_KALITE">2. Kalite</option>
                 <option value="OUTLET">Depo Outlet</option>
               </select>
             </div>
@@ -921,7 +921,7 @@ export default function OutletMarketplacePage() {
                     <option value="ALL">Tüm Fırsatlar</option>
                     <option value="PROJE_FAZLASI">Proje Fazlası</option>
                     <option value="SERI_SONU">Seri Sonu</option>
-                    <option value="IKINCI_KALITE">2. Kalite Palet</option>
+                    <option value="IKINCI_KALITE">2. Kalite</option>
                   </select>
                 </div>
               </div>
