@@ -29,7 +29,10 @@ import {
   Tag,
   Building2,
   Layers,
-  Percent
+  Percent,
+  SlidersHorizontal,
+  Compass,
+  Calculator
 } from 'lucide-react';
 import './ustalar.css';
 
@@ -46,10 +49,14 @@ const TURKEY_CITIES = [
 
 const POPULAR_CITIES = ['ALL', 'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Kocaeli', 'Gaziantep', 'Konya', 'Eskişehir', 'Mersin'];
 
-/**
- * Client-side ultra-fast image compression using HTML5 Canvas.
- * Shrinks massive mobile camera photos (5-20MB) to light, sharp ~80KB JPEGs.
- */
+const SPECIALTY_TABS = [
+  { id: 'ALL', label: 'Tüm Ustalar' },
+  { id: '60x120', label: '📐 60x120 & Büyük Ebat' },
+  { id: 'banyo', label: '🚿 Banyo & Islak Hacim' },
+  { id: 'teras', label: '☀️ Teras & Su İzolasyonu' },
+  { id: 'granit', label: '🏛️ Porselen Granit' }
+];
+
 function compressImageFile(file, maxDimension = 1000, quality = 0.72) {
   return new Promise((resolve) => {
     if (!file || !file.type.startsWith('image/')) {
@@ -88,13 +95,27 @@ function compressImageFile(file, maxDimension = 1000, quality = 0.72) {
   });
 }
 
+function parseRatePerM2(rateString) {
+  if (!rateString) return 280;
+  const match = rateString.match(/(\d+[\.,]?\d*)/);
+  if (match) {
+    const num = parseFloat(match[1].replace(',', '.'));
+    return isNaN(num) || num <= 0 ? 280 : num;
+  }
+  return 280;
+}
+
 export default function InstallersDirectoryPage() {
   const [installers, setInstallers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Search & Filter
   const [selectedCity, setSelectedCity] = useState('ALL');
+  const [selectedSpecialty, setSelectedSpecialty] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Per-artisan labor calculation state { [artisanId]: m2Number }
+  const [cardSelectedArea, setCardSelectedArea] = useState({});
 
   // Register Modal State
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -112,7 +133,7 @@ export default function InstallersDirectoryPage() {
   const [regSuccess, setRegSuccess] = useState('');
   const [regError, setRegError] = useState('');
 
-  // Local Device Photo Upload State (Max 3 Photos)
+  // Local Device Photo Upload State
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState([]);
 
@@ -160,7 +181,13 @@ export default function InstallersDirectoryPage() {
     try {
       let url = '/api/installers?limit=100';
       if (selectedCity && selectedCity !== 'ALL') url += `&city=${encodeURIComponent(selectedCity)}`;
-      if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+      
+      const queryParts = [];
+      if (searchQuery) queryParts.push(searchQuery);
+      if (selectedSpecialty !== 'ALL') queryParts.push(selectedSpecialty);
+      if (queryParts.length > 0) {
+        url += `&search=${encodeURIComponent(queryParts.join(' '))}`;
+      }
 
       const res = await fetch(url);
       if (res.ok) {
@@ -178,7 +205,7 @@ export default function InstallersDirectoryPage() {
 
   useEffect(() => {
     fetchInstallers();
-  }, [selectedCity]);
+  }, [selectedCity, selectedSpecialty]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -243,7 +270,7 @@ export default function InstallersDirectoryPage() {
       }
 
       if (res.ok && data.success) {
-        setRegSuccess(data.message || 'Tebrikler! Seramik ustası başvurunuz başarıyla alındı. Yönetici onayından sonra rehberde yayınlanacaktır.');
+        setRegSuccess(data.message || 'Tebrikler! Seramik ustası başvurunuz başarıyla alındı. Profiliniz incelendikten sonra rehberde yayınlanacaktır.');
         setRegName('');
         setRegPhone('');
         setRegCompany('');
@@ -274,10 +301,10 @@ export default function InstallersDirectoryPage() {
 
   return (
     <div className="ustalar-page-root">
-      {/* 1. TOP APP BAR - FROSTED GLASS */}
+      {/* 1. TOP APP BAR - FROSTED CRYSTAL GLASS */}
       <header className="ustalar-app-header">
         <div className="ustalar-header-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Link href="/" className="ustalar-back-btn" title="Ana Sayfaya Dön">
               <ChevronLeft size={20} />
             </Link>
@@ -286,14 +313,14 @@ export default function InstallersDirectoryPage() {
               <div className="brand-monogram">SB</div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span className="brand-title">SeramikBak</span>
-                <span className="brand-subtitle">USTA REHBERİ</span>
+                <span className="brand-subtitle">USTA DİREKTÖRLÜĞÜ</span>
               </div>
             </Link>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Link href="/outlet" className="header-cross-link" title="Kelepir Stok & Outlet Seramikler">
-              <Tag size={14} style={{ color: '#b38e47' }} />
+            <Link href="/outlet" className="header-cross-link" title="Kelepir Stok & Şantiye Fazlası Borsa">
+              <Tag size={15} style={{ color: '#b38e47' }} />
               <span className="desktop-text">Outlet Borsası</span>
             </Link>
 
@@ -301,7 +328,7 @@ export default function InstallersDirectoryPage() {
               onClick={() => setShowRegisterModal(true)}
               className="ustalar-header-reg-btn"
             >
-              <Plus size={15} />
+              <Plus size={16} />
               <span className="desktop-text">Usta Olarak Kaydol (Ücretsiz)</span>
               <span className="mobile-text">Usta Kaydı</span>
             </button>
@@ -309,46 +336,64 @@ export default function InstallersDirectoryPage() {
         </div>
       </header>
 
-      {/* 2. HERO SECTION */}
+      {/* 2. BESPOKE HERO COMMAND CENTER */}
       <section className="ustalar-hero-section">
         <div className="ustalar-hero-container">
-          {/* Trust Radar Badge */}
+          {/* Trust Radar Indicator */}
           <div className="hero-trust-badge">
             <span className="radar-pulse"></span>
             <ShieldCheck size={14} style={{ color: '#059669', flexShrink: 0 }} />
-            <span>81 İLDE ONAYLI SERAMİK & FAYANS UYGULAMA REHBERİ</span>
+            <span>81 İLDE SERTİFİKALI SERAMİK & FAYANS UYGULAMA REHBERİ</span>
           </div>
 
           <h1 className="hero-heading">
-            Eviniz ve Şantiyeniz İçin <span className="gold-gradient-text">Garantili Seramik Ustaları</span>
+            Eviniz ve Şantiyeniz İçin <span className="gold-gradient-text">Lazer Terazili Seramik Ustaları</span>
           </h1>
 
           <p className="hero-lead">
-            Seramiği aldınız ancak kime döşeteceğinizi bilmiyor musunuz? 60x120 porselen, granit ve ıslak hacimlerde 
-            lazer terazili çalışan, puanlanmış ustaların canlı iş portfolyolarını inceleyin, ücretsiz teklif alın.
+            Kusursuz seramik uygulaması doğru usta ile başlar. 60x120 porselen, banyo ve teras döşemelerinde
+            lazer terazili, derz artılı çalışan sertifikalı ustaları inceleyin, anında tahmini işçilik teklifi alın.
           </p>
 
-          {/* Quick Value Pillars */}
-          <div className="hero-value-pills">
-            <div className="value-pill pill-green">
-              <CheckSquare size={13} style={{ color: '#059669' }} />
-              <span>Lazer Terazi & Derz Garantisi</span>
+          {/* 4 Interactive Command Metrics */}
+          <div className="hero-metrics-deck">
+            <div className="metric-stat-box">
+              <Compass size={18} className="stat-icon" style={{ color: '#b38e47' }} />
+              <span className="stat-val">81 İl</span>
+              <span className="stat-lbl">Aktif Usta Ağı</span>
             </div>
-            <div className="value-pill pill-blue">
-              <Camera size={13} style={{ color: '#2563eb' }} />
-              <span>Canlı Şantiye Öncesi / Sonrası</span>
+            <div className="metric-stat-box">
+              <Ruler size={18} className="stat-icon" style={{ color: '#059669' }} />
+              <span className="stat-val">%100 Lazer</span>
+              <span className="stat-lbl">Terazi & Derz Uyumlu</span>
             </div>
-            <div className="value-pill pill-gold">
-              <FileText size={13} style={{ color: '#b38e47' }} />
-              <span>Standart İki Taraflı Sözleşme</span>
+            <div className="metric-stat-box">
+              <Award size={18} className="stat-icon" style={{ color: '#2563eb' }} />
+              <span className="stat-val">14+ Yıl</span>
+              <span className="stat-lbl">Ortalama Deneyim</span>
             </div>
-            <div className="value-pill pill-purple">
-              <Clock size={13} style={{ color: '#7c3aed' }} />
-              <span>Hızlı Keşif & WhatsApp Teklif</span>
+            <div className="metric-stat-box">
+              <FileText size={18} className="stat-icon" style={{ color: '#7c3aed' }} />
+              <span className="stat-val">Hukuki</span>
+              <span className="stat-lbl">Standart Sözleşme</span>
             </div>
           </div>
 
-          {/* QUICK CITY CHIPS CAROUSEL */}
+          {/* Specialty Segmented Filter Tabs */}
+          <div className="specialty-tabs-bar">
+            {SPECIALTY_TABS.map(tab => (
+              <button
+                key={tab.id}
+                type="button"
+                className={`specialty-tab-btn ${selectedSpecialty === tab.id ? 'active' : ''}`}
+                onClick={() => setSelectedSpecialty(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick City Filter Chips */}
           <div className="city-chips-carousel">
             {POPULAR_CITIES.map(city => (
               <button
@@ -362,13 +407,13 @@ export default function InstallersDirectoryPage() {
             ))}
           </div>
 
-          {/* SEARCH & FILTER BAR */}
+          {/* Search Console Card */}
           <form onSubmit={handleSearchSubmit} className="search-filter-card">
             <div className="search-input-group">
               <Search size={18} className="input-icon" />
               <input
                 type="text"
-                placeholder="Usta adı, ilçe veya uzmanlık (örn: 60x120, banyo, teras)..."
+                placeholder="Usta adı, ilçe veya uzmanlık arayın (örn: 60x120, banyo, teras)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="porcelain-input"
@@ -391,44 +436,44 @@ export default function InstallersDirectoryPage() {
 
             <button type="submit" className="search-submit-btn">
               <Search size={16} />
-              <span>Usta Ara</span>
+              <span>Ustaları Filtrele</span>
             </button>
           </form>
         </div>
       </section>
 
-      {/* 3. MAIN DIRECTORY LISTINGS */}
+      {/* 3. MAIN DIRECTORY LAYOUT */}
       <main className="ustalar-main-layout">
         {/* CROSS OUTLET BANNER */}
         <div className="ustalar-outlet-banner">
           <div className="outlet-banner-left">
             <div className="outlet-icon-wrapper">
-              <Percent size={22} />
+              <Percent size={24} />
             </div>
             <div>
               <h4 className="outlet-banner-title">
-                Seramiğinizi Henüz Almadınız mı? Şantiye Fazlası Outlet Borsasını İnceleyin
+                Seramiğinizi Henüz Almadınız mı? Şantiye Fazlası & Kelepir Outlet Borsası
               </h4>
               <p className="outlet-banner-desc">
-                81 ildeki bayilerden kelepir paletler, seri sonu ve 2. kalite seramikleri %60'a varan indirimlerle bulun.
+                81 ildeki yetkili bayilerin elinde kalan 30-150 m² şantiye artığı ve son palet porselen seramikleri %60'a varan indirimlerle bulun.
               </p>
             </div>
           </div>
 
           <Link href="/outlet" className="outlet-cta-btn">
-            <span>Outlet Borsası</span>
+            <span>Outlet Seramikleri Gör</span>
             <ArrowRight size={15} />
           </Link>
         </div>
 
-        {/* Section Header */}
+        {/* Directory Section Header */}
         <div className="directory-header-row">
           <div>
             <h2 className="directory-title">
-              {selectedCity !== 'ALL' ? `${selectedCity} Seramik & Fayans Ustaları` : 'Onaylı Seramik ve Fayans Ustaları'}
+              {selectedCity !== 'ALL' ? `${selectedCity} Onaylı Seramik Ustaları` : 'Onaylı Seramik & Karo Ustaları'}
             </h2>
             <p className="directory-subtitle">
-              Bölgenizde aktif <span style={{ fontWeight: 800, color: '#0f172a' }}>{installers.length}</span> uzman usta ve uygulama ekibi listeleniyor
+              Seçili kriterlerde aktif <span style={{ fontWeight: 800, color: '#0f172a' }}>{installers.length}</span> uzman usta ve uygulama ekibi listeleniyor
             </p>
           </div>
 
@@ -436,22 +481,22 @@ export default function InstallersDirectoryPage() {
             onClick={() => { setShowRegisterModal(true); if (selectedCity !== 'ALL') setRegCity(selectedCity); }}
             className="secondary-register-trigger"
           >
-            <Plus size={14} />
-            <span>Ben de Ustayı(m) Ekle</span>
+            <Plus size={15} />
+            <span>Usta Olarak Eklenin</span>
           </button>
         </div>
 
         {/* LOADING STATE */}
         {loading ? (
           <div className="loading-state-box">
-            <Loader2 size={36} className="animate-spin" style={{ color: '#b38e47' }} />
+            <Loader2 size={38} className="animate-spin" style={{ color: '#b38e47' }} />
             <p>Onaylı seramik ustaları yükleniyor...</p>
           </div>
         ) : installers.length === 0 ? (
           /* EMPTY STATE */
           <div className="empty-state-box">
             <div className="empty-state-icon">
-              <Wrench size={36} style={{ color: '#b38e47' }} />
+              <Wrench size={38} style={{ color: '#b38e47' }} />
             </div>
             <h3 className="empty-state-title">
               {selectedCity !== 'ALL' ? `${selectedCity} Şehrinde Henüz Kayıtlı Usta Bulunmuyor` : 'Aramanızla Eşleşen Usta Bulunamadı'}
@@ -467,90 +512,114 @@ export default function InstallersDirectoryPage() {
                 <Plus size={15} />
                 <span>Bu Şehirde Usta Olarak Kaydol</span>
               </button>
-              {selectedCity !== 'ALL' && (
+              {(selectedCity !== 'ALL' || selectedSpecialty !== 'ALL' || searchQuery) && (
                 <button
-                  onClick={() => setSelectedCity('ALL')}
+                  onClick={() => { setSelectedCity('ALL'); setSelectedSpecialty('ALL'); setSearchQuery(''); }}
                   className="empty-reset-btn"
                 >
-                  Tüm İlleri Listele
+                  Tüm Filtreleri Temizle
                 </button>
               )}
             </div>
           </div>
         ) : (
-          /* INSTALLERS GRID */
+          /* BESPOKE ARTISAN CARDS GRID */
           <div className="installers-grid">
             {installers.map(inst => {
               const portfolioList = parsePortfolio(inst.portfolioBeforeAfter);
+              const unitRate = parseRatePerM2(inst.contractRateM2);
+              const activeM2 = cardSelectedArea[inst.id] || 30; // default 30 m² for estimation
+              const estimatedTotal = unitRate * activeM2;
+
               const waText = encodeURIComponent(
-                `Merhaba ${inst.name}, SeramikBak Usta Rehberi profiliniz üzerinden ulaşıyorum. ` +
-                `${inst.city} bölgesinde seramik / fayans kaplama işimiz için keşif ve teklif almak istiyoruz.`
+                `Merhaba ${inst.name}, SeramikBak platformundaki Usta Rehberi profiliniz üzerinden ulaşıyorum. ` +
+                `${inst.city} bölgesindeki ${activeM2} m² seramik döşeme işimiz için (tahmini ₺${estimatedTotal.toLocaleString('tr-TR')} bütçe) keşif ve teklifinizi görüşmek istiyoruz.`
               );
               const waLink = `https://wa.me/${inst.phone.replace(/[^\d]/g, '')}?text=${waText}`;
 
               return (
-                <article key={inst.id} className="installer-card">
-                  {/* Top Header Card */}
-                  <div className="card-top">
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0 }}>
-                      <div className="installer-avatar">
+                <article key={inst.id} className="artisan-card">
+                  {/* Card Header with Master Seal */}
+                  <div className="card-header-bar">
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0, flex: 1 }}>
+                      <div className="artisan-avatar-seal">
                         {inst.name.charAt(0).toUpperCase()}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="artisan-title-group">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                          <h3 className="installer-name" title={inst.name}>{inst.name}</h3>
+                          <h3 className="artisan-name" title={inst.name}>{inst.name}</h3>
                           {inst.verified && (
-                            <span className="verified-badge" title="SeramikBak Tarafından Doğrulanmış Usta">
+                            <span className="artisan-verified-pill" title="SeramikBak Doğrulanmış Usta">
                               <ShieldCheck size={12} />
                               Onaylı Usta
                             </span>
                           )}
                         </div>
 
-                        <div className="installer-meta">
+                        <div className="artisan-meta-row">
                           {inst.companyName && (
-                            <span className="meta-company">🏢 {inst.companyName}</span>
+                            <span style={{ fontWeight: 650, color: '#334155' }}>🏢 {inst.companyName}</span>
                           )}
-                          <span className="meta-location">
+                          <span>
                             📍 {inst.city}{inst.district ? ` / ${inst.district}` : ''}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Rating Badge */}
-                    <div className="rating-pill">
+                    {/* Rating Pill */}
+                    <div className="artisan-rating-box">
                       <Star size={13} style={{ color: '#eab308', fill: '#eab308' }} />
                       <span className="rating-score">{inst.rating || '5.0'}</span>
                       <span className="rating-count">({inst.reviewCount || 12})</span>
                     </div>
                   </div>
 
-                  {/* Highlights Bar */}
-                  <div className="card-metrics-row">
-                    <span className="metric-tag tag-exp">
-                      <Award size={12} />
-                      {inst.experienceYears} Yıl Tecrübe
-                    </span>
-
-                    {inst.contractRateM2 && (
-                      <span className="metric-tag tag-price">
-                        <Ruler size={12} />
-                        {inst.contractRateM2}
-                      </span>
-                    )}
-
-                    {inst.guaranteeBadge !== false && (
-                      <span className="metric-tag tag-guarantee">
-                        <Check size={12} />
-                        Terazi & Derz Garantisi
-                      </span>
-                    )}
+                  {/* Quality Radar & Guarantee Meters */}
+                  <div className="skill-meters-block">
+                    <div className="skill-meter-row">
+                      <span>Lazer Terazi & Düzlem Kotu</span>
+                      <span className="meter-badge badge-green">✔ %100 Uyum</span>
+                    </div>
+                    <div className="skill-meter-row">
+                      <span>Gönyeleme & Meyil Kontrolü</span>
+                      <span className="meter-badge badge-blue">✔ Garantili</span>
+                    </div>
+                    <div className="skill-meter-row">
+                      <span>Saha Deneyimi</span>
+                      <span className="meter-badge badge-gold">🏆 {inst.experienceYears} Yıl Kıdem</span>
+                    </div>
                   </div>
 
-                  {/* Specialties Pills */}
+                  {/* Interactive Labor Cost Estimator Box */}
+                  <div className="labor-estimator-box">
+                    <div className="estimator-header">
+                      <span>📐 Birim İşçilik & Tahmin:</span>
+                      <span className="estimator-unit-rate">{inst.contractRateM2 || '280 ₺/m²'}</span>
+                    </div>
+
+                    <div className="estimator-quick-tabs">
+                      {[15, 30, 60, 100].map(m2 => (
+                        <button
+                          key={m2}
+                          type="button"
+                          className={`calc-chip-btn ${activeM2 === m2 ? 'active' : ''}`}
+                          onClick={() => setCardSelectedArea(prev => ({ ...prev, [inst.id]: m2 }))}
+                        >
+                          {m2} m²
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="estimator-summary-row">
+                      <span>Tahmini {activeM2} m² İşçilik:</span>
+                      <span className="estimator-total-val">~₺{estimatedTotal.toLocaleString('tr-TR')}</span>
+                    </div>
+                  </div>
+
+                  {/* Specialties Chips */}
                   {inst.specialties && (
-                    <div className="specialties-row">
+                    <div className="artisan-specialties">
                       {inst.specialties.split(',').slice(0, 3).map((spec, idx) => (
                         <span key={idx} className="spec-chip">
                           {spec.trim()}
@@ -559,14 +628,14 @@ export default function InstallersDirectoryPage() {
                     </div>
                   )}
 
-                  {/* Bio Quote Bubble */}
+                  {/* Bio Quotation */}
                   {inst.notes && (
-                    <div className="installer-quote-bubble">
+                    <div className="artisan-quote-bubble">
                       <p>"{inst.notes}"</p>
                     </div>
                   )}
 
-                  {/* Interactive Trigger Buttons */}
+                  {/* Modal Trigger Buttons */}
                   <div className="card-triggers-row">
                     <button
                       type="button"
@@ -576,8 +645,8 @@ export default function InstallersDirectoryPage() {
                       }}
                       className="trigger-portfolio-btn"
                     >
-                      <Camera size={13} />
-                      <span>{portfolioList.length > 0 ? `Portfolyo (${portfolioList.length})` : 'Canlı Portfolyo'}</span>
+                      <Camera size={14} />
+                      <span>{portfolioList.length > 0 ? `Canlı Portfolyo (${portfolioList.length})` : 'Canlı Portfolyo'}</span>
                     </button>
 
                     <button
@@ -585,12 +654,12 @@ export default function InstallersDirectoryPage() {
                       onClick={() => setSelectedContractInstaller(inst)}
                       className="trigger-contract-btn"
                     >
-                      <FileText size={13} />
+                      <FileText size={14} />
                       <span>Standart Sözleşme</span>
                     </button>
                   </div>
 
-                  {/* Symmetrical Dual Action CTA Buttons (50 / 50) */}
+                  {/* Symmetrical Dual Action Pod (50 / 50) */}
                   <div className="card-dual-actions">
                     <a
                       href={waLink}
@@ -631,11 +700,11 @@ export default function InstallersDirectoryPage() {
 
             <div className="modal-header-row">
               <div className="modal-icon-badge badge-blue-icon">
-                <Camera size={22} />
+                <Camera size={24} />
               </div>
               <div>
                 <h3 className="modal-title">
-                  {selectedPortfolioInstaller.name} — Şantiye Portfolyosu
+                  {selectedPortfolioInstaller.name} — Canlı Proje Portfolyosu
                 </h3>
                 <span className="modal-subtitle">
                   Öncesi (Eski Banyo / Şantiye) vs. Sonrası (Tamamlanan Seramik Döşeme)
@@ -648,11 +717,11 @@ export default function InstallersDirectoryPage() {
               if (!pList || pList.length === 0) {
                 return (
                   <div className="empty-portfolio-box">
-                    <Camera size={40} style={{ color: '#94a3b8', marginBottom: '12px' }} />
-                    <h4 style={{ fontSize: '1.05rem', color: '#0f172a', fontWeight: 800, margin: '0 0 6px 0' }}>
+                    <Camera size={44} style={{ color: '#94a3b8', marginBottom: '14px' }} />
+                    <h4 style={{ fontSize: '1.1rem', color: '#0f172a', fontWeight: 850, margin: '0 0 6px 0' }}>
                       Henüz Yüklenmiş Şantiye Görseli Bulunmuyor
                     </h4>
-                    <p style={{ fontSize: '0.86rem', color: '#64748b', margin: '0 0 16px 0' }}>
+                    <p style={{ fontSize: '0.88rem', color: '#64748b', margin: '0 0 18px 0' }}>
                       Bu usta ile WhatsApp üzerinden iletişime geçerek referans şantiye fotoğraflarını isteyebilirsiniz.
                     </p>
                     <a
@@ -660,7 +729,7 @@ export default function InstallersDirectoryPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-whatsapp-action"
-                      style={{ maxWidth: '280px', margin: '0 auto' }}
+                      style={{ maxWidth: '300px', margin: '0 auto' }}
                     >
                       <MessageSquare size={16} />
                       <span>WhatsApp'tan Fotoğraf İste</span>
@@ -731,7 +800,7 @@ export default function InstallersDirectoryPage() {
                   {/* Modal Footer Direct Contact */}
                   <div className="modal-cta-footer">
                     <a
-                      href={`https://wa.me/${selectedPortfolioInstaller.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Merhaba ${selectedPortfolioInstaller.name}, portfolyonuzdaki Proje #${activePortfolioIndex + 1} benzeri bir iş için fiyat teklifi almak istiyorum.`)}`}
+                      href={`https://wa.me/${selectedPortfolioInstaller.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Merhaba ${selectedPortfolioInstaller.name}, portfolyonuzdaki Proje #${activePortfolioIndex + 1} benzeri bir seramik işi için fiyat teklifi almak istiyorum.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-whatsapp-action"
@@ -780,7 +849,6 @@ export default function InstallersDirectoryPage() {
 
             {/* Document Body */}
             <div className="contract-body">
-              {/* Section 1 */}
               <div className="contract-section">
                 <h4 className="contract-section-heading">1. TARAFLAR VE İLETİŞİM BİLGİLERİ</h4>
                 <div className="contract-two-col">
@@ -801,7 +869,6 @@ export default function InstallersDirectoryPage() {
                 </div>
               </div>
 
-              {/* Section 2 */}
               <div className="contract-section">
                 <h4 className="contract-section-heading">2. İŞİN KAPSAMI VE BİRİM İŞÇİLİK ÜCRETİ</h4>
                 <p style={{ margin: '0 0 10px 0' }}>
@@ -814,7 +881,6 @@ export default function InstallersDirectoryPage() {
                 </div>
               </div>
 
-              {/* Section 3 */}
               <div className="contract-section">
                 <h4 className="contract-section-heading">3. TEKNİK UYGULAMA VE TESLİMAT ESASLARI</h4>
                 <ul className="contract-rules-list">
@@ -826,20 +892,18 @@ export default function InstallersDirectoryPage() {
                 </ul>
               </div>
 
-              {/* Signatures */}
               <div className="contract-signatures">
                 <div className="signature-box">
                   <strong>Yüklenici Usta İmza</strong><br />
-                  <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{selectedContractInstaller.name}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{selectedContractInstaller.name}</span>
                 </div>
 
                 <div className="signature-box">
                   <strong>İşveren Müşteri İmza</strong><br />
-                  <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Ad Soyad</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Ad Soyad</span>
                 </div>
               </div>
 
-              {/* Print Action */}
               <div style={{ textAlign: 'center', marginTop: '20px' }}>
                 <button
                   onClick={() => window.print()}
@@ -868,7 +932,7 @@ export default function InstallersDirectoryPage() {
 
             <div className="modal-header-row">
               <div className="modal-icon-badge badge-gold-icon">
-                <Wrench size={22} />
+                <Wrench size={24} />
               </div>
               <div>
                 <h3 className="modal-title">Seramik Ustası Kayıt Formu</h3>
@@ -878,11 +942,11 @@ export default function InstallersDirectoryPage() {
 
             {regSuccess ? (
               <div className="register-success-box">
-                <CheckCircle2 size={44} style={{ color: '#059669', marginBottom: '12px' }} />
-                <h4 style={{ fontSize: '1.15rem', color: '#0f172a', fontWeight: 800, marginBottom: '8px' }}>
+                <CheckCircle2 size={46} style={{ color: '#059669', marginBottom: '12px' }} />
+                <h4 style={{ fontSize: '1.2rem', color: '#0f172a', fontWeight: 900, marginBottom: '8px' }}>
                   Başvurunuz Başarıyla Alındı!
                 </h4>
-                <p style={{ fontSize: '0.88rem', color: '#475569', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.9rem', color: '#475569', margin: '0 0 22px 0', lineHeight: 1.6 }}>
                   {regSuccess}
                 </p>
                 <button
@@ -999,11 +1063,11 @@ export default function InstallersDirectoryPage() {
                   </div>
                 </div>
 
-                {/* Photo Upload Area */}
+                {/* Photo Upload Area with Auto Canvas Compression */}
                 <div className="photo-upload-container">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span className="photo-upload-title">
-                      <Camera size={15} />
+                      <Camera size={16} />
                       Şantiye Referans Fotoğrafları (En Fazla 3 Adet)
                     </span>
                     <span className="photo-upload-count">{uploadedPhotos.length} / 3 Yüklendi</span>

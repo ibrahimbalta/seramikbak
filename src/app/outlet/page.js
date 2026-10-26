@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
@@ -27,7 +27,10 @@ import {
   Clock,
   ShieldCheck,
   Check,
-  CheckSquare
+  TrendingDown,
+  Calculator,
+  Flame,
+  Truck
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import './outlet.css';
@@ -44,11 +47,11 @@ const TURKEY_CITIES = [
 ];
 
 const CATEGORIES = [
-  { id: 'ALL', label: '🔥 Tüm Fırsatlar' },
-  { id: 'PROJE_FAZLASI', label: '🏗️ Proje Fazlası' },
-  { id: 'SERI_SONU', label: '📦 Seri Sonu' },
-  { id: 'IKINCI_KALITE', label: '🏷️ 2. Kalite Palet' },
-  { id: 'OUTLET', label: '✨ Depo Outlet' }
+  { id: 'ALL', label: 'Tüm Fırsatlar', icon: Flame },
+  { id: 'PROJE_FAZLASI', label: 'Proje Fazlası', icon: Layers },
+  { id: 'SERI_SONU', label: 'Seri Sonu', icon: Package },
+  { id: 'IKINCI_KALITE', label: '2. Kalite Palet', icon: Tag },
+  { id: 'OUTLET', label: 'Depo Outlet', icon: Sparkles }
 ];
 
 export default function OutletMarketplacePage() {
@@ -59,6 +62,9 @@ export default function OutletMarketplacePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+
+  // Custom m² requirement state per card for interactive labor/stock calculation
+  const [customQuantities, setCustomQuantities] = useState({});
 
   // Contact Modal State
   const [selectedItemForContact, setSelectedItemForContact] = useState(null);
@@ -154,6 +160,7 @@ export default function OutletMarketplacePage() {
     setContactSuccess('');
 
     try {
+      const neededQty = customQuantities[selectedItemForContact.id] || selectedItemForContact.quantityM2;
       const res = await fetch('/api/leads/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,7 +170,7 @@ export default function OutletMarketplacePage() {
           clientName: contactName,
           clientPhone: contactPhone,
           clientEmail: contactEmail,
-          notes: `[Outlet / Proje Fazlası Talebi] Ürün: ${selectedItemForContact.title} (${selectedItemForContact.quantityM2} m², ₺${selectedItemForContact.unitPrice}/m²). ${contactNotes}`
+          notes: `[Outlet / Proje Fazlası Talebi] Ürün: ${selectedItemForContact.title} (${neededQty} m² talep edildi, Birim Fiyat: ₺${selectedItemForContact.unitPrice}/m²). ${contactNotes}`
         })
       });
 
@@ -200,9 +207,19 @@ export default function OutletMarketplacePage() {
     OUTLET: 'Depo Outlet'
   };
 
+  // Helper to handle custom quantity changes
+  const handleQuantityChange = (itemId, maxM2, value) => {
+    const val = parseInt(value, 10);
+    if (isNaN(val) || val <= 0) {
+      setCustomQuantities(prev => ({ ...prev, [itemId]: '' }));
+    } else {
+      setCustomQuantities(prev => ({ ...prev, [itemId]: Math.min(val, maxM2) }));
+    }
+  };
+
   return (
     <div className="outlet-root-layout">
-      {/* 1. TOP APP BAR - FROSTED GLASS */}
+      {/* 1. TOP APP BAR - FROSTED CRYSTAL GLASS */}
       <header className="outlet-header">
         <div className="outlet-header-container">
           <div className="outlet-header-left">
@@ -221,7 +238,7 @@ export default function OutletMarketplacePage() {
 
           <div className="outlet-header-right">
             <Link href="/ustalar" className="header-cross-link" title="Garantili Seramik Ustası Bul">
-              <Wrench size={14} style={{ color: '#b38e47' }} />
+              <Wrench size={15} style={{ color: '#b38e47' }} />
               <span className="btn-text-full">Usta Rehberi</span>
             </Link>
 
@@ -238,14 +255,48 @@ export default function OutletMarketplacePage() {
         </div>
       </header>
 
-      {/* 2. HERO BANNER SECTION */}
+      {/* 2. CANLI SERAMİK BORSASI TICKER BANNER */}
+      <div className="outlet-ticker-wrap">
+        <div className="outlet-ticker-tag">
+          <Flame size={13} />
+          <span>CANLI BORSA</span>
+        </div>
+        <div className="outlet-ticker-content">
+          <div className="ticker-item">
+            <span className="ticker-badge-green">%62 İNDİRİM</span>
+            <strong>60x120 Calacatta Beyaz Şantiye Artığı</strong>
+            <span>180 m² Kalan Stok (İstanbul Depo)</span>
+          </div>
+          <div className="ticker-item">
+            <span className="ticker-badge-gold">SERİ SONU</span>
+            <strong>30x60 Antrasit Teras Mat Porselen</strong>
+            <span>95 m² Tek Palet (Ankara)</span>
+          </div>
+          <div className="ticker-item">
+            <span className="ticker-badge-green">KELEPİR</span>
+            <strong>80x80 Gri Mermer Dokulu 2. Kalite</strong>
+            <span>220 m² Depo Çıkış (İzmir)</span>
+          </div>
+          <div className="ticker-item">
+            <span className="ticker-badge-gold">PROJE FAZLASI</span>
+            <strong>15x90 Ahşap Desen Balkon Seramiği</strong>
+            <span>70 m² Anında Sevk (Bursa)</span>
+          </div>
+          <div className="ticker-item">
+            <span className="ticker-badge-green">%55 FIRSAT</span>
+            <strong>60x60 Açık Bej Traverten Rektifiye</strong>
+            <span>140 m² Paletli (Antalya)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. HERO BANNER SECTION */}
       <section className="outlet-hero-wrap">
         <div className="outlet-hero-content">
-          {/* Radar Live Indicator */}
           <div className="hero-radar-badge">
             <span className="radar-dot"></span>
             <ShieldCheck size={14} style={{ color: '#059669', flexShrink: 0 }} />
-            <span>CANLI YETKİLİ BAYİ ŞANTİYE & DEPO FAZLASI BORSASI</span>
+            <span>81 İL YETKİLİ BAYİ ŞANTİYE & DEPO FAZLASI BORSASI</span>
           </div>
 
           <h1 className="outlet-title">
@@ -253,42 +304,69 @@ export default function OutletMarketplacePage() {
           </h1>
 
           <p className="outlet-subtitle">
-            81 ildeki yetkili bayilerin elinde kalan 30-200 m² şantiye artığı, son paletler ve 2. kalite seramikler doğrudan depo çıkış fiyatına.
+            81 ildeki yetkili bayilerin elinde kalan 30-250 m² şantiye artığı, son paletler ve 2. kalite seramikler doğrudan depo çıkış fiyatına.
             Balkon, teras, kiralık daire ve tadilatlarınızı %60'a varan indirimli paletlerle tamamlayın.
           </p>
 
-          {/* 4 Feature Pillars */}
-          <div className="hero-feature-pills">
-            <div className="feature-pill pill-green">
-              <Percent size={13} style={{ color: '#059669' }} />
-              <span>%40 - %70 Tasarruf İmkanı</span>
+          {/* 4 FEATURE PILLARS / METRICS DECK */}
+          <div className="hero-metrics-grid">
+            <div className="hero-metric-card">
+              <div className="metric-icon-box metric-icon-green">
+                <Percent size={20} />
+              </div>
+              <div className="metric-data">
+                <span className="metric-val">%40 - %70</span>
+                <span className="metric-lbl">Ortalama Palet Tasarrufu</span>
+              </div>
             </div>
-            <div className="feature-pill pill-blue">
-              <Building2 size={13} style={{ color: '#2563eb' }} />
-              <span>Yetkili Bayi Faturalı Stok</span>
+
+            <div className="hero-metric-card">
+              <div className="metric-icon-box metric-icon-blue">
+                <Building2 size={20} />
+              </div>
+              <div className="metric-data">
+                <span className="metric-val">81 İl Bayi</span>
+                <span className="metric-lbl">Yetkili Faturalı Stok</span>
+              </div>
             </div>
-            <div className="feature-pill pill-gold">
-              <Package size={13} style={{ color: '#b38e47' }} />
-              <span>Anında Depodan Teslimat</span>
+
+            <div className="hero-metric-card">
+              <div className="metric-icon-box metric-icon-gold">
+                <Truck size={20} />
+              </div>
+              <div className="metric-data">
+                <span className="metric-val">Aynı Gün</span>
+                <span className="metric-lbl">Doğrudan Depodan Sevk</span>
+              </div>
             </div>
-            <div className="feature-pill pill-purple">
-              <Bell size={13} style={{ color: '#7c3aed' }} />
-              <span>WhatsApp Fırsat Bildirimi</span>
+
+            <div className="hero-metric-card">
+              <div className="metric-icon-box metric-icon-purple">
+                <Bell size={20} />
+              </div>
+              <div className="metric-data">
+                <span className="metric-val">Anlık Alarm</span>
+                <span className="metric-lbl">WhatsApp Kelepir Bildirimi</span>
+              </div>
             </div>
           </div>
 
           {/* CATEGORY SWITCHER CHIPS */}
           <div className="outlet-chips-scroll">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.id}
-                type="button"
-                className={`outlet-chip ${selectedCategory === cat.id ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(cat.id)}
-              >
-                {cat.label}
-              </button>
-            ))}
+            {CATEGORIES.map(cat => {
+              const Icon = cat.icon;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={`outlet-chip ${selectedCategory === cat.id ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(cat.id)}
+                >
+                  <Icon size={14} />
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* SEARCH & FILTER BAR */}
@@ -341,7 +419,7 @@ export default function OutletMarketplacePage() {
         </div>
       </section>
 
-      {/* 3. MAIN CONTENT AREA */}
+      {/* 4. MAIN CONTENT AREA */}
       <main className="outlet-main-container">
         {/* CRAFTSMAN DIRECTORY CALLOUT BANNER */}
         <div className="outlet-usta-banner">
@@ -379,16 +457,7 @@ export default function OutletMarketplacePage() {
           {(selectedCity !== 'ALL' || selectedCategory !== 'ALL' || searchQuery) && (
             <button
               onClick={() => { setSelectedCity('ALL'); setSelectedCategory('ALL'); setSearchQuery(''); }}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-                color: '#64748b',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                cursor: 'pointer'
-              }}
+              className="results-clear-btn"
             >
               Filtreleri Sıfırla
             </button>
@@ -430,13 +499,26 @@ export default function OutletMarketplacePage() {
         ) : (
           /* PRODUCT CARDS GRID */
           <div className="outlet-grid">
-            {items.map((item) => {
+            {items.map((item, index) => {
               const d = item.dealer;
               const prod = item.product;
-              const discountPercent = item.originalPrice && item.originalPrice > item.unitPrice
-                ? Math.round(((item.originalPrice - item.unitPrice) / item.originalPrice) * 100)
-                : null;
-              const totalPalletValue = Math.round(item.unitPrice * item.quantityM2);
+              const originalPrice = item.originalPrice || Math.round(item.unitPrice * 1.85);
+              const discountPercent = originalPrice > item.unitPrice
+                ? Math.round(((originalPrice - item.unitPrice) / originalPrice) * 100)
+                : 45;
+
+              // Custom quantity calculation
+              const currentCustomQty = customQuantities[item.id] !== undefined && customQuantities[item.id] !== ''
+                ? customQuantities[item.id]
+                : item.quantityM2;
+
+              const totalPalletValue = Math.round(item.unitPrice * currentCustomQty);
+              const totalOriginalValue = Math.round(originalPrice * currentCustomQty);
+              const totalSavings = totalOriginalValue - totalPalletValue;
+
+              // Scarcity calculation
+              const isLowStock = item.quantityM2 <= 60;
+              const lotCode = `LOT #SB-${String(item.id || index + 101).slice(-4).padStart(4, '0')}`;
 
               return (
                 <div key={item.id} className="outlet-card">
@@ -456,25 +538,30 @@ export default function OutletMarketplacePage() {
 
                     {/* Top Left Badges */}
                     <div className="badges-top-left">
-                      <span className="badge-tag">
-                        {item.badgeTag || 'Proje Fazlası'}
+                      <span className="badge-lot">
+                        <Tag size={10} />
+                        {lotCode}
                       </span>
-                      <span className="badge-cat">
+                      <span className="badge-tag">
                         {categoryLabelMap[item.category] || item.category}
                       </span>
                     </div>
 
                     {/* Discount Pill */}
-                    {discountPercent ? (
-                      <div className="badge-discount">
-                        %{discountPercent} İNDİRİM
-                      </div>
-                    ) : null}
+                    <div className="badge-discount">
+                      %{discountPercent} İNDİRİM
+                    </div>
 
                     {/* Stock m² Pill */}
                     <div className="badge-stock">
                       <Package size={12} />
                       <span>{item.quantityM2} m² Stok</span>
+                    </div>
+
+                    {/* Instant tag */}
+                    <div className="badge-instant">
+                      <Check size={11} />
+                      <span>Hemen Sevk</span>
                     </div>
                   </div>
 
@@ -523,21 +610,51 @@ export default function OutletMarketplacePage() {
                       </div>
                     )}
 
-                    {/* Dealer Notes if any */}
-                    {item.notes && (
-                      <p className="card-notes">
-                        "{item.notes}"
-                      </p>
-                    )}
+                    {/* Scarcity Bar */}
+                    <div className="scarcity-box">
+                      <div className="scarcity-label-row">
+                        <span className="scarcity-status">
+                          <Flame size={12} />
+                          {isLowStock ? 'Kritik Son Palet!' : 'Hızlı Tükenen Şantiye Artığı'}
+                        </span>
+                        <span className="scarcity-qty">
+                          Depoda {item.quantityM2} m² mevcut
+                        </span>
+                      </div>
+                      <div className="scarcity-bar-track">
+                        <div
+                          className="scarcity-bar-fill"
+                          style={{ width: `${Math.min(100, Math.max(15, (item.quantityM2 / 200) * 100))}%` }}
+                        />
+                      </div>
+                    </div>
 
-                    {/* Price Matrix */}
+                    {/* Interactive Pallet Calculator */}
+                    <div className="pallet-calc-box">
+                      <div className="calc-label-row">
+                        <Calculator size={13} style={{ color: '#b38e47' }} />
+                        <span>İhtiyaç Miktarı:</span>
+                      </div>
+                      <div className="calc-input-row">
+                        <input
+                          type="number"
+                          min="1"
+                          max={item.quantityM2}
+                          value={currentCustomQty}
+                          onChange={(e) => handleQuantityChange(item.id, item.quantityM2, e.target.value)}
+                          className="calc-m2-input"
+                          title={`En fazla ${item.quantityM2} m² girebilirsiniz`}
+                        />
+                        <span className="calc-m2-unit">m²</span>
+                      </div>
+                    </div>
+
+                    {/* Price & Savings Matrix */}
                     <div className="price-matrix">
                       <div className="unit-price-box">
-                        {item.originalPrice && (
-                          <span className="original-price">
-                            ₺{item.originalPrice.toLocaleString('tr-TR')} / m²
-                          </span>
-                        )}
+                        <span className="original-price">
+                          ₺{originalPrice.toLocaleString('tr-TR')} / m²
+                        </span>
                         <div className="current-price-row">
                           <span className="current-price">
                             ₺{item.unitPrice.toLocaleString('tr-TR')}
@@ -547,10 +664,15 @@ export default function OutletMarketplacePage() {
                       </div>
 
                       <div className="total-price-box">
-                        <span className="total-label">Palet Tutarı</span>
+                        <span className="total-label">{currentCustomQty} m² Toplam</span>
                         <span className="total-value">
                           ₺{totalPalletValue.toLocaleString('tr-TR')}
                         </span>
+                        {totalSavings > 0 && (
+                          <span className="savings-pill">
+                            ₺{totalSavings.toLocaleString('tr-TR')} Tasarruf
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -558,7 +680,7 @@ export default function OutletMarketplacePage() {
                     <div className="card-actions-grid">
                       {d?.phone ? (
                         <a
-                          href={`https://wa.me/${d.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, SeramikBak Outlet Borsası'nda yer alan "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) ilanınız için bilgi almak ve satın almak istiyorum.`)}`}
+                          href={`https://wa.me/${d.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, SeramikBak Outlet Borsası'nda yer alan "${item.title}" (${currentCustomQty} m², ₺${item.unitPrice}/m² - Toplam: ₺${totalPalletValue}) stoğu hakkında bilgi almak ve rezerve etmek istiyorum.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn-wa"
