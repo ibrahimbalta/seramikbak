@@ -33,15 +33,39 @@ export const metadata = {
 
 const ustalarDirectorySchema = {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": "Türkiye Seramik & Fayans Ustası Rehberi",
-  "description": "81 ilde seramik, granit, vitrifiye ve kalebodur montajı yapan puanlanmış ustalar ve usta profilleri.",
-  "url": "https://www.seramikbak.com/ustalar",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "SeramikBak Global",
-    "url": "https://www.seramikbak.com",
-  },
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://www.seramikbak.com/ustalar#webpage",
+      "name": "Türkiye Seramik & Fayans Ustası Rehberi | SeramikBak",
+      "description": "81 ilde seramik, granit, vitrifiye ve kalebodur montajı yapan puanlanmış ustalar ve usta profilleri.",
+      "url": "https://www.seramikbak.com/ustalar",
+      "isPartOf": {
+        "@type": "WebSite",
+        "@id": "https://www.seramikbak.com/#website",
+        "name": "SeramikBak",
+        "url": "https://www.seramikbak.com",
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.seramikbak.com/ustalar#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Ana Sayfa",
+          "item": "https://www.seramikbak.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Seramik Ustaları",
+          "item": "https://www.seramikbak.com/ustalar"
+        }
+      ]
+    }
+  ]
 };
 
 export default function UstalarLayout({ children }) {
