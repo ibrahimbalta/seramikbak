@@ -838,7 +838,7 @@ export default function InstallersDirectoryPage() {
 
             {/* Document Header */}
             <div className="contract-header">
-              <div className="contract-eyebrow">SERAMİKBAK GÜVENCELİ UYGULAMA VE KALİTE STANDARTLARI</div>
+              <div className="contract-eyebrow">TEKNİK UYGULAMA VE KALİTE STANDARTLARI</div>
               <h2 className="contract-title">
                 STANDART SERAMİK VE KARO UYGULAMA İŞ SÖZLEŞMESİ
               </h2>
