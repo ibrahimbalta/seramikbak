@@ -46,6 +46,48 @@ const TURKEY_CITIES = [
 
 const POPULAR_CITIES = ['ALL', 'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Kocaeli', 'Gaziantep', 'Konya', 'Eskişehir', 'Mersin'];
 
+/**
+ * Client-side ultra-fast image compression using HTML5 Canvas.
+ * Shrinks massive mobile camera photos (5-20MB) to light, sharp ~80KB JPEGs.
+ */
+function compressImageFile(file, maxDimension = 1000, quality = 0.72) {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith('image/')) {
+      resolve(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          const ratio = Math.min(maxDimension / width, maxDimension / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressed);
+        } else {
+          resolve(e.target.result);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function InstallersDirectoryPage() {
   const [installers, setInstallers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -95,39 +137,14 @@ export default function InstallersDirectoryPage() {
       const newUrls = [...uploadedPhotos];
       for (const file of files) {
         if (newUrls.length >= 3) break;
-
-        const reader = new FileReader();
-        const base64Promise = new Promise((resolve) => {
-          reader.onload = (event) => resolve(event.target.result);
-          reader.readAsDataURL(file);
-        });
-        const base64Data = await base64Promise;
-
-        try {
-          const res = await fetch('/api/dealers/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              base64Data,
-              filename: file.name,
-              folder: 'seramikbak/installers'
-            })
-          });
-
-          const data = await res.json();
-          const uploadedUrl = data.url || data.fileUrl;
-          if (res.ok && uploadedUrl) {
-            newUrls.push(uploadedUrl);
-          } else {
-            newUrls.push(base64Data);
-          }
-        } catch {
-          newUrls.push(base64Data);
+        const compressedBase64 = await compressImageFile(file, 1000, 0.72);
+        if (compressedBase64) {
+          newUrls.push(compressedBase64);
         }
       }
       setUploadedPhotos(newUrls);
     } catch (err) {
-      console.error('File upload error:', err);
+      console.error('File compression error:', err);
     } finally {
       setUploadingPhotos(false);
       e.target.value = '';
@@ -178,16 +195,23 @@ export default function InstallersDirectoryPage() {
       return;
     }
 
+    const cleanName = regName.trim();
+    const cleanPhone = regPhone.trim();
+    if (!cleanName || !cleanPhone || !regCity) {
+      setRegError('Lütfen Ad-Soyad, Telefon ve Şehir alanlarını eksiksiz doldurun.');
+      return;
+    }
+
     setRegLoading(true);
 
     try {
       let portfolioData = null;
       if (uploadedPhotos.length > 0) {
         portfolioData = uploadedPhotos.map((url, idx) => ({
-          title: `${regName} - Tamamlanan Şantiye Projesi #${idx + 1}`,
+          title: `${cleanName} - Referans Şantiye Projesi #${idx + 1}`,
           areaM2: '35 m²',
           duration: '3 Gün',
-          ceramicUsed: regSpecialties || '60x120 Porselen Granit',
+          ceramicUsed: regSpecialties.trim() || '60x120 Porselen Granit',
           beforeUrl: url,
           afterUrl: url
         }));
@@ -197,20 +221,27 @@ export default function InstallersDirectoryPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: regName,
-          companyName: regCompany,
-          phone: regPhone,
+          name: cleanName,
+          companyName: regCompany.trim() || null,
+          phone: cleanPhone,
           city: regCity,
-          district: regDistrict,
-          experienceYears: regExpYears,
-          specialties: regSpecialties,
-          contractRateM2: regContractRate,
+          district: regDistrict.trim() || null,
+          experienceYears: regExpYears ? parseInt(regExpYears, 10) : 10,
+          specialties: regSpecialties.trim() || 'Seramik, Granit, Banyo & Zemin Döşeme',
+          contractRateM2: regContractRate.trim() || '280 ₺/m²',
           guaranteeBadge: true,
           portfolioBeforeAfter: portfolioData ? JSON.stringify(portfolioData) : null,
-          notes: regNotes
+          notes: regNotes.trim() || null
         })
       });
-      const data = await res.json();
+
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error(`Sunucu yanıtı okunamadı (${res.status} ${res.statusText}).`);
+      }
+
       if (res.ok && data.success) {
         setRegSuccess(data.message || 'Tebrikler! Seramik ustası başvurunuz başarıyla alındı. Yönetici onayından sonra rehberde yayınlanacaktır.');
         setRegName('');
@@ -221,10 +252,11 @@ export default function InstallersDirectoryPage() {
         setRegNotes('');
         fetchInstallers();
       } else {
-        setRegError(data.error || 'Profil oluşturulurken bir hata oluştu.');
+        setRegError(data.error || 'Profil oluşturulurken bir hata oluştu. Lütfen bilgilerinizi kontrol ediniz.');
       }
     } catch (err) {
-      setRegError('Sunucu bağlantı hatası.');
+      console.error('Usta kayıt hatası:', err);
+      setRegError(err?.message || 'Sunucuya bağlanırken bir hata oluştu. Lütfen internet bağlantınızı kontrol edip tekrar deneyiniz.');
     } finally {
       setRegLoading(false);
     }
@@ -896,7 +928,7 @@ export default function InstallersDirectoryPage() {
                     <label className="form-label">Telefon Numaranız *</label>
                     <input
                       type="tel"
-                      placeholder="Örn: 0532 123 45 67"
+                      placeholder="Örn: 0545 346 79 86"
                       value={regPhone}
                       onChange={(e) => setRegPhone(e.target.value)}
                       required
@@ -923,7 +955,7 @@ export default function InstallersDirectoryPage() {
                     <label className="form-label">Hizmet İlçeleri</label>
                     <input
                       type="text"
-                      placeholder="Örn: Kadıköy, Üsküdar"
+                      placeholder="Örn: Kadıköy, Bartın Merkez"
                       value={regDistrict}
                       onChange={(e) => setRegDistrict(e.target.value)}
                       className="form-input"
@@ -980,7 +1012,7 @@ export default function InstallersDirectoryPage() {
                   {uploadedPhotos.length < 3 && (
                     <label className="photo-dropzone">
                       <Upload size={18} />
-                      <span>{uploadingPhotos ? 'Fotoğraflar İşleniyor...' : 'Cihazınızdan Şantiye Fotoğrafı Seçin'}</span>
+                      <span>{uploadingPhotos ? 'Fotoğraflar Optimize Ediliyor...' : 'Cihazınızdan Şantiye Fotoğrafı Seçin'}</span>
                       <input
                         type="file"
                         accept="image/*"

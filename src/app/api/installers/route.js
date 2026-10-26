@@ -68,6 +68,19 @@ export async function POST(request) {
 
     // Clean phone number
     const cleanPhone = phone.replace(/[^\d+]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      return NextResponse.json({ success: false, error: 'Lütfen geçerli bir telefon numarası giriniz.' }, { status: 400 });
+    }
+
+    // Safe portfolio JSON string validation
+    let safePortfolio = null;
+    if (portfolioBeforeAfter) {
+      safePortfolio = typeof portfolioBeforeAfter === 'string' ? portfolioBeforeAfter : JSON.stringify(portfolioBeforeAfter);
+      // Hard guard: 3MB max string to prevent database bloat
+      if (safePortfolio.length > 3 * 1024 * 1024) {
+        return NextResponse.json({ success: false, error: 'Yüklenen şantiye görsellerinin boyutu çok büyük. Lütfen daha küçük görseller seçiniz.' }, { status: 413 });
+      }
+    }
 
     const installer = await prisma.installer.create({
       data: {
@@ -80,33 +93,37 @@ export async function POST(request) {
         specialties: specialties ? specialties.trim() : 'Seramik, Granit, Banyo & Zemin Döşeme',
         notes: notes ? notes.trim() : null,
         guaranteeBadge: guaranteeBadge !== undefined ? Boolean(guaranteeBadge) : true,
-        contractRateM2: contractRateM2 ? contractRateM2.trim() : '250 ₺/m²',
-        portfolioBeforeAfter: portfolioBeforeAfter ? (typeof portfolioBeforeAfter === 'string' ? portfolioBeforeAfter : JSON.stringify(portfolioBeforeAfter)) : null,
-        verified: false, // Pending admin approval
+        contractRateM2: contractRateM2 ? contractRateM2.trim() : '280 ₺/m²',
+        portfolioBeforeAfter: safePortfolio,
+        verified: false, // Pending admin review
         rating: 5.0,
         reviewCount: 1,
         status: 'ACTIVE'
       }
     });
 
-    // Send email notification to seramikbak@gmail.com
-    sendInstallerNotification({
-      name: name.trim(),
-      phone: cleanPhone,
-      city: city.trim(),
-      experienceYears: experienceYears || 10,
-      specialties: specialties || 'Seramik Döşeme'
-    }).catch(err => {
-      console.error('Installer email notification trigger error:', err);
-    });
+    // Safely trigger email notification (non-blocking, won't break registration if email fails)
+    try {
+      sendInstallerNotification({
+        name: name.trim(),
+        phone: cleanPhone,
+        city: city.trim(),
+        experienceYears: experienceYears ? parseInt(experienceYears, 10) : 10,
+        specialties: specialties || 'Seramik Döşeme'
+      }).catch(err => {
+        console.error('Installer email notification trigger error:', err);
+      });
+    } catch (mailErr) {
+      console.error('sendInstallerNotification sync error:', mailErr);
+    }
 
     return NextResponse.json({
       success: true,
       installer,
-      message: 'Seramik ustası başvurunuz başarıyla alındı! Yönetici onayından sonra profiliniz rehberde yayınlanacaktır.'
+      message: 'Seramik ustası başvurunuz başarıyla alındı! Profiliniz incelendikten sonra rehberde yayınlanacaktır.'
     });
   } catch (error) {
     console.error('POST /api/installers Error:', error);
-    return NextResponse.json({ success: false, error: 'Kayıt sırasında sistemsel bir hata oluştu.' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Kayıt sırasında sistemsel bir hata oluştu: ' + (error?.message || 'Lütfen tekrar deneyin.') }, { status: 500 });
   }
 }
