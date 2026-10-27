@@ -297,28 +297,36 @@ export default function BrandConsumerStudioPage() {
         // =========================================================================
         setIsBrandMode(true);
         try {
-          const [brandRes, prodRes] = await Promise.all([
-            fetch('/api/brands').then(r => r.json()).catch(() => null),
-            fetch(`/api/products?brandId=${encodeURIComponent(targetBrandSlug)}&limit=500`).then(r => r.json()).catch(() => null)
-          ]);
+          const brandRes = await fetch('/api/brands').then(r => r.json()).catch(() => null);
 
           let matchedBrand = null;
           if (Array.isArray(brandRes)) {
             const normTarget = targetBrandSlug.toLowerCase().replace(/[-_\s]/g, '');
-            matchedBrand = brandRes.find(b => {
-              const normSlug = (b.slug || '').toLowerCase().replace(/[-_\s]/g, '');
-              const normName = (b.name || '').toLowerCase().replace(/[-_\s]/g, '');
-              const trClean = normName.replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
-              return (
-                b.id === targetBrandSlug ||
-                b.slug === targetBrandSlug ||
-                normSlug === normTarget ||
-                normSlug.startsWith(normTarget) ||
-                normName.includes(normTarget) ||
-                trClean.includes(normTarget) ||
-                normTarget.includes(normSlug)
-              );
-            });
+            // Exact ID or slug match first
+            matchedBrand = brandRes.find(b => 
+              (b.id && b.id.toLowerCase() === targetBrandSlug.toLowerCase()) || 
+              (b.slug && b.slug.toLowerCase() === targetBrandSlug.toLowerCase())
+            );
+
+            // If not found, match by normalized name
+            if (!matchedBrand) {
+              matchedBrand = brandRes.find(b => {
+                const bSlug = (b.slug || '').toLowerCase().replace(/[-_\s]/g, '');
+                const bName = (b.name || '').toLowerCase().replace(/[-_\s]/g, '');
+                const trClean = bName
+                  .replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ı/g, 'i')
+                  .replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
+
+                return (
+                  (bSlug && bSlug === normTarget) ||
+                  bName === normTarget ||
+                  trClean === normTarget ||
+                  (bName.length >= 3 && normTarget.includes(bName)) ||
+                  (trClean.length >= 3 && normTarget.includes(trClean)) ||
+                  (normTarget.length >= 3 && bName.includes(normTarget))
+                );
+              });
+            }
           }
 
           if (!matchedBrand) {
@@ -342,28 +350,27 @@ export default function BrandConsumerStudioPage() {
             document.title = `${matchedBrand.name} - 3D Mimari Mekan & Tasarım Stüdyosu | SeramikBak`;
           }
 
-          let loadedProducts = [];
+          // Fetch products strictly using the resolved brand ID and slug
+          const brandQueryId = matchedBrand.id || targetBrandSlug;
+          const prodRes = await fetch(`/api/products?brandId=${encodeURIComponent(brandQueryId)}&limit=500`)
+            .then(r => r.json())
+            .catch(() => null);
 
-          if (prodRes && prodRes.products && prodRes.products.length > 0) {
-            loadedProducts = prodRes.products;
-          } else if (matchedBrand?.id && matchedBrand.id !== targetBrandSlug) {
-            const retryRes = await fetch(`/api/products?brandId=${encodeURIComponent(matchedBrand.id)}&limit=500`).then(r => r.json()).catch(() => null);
-            if (retryRes && retryRes.products && retryRes.products.length > 0) {
-              loadedProducts = retryRes.products;
-            }
-          }
+          let loadedProducts = (prodRes && prodRes.products) ? prodRes.products : [];
 
           // Strict brand isolation: reject any product belonging to another brand
           const strictlyBrandProducts = loadedProducts.filter(p => {
             if (p.brandId && matchedBrand.id && p.brandId === matchedBrand.id) return true;
             if (p.brand?.id && matchedBrand.id && p.brand.id === matchedBrand.id) return true;
             if (p.brand?.name && matchedBrand.name && p.brand.name.toLowerCase() === matchedBrand.name.toLowerCase()) return true;
+            if (p.brand?.slug && matchedBrand.slug && p.brand.slug.toLowerCase() === matchedBrand.slug.toLowerCase()) return true;
             return false;
           });
 
+          // NEVER leak other brands into this white-label brand catalog
           const activeCatalog = strictlyBrandProducts.length > 0
             ? strictlyBrandProducts
-            : (loadedProducts.length > 0 ? loadedProducts : generateBrandFallbacks(matchedBrand));
+            : generateBrandFallbacks(matchedBrand);
 
           const sanitized = activeCatalog.map((p, idx) => {
             let tex = p.textureUrl || p.imageUrl;

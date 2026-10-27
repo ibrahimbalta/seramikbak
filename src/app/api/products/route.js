@@ -57,7 +57,7 @@ export async function GET(request) {
         orderBy: { createdAt: 'desc' },
         include: {
           brand: {
-            select: { id: true, name: true, logoUrl: true }
+            select: { id: true, name: true, slug: true, logoUrl: true }
           }
         }
       }),
