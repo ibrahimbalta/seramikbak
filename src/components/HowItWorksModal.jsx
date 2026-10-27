@@ -37,7 +37,8 @@ import {
 export default function HowItWorksModal({
   isOpen,
   onClose,
-  initialTab = 'customers'
+  initialTab = 'customers',
+  onOpenStudio
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [sliderPos, setSliderPos] = useState(50);
@@ -328,8 +329,14 @@ export default function HowItWorksModal({
                   </div>
 
                   <Link
-                    href="/tasarim"
-                    onClick={onClose}
+                    href="/?tab=studio"
+                    onClick={(e) => {
+                      onClose?.();
+                      if (onOpenStudio) {
+                        e.preventDefault();
+                        onOpenStudio(selectedSampleTile);
+                      }
+                    }}
                     className="tile-card-action-btn"
                   >
                     <Sparkles size={14} />
@@ -528,8 +535,14 @@ export default function HowItWorksModal({
 
               <div className="hiw-cta-card-right">
                 <Link
-                  href="/tasarim"
-                  onClick={onClose}
+                  href="/?tab=studio"
+                  onClick={(e) => {
+                    onClose?.();
+                    if (onOpenStudio) {
+                      e.preventDefault();
+                      onOpenStudio(selectedSampleTile);
+                    }
+                  }}
                   className="hiw-btn-action-primary gold"
                   style={{
                     display: 'inline-flex',

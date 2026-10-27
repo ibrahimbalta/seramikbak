@@ -7840,6 +7840,32 @@ export default function Home() {
         isOpen={showHowItWorksModal}
         onClose={() => setShowHowItWorksModal(false)}
         initialTab={howItWorksActiveTab}
+        onOpenStudio={(sampleTile) => {
+          setShowHowItWorksModal(false);
+          setActiveTab('studio');
+          if (sampleTile) {
+            const found = products.find(p => 
+              (p.name && sampleTile.name && p.name.toLowerCase().includes(sampleTile.name.toLowerCase().split(' ')[0])) ||
+              (p.textureUrl && p.textureUrl === sampleTile.texture)
+            );
+            if (found) {
+              setActiveProduct(found);
+              setStudioFloorProduct(found);
+              setStudioWallProduct(found);
+              setStudioApplyFloor(true);
+              setStudioApplyWalls(true);
+            }
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => {
+            const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
+            if (studioEl) {
+              const yOffset = -70;
+              const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            }
+          }, 200);
+        }}
       />
 
       {/* SAMPLE ORDER (NUMUNE KARO TALEBİ) MODAL */}
