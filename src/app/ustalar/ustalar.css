@@ -587,6 +587,7 @@
   gap: 22px;
   width: 100%;
   box-sizing: border-box;
+  align-items: start;
 }
 
 /* Card Container */
@@ -594,11 +595,10 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 22px;
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
@@ -749,6 +749,83 @@
 .badge-gold {
   background: #fefce8;
   color: #854d0e;
+}
+
+/* ARTISAN ACCORDION TOGGLE & COLLAPSIBLE BODY */
+.artisan-accordion-toggle {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 0.78rem;
+  font-weight: 750;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.artisan-accordion-toggle:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.artisan-accordion-toggle.active {
+  background: #fefce8;
+  border-color: #fde047;
+  color: #854d0e;
+}
+
+.accordion-toggle-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.accordion-icon {
+  color: #b38e47;
+  flex-shrink: 0;
+}
+
+.accordion-chevron {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.accordion-chevron.rotated {
+  transform: rotate(180deg);
+  color: #b38e47;
+}
+
+.artisan-accordion-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, margin 0.25s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.artisan-accordion-body.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.accordion-inner-content {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* Labor Rate & Interactive m² Estimator */

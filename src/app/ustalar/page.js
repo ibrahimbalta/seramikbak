@@ -24,6 +24,7 @@ import {
   CheckSquare,
   Upload,
   ChevronLeft,
+  ChevronDown,
   ArrowRight,
   Check,
   Tag,
@@ -116,6 +117,16 @@ export default function InstallersDirectoryPage() {
 
   // Per-artisan labor calculation state { [artisanId]: m2Number }
   const [cardSelectedArea, setCardSelectedArea] = useState({});
+
+  // Per-artisan accordion expand state { [artisanId]: boolean }
+  const [expandedCards, setExpandedCards] = useState({});
+
+  const toggleCardExpand = (id) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   // Register Modal State
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -537,8 +548,10 @@ export default function InstallersDirectoryPage() {
               );
               const waLink = `https://wa.me/${inst.phone.replace(/[^\d]/g, '')}?text=${waText}`;
 
+              const isExpanded = !!expandedCards[inst.id];
+
               return (
-                <article key={inst.id} className="artisan-card">
+                <article key={inst.id} className={`artisan-card ${isExpanded ? 'is-expanded' : ''}`}>
                   {/* Card Header with Master Seal */}
                   <div className="card-header-bar">
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0, flex: 1 }}>
@@ -591,72 +604,91 @@ export default function InstallersDirectoryPage() {
                     </div>
                   </div>
 
-                  {/* Interactive Labor Cost Estimator Box */}
-                  <div className="labor-estimator-box">
-                    <div className="estimator-header">
-                      <span>📐 Birim İşçilik & Tahmin:</span>
-                      <span className="estimator-unit-rate">{inst.contractRateM2 || '280 ₺/m²'}</span>
+                  {/* Accordion Toggle Trigger Button */}
+                  <button
+                    type="button"
+                    onClick={() => toggleCardExpand(inst.id)}
+                    className={`artisan-accordion-toggle ${isExpanded ? 'active' : ''}`}
+                    aria-expanded={isExpanded}
+                  >
+                    <div className="accordion-toggle-content">
+                      <Calculator size={14} className="accordion-icon" />
+                      <span>{isExpanded ? 'Detayları & Hesaplayıcıyı Kapat' : 'İşçilik Hesaplayıcı & Detaylar'}</span>
                     </div>
+                    <ChevronDown size={15} className={`accordion-chevron ${isExpanded ? 'rotated' : ''}`} />
+                  </button>
 
-                    <div className="estimator-quick-tabs">
-                      {[15, 30, 60, 100].map(m2 => (
+                  {/* Collapsible Accordion Body */}
+                  <div className={`artisan-accordion-body ${isExpanded ? 'open' : ''}`}>
+                    <div className="accordion-inner-content">
+                      {/* Interactive Labor Cost Estimator Box */}
+                      <div className="labor-estimator-box">
+                        <div className="estimator-header">
+                          <span>📐 Birim İşçilik & Tahmin:</span>
+                          <span className="estimator-unit-rate">{inst.contractRateM2 || '280 ₺/m²'}</span>
+                        </div>
+
+                        <div className="estimator-quick-tabs">
+                          {[15, 30, 60, 100].map(m2 => (
+                            <button
+                              key={m2}
+                              type="button"
+                              className={`calc-chip-btn ${activeM2 === m2 ? 'active' : ''}`}
+                              onClick={() => setCardSelectedArea(prev => ({ ...prev, [inst.id]: m2 }))}
+                            >
+                              {m2} m²
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="estimator-summary-row">
+                          <span>Tahmini {activeM2} m² İşçilik:</span>
+                          <span className="estimator-total-val">~₺{estimatedTotal.toLocaleString('tr-TR')}</span>
+                        </div>
+                      </div>
+
+                      {/* Specialties Chips */}
+                      {inst.specialties && (
+                        <div className="artisan-specialties">
+                          {inst.specialties.split(',').slice(0, 3).map((spec, idx) => (
+                            <span key={idx} className="spec-chip">
+                              {spec.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Bio Quotation */}
+                      {inst.notes && (
+                        <div className="artisan-quote-bubble">
+                          <p>"{inst.notes}"</p>
+                        </div>
+                      )}
+
+                      {/* Modal Trigger Buttons */}
+                      <div className="card-triggers-row">
                         <button
-                          key={m2}
                           type="button"
-                          className={`calc-chip-btn ${activeM2 === m2 ? 'active' : ''}`}
-                          onClick={() => setCardSelectedArea(prev => ({ ...prev, [inst.id]: m2 }))}
+                          onClick={() => {
+                            setSelectedPortfolioInstaller(inst);
+                            setActivePortfolioIndex(0);
+                          }}
+                          className="trigger-portfolio-btn"
                         >
-                          {m2} m²
+                          <Camera size={14} />
+                          <span>{portfolioList.length > 0 ? `Canlı Portfolyo (${portfolioList.length})` : 'Canlı Portfolyo'}</span>
                         </button>
-                      ))}
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedContractInstaller(inst)}
+                          className="trigger-contract-btn"
+                        >
+                          <FileText size={14} />
+                          <span>Standart Sözleşme</span>
+                        </button>
+                      </div>
                     </div>
-
-                    <div className="estimator-summary-row">
-                      <span>Tahmini {activeM2} m² İşçilik:</span>
-                      <span className="estimator-total-val">~₺{estimatedTotal.toLocaleString('tr-TR')}</span>
-                    </div>
-                  </div>
-
-                  {/* Specialties Chips */}
-                  {inst.specialties && (
-                    <div className="artisan-specialties">
-                      {inst.specialties.split(',').slice(0, 3).map((spec, idx) => (
-                        <span key={idx} className="spec-chip">
-                          {spec.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Bio Quotation */}
-                  {inst.notes && (
-                    <div className="artisan-quote-bubble">
-                      <p>"{inst.notes}"</p>
-                    </div>
-                  )}
-
-                  {/* Modal Trigger Buttons */}
-                  <div className="card-triggers-row">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedPortfolioInstaller(inst);
-                        setActivePortfolioIndex(0);
-                      }}
-                      className="trigger-portfolio-btn"
-                    >
-                      <Camera size={14} />
-                      <span>{portfolioList.length > 0 ? `Canlı Portfolyo (${portfolioList.length})` : 'Canlı Portfolyo'}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setSelectedContractInstaller(inst)}
-                      className="trigger-contract-btn"
-                    >
-                      <FileText size={14} />
-                      <span>Standart Sözleşme</span>
-                    </button>
                   </div>
 
                   {/* Symmetrical Dual Action Pod (50 / 50) */}
