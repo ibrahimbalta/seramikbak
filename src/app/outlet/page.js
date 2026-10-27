@@ -432,7 +432,7 @@ export default function OutletMarketplacePage() {
                 Bu Seramikleri Döşetecek Tecrübeli Seramik Ustası mı Arıyorsunuz?
               </h4>
               <p className="usta-desc">
-                81 ilde lazer terazili, puanlanmış ve garantili seramik ustalarının canlı portfolyolarını hemen inceleyin.
+                81 ilde puanlanmış, tecrübeli ve garantili seramik ustalarının canlı portfolyolarını hemen inceleyin.
               </p>
             </div>
           </div>

@@ -358,12 +358,12 @@ export default function InstallersDirectoryPage() {
           </div>
 
           <h1 className="hero-heading">
-            Eviniz ve Şantiyeniz İçin <span className="gold-gradient-text">Lazer Terazili Seramik Ustaları</span>
+            Eviniz ve Şantiyeniz İçin <span className="gold-gradient-text">Uzman Seramik Ustaları</span>
           </h1>
 
           <p className="hero-lead">
             Kusursuz seramik uygulaması doğru usta ile başlar. 60x120 porselen, banyo ve teras döşemelerinde
-            lazer terazili, derz artılı çalışan sertifikalı ustaları inceleyin, anında tahmini işçilik teklifi alın.
+            hassas işçilikle çalışan sertifikalı ustaları inceleyin, anında tahmini işçilik teklifi alın.
           </p>
 
           {/* 4 Interactive Command Metrics */}
@@ -375,8 +375,8 @@ export default function InstallersDirectoryPage() {
             </div>
             <div className="metric-stat-box">
               <Ruler size={18} className="stat-icon" style={{ color: '#059669' }} />
-              <span className="stat-val">%100 Lazer</span>
-              <span className="stat-lbl">Terazi & Derz Uyumlu</span>
+              <span className="stat-val">%100 Gönye</span>
+              <span className="stat-lbl">Hassas Kot & Düzlem</span>
             </div>
             <div className="metric-stat-box">
               <Award size={18} className="stat-icon" style={{ color: '#2563eb' }} />
@@ -591,7 +591,7 @@ export default function InstallersDirectoryPage() {
                   {/* Quality Radar & Guarantee Meters */}
                   <div className="skill-meters-block">
                     <div className="skill-meter-row">
-                      <span>Lazer Terazi & Düzlem Kotu</span>
+                      <span>Hassas Kot & Düzlem Uyumu</span>
                       <span className="meter-badge badge-green">✔ %100 Uyum</span>
                     </div>
                     <div className="skill-meter-row">
@@ -916,7 +916,7 @@ export default function InstallersDirectoryPage() {
               <div className="contract-section">
                 <h4 className="contract-section-heading">3. TEKNİK UYGULAMA VE TESLİMAT ESASLARI</h4>
                 <ul className="contract-rules-list">
-                  <li><strong>📏 Lazer Terazi & Eğim Kontrolü:</strong> Zemin ve duvar karoları su/lazer terazisi ile gönyesinde döşenecek, banyo ve teras zeminlerinde gider süzgecine doğru gerekli su akış meyli verilecektir.</li>
+                  <li><strong>📏 Terazi & Eğim Kontrolü:</strong> Zemin ve duvar karoları hassas terazi ile gönyesinde döşenecek, banyo ve teras zeminlerinde gider süzgecine doğru gerekli su akış meyli verilecektir.</li>
                   <li><strong>📐 Derz Artısı ve Kalibre Hizalama:</strong> Seramik ebadına uygun plastik derz artısı kullanılacak, tırnak yapması ve kot farkı oluşumu engellenecektir.</li>
                   <li><strong>💧 Zemin Temizliği & Astar Hazırlığı:</strong> Döşeme öncesinde zemin tozu, oynak parçalar temizlenecek ve yapıştırıcı harcın tam yapışması sağlanacaktır.</li>
                   <li><strong>🧹 Kaba Şantiye Temizliği:</strong> İş bitiminde derz ve harç artıkları sünger ve özel temizleyici ile kabaca temizlenerek teslim edilecektir.</li>
@@ -1142,7 +1142,7 @@ export default function InstallersDirectoryPage() {
                   <label className="form-label">Tanıtım ve İşçilik Notunuz</label>
                   <textarea
                     rows={2}
-                    placeholder="Ekip mevcudunuz, lazerli terazi donanımınız veya iş teslim taahhüdünüz..."
+                    placeholder="Ekip mevcudunuz, tecrübeniz ve iş teslim taahhüdünüz..."
                     value={regNotes}
                     onChange={(e) => setRegNotes(e.target.value)}
                     className="form-textarea"
