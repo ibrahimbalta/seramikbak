@@ -261,6 +261,7 @@ import { LanguageProvider } from "@/lib/languageContext";
 import CookieBanner from "@/components/CookieBanner";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import CatalogToast from "@/components/ui/CatalogToast";
+import AutoTranslateNotice from "@/components/AutoTranslateNotice";
 import Script from "next/script";
 
 export default function RootLayout({ children }) {
@@ -320,11 +321,39 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
+        <div id="google_translate_element" style={{ display: 'none' }} />
+        <Script
+          id="google-translate-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.googleTranslateElementInit = function() {
+                try {
+                  if (window.google && window.google.translate) {
+                    new window.google.translate.TranslateElement({
+                      pageLanguage: 'tr',
+                      includedLanguages: 'tr,en,de,ar,ru,fr,es',
+                      autoDisplay: false
+                    }, 'google_translate_element');
+                  }
+                } catch(e) {
+                  console.debug('Translate init failed:', e);
+                }
+              };
+            `,
+          }}
+        />
+        <Script
+          id="google-translate-script"
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        />
         <LanguageProvider>
           {children}
           <CookieBanner />
           <PWAInstallPrompt />
           <CatalogToast />
+          <AutoTranslateNotice />
         </LanguageProvider>
       </body>
     </html>
