@@ -65,22 +65,33 @@ function triggerGoogleTranslateDOM(targetLang) {
 
 /**
  * Automatically detects user country and language via:
- * 1. navigator.language (browser locale)
+ * 1. Fast Geo IP lookup (Crucial for VPN testing, expats, tourists, and international IP routing)
  * 2. Timezone (zero-latency client signal)
- * 3. Fast Geo IP fallback
+ * 3. Browser locale fallback (navigator.language)
  */
 async function detectUserLanguage() {
   if (typeof window === 'undefined') return 'tr';
 
-  // 1. Browser locale check (Zero-latency)
-  const navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-  if (navLang.startsWith('de')) return 'de';
-  if (navLang.startsWith('fr')) return 'fr';
-  if (navLang.startsWith('es')) return 'es';
-  if (navLang.startsWith('ar')) return 'ar';
-  if (navLang.startsWith('ru')) return 'ru';
-  if (navLang.startsWith('tr')) return 'tr';
-  if (navLang.startsWith('en')) return 'en';
+  // 1. Fast Geo IP lookup (1.4s timeout, handles VPN and international connections accurately)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1400);
+    const res = await fetch('https://get.geojs.io/v1/ip/country.json', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      const country = data?.country?.toUpperCase();
+      if (['DE', 'AT', 'CH'].includes(country)) return 'de';
+      if (['FR', 'BE', 'LU'].includes(country)) return 'fr';
+      if (['ES', 'MX', 'AR', 'CO', 'CL'].includes(country)) return 'es';
+      if (['SA', 'AE', 'EG', 'QA', 'KW', 'OM', 'BH', 'IQ', 'JO'].includes(country)) return 'ar';
+      if (['RU', 'BY', 'KZ', 'UA', 'UZ'].includes(country)) return 'ru';
+      if (['TR', 'CY'].includes(country)) return 'tr';
+      if (country) return 'en'; // Any other international country (US, UK, NL, IT, etc.)
+    }
+  } catch (e) {
+    // Ignore geo lookup errors and fallback to timezone / browser locale
+  }
 
   // 2. Client TimeZone check (Zero-latency geographic proxy)
   try {
@@ -95,26 +106,15 @@ async function detectUserLanguage() {
     // Ignore timezone detection errors
   }
 
-  // 3. Fast lightweight Geo Lookup fallback (1.2s timeout)
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
-    const res = await fetch('https://get.geojs.io/v1/ip/country.json', { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (res.ok) {
-      const data = await res.json();
-      const country = data?.country?.toUpperCase();
-      if (['DE', 'AT', 'CH'].includes(country)) return 'de';
-      if (['FR', 'BE', 'LU'].includes(country)) return 'fr';
-      if (['ES', 'MX', 'AR', 'CO', 'CL'].includes(country)) return 'es';
-      if (['SA', 'AE', 'EG', 'QA', 'KW', 'OM', 'BH', 'IQ', 'JO'].includes(country)) return 'ar';
-      if (['RU', 'BY', 'KZ', 'UA', 'UZ'].includes(country)) return 'ru';
-      if (['TR', 'CY'].includes(country)) return 'tr';
-      return 'en'; // Default for rest of world
-    }
-  } catch (e) {
-    // Ignore geo lookup errors
-  }
+  // 3. Browser locale check (Zero-latency fallback)
+  const navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  if (navLang.startsWith('de')) return 'de';
+  if (navLang.startsWith('fr')) return 'fr';
+  if (navLang.startsWith('es')) return 'es';
+  if (navLang.startsWith('ar')) return 'ar';
+  if (navLang.startsWith('ru')) return 'ru';
+  if (navLang.startsWith('tr')) return 'tr';
+  if (navLang.startsWith('en')) return 'en';
 
   return 'tr';
 }
