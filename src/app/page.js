@@ -5354,20 +5354,27 @@ export default function Home() {
                       type="button"
                       onClick={detectUserLocation}
                       disabled={isLocating}
-                      title="GPS ile Bul"
+                      title="Mevcut Konumumu Algıla (GPS)"
+                      aria-label="Mevcut Konumumu Algıla"
                       style={{
                         padding: '6px 10px',
                         borderRadius: '8px',
                         border: '1px solid #b38e47',
                         background: '#b38e47',
                         color: '#ffffff',
-                        cursor: 'pointer',
+                        cursor: isLocating ? 'wait' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        gap: '5px',
+                        fontSize: '0.74rem',
+                        fontWeight: '700',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.2s ease'
                       }}
                     >
-                      <Navigation size={13} className={isLocating ? 'animate-pulse' : ''} />
+                      <Navigation size={12} className={isLocating ? 'animate-spin' : ''} />
+                      <span>{isLocating ? 'Bulunuyor...' : 'GPS'}</span>
                     </button>
                   </div>
                 </div>
@@ -9177,20 +9184,27 @@ export default function Home() {
                 type="button"
                 onClick={detectUserLocation}
                 disabled={isLocating}
-                title="GPS ile Bul"
+                title="Mevcut Konumumu Algıla (GPS)"
+                aria-label="Mevcut Konumumu Algıla"
                 style={{
                   padding: '6px 10px',
                   borderRadius: '8px',
                   border: '1px solid #b38e47',
                   background: '#b38e47',
                   color: '#ffffff',
-                  cursor: 'pointer',
+                  cursor: isLocating ? 'wait' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  gap: '5px',
+                  fontSize: '0.74rem',
+                  fontWeight: '700',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                <Navigation size={13} className={isLocating ? 'animate-pulse' : ''} />
+                <Navigation size={12} className={isLocating ? 'animate-spin' : ''} />
+                <span>{isLocating ? 'Bulunuyor...' : 'GPS'}</span>
               </button>
             </div>
           </div>
