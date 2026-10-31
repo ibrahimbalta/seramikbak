@@ -6,12 +6,12 @@ import './product-detail.css';
 import { generateProductSchema, generateBreadcrumbSchema, generateFaqSchema, generateImageObjectSchema } from '@/lib/seo/schemaGenerator';
 import { generateImageAltText } from '@/lib/seo/imageSeo';
 
-// Helper to find a product by slug, code or ID (O(1) indexed database query)
+// Helper to find a product by slug, code, brand+name slug or ID
 async function getProductBySlugOrId(slug) {
   if (!slug) return null;
 
   try {
-    const targetSlug = slug.toLowerCase().trim();
+    const targetSlug = decodeURIComponent(slug).toLowerCase().trim();
 
     // 1. Direct indexed slug match - fastest O(1)
     const bySlug = await prisma.product.findUnique({
@@ -21,20 +21,20 @@ async function getProductBySlugOrId(slug) {
     if (bySlug) return bySlug;
 
     // 2. Direct UUID match
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetSlug);
     if (isUuid) {
       const p = await prisma.product.findUnique({
-        where: { id: slug },
+        where: { id: targetSlug },
         include: { brand: true }
       });
       if (p) return p;
     }
 
-    // 3. Direct exact code match
+    // 3. Direct exact code match (case-insensitive)
     const byCode = await prisma.product.findFirst({
       where: {
         code: {
-          equals: slug,
+          equals: targetSlug,
           mode: 'insensitive'
         }
       },
@@ -54,17 +54,73 @@ async function getProductBySlugOrId(slug) {
     });
     if (bySlugInsensitive) return bySlugInsensitive;
 
-    // 5. Targeted name fallback (only top 5 candidates instead of entire table)
+    // 5. Brand-prefixed slug resolution (e.g. 'ng-kutahya-seramik-calacatta-gold')
+    const brands = await prisma.brand.findMany({
+      select: { id: true, name: true, slug: true }
+    });
+    const sortedBrands = brands.sort((a, b) => (b.slug || '').length - (a.slug || '').length);
+    for (const b of sortedBrands) {
+      const bSlug = b.slug || slugify(b.name);
+      if (bSlug && targetSlug.startsWith(bSlug)) {
+        const rest = targetSlug.slice(bSlug.length).replace(/^-+/, '').replace(/-/g, ' ').trim();
+        if (rest) {
+          // 5a. Direct name contains remainder
+          let p = await prisma.product.findFirst({
+            where: {
+              brandId: b.id,
+              name: { contains: rest, mode: 'insensitive' }
+            },
+            include: { brand: true }
+          });
+          if (p) return p;
+
+          // 5b. All non-stop tokens must match
+          const tokens = rest.split(/\s+/).filter(t => t.length > 2 && !['seramik', 'karo', 'porselen'].includes(t));
+          if (tokens.length > 0) {
+            p = await prisma.product.findFirst({
+              where: {
+                brandId: b.id,
+                AND: tokens.map(t => ({ name: { contains: t, mode: 'insensitive' } }))
+              },
+              include: { brand: true }
+            });
+            if (p) return p;
+          }
+        }
+      }
+    }
+
+    // 6. Direct name fallback
+    const plainName = targetSlug.replace(/-/g, ' ');
     const nameMatch = await prisma.product.findFirst({
       where: {
         name: {
-          contains: targetSlug.replace(/-/g, ' '),
+          contains: plainName,
           mode: 'insensitive'
         }
       },
       include: { brand: true }
     });
-    return nameMatch || null;
+    if (nameMatch) return nameMatch;
+
+    // 7. Token-based multi-keyword fallback across all products
+    const words = targetSlug.replace(/-/g, ' ').split(/\s+/).filter(w => w.length > 2 && !['seramik', 'karo', 'porselen', 'modeli', 'fiyat'].includes(w));
+    if (words.length > 0) {
+      const tokenMatch = await prisma.product.findFirst({
+        where: {
+          AND: words.map(w => ({
+            OR: [
+              { name: { contains: w, mode: 'insensitive' } },
+              { code: { contains: w, mode: 'insensitive' } }
+            ]
+          }))
+        },
+        include: { brand: true }
+      });
+      if (tokenMatch) return tokenMatch;
+    }
+
+    return null;
   } catch (err) {
     console.error('Error fetching product by slug:', err);
     return null;

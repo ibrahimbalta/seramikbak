@@ -2835,14 +2835,27 @@ export default function Home() {
     }
   };
 
-  const openProductByCode = async (code) => {
+  const openProductByCode = async (code, fallbackName, fallbackBrand) => {
     try {
-      const res = await fetch(`/api/search?q=${code}&fullDetail=true`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(code)}&fullDetail=true`);
       if (res.ok) {
         const data = await res.json();
         if (data.length > 0) {
           const enriched = enrichProductData(data[0]);
           handleProductCardClick(enriched);
+          return;
+        }
+      }
+      // Fallback search by name or brand if code did not match
+      if (fallbackName) {
+        const queryTerm = fallbackBrand ? `${fallbackBrand} ${fallbackName}` : fallbackName;
+        const resFallback = await fetch(`/api/search?q=${encodeURIComponent(queryTerm)}&fullDetail=true`);
+        if (resFallback.ok) {
+          const dataFallback = await resFallback.json();
+          if (dataFallback.length > 0) {
+            const enriched = enrichProductData(dataFallback[0]);
+            handleProductCardClick(enriched);
+          }
         }
       }
     } catch (err) {
@@ -2889,7 +2902,7 @@ export default function Home() {
       const enriched = enrichProductData(item.product);
       handleProductCardClick(enriched);
     } else if (item.code) {
-      openProductByCode(item.code);
+      openProductByCode(item.code, item.name, item.brand);
     }
 
     // Track advertising click analytics for brand analytics and billing
@@ -7450,7 +7463,7 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {/* 2. Secondary 2-Column Action Grid */}
+                  {/* 2. Secondary 2-Column Action Grid - Symmetrical 2x2 Layout */}
                   <div className="detail-secondary-actions-grid">
                     <button 
                       onClick={() => {
@@ -7458,16 +7471,16 @@ export default function Home() {
                       }}
                       className="detail-action-btn btn-action-cart"
                       style={{
-                        background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#ecfdf5' : '#fffdfa',
-                        borderColor: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#b38e47'
+                        background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#ecfdf5' : '#ffffff',
+                        borderColor: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#cbd5e1'
                       }}
                     >
-                      <div className="btn-action-icon-circle" style={{ background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#b38e47', color: '#fff' }}>
-                        <ShoppingBag size={16} />
+                      <div className="btn-action-icon-circle cart-icon-circle" style={{ background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : 'rgba(179, 142, 71, 0.15)', color: quoteCartItems.some(c => c.id === detailProduct.id) ? '#ffffff' : '#b38e47' }}>
+                        <ShoppingBag size={15} />
                       </div>
                       <div className="btn-text-group">
-                        <span className="btn-title" style={{ color: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#b38e47' }}>
-                          {quoteCartItems.some(c => c.id === detailProduct.id) ? '✓ Teklif Sepetinde' : '+ Teklif Sepetine Ekle'}
+                        <span className="btn-title" style={{ color: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#0f172a' }}>
+                          {quoteCartItems.some(c => c.id === detailProduct.id) ? '✓ Sepette' : 'Teklif Sepetine Ekle'}
                         </span>
                         <span className="btn-subtext">Çoklu Liste & Keşif</span>
                       </div>
@@ -7481,7 +7494,7 @@ export default function Home() {
                       className="detail-action-btn btn-action-dealer"
                     >
                       <div className="btn-action-icon-circle dealer-icon-circle">
-                        <MapPin size={16} />
+                        <MapPin size={15} />
                       </div>
                       <div className="btn-text-group">
                         <span className="btn-title">Bayiler & Teklif Al</span>
@@ -7507,41 +7520,28 @@ export default function Home() {
                       className="detail-action-btn btn-action-sample"
                     >
                       <div className="btn-action-icon-circle sample-icon-circle">
-                        <Truck size={16} />
+                        <Truck size={15} />
                       </div>
                       <div className="btn-text-group">
                         <span className="btn-title">Ücretsiz Numune</span>
-                        <span className="btn-subtext">Kapınıza Gelsin</span>
+                        <span className="btn-subtext">Kapınıza Numune Gelsin</span>
                       </div>
                     </button>
-                  </div>
 
-                  {/* 3. Müstakil Ürün Sayfası Kartı */}
-                  <Link
-                    href={`/urun/${slugify(`${detailProduct.brand?.name || 'seramik'} ${detailProduct.name}`)}`}
-                    target="_blank"
-                    className="btn-action-standalone"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      textDecoration: 'none'
-                    }}
-                  >
-                    <div className="standalone-left">
-                      <div className="standalone-icon-circle">
-                        <ExternalLink size={13} />
+                    <Link
+                      href={detailProduct.slug ? `/urun/${detailProduct.slug}` : `/urun/${slugify(`${detailProduct.brand?.name || 'seramik'} ${detailProduct.name}`)}`}
+                      target="_blank"
+                      className="detail-action-btn btn-action-standalone-sym"
+                    >
+                      <div className="btn-action-icon-circle standalone-icon-circle">
+                        <ExternalLink size={15} />
                       </div>
-                      <div className="standalone-text-wrap">
-                        <span className="standalone-title">Müstakil Ürün Sayfası</span>
-                        <span className="standalone-desc">Tüm teknik özellikler, 4K doku & paylaşım</span>
+                      <div className="btn-text-group">
+                        <span className="btn-title">Müstakil Ürün Sayfası</span>
+                        <span className="btn-subtext">Tüm Teknik Detaylar & 4K</span>
                       </div>
-                    </div>
-                    <div className="standalone-arrow-pill">
-                      <span>İncele</span>
-                      <ChevronRight size={13} />
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="detail-specs-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
@@ -15935,20 +15935,20 @@ export default function Home() {
           resize: vertical;
         }
 
-        /* Detail Modal Styles */
+        /* Detail Modal Styles - Soft Architectural Pearl Palette, Anti-Glare */
         .detail-modal-content-premium {
           max-width: 1260px;
           width: 96%;
           max-height: 94vh;
           padding: 20px 24px;
           border-radius: 20px;
-          background: #ffffff;
-          border: 1px solid rgba(179, 142, 71, 0.35);
+          background: #f8fafc;
+          border: 1px solid rgba(179, 142, 71, 0.28);
           backdrop-filter: blur(30px);
           -webkit-backdrop-filter: blur(30px);
-          box-shadow: 0 30px 70px rgba(15, 23, 42, 0.18), 
-                      0 0 50px rgba(197, 160, 89, 0.08);
-          color: #1e293b;
+          box-shadow: 0 25px 60px rgba(15, 23, 42, 0.28), 
+                      0 0 40px rgba(197, 160, 89, 0.06);
+          color: #0f172a;
           display: flex;
           flex-direction: column;
           gap: 16px;
@@ -16240,7 +16240,7 @@ export default function Home() {
           white-space: nowrap;
         }
 
-        /* 2. Secondary 2-Column Action Grid */
+        /* 2. Secondary Symmetrical 2x2 Action Grid */
         .detail-secondary-actions-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -16266,161 +16266,120 @@ export default function Home() {
           }
         }
 
-        .btn-action-dealer, .btn-action-sample {
-          padding: 11px 13px;
-          border-radius: 13px;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-          position: relative;
-          overflow: hidden;
-          text-align: left;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
-          box-sizing: border-box;
-          min-width: 0;
+        .btn-action-cart,
+        .btn-action-dealer, 
+        .btn-action-sample,
+        :global(.btn-action-standalone-sym) {
+          padding: 8px 12px !important;
+          min-height: 52px !important;
+          height: 52px !important;
+          border-radius: 12px !important;
+          background: #ffffff !important;
+          border: 1px solid #e2e8f0 !important;
+          cursor: pointer !important;
+          display: flex !important;
+          align-items: center !important;
+          gap: 10px !important;
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          position: relative !important;
+          overflow: hidden !important;
+          text-align: left !important;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+          box-sizing: border-box !important;
+          min-width: 0 !important;
+          width: 100% !important;
+          text-decoration: none !important;
+        }
+
+        .btn-action-cart:hover,
+        .btn-action-dealer:hover,
+        .btn-action-sample:hover,
+        :global(.btn-action-standalone-sym:hover) {
+          transform: translateY(-2px) !important;
+          border-color: rgba(179, 142, 71, 0.45) !important;
+          box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08) !important;
+          background: #ffffff !important;
+        }
+
+        .btn-action-cart:active,
+        .btn-action-dealer:active,
+        .btn-action-sample:active,
+        :global(.btn-action-standalone-sym:active) {
+          transform: translateY(0) scale(0.98) !important;
         }
 
         .btn-action-icon-circle {
-          width: 34px;
-          height: 34px;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          transition: transform 0.2s ease;
+          width: 34px !important;
+          height: 34px !important;
+          border-radius: 9px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          flex-shrink: 0 !important;
+          transition: transform 0.2s ease !important;
+        }
+
+        .cart-icon-circle {
+          background: rgba(179, 142, 71, 0.12) !important;
+          border: 1px solid rgba(179, 142, 71, 0.28) !important;
+          color: #b38e47 !important;
         }
 
         .dealer-icon-circle {
-          background: rgba(59, 130, 246, 0.12);
-          border: 1px solid rgba(59, 130, 246, 0.28);
-          color: #2563eb;
+          background: rgba(59, 130, 246, 0.12) !important;
+          border: 1px solid rgba(59, 130, 246, 0.28) !important;
+          color: #2563eb !important;
         }
 
         .sample-icon-circle {
-          background: rgba(16, 185, 129, 0.12);
-          border: 1px solid rgba(16, 185, 129, 0.28);
-          color: #059669;
-        }
-
-        .btn-action-dealer .btn-title, .btn-action-sample .btn-title {
-          font-size: 0.82rem;
-          font-weight: 700;
-          color: #0f172a;
-          line-height: 1.2;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 100%;
-        }
-
-        .btn-action-dealer .btn-subtext, .btn-action-sample .btn-subtext {
-          font-size: 0.68rem;
-          font-weight: 500;
-          color: #64748b;
-          margin-top: 2px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 100%;
-        }
-
-        .btn-action-dealer:hover {
-          background: #ffffff;
-          border-color: rgba(59, 130, 246, 0.4);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 22px -2px rgba(59, 130, 246, 0.18);
-        }
-
-        .btn-action-dealer:hover .dealer-icon-circle {
-          transform: scale(1.08);
-          background: rgba(59, 130, 246, 0.22);
-          color: #1d4ed8;
-        }
-
-        .btn-action-sample:hover {
-          background: rgba(14, 45, 36, 0.85);
-          border-color: rgba(52, 211, 153, 0.55);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 22px -2px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-action-sample:hover .sample-icon-circle {
-          transform: scale(1.08);
-          background: rgba(16, 185, 129, 0.22);
-          color: #6ee7b7;
-        }
-
-        .btn-action-dealer:active, .btn-action-sample:active {
-          transform: translateY(0) scale(0.98);
-        }
-
-        /* 3. Standalone Link Card */
-        :global(.btn-action-standalone) {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          gap: 12px !important;
-          width: 100% !important;
-          padding: 10px 14px !important;
-          background: #f8fafc !important;
-          border: 1px solid #e2e8f0 !important;
-          border-radius: 12px !important;
-          color: #0f172a !important;
-          text-decoration: none !important;
-          box-sizing: border-box !important;
-          transition: all 0.22s ease !important;
-        }
-
-        :global(.btn-action-standalone:hover) {
-          background: #ffffff !important;
-          border-color: rgba(179, 142, 71, 0.4) !important;
-          color: #0f172a !important;
-          transform: translateY(-1px) !important;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.12) !important;
-        }
-
-        .standalone-left {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          min-width: 0;
+          background: rgba(16, 185, 129, 0.12) !important;
+          border: 1px solid rgba(16, 185, 129, 0.28) !important;
+          color: #059669 !important;
         }
 
         .standalone-icon-circle {
-          width: 28px;
-          height: 28px;
-          border-radius: 8px;
-          background: rgba(212, 175, 55, 0.12);
-          border: 1px solid rgba(212, 175, 55, 0.25);
-          color: #d4af37;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
+          background: rgba(139, 92, 246, 0.12) !important;
+          border: 1px solid rgba(139, 92, 246, 0.28) !important;
+          color: #7c3aed !important;
         }
 
-        .standalone-text-wrap {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-          min-width: 0;
+        .btn-text-group {
+          display: flex !important;
+          flex-direction: column !important;
+          min-width: 0 !important;
+          flex: 1 !important;
+          overflow: hidden !important;
         }
 
-        .standalone-title {
-          font-size: 0.80rem;
-          font-weight: 700;
-          color: #0f172a;
-          white-space: nowrap;
+        .btn-action-cart .btn-title,
+        .btn-action-dealer .btn-title,
+        .btn-action-sample .btn-title,
+        :global(.btn-action-standalone-sym .btn-title) {
+          font-size: 0.80rem !important;
+          font-weight: 700 !important;
+          color: #0f172a !important;
+          line-height: 1.25 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          width: 100% !important;
+          margin: 0 !important;
         }
 
-        .standalone-desc {
-          font-size: 0.67rem;
+        .btn-action-cart .btn-subtext,
+        .btn-action-dealer .btn-subtext,
+        .btn-action-sample .btn-subtext,
+        :global(.btn-action-standalone-sym .btn-subtext) {
+          font-size: 0.67rem !important;
+          font-weight: 500 !important;
+          color: #64748b !important;
+          line-height: 1.2 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          width: 100% !important;
+          margin-top: 2px !important;
+        }
           color: #64748b;
           white-space: nowrap;
         }
