@@ -104,7 +104,7 @@ export default function ProductCard({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
-                title={isInCart ? 'Teklif Sepetinden Çıkar' : 'Teklif Sepetine Ekle'}
+                title={isInCart ? t('inCart') : t('addQuote')}
                 style={{
                   height: '24px',
                   minWidth: '58px',
@@ -125,7 +125,7 @@ export default function ProductCard({
                   transition: 'all 0.15s ease'
                 }}
               >
-                <span>{isInCart ? '✓ Sepet' : '+ Teklif'}</span>
+                <span>{isInCart ? t('inCart') : t('addQuote')}</span>
               </button>
             )}
             <button
@@ -152,7 +152,7 @@ export default function ProductCard({
                 transition: 'all 0.15s ease'
               }}
             >
-              <span>{isCompared ? '✓ Kıyas' : '+ Kıyas'}</span>
+              <span>{isCompared ? t('compared') : t('compare')}</span>
             </button>
           </div>
         </div>

@@ -9,7 +9,9 @@ const languages = [
   { code: 'en', name: 'English', label: 'EN' },
   { code: 'de', name: 'Deutsch', label: 'DE' },
   { code: 'ar', name: 'العربية', label: 'AR' },
-  { code: 'ru', name: 'Русский', label: 'RU' }
+  { code: 'ru', name: 'Русский', label: 'RU' },
+  { code: 'fr', name: 'Français', label: 'FR' },
+  { code: 'es', name: 'Español', label: 'ES' }
 ];
 
 export default function LanguageSelector({ compact = false }) {

@@ -17,6 +17,16 @@ export function LanguageProvider({ children }) {
       } else {
         document.body.classList.remove('rtl-mode');
       }
+
+      // Dynamic International SEO Title & Meta Description
+      const dict = dictionaries[selectedLang] || dictionaries['tr'];
+      if (dict && dict.seoTitle) {
+        document.title = dict.seoTitle;
+      }
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && dict && dict.seoDescription) {
+        metaDesc.setAttribute('content', dict.seoDescription);
+      }
     }
   };
 

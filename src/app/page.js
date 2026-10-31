@@ -3866,16 +3866,16 @@ export default function Home() {
         {/* Desktop View: All 4 in one row */}
         <div className="desktop-trust-strip" style={{ alignItems: 'center', justifyContent: 'center', gap: '24px', fontSize: '0.8rem', color: '#94a3b8' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>17 Lider Seramik Markası</strong> Tek Çatı Altında
+            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar1')}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>81 İlde Yetkili Bayi Ağı</strong>
+            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar2')}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>%100 Ücretsiz</strong> Fiyat Teklifi
+            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar3')}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> <strong>3D Sanal Stüdyo & AR</strong>
+            <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> {t('topBar4')}
           </span>
         </div>
 
@@ -3883,22 +3883,22 @@ export default function Home() {
         <div className="mobile-trust-strip" style={{ alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', color: '#f1f5f9', textAlign: 'center', width: '100%', minHeight: '20px' }}>
           {topTrustIdx === 0 && (
             <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>17 Lider Marka</strong> Tek Çatı Altında
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar1')}
             </span>
           )}
           {topTrustIdx === 1 && (
             <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>81 İlde</strong> Yetkili Bayi Ağı
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar2')}
             </span>
           )}
           {topTrustIdx === 2 && (
             <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> <strong>%100 Ücretsiz</strong> Fiyat Teklifi
+              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar3')}
             </span>
           )}
           {topTrustIdx === 3 && (
             <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> <strong>3D Sanal Stüdyo</strong> & AR Deneyimi
+              <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> {t('topBar4')}
             </span>
           )}
         </div>
@@ -4188,7 +4188,7 @@ export default function Home() {
                 <button 
                   className="header-btn quote-cart-btn" 
                   onClick={() => setShowQuoteCartDrawer(true)}
-                  title="Teklif & Numune Sepeti"
+                  title={t('quoteDrawerTitle')}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -4198,7 +4198,7 @@ export default function Home() {
                   }}
                 >
                   <ShoppingBag size={14} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
-                  <span>Sepet</span>
+                  <span>{t('cart')}</span>
                   {quoteCartItems.length > 0 && (
                     <span 
                       style={{
@@ -4218,10 +4218,10 @@ export default function Home() {
                 <button 
                   className="header-btn favorites-btn" 
                   onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
-                  title="Favorilerim"
+                  title={t('favorites')}
                 >
                   <HeartIcon size={14} className="heart-icon-gold" />
-                  <span>Favoriler</span>
+                  <span>{t('favorites')}</span>
                   {userFavorites.length > 0 && <span className="fav-count-badge">{userFavorites.length}</span>}
                 </button>
                 {currentUser ? (
@@ -4262,7 +4262,7 @@ export default function Home() {
                 ) : (
                   <button className="header-btn account-btn" onClick={() => window.location.href = '/uyelik'}>
                     <UserIcon size={14} />
-                    <span>Giriş</span>
+                    <span>{t('login')}</span>
                   </button>
                 )}
               </>
@@ -4592,21 +4592,27 @@ export default function Home() {
       <div className="content-container">
         
         {/* TAB 1: SMART SEARCH & CATALOG */}
-        {activeTab === 'search' && (
+        {activeTab === 'search' && (() => {
+          const langSlides = t('heroSlides');
+          const activeHeroSlides = Array.isArray(langSlides) && langSlides.length > 0 ? langSlides : heroSlides;
+          const currentHeroSlide = activeHeroSlides[heroSlideIndex % activeHeroSlides.length] || heroSlides[0];
+          const currentHeroBg = heroSlides[heroSlideIndex % heroSlides.length]?.bg || "/hero/luxury_bathroom.png";
+
+          return (
           <div className="search-portal animate-fade-in">
             {/* Wide Centered Hero Section with Showroom Image Background */}
-            <div className="showroom-hero-banner glass-panel" style={{ backgroundImage: `url(${heroSlides[heroSlideIndex].bg})`, transition: 'background-image 0.8s ease' }}>
+            <div className="showroom-hero-banner glass-panel" style={{ backgroundImage: `url(${currentHeroBg})`, transition: 'background-image 0.8s ease' }}>
               <div className="hero-dark-overlay" />
               <div className="hero-banner-content">
                 <div className="hero-badge-capsule">
                   <Sparkles size={12} className="badge-icon-gold" />
-                  <span>{heroSlides[heroSlideIndex].tag}</span>
+                  <span>{currentHeroSlide.tag}</span>
                 </div>
                 
-                <h1 style={{ minHeight: '84px' }}>{heroSlides[heroSlideIndex].title} <br /><span className="highlight-text">{heroSlides[heroSlideIndex].highlight}</span></h1>
+                <h1 style={{ minHeight: '84px' }}>{currentHeroSlide.title} <br /><span className="highlight-text">{currentHeroSlide.highlight}</span></h1>
                 
                 <p className="hero-banner-subtitle">
-                  {heroSlides[heroSlideIndex].subtitle}
+                  {currentHeroSlide.subtitle}
                 </p>
 
                 {/* Wide Centered Search Bar */}
@@ -4619,7 +4625,7 @@ export default function Home() {
                     )}
                     <input 
                       type="text" 
-                      placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : "Seramik, mermer, model veya marka ara..."}
+                      placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : (t('searchPlaceholder') || "Seramik, mermer, model veya marka ara...")}
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
@@ -4674,7 +4680,7 @@ export default function Home() {
                     </div>
                     
                     <button type="submit" className="wide-search-submit-btn" disabled={visualSearchLoading}>
-                      {visualSearchLoading ? 'Aranıyor...' : 'Ara'}
+                      {visualSearchLoading ? (t('searching') || 'Aranıyor...') : (t('search') || 'Ara')}
                     </button>
                   </div>
 
@@ -4732,13 +4738,13 @@ export default function Home() {
 
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
-                  <span className="pop-tags-label">Popüler Aramalar:</span>
-                  <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 Mermer</button>
+                  <span className="pop-tags-label">{t('popularSearches') || 'Popüler Aramalar'}:</span>
+                  <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 {translateStyle('Mermer') || 'Mermer'}</button>
                   <button onClick={() => handleTagClick('Calacatta Gold', 'style', 'Mermer')} className="pop-tag-capsule">Calacatta Gold</button>
-                  <button onClick={() => handleTagClick('Ahşap', 'style', 'Ahşap')} className="pop-tag-capsule">Mat Ahşap</button>
-                  <button onClick={() => handleTagClick('Beton', 'style', 'Beton')} className="pop-tag-capsule">Gri Beton</button>
-                  <button onClick={() => handleTagClick('Traverten', 'style', 'Beton')} className="pop-tag-capsule">Traverten</button>
-                  <button onClick={() => handleTagClick('Beyaz', 'style', 'Mermer')} className="pop-tag-capsule">Parlak Beyaz</button>
+                  <button onClick={() => handleTagClick('Ahşap', 'style', 'Ahşap')} className="pop-tag-capsule">{translateFinish('Mat') || 'Mat'} {translateStyle('Ahşap') || 'Ahşap'}</button>
+                  <button onClick={() => handleTagClick('Beton', 'style', 'Beton')} className="pop-tag-capsule">{translateStyle('Beton') || 'Gri Beton'}</button>
+                  <button onClick={() => handleTagClick('Traverten', 'style', 'Beton')} className="pop-tag-capsule">{translateStyle('Traverten') || 'Traverten'}</button>
+                  <button onClick={() => handleTagClick('Beyaz', 'style', 'Mermer')} className="pop-tag-capsule">{translateFinish('Parlak') || 'Parlak'} {translateStyle('Mermer') || 'Mermer'}</button>
                 </div>
 
                 {/* Feature Columns Row */}
@@ -4981,7 +4987,7 @@ export default function Home() {
                   <div className="category-circle-icon-wrapper flat-bg-gold">
                     <Layers2 size={18} />
                   </div>
-                  <span>Tümü</span>
+                  <span>{t('all') || 'Tümü'}</span>
                 </button>
 
                 <button 
@@ -4989,7 +4995,7 @@ export default function Home() {
                   className={`category-circle-btn ${selectedStyle === 'Mermer' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper marble-pattern-bg" />
-                  <span>Mermer</span>
+                  <span>{translateStyle('Mermer') || 'Mermer'}</span>
                 </button>
 
                 <button 
@@ -4997,7 +5003,7 @@ export default function Home() {
                   className={`category-circle-btn ${selectedStyle === 'Beton' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper concrete-pattern-bg" />
-                  <span>Beton</span>
+                  <span>{translateStyle('Beton') || 'Beton'}</span>
                 </button>
 
                 <button 
@@ -5005,7 +5011,7 @@ export default function Home() {
                   className={`category-circle-btn ${selectedStyle === 'Ahşap' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper wood-pattern-bg" />
-                  <span>Ahşap</span>
+                  <span>{translateStyle('Ahşap') || 'Ahşap'}</span>
                 </button>
 
                 <button 
@@ -5013,7 +5019,7 @@ export default function Home() {
                   className="category-circle-btn"
                 >
                   <div className="category-circle-icon-wrapper stone-pattern-bg" />
-                  <span>Taş</span>
+                  <span>{translateStyle('Taş') || 'Taş'}</span>
                 </button>
 
                 <button 
@@ -5021,22 +5027,22 @@ export default function Home() {
                   className="category-circle-btn"
                 >
                   <div className="category-circle-icon-wrapper travert-pattern-bg" />
-                  <span>Traverten</span>
+                  <span>{translateStyle('Traverten') || 'Traverten'}</span>
                 </button>
 
                 <button className="category-circle-btn" onClick={() => alert('Mozaik seriler listeleniyor...')}>
                   <div className="category-circle-icon-wrapper mosaic-pattern-bg" />
-                  <span>Mozaik</span>
+                  <span>{translateStyle('Mozaik') || 'Mozaik'}</span>
                 </button>
 
                 <button className="category-circle-btn" onClick={() => alert('Dekoratif seriler listeleniyor...')}>
                   <div className="category-circle-icon-wrapper decor-pattern-bg" />
-                  <span>Dekor</span>
+                  <span>{translateStyle('Dekoratif') || 'Dekor'}</span>
                 </button>
 
                 <button className="category-circle-btn" onClick={() => { setSelectedColor('Gri'); fetchProducts('color=Gri'); }}>
                   <div className="category-circle-icon-wrapper flat-grey-bg" />
-                  <span>Düz Renk</span>
+                  <span>{translateStyle('Düz Renk') || 'Düz Renk'}</span>
                 </button>
 
                 <button 
@@ -5044,7 +5050,7 @@ export default function Home() {
                   onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   <div className="category-circle-icon-wrapper wireframe-bg" />
-                  <span>3D Tasarım</span>
+                  <span>{t('navStudio') || '3D Tasarım'}</span>
                 </button>
               </div>
             </div>
@@ -5971,7 +5977,8 @@ export default function Home() {
             {/* NASIL ÇALIŞIR & SIKÇA SORULAN SORULAR (TRUST & FAQ SCHEMA) */}
             <HomeTrustFaqSection onNavigateToStudio={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </div>
-        )}
+          );
+        })()}
 
         {/* TAB 2: 3D VIRTUAL STUDIO (TEK DÜZENLİ, PROFESYONEL VE SADELEŞTİRİLMİŞ STÜDYO) */}
         {activeTab === 'studio' && (

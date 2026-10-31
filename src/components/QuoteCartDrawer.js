@@ -20,6 +20,7 @@ import {
 import TileVisualPreview from './TileVisualPreview';
 import { exportMetrajReportToPdf } from '@/lib/pdfReportExporter';
 import { TURKEY_CITIES } from '@/lib/turkeyCities';
+import { useLanguage } from '@/lib/languageContext';
 
 export default function QuoteCartDrawer({
   isOpen,
@@ -31,6 +32,7 @@ export default function QuoteCartDrawer({
   userLocationName = 'İstanbul',
   userCoords
 }) {
+  const { t } = useLanguage();
   const [activeStep, setActiveStep] = useState('list'); // 'list' | 'form' | 'success'
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
@@ -228,10 +230,10 @@ export default function QuoteCartDrawer({
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#0f172a' }}>
-                Teklif & Numune Sepeti
+                {t('quoteDrawerTitle')}
               </h3>
               <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
-                {cartItems.length} Kalem Seramik Seçildi • <MapPin size={11} style={{ display: 'inline', color: '#b38e47' }} /> {userLocationName}
+                {cartItems.length} {t('quoteDrawerSub')} • <MapPin size={11} style={{ display: 'inline', color: '#b38e47' }} /> {userLocationName}
               </span>
             </div>
           </div>
@@ -267,10 +269,10 @@ export default function QuoteCartDrawer({
                 }}>
                   <ShoppingBag size={48} strokeWidth={1.5} />
                   <h4 style={{ margin: 0, color: '#0f172a', fontSize: '1rem', fontWeight: '800' }}>
-                    Sepetinizde Henüz Karo Yok
+                    {t('quoteDrawerEmpty')}
                   </h4>
                   <p style={{ margin: 0, fontSize: '0.82rem', maxWidth: '280px', lineHeight: '1.5' }}>
-                    Katalogdan beğendiğiniz seramik modellerini <strong>"+ Teklif Listesine Ekle"</strong> butonuyla buraya toplayabilir, tek tıkla bayilerden fiyat teklifi alabilirsiniz.
+                    {t('quoteDrawerEmptyDesc')}
                   </p>
                 </div>
               ) : (
@@ -357,10 +359,10 @@ export default function QuoteCartDrawer({
                                 border: '1px solid #e2e8f0',
                                 whiteSpace: 'nowrap'
                               }}>
-                                ~{estimatedBoxes} Kutu
+                                ~{estimatedBoxes} {t('estimatedBoxes')}
                               </span>
                               <span style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '2px', fontWeight: '600' }}>
-                                Teklif Kapsamında
+                                {t('quoteScope')}
                               </span>
                             </div>
                           </div>
@@ -388,16 +390,16 @@ export default function QuoteCartDrawer({
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.80rem', fontWeight: '800', color: '#0f172a' }}>
                     <MapPin size={14} style={{ color: '#b38e47' }} />
-                    <span>Konumunuz: <strong>{userLocationName}</strong></span>
+                    <span>{t('quoteDrawerLocationLabel')}: <strong>{userLocationName}</strong></span>
                   </div>
                   <span style={{ fontSize: '0.68rem', color: '#059669', background: '#ecfdf5', padding: '2px 8px', borderRadius: '10px', fontWeight: '700' }}>
-                    ✓ Bayi Portalı Entegre
+                    {t('quoteDrawerDirectDealer')}
                   </span>
                 </div>
 
                 <div>
                   <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#334155', display: 'block', marginBottom: '5px' }}>
-                    Teklif İletilecek Yetkili Bayi Showroomu *
+                    {t('quoteDrawerSelectDealer')} *
                   </label>
                   {isLoadingDealers ? (
                     <div style={{ fontSize: '0.76rem', color: '#64748b', padding: '10px', background: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
@@ -512,7 +514,7 @@ export default function QuoteCartDrawer({
                 </div>
 
                 <div style={{ fontSize: '0.67rem', color: '#64748b', lineHeight: '1.4', borderTop: '1px dashed #cbd5e1', paddingTop: '6px' }}>
-                  ℹ️ <strong>SeramikBak Doğrudan Satıcı Değildir:</strong> SeramikBak aracılık veya komisyon almaz. Talebiniz ve malzeme listeniz doğrudan yukarıda seçtiğiniz yetkili bayinin kurumsal portalına iletilir; fiyat teklifi ve stok temini bayi tarafından sunulur.
+                  ℹ️ {t('quoteDrawerNoBroker')}
                 </div>
               </div>
 
@@ -607,7 +609,7 @@ export default function QuoteCartDrawer({
                   style={{ flex: 2, padding: '12px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   <Send size={15} />
-                  <span>{isSubmitting ? 'İletiliyor...' : 'Teklif Talebini Gönder'}</span>
+                  <span>{isSubmitting ? t('searching') : t('quoteDrawerSendBtn')}</span>
                 </button>
               </div>
             </form>
@@ -619,18 +621,18 @@ export default function QuoteCartDrawer({
                 <CheckCircle size={32} />
               </div>
               <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '800', color: '#0f172a' }}>
-                Talebiniz Bayi Portalına İletildi!
+                {t('quoteDrawerSuccessTitle')}
               </h3>
               <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b', maxWidth: '320px', lineHeight: '1.5' }}>
                 {activeDealer ? (
-                  <>Seçtiğiniz <strong>{activeDealer.name}</strong> ({activeDealer.brand?.name}) yetkili bayi portalına malzeme listeniz başarıyla iletildi. Yetkili bayi doğrudan sizinle iletişime geçecektir.</>
+                  <>Seçtiğiniz <strong>{activeDealer.name}</strong> ({activeDealer.brand?.name}) {t('quoteDrawerSuccessDesc')}</>
                 ) : (
-                  <>Yetkili bayi temsilcisi en kısa sürede özel iskonto ve stok bilgisiyle dönüş yapacaktır.</>
+                  <>{t('quoteDrawerSuccessDesc')}</>
                 )}
               </p>
 
               <div style={{ padding: '8px 16px', background: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1', fontSize: '0.80rem', fontWeight: '800', color: '#b38e47' }}>
-                Teklif Referans No: {submitSuccessCode}
+                {t('quoteDrawerRefCode')}: {submitSuccessCode}
               </div>
 
               {/* Hızlı WhatsApp / İletişim Aksiyonları */}
@@ -659,7 +661,7 @@ export default function QuoteCartDrawer({
                     }}
                   >
                     <MessageCircle size={16} />
-                    <span>Yetkili Bayiye WhatsApp'tan Ulaş</span>
+                    <span>{t('quoteDrawerWhatsAppBtn')}</span>
                   </a>
 
                   <a
@@ -681,7 +683,7 @@ export default function QuoteCartDrawer({
                     }}
                   >
                     <Phone size={14} style={{ color: '#b38e47' }} />
-                    <span>Bayiyi Telefonla Ara: {activeDealer.phone}</span>
+                    <span>{t('quoteDrawerCallBtn')}: {activeDealer.phone}</span>
                   </a>
                 </div>
               )}
@@ -707,7 +709,7 @@ export default function QuoteCartDrawer({
                   }}
                 >
                   <FileText size={16} />
-                  <span>Keşif & Malzeme Listesi PDF İndir</span>
+                  <span>{t('quoteDrawerPdfBtn')}</span>
                 </button>
 
                 <button
@@ -728,7 +730,7 @@ export default function QuoteCartDrawer({
                     cursor: 'pointer'
                   }}
                 >
-                  Sepeti Kapat ve Aramaya Devam Et
+                  {t('quoteDrawerCloseBtn')}
                 </button>
               </div>
             </div>
@@ -747,9 +749,9 @@ export default function QuoteCartDrawer({
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Toplam Metraj:</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{t('totalMetraj')}:</div>
                 <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a' }}>
-                  {totalM2} m² <span style={{ fontSize: '0.80rem', fontWeight: '700', color: '#b38e47', marginLeft: '6px' }}>({cartItems.length} Kalem Seramik)</span>
+                  {totalM2} m² <span style={{ fontSize: '0.80rem', fontWeight: '700', color: '#b38e47', marginLeft: '6px' }}>({cartItems.length} {t('productCount')})</span>
                 </div>
               </div>
               <button
@@ -771,7 +773,7 @@ export default function QuoteCartDrawer({
                 }}
               >
                 <FileText size={14} style={{ color: '#b38e47' }} />
-                <span>PDF İndir</span>
+                <span>PDF</span>
               </button>
             </div>
 
@@ -796,7 +798,7 @@ export default function QuoteCartDrawer({
               }}
             >
               <Send size={16} />
-              <span>Bayilerden Fiyat Teklifi İste</span>
+              <span>{t('quoteDrawerSendBtn')}</span>
             </button>
           </div>
         )}
