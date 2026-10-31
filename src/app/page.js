@@ -10954,24 +10954,24 @@ export default function Home() {
         .header-brand {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
           flex-shrink: 0;
         }
 
         .logo-icon {
-          width: 38px;
-          height: 38px;
+          width: 46px;
+          height: 46px;
           background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
-          border: 1.5px solid #d4af37;
-          border-radius: 8px;
+          border: 2px solid #d4af37;
+          border-radius: 11px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: var(--font-title);
           font-weight: 850;
           color: #ffffff;
-          font-size: 1.05rem;
-          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.2), 0 0 8px rgba(212, 175, 55, 0.12);
+          font-size: 1.25rem;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22), 0 0 10px rgba(212, 175, 55, 0.18);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
@@ -10979,12 +10979,13 @@ export default function Home() {
 
         .logo-icon:hover {
           border-color: #f1d279;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3), 0 0 12px rgba(212, 175, 55, 0.25);
+          box-shadow: 0 6px 18px rgba(15, 23, 42, 0.3), 0 0 14px rgba(212, 175, 55, 0.28);
+          transform: translateY(-1px);
         }
 
         .logo-text {
           font-family: var(--font-title);
-          font-size: 1.35rem;
+          font-size: 1.68rem;
           font-weight: 900;
           color: var(--text-primary);
           letter-spacing: -0.03em;
@@ -18523,16 +18524,16 @@ export default function Home() {
           .header-brand {
             display: flex !important;
             align-items: center !important;
-            gap: 8px !important;
+            gap: 10px !important;
           }
           .logo-icon {
-            width: 34px !important;
-            height: 34px !important;
-            font-size: 0.90rem !important;
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 1.10rem !important;
             font-weight: 850 !important;
-            border-radius: 9px !important;
+            border-radius: 10px !important;
             background: linear-gradient(135deg, #182030 0%, #0b0f19 100%) !important;
-            border: 1.5px solid #d4af37 !important;
+            border: 2px solid #d4af37 !important;
             color: #ffffff !important;
             box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25), 0 0 8px rgba(212, 175, 55, 0.15) !important;
             display: flex !important;
@@ -18540,8 +18541,8 @@ export default function Home() {
             justify-content: center !important;
           }
           .logo-text {
-            font-size: 1.12rem !important;
-            font-weight: 800 !important;
+            font-size: 1.36rem !important;
+            font-weight: 900 !important;
             letter-spacing: -0.02em !important;
           }
           .header-nav,
