@@ -14,7 +14,8 @@ import {
   Building2, 
   Calculator,
   Phone,
-  MessageCircle
+  MessageCircle,
+  ChevronDown
 } from 'lucide-react';
 import TileVisualPreview from './TileVisualPreview';
 import { exportMetrajReportToPdf } from '@/lib/pdfReportExporter';
@@ -44,6 +45,7 @@ export default function QuoteCartDrawer({
   const [nearbyDealers, setNearbyDealers] = useState([]);
   const [selectedDealerId, setSelectedDealerId] = useState('');
   const [isLoadingDealers, setIsLoadingDealers] = useState(false);
+  const [isDealerDropdownOpen, setIsDealerDropdownOpen] = useState(false);
 
   // Otomatik olarak kullanıcının bulunduğu şehirdeki yetkili bayileri yükle
   useEffect(() => {
@@ -402,52 +404,105 @@ export default function QuoteCartDrawer({
                       Bölgenizdeki yetkili bayiler taranıyor...
                     </div>
                   ) : nearbyDealers.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <select
-                        value={selectedDealerId}
-                        onChange={(e) => setSelectedDealerId(e.target.value)}
+                    <div style={{ position: 'relative', width: '100%' }}>
+                      {/* Custom Non-Overflowing Dropdown Trigger Button */}
+                      <button
+                        type="button"
+                        onClick={() => setIsDealerDropdownOpen(!isDealerDropdownOpen)}
                         style={{
                           width: '100%',
-                          padding: '9px 10px',
+                          padding: '9px 12px',
                           borderRadius: '8px',
-                          border: '1.5px solid #cbd5e1',
-                          fontSize: '0.80rem',
-                          fontWeight: '700',
-                          color: '#0f172a',
+                          border: isDealerDropdownOpen ? '1.5px solid #b38e47' : '1.5px solid #cbd5e1',
                           background: '#ffffff',
-                          outline: 'none',
-                          cursor: 'pointer'
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          boxSizing: 'border-box'
                         }}
                       >
-                        {nearbyDealers.map(d => (
-                          <option key={d.id} value={d.id}>
-                            {d.name} ({d.brand?.name || 'Yetkili Bayi'}) • {d.district ? `${d.district}, ` : ''}{d.city} {d.distanceKm ? `(~${d.distanceKm} km)` : ''}
-                          </option>
-                        ))}
-                      </select>
-
-                      {/* Selected dealer mini details */}
-                      {(() => {
-                        const cur = activeDealer;
-                        if (!cur) return null;
-                        return (
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            fontSize: '0.70rem',
-                            color: '#475569',
-                            background: '#ffffff',
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            border: '1px solid #e2e8f0',
-                            fontWeight: '600'
-                          }}>
-                            <span>🏢 {cur.name} ({cur.brand?.name})</span>
-                            <span>📍 {cur.district ? `${cur.district}, ` : ''}{cur.city} {cur.distanceKm ? `(~${cur.distanceKm} km)` : ''}</span>
+                        <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                          <div style={{ fontSize: '0.80rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {activeDealer?.name || 'Yetkili Bayi Seçiniz'}
                           </div>
-                        );
-                      })()}
+                          <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {activeDealer?.brand?.name || 'Yetkili'} • {activeDealer?.district ? `${activeDealer.district}, ` : ''}{activeDealer?.city} {activeDealer?.distanceKm ? `(~${Math.round(activeDealer.distanceKm)} km)` : ''}
+                          </div>
+                        </div>
+                        <ChevronDown 
+                          size={16} 
+                          style={{ 
+                            color: '#64748b', 
+                            transform: isDealerDropdownOpen ? 'rotate(180deg)' : 'none', 
+                            transition: 'transform 0.2s ease', 
+                            flexShrink: 0 
+                          }} 
+                        />
+                      </button>
+
+                      {/* Custom Non-Overflowing Dropdown Menu */}
+                      {isDealerDropdownOpen && (
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            top: 'calc(100% + 4px)',
+                            left: 0,
+                            right: 0,
+                            width: '100%',
+                            background: '#ffffff',
+                            borderRadius: '8px',
+                            border: '1.5px solid #cbd5e1',
+                            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
+                            maxHeight: '220px',
+                            overflowY: 'auto',
+                            overflowX: 'hidden',
+                            zIndex: 100,
+                            padding: '4px',
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          {nearbyDealers.map((d) => {
+                            const isSelected = d.id === selectedDealerId;
+                            return (
+                              <div
+                                key={d.id}
+                                onClick={() => {
+                                  setSelectedDealerId(d.id);
+                                  setIsDealerDropdownOpen(false);
+                                }}
+                                style={{
+                                  padding: '8px 10px',
+                                  borderRadius: '6px',
+                                  background: isSelected ? '#f1f5f9' : 'transparent',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: '8px',
+                                  transition: 'background 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#f8fafc'; }}
+                                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                              >
+                                <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                                  <div style={{ fontSize: '0.78rem', fontWeight: isSelected ? '800' : '700', color: isSelected ? '#b38e47' : '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {d.name}
+                                  </div>
+                                  <div style={{ fontSize: '0.67rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '1px' }}>
+                                    {d.brand?.name || 'Yetkili'} • {d.district ? `${d.district}, ` : ''}{d.city} {d.distanceKm ? `(~${Math.round(d.distanceKm)} km)` : ''}
+                                  </div>
+                                </div>
+                                {isSelected && (
+                                  <span style={{ fontSize: '0.74rem', color: '#059669', fontWeight: '800', flexShrink: 0 }}>✓</span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div style={{ fontSize: '0.74rem', color: '#b45309', padding: '8px', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fde68a' }}>
