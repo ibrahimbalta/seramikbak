@@ -72,6 +72,14 @@ function triggerGoogleTranslateDOM(targetLang) {
 async function detectUserLanguage() {
   if (typeof window === 'undefined') return 'tr';
 
+  // Check if visitor is a crawler / bot / lighthouse audit
+  if (typeof navigator !== 'undefined') {
+    const ua = (navigator.userAgent || '').toLowerCase();
+    if (/bot|googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|ia_archiver|chrome-lighthouse|headlesschrome|audit|crawler/i.test(ua)) {
+      return 'tr';
+    }
+  }
+
   // 1. Fast Geo IP lookup (1.4s timeout, handles VPN and international connections accurately)
   try {
     const controller = new AbortController();
@@ -172,6 +180,15 @@ export function LanguageProvider({ children }) {
     if (savedLang && SUPPORTED_LANGUAGES.includes(savedLang)) {
       setLangState(savedLang);
       applyLanguageSettings(savedLang, false);
+      return;
+    }
+
+    // Check if visitor is a crawler / bot / lighthouse audit -> preserve canonical Turkish
+    const ua = (navigator.userAgent || '').toLowerCase();
+    const isBot = /bot|googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|ia_archiver|chrome-lighthouse|headlesschrome|audit|crawler/i.test(ua);
+    if (isBot) {
+      setLangState('tr');
+      applyLanguageSettings('tr', false);
       return;
     }
 

@@ -18,10 +18,10 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata = {
   metadataBase: new URL("https://www.seramikbak.com"),
   title: {
-    default: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Bayi Ağı",
+    default: "Seramik Arama Motoru & Bayi Fiyat Teklifleri | SeramikBak",
     template: "%s | SeramikBak"
   },
-  description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili seramik bayilerinden anında ücretsiz fiyat teklifi ve usta desteği alın.",
+  description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.",
   keywords: [
     // 16 Dev Türk Seramik Markası
     "çanakkale seramik", "ng kütahya seramik", "vitra seramik", "bien seramik", "yurtbay seramik",
@@ -74,8 +74,8 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Bayi Ağı",
-    description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili seramik bayilerinden anında ücretsiz fiyat teklifi ve usta desteği alın.",
+    title: "Seramik Arama Motoru & Bayi Fiyat Teklifleri | SeramikBak",
+    description: "Binlerce seramik modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.",
     url: "https://www.seramikbak.com",
     siteName: "SeramikBak",
     locale: "tr_TR",
@@ -93,8 +93,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Bayi Ağı",
-    description: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda canlı deneyin. 81 ildeki yetkili bayilerden anında teklif alın.",
+    title: "Seramik Arama Motoru & Bayi Fiyat Teklifleri | SeramikBak",
+    description: "Binlerce seramik modelini keşfedin, 3D odanızda deneyin. 81 ildeki yetkili bayilerden anında ücretsiz teklif alın.",
     images: ["/og-image.png"],
     creator: "@seramikbak",
   },
@@ -324,7 +324,7 @@ export default function RootLayout({ children }) {
         <div id="google_translate_element" style={{ display: 'none' }} />
         <Script
           id="google-translate-init"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.googleTranslateElementInit = function() {
@@ -346,7 +346,7 @@ export default function RootLayout({ children }) {
         <Script
           id="google-translate-script"
           src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <LanguageProvider>
           {children}

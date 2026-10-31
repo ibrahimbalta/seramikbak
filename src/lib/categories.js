@@ -161,5 +161,39 @@ export const CATEGORY_DEFINITIONS = {
         a: 'Özellikle geniş salonlar, mağazalar, otel lobileri ve ofis zeminlerinde ferah bir zemin tasarımı sunar.'
       }
     ]
+  },
+
+  'traverten-gorunumlu-seramik': {
+    slug: 'traverten-gorunumlu-seramik',
+    title: 'Traverten Görünümlü Seramik & Porselen Karo Modelleri',
+    h1: 'Traverten Görünümlü Seramikler (Cross-Cut & Vein-Cut)',
+    metaTitle: 'Traverten Görünümlü Seramik Modelleri & Bej Karo Fiyatları | SeramikBak',
+    metaDescription: 'Doğal taş sıcaklığını yansıtan bej ve krem traverten desenli porselen karolar. Çizilmez, leke tutmaz ve periyodik cila gerektirmez.',
+    filter: { style: 'Beton' },
+    keywords: ['traverten görünümlü seramik', 'traverten karo', 'bej seramik', 'doğal taş görünümlü seramik', 'vein cut seramik'],
+    heroDescription: 'Akdeniz mimarisinin sıcak dokusu traverten taşının estetiğini porselenin sıfır emicilik ve yüksek dayanıklılık avantajıyla buluşturan koleksiyonlar.',
+    faqs: [
+      {
+        q: 'Traverten seramik doğal travertenden daha mı dayanıklıdır?',
+        a: 'Evet, doğal traverten gözenekli yapısı nedeniyle leke ve su emerken; traverten görünümlü porselen seramik sıfır su emme özelliği ile leke tutmaz ve aşınmaz.'
+      }
+    ]
+  },
+
+  '120x240-porselen-slab': {
+    slug: '120x240-porselen-slab',
+    title: '120x240 Porselen Plaka (Slab) Modelleri & Fiyatları',
+    h1: '120x240 cm Dev Porselen Slab Plakalar',
+    metaTitle: '120x240 Porselen Plaka Modelleri & Büyük Format Fiyatları | SeramikBak',
+    metaDescription: 'Lüks mimari projeler, banyo duvarları ve mutfak adaları için 120x240 cm dev format porselen levhalar. Derzsiz, yekpare lüks zemin ve cephe kaplamaları.',
+    filter: { width: 120, height: 240 },
+    keywords: ['120x240 seramik', '120x240 porselen slab', 'büyük ebat porselen levha', 'dev format seramik', 'derzsiz banyo paneli'],
+    heroDescription: 'Tavandan tabana derzsiz ve yekpare kaplama imkanı sunan, modern lüks banyo ve ada mutfakların gözdesi 120x240 cm mimari porselen plakalar.',
+    faqs: [
+      {
+        q: '120x240 seramik levhalar asansöre sığar mı?',
+        a: 'Büyük format plakalar özel vinçli taşıma sistemleriyle katlara ulaştırılabilir veya merdiven sahanlıkları uygunsa iki usta tarafından özel taşıma vantuzlarıyla taşınır.'
+      }
+    ]
   }
 };

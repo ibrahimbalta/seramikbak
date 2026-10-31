@@ -77,7 +77,7 @@ const GlobalExportHub = dynamic(() => import('@/components/GlobalExportHub'), { 
 const HowItWorksModal = dynamic(() => import('@/components/HowItWorksModal'), { ssr: false });
 const BimSpecDownloadModal = dynamic(() => import('@/components/BimSpecDownloadModal'), { ssr: false });
 const TileCalculatorWidget = dynamic(() => import('@/components/TileCalculatorWidget'), { ssr: false });
-const HomeTrustFaqSection = dynamic(() => import('@/components/HomeTrustFaqSection'), { ssr: false });
+import HomeTrustFaqSection from '@/components/HomeTrustFaqSection';
 
 // Dynamically import Room Renovation (Mekânımda Gör & Dene) modal
 const RoomRenovationModal = dynamic(() => import('@/components/RoomRenovationModal'), { 
@@ -3877,6 +3877,13 @@ export default function Home() {
 
   return (
     <main className="main-layout">
+      {/* Search Engine Optimized Opening Snippet Source */}
+      <section className="sr-intro-snippet-bar" aria-label="SeramikBak Hakkında" style={{ background: '#090d16', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '8px 16px', textAlign: 'center' }}>
+        <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.4', maxWidth: '1100px', marginInline: 'auto' }}>
+          <strong style={{ color: '#ffffff' }}>SeramikBak:</strong> 17 lider Türk seramik markasının binlerce modelini 3D mekân stüdyosunda deneyin, 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.
+        </p>
+      </section>
+
       {/* Platform Trust & Reassurance Bar */}
       <div className="live-analytics-top-bar" style={{ background: '#0b1120', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', minHeight: '32px' }}>
         {/* Desktop View: All 4 in one row */}
@@ -4601,9 +4608,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* CANLI FIRSAT RADARI & CANLI İNDİRİM ŞERİDİ */}
-      <LiveDealsTicker />
-
       {/* Main Content */}
       <div className="content-container">
         
@@ -4800,6 +4804,25 @@ export default function Home() {
                     <span>AI Seramik Shazam</span>
                   </label>
 
+                  <Link 
+                    href="/teklif-al" 
+                    className="hero-feature-btn quote-primary-btn" 
+                    title="81 İldeki Yetkili Bayilerden Ücretsiz Fiyat Teklifi Al"
+                    style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      color: '#ffffff',
+                      fontWeight: '800',
+                      border: 'none',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <FileText size={15} color="#ffffff" />
+                    <span>⚡ Bayiden Teklif Al</span>
+                  </Link>
+
                   <button 
                     onClick={() => {
                       setActiveTab('studio');
@@ -4862,7 +4885,10 @@ export default function Home() {
                 {heroSlides.map((_, idx) => (
                   <button
                     key={idx}
+                    type="button"
                     onClick={() => setHeroSlideIndex(idx)}
+                    aria-label={`Slayt ${idx + 1}`}
+                    aria-current={heroSlideIndex === idx ? 'true' : undefined}
                     style={{
                       width: '8px',
                       height: '8px',
@@ -4896,10 +4922,18 @@ export default function Home() {
                     setRenovationProduct(targetProduct);
                     setShowRenovationModal(true);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      const targetProduct = activeProduct || weeklyProducts?.[0] || products?.[0];
+                      if (targetProduct) { setRenovationProduct(targetProduct); setShowRenovationModal(true); }
+                    }
+                  }}
                   className="persona-banner-card card-studio"
                   style={{ textDecoration: 'none', cursor: 'pointer' }}
                   role="button"
                   tabIndex={0}
+                  aria-label="Mekânımda Gör ve Dene ile seramikleri odanızda canlı deneyin"
                   title="Mekânımda Gör & Dene ile seramikleri odanızda canlı deneyin"
                 >
                   <div className="promo-text-column">
@@ -4929,8 +4963,18 @@ export default function Home() {
                       calculatorSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 80);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setShowCalculatorWidget(prev => !prev);
+                      setTimeout(() => {
+                        calculatorSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 80);
+                    }
+                  }}
                   role="button"
                   tabIndex={0}
+                  aria-label="Metraj ve Maliyet Robotu ile kutu ve fire ihtiyacını hesaplayın"
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="promo-text-column">
@@ -4962,8 +5006,20 @@ export default function Home() {
                       else window.scrollTo({ top: 300, behavior: 'smooth' });
                     }, 100);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveTab('dealers');
+                      setTimeout(() => {
+                        const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        else window.scrollTo({ top: 300, behavior: 'smooth' });
+                      }, 100);
+                    }
+                  }}
                   role="button"
                   tabIndex={0}
+                  aria-label="En yakın yetkili seramik bayisini haritada bulun"
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="promo-text-column">
@@ -5012,6 +5068,11 @@ export default function Home() {
                 </div>
               )}
             </section>
+
+            {/* Canlı Teklif & Fırsat Bildirim Şeridi (Sosyal Kanıt) */}
+            <div style={{ margin: '14px 0' }}>
+              <LiveDealsTicker />
+            </div>
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
@@ -5092,8 +5153,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
-            <ProductSchemaJsonLd product={activeProduct || (products && products[0])} />
             {/* Brand Logos Infinite Marquee */}
             <div className="brand-marquee-section">
               <div className="brand-marquee-container">

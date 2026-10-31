@@ -38,6 +38,22 @@ const FAQ_ITEMS = [
   {
     q: "Kendi banyomun veya mutfağımın fotoğrafını yükleyip seramik deneyebilir miyim?",
     a: "'Mekânımda Gör & Dene' özelliğimizle odanızın fotoğrafını yükleyebilirsiniz. Yapay zeka zemin ve duvar sınırlarını otomatik olarak algılar ve seçtiğiniz seramikleri gerçekçi ışık ve perspektif eşliğinde odanıza giydirir."
+  },
+  {
+    q: "Banyo ve ıslak zeminlerde mat mı yoksa parlak seramik mi tercih edilmeli?",
+    a: "Banyo zemini, duş içi ve balkon gibi ıslak alanlarda kayma riskini önlemek için R9 veya R10 kaymazlık sınıfına sahip mat seramikler tavsiye edilir. Parlak (full lappato) seramikler ise ışığı yansıtarak ferahlık kattığı için banyo duvarları ve salon zeminleri için mükemmel bir tercihtir."
+  },
+  {
+    q: "Küçük banyolar için hangi seramik ebatları uygundur?",
+    a: "Küçük banyolarda daha az derz çizgisi oluşturduğu ve alanı kesintisiz gösterdiği için 60x120 cm rektifiyeli büyük ebat karolar sıklıkla tercih edilmektedir. Açık tonlu mermer ve traverten desenleri mekânı çok daha geniş hissettirir."
+  },
+  {
+    q: "Bir banyo için kaç kutu seramik ve ne kadar fire hesabı yapılmalıdır?",
+    a: "Net zemin ve duvar alanına köşe kesimleri ve desen uyumu için standart düz döşemede %10, çapraz veya balıksırtı döşemede %15 fire payı eklenmelidir. Platformumuzdaki Akıllı Metraj Robotu seçtiğiniz karo ebadına göre gereken tam kutu adedini ve paket metrajını anında hesaplar."
+  },
+  {
+    q: "Rektifiyeli seramik ne demektir, derzsiz döşenebilir mi?",
+    a: "Rektifiye, seramik kenarlarının fırından çıktıktan sonra lazerle 90 derece dik kesilerek milimetrik ölçüye getirilmesidir. 1-2 mm gibi son derece ince derzlerle döşenmesini sağlayarak modern, yekpare bir görünüm sunar."
   }
 ];
 

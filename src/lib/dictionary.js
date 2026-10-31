@@ -158,8 +158,8 @@ export const dictionaries = {
     submitRfq: 'Toplu Teklif İsteğini Gönder',
 
     // SEO Metadata
-    seoTitle: "SeramikBak | Türkiye'nin Seramik Arama Motoru, 3D Mekân & Yetkili Bayi Ağı",
-    seoDescription: "Binlerce seramik ve fayans modelini keşfedin, 3D sanal stüdyoda odanızda deneyin. 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.",
+    seoTitle: "Seramik Arama Motoru & Bayi Fiyat Teklifleri | SeramikBak",
+    seoDescription: "Binlerce seramik ve fayans modelini keşfedin, 3D odanızda deneyin. 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.",
     seoKeywords: "seramik modelleri, fayans fiyatları, 3d oda seramik görselleştirme, banyo seramikleri, porselen karo, yetkili seramik bayileri",
 
     // Footer & Global
@@ -322,8 +322,8 @@ export const dictionaries = {
     submitRfq: 'Submit RFQ Request',
 
     // SEO Metadata
-    seoTitle: "SeramikBak | Global Ceramic Search Engine, 3D Studio & Dealer Network",
-    seoDescription: "Discover thousands of premium porcelain and ceramic tiles from 40+ leading Turkish manufacturers. Visualize in 3D and get instant quotes from authorized dealers.",
+    seoTitle: "Ceramic Tile Search & Dealer Quotes | SeramikBak",
+    seoDescription: "Browse Turkish ceramic tiles, preview them in 3D, and request wholesale quotes from authorized dealers across Turkey.",
     seoKeywords: "turkish ceramic tiles, porcelain tiles, 3d tile visualizer, bathroom wall tiles, floor tiles exporter, architectural porcelain slabs",
 
     // Footer & Global
@@ -486,8 +486,8 @@ export const dictionaries = {
     submitRfq: 'Anfrage Absenden',
 
     // SEO Metadata
-    seoTitle: "SeramikBak | Suchmaschine für Türkische Fliesen, 3D Studio & Händlernetz",
-    seoDescription: "Entdecken Sie über 40 führende türkische Fliesenmarken. Feinsteinzeug im 3D Studio planen und direkte Großhandelspreise anfordern.",
+    seoTitle: "Türkische Fliesen & Händlerangebote | SeramikBak",
+    seoDescription: "Entdecken Sie führende türkische Fliesen im 3D Studio und fordern Sie Angebote von autorisierten Fachhändlern an.",
     seoKeywords: "türkische fliesen, feinsteinzeug kaufen, fliesen 3d visualisierer, badfliesen marmoroptik, fliesen export großhandel",
 
     // Footer & Global
