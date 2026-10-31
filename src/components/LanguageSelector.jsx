@@ -36,20 +36,19 @@ export default function LanguageSelector({ compact = false }) {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          height: ${compact ? '30px' : '38px'};
-          background: rgba(255, 255, 255, 0.95);
+          gap: 4px;
+          height: ${compact ? '28px' : '33px'};
+          background: #f8fafc;
           border: 1px solid #e2e8f0;
-          padding: ${compact ? '0 10px' : '0 14px'};
-          border-radius: ${compact ? '10px' : '20px'};
-          font-size: ${compact ? '0.78rem' : '0.8rem'};
+          padding: 0 9px;
+          border-radius: 16px;
+          font-size: 0.74rem;
           font-weight: 700;
-          color: #0f172a;
+          color: #334155;
           cursor: pointer;
           white-space: nowrap;
           box-sizing: border-box;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
         }
         .lang-trigger-btn:hover {
           border-color: #b38e47;

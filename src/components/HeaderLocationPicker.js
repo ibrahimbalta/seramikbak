@@ -84,25 +84,25 @@ export default function HeaderLocationPicker({
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          padding: '6px 12px',
-          borderRadius: '20px',
+          gap: '5px',
+          height: '33px',
+          padding: '0 10px',
+          borderRadius: '16px',
           border: '1px solid rgba(179, 142, 71, 0.35)',
-          background: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(10px)',
+          background: '#ffffff',
           color: '#0f172a',
-          fontSize: '0.82rem',
+          fontSize: '0.76rem',
           fontWeight: '700',
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+          boxSizing: 'border-box'
         }}
       >
-        <MapPin size={15} style={{ color: 'var(--accent-gold, #b38e47)', flexShrink: 0 }} />
-        <span style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <MapPin size={13} style={{ color: 'var(--accent-gold, #b38e47)', flexShrink: 0 }} />
+        <span style={{ maxWidth: '85px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {displayCity}
         </span>
-        <ChevronDown size={13} style={{ color: '#64748b', transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'none' }} />
+        <ChevronDown size={11} style={{ color: '#64748b', transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'none' }} />
       </button>
 
       {isOpen && (

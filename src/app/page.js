@@ -4192,32 +4192,36 @@ export default function Home() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    gap: '5px',
                     position: 'relative',
                     borderColor: quoteCartItems.length > 0 ? 'var(--accent-gold)' : undefined
                   }}
                 >
-                  <ShoppingBag size={16} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
-                  <span>Teklif Sepetim</span>
+                  <ShoppingBag size={14} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
+                  <span>Sepet</span>
                   {quoteCartItems.length > 0 && (
                     <span 
                       style={{
                         background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                         color: '#ffffff',
-                        fontSize: '0.68rem',
+                        fontSize: '0.64rem',
                         fontWeight: '800',
                         borderRadius: '10px',
-                        padding: '1px 6px',
-                        marginLeft: '2px'
+                        padding: '1px 5px',
+                        marginLeft: '1px'
                       }}
                     >
                       {quoteCartItems.length}
                     </span>
                   )}
                 </button>
-                <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
-                  <HeartIcon size={16} className="heart-icon-gold" />
-                  <span>Favorilerim</span>
+                <button 
+                  className="header-btn favorites-btn" 
+                  onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
+                  title="Favorilerim"
+                >
+                  <HeartIcon size={14} className="heart-icon-gold" />
+                  <span>Favoriler</span>
                   {userFavorites.length > 0 && <span className="fav-count-badge">{userFavorites.length}</span>}
                 </button>
                 {currentUser ? (
@@ -4225,7 +4229,7 @@ export default function Home() {
                     <button className="header-btn account-btn logged-in" onClick={() => setShowUserMenu(!showUserMenu)}>
                       <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
                       <span>{currentUser.name.split(' ')[0]}</span>
-                      <ChevronDown size={12} />
+                      <ChevronDown size={11} />
                     </button>
                     {showUserMenu && (
                       <div className="user-dropdown-menu glass-panel">
@@ -4257,8 +4261,8 @@ export default function Home() {
                   </div>
                 ) : (
                   <button className="header-btn account-btn" onClick={() => window.location.href = '/uyelik'}>
-                    <UserIcon size={16} />
-                    <span>{t('account')}</span>
+                    <UserIcon size={14} />
+                    <span>Giriş</span>
                   </button>
                 )}
               </>
@@ -10920,53 +10924,54 @@ export default function Home() {
           text-shadow: 0 0 10px rgba(179, 142, 71, 0.1);
         }
 
-        /* Redesigned Premium White Header */
+        /* Redesigned Premium Compact Header */
         .main-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 14px 28px;
-          border-radius: var(--border-radius-lg);
+          padding: 8px 18px;
+          border-radius: var(--border-radius-md);
           background: #ffffff; /* solid white */
           border: 1px solid rgba(0, 0, 0, 0.06);
-          box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.03), 
-                      0 1px 0 rgba(255, 255, 255, 0.8) inset;
+          box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.04);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           z-index: 1000;
+          gap: 12px;
         }
 
         /* Adjust header border-radius if Top Utility Bar is present */
         :global(.top-utility-bar) + .main-header {
-          border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+          border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
           border-top: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .main-header:hover {
           border-color: rgba(212, 175, 55, 0.25);
-          box-shadow: 0 15px 35px -10px rgba(179, 142, 71, 0.08);
+          box-shadow: 0 10px 25px -8px rgba(179, 142, 71, 0.08);
         }
 
         .header-brand {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 10px;
+          flex-shrink: 0;
         }
 
         .logo-icon {
-          width: 54px; /* enlarged logo icon */
-          height: 54px;
+          width: 38px;
+          height: 38px;
           background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
           border: 1.5px solid #d4af37;
-          border-radius: var(--border-radius-sm);
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: var(--font-title);
           font-weight: 850;
           color: #ffffff;
-          font-size: 1.55rem;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25), 0 0 12px rgba(212, 175, 55, 0.15);
+          font-size: 1.05rem;
+          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.2), 0 0 8px rgba(212, 175, 55, 0.12);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
@@ -10974,12 +10979,12 @@ export default function Home() {
 
         .logo-icon:hover {
           border-color: #f1d279;
-          box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35), 0 0 16px rgba(212, 175, 55, 0.3);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3), 0 0 12px rgba(212, 175, 55, 0.25);
         }
 
         .logo-text {
           font-family: var(--font-title);
-          font-size: 1.85rem; /* enlarged logo text */
+          font-size: 1.35rem;
           font-weight: 900;
           color: var(--text-primary);
           letter-spacing: -0.03em;
@@ -10990,30 +10995,31 @@ export default function Home() {
 
         .header-nav {
           display: flex;
-          background: rgba(0, 0, 0, 0.035); /* dark glass backdrop in light header */
-          padding: 5px;
-          border-radius: 30px;
+          background: rgba(0, 0, 0, 0.035);
+          padding: 3px;
+          border-radius: 20px;
           border: 1px solid rgba(0, 0, 0, 0.04);
           backdrop-filter: blur(5px);
-          gap: 4px;
+          gap: 2px;
+          flex-shrink: 0;
         }
 
         :global(.nav-link) {
           background: transparent;
           border: none;
           color: #475569;
-          padding: 8px 24px;
-          border-radius: 24px;
+          padding: 6px 14px;
+          border-radius: 16px;
           cursor: pointer;
           font-family: var(--font-title);
           font-weight: 700 !important;
-          font-size: 0.85rem;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          font-size: 0.78rem;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           display: inline-flex !important;
           flex-direction: row !important;
           align-items: center !important;
-          gap: 8px !important;
-          letter-spacing: 0.02em;
+          gap: 6px !important;
+          letter-spacing: 0.01em;
           white-space: nowrap !important;
           flex-shrink: 0;
           text-decoration: none !important;
@@ -11030,25 +11036,24 @@ export default function Home() {
 
         :global(.nav-link svg) {
           color: #64748b;
-          transition: color 0.3s ease, transform 0.3s ease;
+          transition: color 0.2s ease;
           flex-shrink: 0 !important;
         }
 
         :global(.nav-link:hover) {
           color: #0f172a !important;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.7);
         }
 
         :global(.nav-link:hover svg) {
           color: var(--accent-gold);
-          transform: translateY(-1px);
         }
 
         .nav-link.active {
           color: #ffffff !important;
-          background: #0f172a; /* high contrast modern charcoal button */
+          background: #0f172a;
           border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+          box-shadow: 0 3px 8px rgba(15, 23, 42, 0.15);
         }
 
         .nav-link.active svg {
@@ -11058,33 +11063,33 @@ export default function Home() {
         .header-right-buttons {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
         }
 
         .desktop-header-actions {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 6px;
         }
 
         .header-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
-          height: 38px;
-          background: rgba(0, 0, 0, 0.02);
-          border: 1px solid rgba(0, 0, 0, 0.05);
-          color: #475569;
-          padding: 0 16px;
-          border-radius: 20px;
+          gap: 6px;
+          height: 33px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #334155;
+          padding: 0 11px;
+          border-radius: 16px;
           cursor: pointer;
           font-family: var(--font-title);
-          font-size: 0.8rem;
-          font-weight: 600;
+          font-size: 0.76rem;
+          font-weight: 700;
           white-space: nowrap;
           box-sizing: border-box;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           text-decoration: none !important;
         }
 
@@ -11094,11 +11099,11 @@ export default function Home() {
         }
 
         .header-btn:hover {
-          transform: translateY(-2px);
+          transform: translateY(-1px);
           background: #ffffff;
-          border-color: rgba(212, 175, 55, 0.25);
+          border-color: rgba(212, 175, 55, 0.35);
           color: #0f172a;
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
         }
 
         .header-btn:active {
@@ -11106,11 +11111,11 @@ export default function Home() {
         }
 
         .header-btn svg {
-          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .header-btn:hover svg {
-          transform: scale(1.1);
+          transform: scale(1.08);
         }
 
         .header-btn.favorites-btn {
@@ -11123,28 +11128,26 @@ export default function Home() {
 
         .heart-icon-gold {
           color: #64748b;
-          transition: color 0.3s ease;
+          transition: color 0.2s ease;
         }
 
         .header-btn.favorites-btn:hover .heart-icon-gold {
           color: #e11d48;
-          filter: drop-shadow(0 0 2px rgba(225, 29, 72, 0.3));
         }
 
         .fav-count-badge {
           background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
           color: #ffffff;
-          font-size: 0.65rem;
+          font-size: 0.62rem;
           font-weight: 800;
-          min-width: 17px;
-          height: 17px;
+          min-width: 16px;
+          height: 16px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 4px;
+          padding: 0 3px;
           line-height: 1;
-          box-shadow: 0 2px 6px rgba(225, 29, 72, 0.3);
         }
 
         .header-btn.kiosk-btn.active.exit-kiosk-btn {
