@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   ShoppingBag, 
   X, 
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import TileVisualPreview from './TileVisualPreview';
 import { exportMetrajReportToPdf } from '@/lib/pdfReportExporter';
+import { TURKEY_CITIES } from '@/lib/turkeyCities';
 
 export default function QuoteCartDrawer({
   isOpen,
@@ -39,10 +40,71 @@ export default function QuoteCartDrawer({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccessCode, setSubmitSuccessCode] = useState('');
 
+  // Konumdaki yetkili bayiler
+  const [nearbyDealers, setNearbyDealers] = useState([]);
+  const [selectedDealerId, setSelectedDealerId] = useState('');
+  const [isLoadingDealers, setIsLoadingDealers] = useState(false);
+
+  // Otomatik olarak kullanıcının bulunduğu şehirdeki yetkili bayileri yükle
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let lat = userCoords?.lat;
+    let lng = userCoords?.lng;
+
+    if (!lat || !lng) {
+      const foundCity = TURKEY_CITIES.find(
+        (c) => c.name.toLowerCase() === (userLocationName || '').toLowerCase()
+      );
+      if (foundCity) {
+        lat = foundCity.lat;
+        lng = foundCity.lng;
+      } else {
+        lat = 41.0082;
+        lng = 28.9784;
+      }
+    }
+
+    const firstProductBrandId = cartItems[0]?.brandId || cartItems[0]?.brand?.id || '';
+
+    setIsLoadingDealers(true);
+    const url = firstProductBrandId
+      ? `/api/dealers/nearest?brandId=${encodeURIComponent(firstProductBrandId)}&lat=${lat}&lng=${lng}`
+      : `/api/dealers/nearest?lat=${lat}&lng=${lng}`;
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setNearbyDealers(data);
+          setSelectedDealerId(data[0].id);
+        } else {
+          // Marka özelinde yoksa genel en yakın bayileri getir
+          fetch(`/api/dealers/nearest?lat=${lat}&lng=${lng}`)
+            .then((r) => r.json())
+            .then((allData) => {
+              if (Array.isArray(allData) && allData.length > 0) {
+                setNearbyDealers(allData);
+                setSelectedDealerId(allData[0].id);
+              } else {
+                setNearbyDealers([]);
+              }
+            });
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load nearby dealers for quote cart:', err);
+      })
+      .finally(() => {
+        setIsLoadingDealers(false);
+      });
+  }, [isOpen, userLocationName, userCoords, cartItems]);
+
   if (!isOpen) return null;
 
   // Toplam m2
   const totalM2 = cartItems.reduce((acc, item) => acc + (item.quantityM2 || 25), 0);
+  const activeDealer = nearbyDealers.find((d) => d.id === selectedDealerId) || nearbyDealers[0];
 
   const handleSubmitQuote = async (e) => {
     e.preventDefault();
@@ -51,19 +113,25 @@ export default function QuoteCartDrawer({
       return;
     }
 
+    const targetDealer = activeDealer;
+    if (!targetDealer) {
+      alert('Lütfen teklif iletilecek yetkili bayiyi seçiniz.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Çoklu ürün teklifini leads API'sine kaydet
+      // Seçilen yetkili bayinin portalına lead oluştur
       const res = await fetch('/api/leads/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          productId: cartItems[0]?.id || 'multi-quote',
-          dealerId: 'all-nearest', // Seçilen ildeki en yakın bayiler
+          productId: cartItems[0]?.id || null,
+          dealerId: targetDealer.id,
           clientName,
           clientPhone,
           clientEmail,
-          notes: `[TOPLU TEKLİF LİSTESİ] ${projectName} (${userLocationName}) - ${cartItems.length} Kalem Ürün: ` + 
+          notes: `[SEPET TEKLİF LİSTESİ] ${projectName} (${userLocationName}) - ${cartItems.length} Kalem Seramik: ` + 
                  cartItems.map(c => `${c.name} (${c.quantityM2 || 25}m²)`).join(', ') + 
                  (projectNotes ? ` | Not: ${projectNotes}` : ''),
           requestedUsta: requestUsta,
@@ -71,9 +139,14 @@ export default function QuoteCartDrawer({
         })
       });
 
-      const randomCode = 'SB-' + Math.floor(100000 + Math.random() * 900000);
-      setSubmitSuccessCode(randomCode);
-      setActiveStep('success');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const randomCode = 'SB-' + Math.floor(100000 + Math.random() * 900000);
+        setSubmitSuccessCode(randomCode);
+        setActiveStep('success');
+      } else {
+        alert(data.error || 'Teklif talebi bayiye iletilemedi. Lütfen bilgilerinizi kontrol ediniz.');
+      }
     } catch (err) {
       console.error('Quote submit error:', err);
       alert('Teklif gönderilirken bir hata oluştu, lütfen tekrar deneyin.');
@@ -300,8 +373,92 @@ export default function QuoteCartDrawer({
 
           {activeStep === 'form' && (
             <form onSubmit={handleSubmitQuote} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '0.78rem', color: '#475569' }}>
-                📍 Teklifiniz <strong>{userLocationName}</strong> bölgesindeki yetkili bayilere ve tedarikçilere eş zamanlı iletilecektir.
+              {/* Yetkili Bayi Seçim ve Entegrasyon Kartı */}
+              <div style={{
+                padding: '12px 14px',
+                background: '#f8fafc',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.80rem', fontWeight: '800', color: '#0f172a' }}>
+                    <MapPin size={14} style={{ color: '#b38e47' }} />
+                    <span>Konumunuz: <strong>{userLocationName}</strong></span>
+                  </div>
+                  <span style={{ fontSize: '0.68rem', color: '#059669', background: '#ecfdf5', padding: '2px 8px', borderRadius: '10px', fontWeight: '700' }}>
+                    ✓ Bayi Portalı Entegre
+                  </span>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#334155', display: 'block', marginBottom: '5px' }}>
+                    Teklif İletilecek Yetkili Bayi Showroomu *
+                  </label>
+                  {isLoadingDealers ? (
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', padding: '10px', background: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1', textAlign: 'center' }}>
+                      Bölgenizdeki yetkili bayiler taranıyor...
+                    </div>
+                  ) : nearbyDealers.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <select
+                        value={selectedDealerId}
+                        onChange={(e) => setSelectedDealerId(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '9px 10px',
+                          borderRadius: '8px',
+                          border: '1.5px solid #cbd5e1',
+                          fontSize: '0.80rem',
+                          fontWeight: '700',
+                          color: '#0f172a',
+                          background: '#ffffff',
+                          outline: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {nearbyDealers.map(d => (
+                          <option key={d.id} value={d.id}>
+                            {d.name} ({d.brand?.name || 'Yetkili Bayi'}) • {d.district ? `${d.district}, ` : ''}{d.city} {d.distanceKm ? `(~${d.distanceKm} km)` : ''}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Selected dealer mini details */}
+                      {(() => {
+                        const cur = activeDealer;
+                        if (!cur) return null;
+                        return (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            fontSize: '0.70rem',
+                            color: '#475569',
+                            background: '#ffffff',
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid #e2e8f0',
+                            fontWeight: '600'
+                          }}>
+                            <span>🏢 {cur.name} ({cur.brand?.name})</span>
+                            <span>📍 {cur.district ? `${cur.district}, ` : ''}{cur.city} {cur.distanceKm ? `(~${cur.distanceKm} km)` : ''}</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.74rem', color: '#b45309', padding: '8px', background: '#fef3c7', borderRadius: '8px', border: '1px solid #fde68a' }}>
+                      {userLocationName} bölgesinde doğrudan kayıtlı bayi bulunamadı; en yakın bölge temsilcisine yönlendirilecektir.
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '0.67rem', color: '#64748b', lineHeight: '1.4', borderTop: '1px dashed #cbd5e1', paddingTop: '6px' }}>
+                  ℹ️ <strong>SeramikBak Doğrudan Satıcı Değildir:</strong> SeramikBak aracılık veya komisyon almaz. Talebiniz ve malzeme listeniz doğrudan yukarıda seçtiğiniz yetkili bayinin kurumsal portalına iletilir; fiyat teklifi ve stok temini bayi tarafından sunulur.
+                </div>
               </div>
 
               <div>
@@ -391,7 +548,7 @@ export default function QuoteCartDrawer({
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !activeDealer}
                   style={{ flex: 2, padding: '12px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   <Send size={15} />
@@ -402,27 +559,85 @@ export default function QuoteCartDrawer({
           )}
 
           {activeStep === 'success' && (
-            <div style={{ textAlign: 'center', padding: '40px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+            <div style={{ textAlign: 'center', padding: '30px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
               <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle size={32} />
               </div>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>
-                Talebiniz Bayilere İletildi!
+              <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '800', color: '#0f172a' }}>
+                Talebiniz Bayi Portalına İletildi!
               </h3>
-              <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748b', maxWidth: '300px', lineHeight: '1.5' }}>
-                Seçtiğiniz {cartItems.length} ürün için en yakın yetkili bayilerimiz en kısa sürede özel iskonto ve stok bilgisiyle dönüş yapacaktır.
+              <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b', maxWidth: '320px', lineHeight: '1.5' }}>
+                {activeDealer ? (
+                  <>Seçtiğiniz <strong>{activeDealer.name}</strong> ({activeDealer.brand?.name}) yetkili bayi portalına malzeme listeniz başarıyla iletildi. Yetkili bayi doğrudan sizinle iletişime geçecektir.</>
+                ) : (
+                  <>Yetkili bayi temsilcisi en kısa sürede özel iskonto ve stok bilgisiyle dönüş yapacaktır.</>
+                )}
               </p>
+
               <div style={{ padding: '8px 16px', background: '#f8fafc', borderRadius: '8px', border: '1px dashed #cbd5e1', fontSize: '0.80rem', fontWeight: '800', color: '#b38e47' }}>
-                Referans Kodunuz: {submitSuccessCode}
+                Teklif Referans No: {submitSuccessCode}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '16px' }}>
+              {/* Hızlı WhatsApp / İletişim Aksiyonları */}
+              {activeDealer?.phone && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '6px' }}>
+                  <a
+                    href={`https://wa.me/${activeDealer.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                      `Merhaba ${activeDealer.name}, SeramikBak üzerinden ${submitSuccessCode} referans kodlu ${cartItems.length} kalemlik seramik teklif talebimi oluşturdum. Detayları ve fiyatlandırmayı görüşmek istiyorum.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      width: '100%',
+                      padding: '11px',
+                      background: '#25D366',
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      fontWeight: '800',
+                      fontSize: '0.84rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 12px rgba(37,211,102,0.25)'
+                    }}
+                  >
+                    <MessageCircle size={16} />
+                    <span>Yetkili Bayiye WhatsApp'tan Ulaş</span>
+                  </a>
+
+                  <a
+                    href={`tel:${activeDealer.phone.replace(/\s+/g, '')}`}
+                    style={{
+                      width: '100%',
+                      padding: '9px',
+                      background: '#f8fafc',
+                      border: '1px solid #cbd5e1',
+                      color: '#0f172a',
+                      borderRadius: '10px',
+                      fontWeight: '700',
+                      fontSize: '0.80rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <Phone size={14} style={{ color: '#b38e47' }} />
+                    <span>Bayiyi Telefonla Ara: {activeDealer.phone}</span>
+                  </a>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginTop: '10px' }}>
                 <button
                   type="button"
                   onClick={handleDownloadPdf}
                   style={{
                     width: '100%',
-                    padding: '12px',
+                    padding: '11px',
                     borderRadius: '10px',
                     border: '1.5px solid #b38e47',
                     background: '#fffdfa',
@@ -458,7 +673,7 @@ export default function QuoteCartDrawer({
                     cursor: 'pointer'
                   }}
                 >
-                  Sepeti Kapat ve Alışverişe Devam Et
+                  Sepeti Kapat ve Aramaya Devam Et
                 </button>
               </div>
             </div>
