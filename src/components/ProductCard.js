@@ -66,7 +66,7 @@ export default function ProductCard({
             type="button"
             onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
             className="card-action-btn-new btn-action-dealer"
-            title="Yetkili Bayiler & Fiyat"
+            title="Yetkili Bayiler & Teklif"
           >
             Bayi
           </button>
@@ -95,30 +95,37 @@ export default function ProductCard({
         <h4 className="card-title-new">{product.name}</h4>
         <p className="card-specs-new">{product.width}x{product.height} cm • {translateStyle(product.style) || product.style}</p>
         
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
-          <p className="card-brand-new" style={{ margin: 0 }}>{product.brand?.name}</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', gap: '6px' }}>
+          <p className="card-brand-new" style={{ margin: 0, minWidth: 0, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={product.brand?.name}>
+            {product.brand?.name}
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
             {onAddToCart && (
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
                 title={isInCart ? 'Teklif Sepetinden Çıkar' : 'Teklif Sepetine Ekle'}
                 style={{
-                  background: isInCart ? '#059669' : 'rgba(179, 142, 71, 0.1)',
-                  color: isInCart ? '#ffffff' : '#b38e47',
-                  border: isInCart ? '1px solid #059669' : '1px solid rgba(179, 142, 71, 0.3)',
+                  height: '24px',
+                  minWidth: '58px',
+                  padding: '0 6px',
+                  boxSizing: 'border-box',
+                  background: isInCart ? '#059669' : '#fdfaf3',
+                  color: isInCart ? '#ffffff' : '#a27b38',
+                  border: isInCart ? '1px solid #059669' : '1px solid #e7d8bf',
                   borderRadius: '6px',
-                  padding: '2px 7px',
                   fontSize: '0.68rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '3px'
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease'
                 }}
               >
-                <ShoppingBag size={11} />
-                <span>{isInCart ? '✓ Sepette' : '+ Teklif'}</span>
+                <span>{isInCart ? '✓ Sepet' : '+ Teklif'}</span>
               </button>
             )}
             <button
@@ -126,17 +133,23 @@ export default function ProductCard({
               onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
               title={t('comparePrices')}
               style={{
-                background: isCompared ? 'var(--accent-gold)' : 'transparent',
-                color: isCompared ? '#ffffff' : 'var(--text-muted)',
-                border: isCompared ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
+                height: '24px',
+                minWidth: '58px',
+                padding: '0 6px',
+                boxSizing: 'border-box',
+                background: isCompared ? '#b38e47' : '#ffffff',
+                color: isCompared ? '#ffffff' : '#64748b',
+                border: isCompared ? '1px solid #b38e47' : '1px solid #e2e8f0',
                 borderRadius: '6px',
-                padding: '2px 7px',
                 fontSize: '0.68rem',
-                fontWeight: '600',
+                fontWeight: '700',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '3px'
+                justifyContent: 'center',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                transition: 'all 0.15s ease'
               }}
             >
               <span>{isCompared ? '✓ Kıyas' : '+ Kıyas'}</span>

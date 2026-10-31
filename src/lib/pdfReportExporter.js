@@ -25,8 +25,6 @@ export function exportMetrajReportToPdf({
   const itemsHtml = products.map((item, index) => {
     const m2 = item.quantityM2 || item.m2 || 25;
     const boxCount = item.boxCount || Math.ceil(m2 / 1.44);
-    const estPrice = item.cheapestOffer?.price || item.price || 450;
-    const totalEst = m2 * estPrice;
 
     return `
       <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -34,14 +32,20 @@ export function exportMetrajReportToPdf({
         <td style="padding: 12px;">
           <div style="font-weight: 800; color: #0f172a; font-size: 14px;">${item.name || 'Seramik Karo'}</div>
           <div style="color: #64748b; font-size: 12px; margin-top: 2px;">
-            ${item.brand?.name || item.brand || 'Lider Türk Markası'} • ${item.width || 60}x${item.height || 120} cm • ${item.finish || 'Mat/Parlak'}
+            ${item.brand?.name || item.brand || 'Lider Türk Markası'}
             ${item.code ? `• Kod: ${item.code}` : ''}
           </div>
         </td>
-        <td style="padding: 12px; text-align: center; font-weight: 800; color: #0f172a;">${m2} m²</td>
-        <td style="padding: 12px; text-align: center; color: #334155;">${boxCount} Kutu</td>
-        <td style="padding: 12px; text-align: right; color: #64748b; font-size: 13px;">₺${estPrice.toLocaleString('tr-TR')} / m²</td>
-        <td style="padding: 12px; text-align: right; font-weight: 800; color: #b38e47; font-size: 14px;">₺${totalEst.toLocaleString('tr-TR')}</td>
+        <td style="padding: 12px; text-align: center; color: #475569; font-size: 12px;">
+          ${item.width || 60}x${item.height || 120} cm • ${item.finish || 'Mat/Parlak'}
+        </td>
+        <td style="padding: 12px; text-align: center; font-weight: 800; color: #0f172a; font-size: 13px;">${m2} m²</td>
+        <td style="padding: 12px; text-align: center; color: #334155; font-weight: 700; font-size: 13px;">${boxCount} Kutu</td>
+        <td style="padding: 12px; text-align: right;">
+          <span style="display: inline-block; padding: 4px 8px; background: #fdf8ef; border: 1px solid #e7d8bf; border-radius: 5px; color: #a27b38; font-weight: 700; font-size: 11px;">
+            Yetkili Bayi Teklif Talebi
+          </span>
+        </td>
       </tr>
     `;
   }).join('');
@@ -167,12 +171,12 @@ export function exportMetrajReportToPdf({
       <table style="margin-top: 20px;">
         <thead>
           <tr>
-            <th style="width: 40px; text-align: center;">#</th>
-            <th style="text-align: left;">Seramik Modeli & Ebat</th>
-            <th style="text-align: center; width: 80px;">Net Alan</th>
-            <th style="text-align: center; width: 90px;">Tahmini Kutu</th>
-            <th style="text-align: right; width: 110px;">Birim Fiyat</th>
-            <th style="text-align: right; width: 120px;">Toplam Tutar</th>
+            <th style="width: 36px; text-align: center;">#</th>
+            <th style="text-align: left;">Seramik Modeli & Marka</th>
+            <th style="text-align: center; width: 140px;">Ebat & Yüzey</th>
+            <th style="text-align: center; width: 85px;">Net Alan</th>
+            <th style="text-align: center; width: 95px;">Tahmini Kutu</th>
+            <th style="text-align: right; width: 140px;">Teklif Durumu</th>
           </tr>
         </thead>
         <tbody>

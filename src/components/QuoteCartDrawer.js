@@ -41,12 +41,8 @@ export default function QuoteCartDrawer({
 
   if (!isOpen) return null;
 
-  // Toplam m2 ve yaklaşık tutar
+  // Toplam m2
   const totalM2 = cartItems.reduce((acc, item) => acc + (item.quantityM2 || 25), 0);
-  const totalEstPrice = cartItems.reduce((acc, item) => {
-    const unitPrice = item.cheapestOffer?.price || 480;
-    return acc + (unitPrice * (item.quantityM2 || 25));
-  }, 0);
 
   const handleSubmitQuote = async (e) => {
     e.preventDefault();
@@ -206,7 +202,7 @@ export default function QuoteCartDrawer({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {cartItems.map((item, idx) => {
                     const m2 = item.quantityM2 || 25;
-                    const unitPrice = item.cheapestOffer?.price || 480;
+                    const estimatedBoxes = Math.ceil(m2 / 1.44);
                     return (
                       <div 
                         key={item.id || idx}
@@ -274,14 +270,23 @@ export default function QuoteCartDrawer({
                               </button>
                             </div>
 
-                            {/* Estimated Price */}
-                            <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#b38e47' }}>
-                                ₺{(unitPrice * m2).toLocaleString('tr-TR')}
-                              </div>
-                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>
-                                (₺{unitPrice}/m²)
-                              </div>
+                            {/* Box info & quote readiness */}
+                            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+                              <span style={{ 
+                                fontSize: '0.74rem', 
+                                fontWeight: '800', 
+                                color: '#0f172a',
+                                background: '#f8fafc',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                ~{estimatedBoxes} Kutu
+                              </span>
+                              <span style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '2px', fontWeight: '600' }}>
+                                Teklif Kapsamında
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -472,9 +477,9 @@ export default function QuoteCartDrawer({
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Toplam Metraj / Tutar:</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Toplam Metraj:</div>
                 <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a' }}>
-                  {totalM2} m² • <span style={{ color: '#b38e47' }}>₺{totalEstPrice.toLocaleString('tr-TR')}</span>
+                  {totalM2} m² <span style={{ fontSize: '0.80rem', fontWeight: '700', color: '#b38e47', marginLeft: '6px' }}>({cartItems.length} Kalem Seramik)</span>
                 </div>
               </div>
               <button
