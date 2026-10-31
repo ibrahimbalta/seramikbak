@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
 import HeaderLocationPicker from '@/components/HeaderLocationPicker';
+import QuoteCartDrawer from '@/components/QuoteCartDrawer';
 import { findNearestCity, TURKEY_CITIES } from '@/lib/turkeyCities';
 import { useLanguage } from '@/lib/languageContext';
 
@@ -1329,6 +1330,67 @@ export default function Home() {
   const [userFavorites, setUserFavorites] = useState([]);
   const [showFavoritesPanel, setShowFavoritesPanel] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Quote Cart / Karo Sepeti State
+  const [quoteCartItems, setQuoteCartItems] = useState([]);
+  const [showQuoteCartDrawer, setShowQuoteCartDrawer] = useState(false);
+
+  // Quote Cart LocalStorage Senkronizasyonu
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem('seramikbak_quote_cart');
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        if (Array.isArray(parsed)) setQuoteCartItems(parsed);
+      }
+    } catch (e) {}
+  }, []);
+
+  const saveCartToStorage = (items) => {
+    try {
+      localStorage.setItem('seramikbak_quote_cart', JSON.stringify(items));
+    } catch (e) {}
+  };
+
+  const handleToggleCartItem = (product) => {
+    setQuoteCartItems(prev => {
+      const exists = prev.some(p => p.id === product.id);
+      let next;
+      if (exists) {
+        next = prev.filter(p => p.id !== product.id);
+      } else {
+        const itemToAdd = {
+          ...product,
+          quantityM2: 25 // varsayılan 25 m2
+        };
+        next = [...prev, itemToAdd];
+        setShowQuoteCartDrawer(true);
+      }
+      saveCartToStorage(next);
+      return next;
+    });
+  };
+
+  const handleRemoveCartItem = (productId) => {
+    setQuoteCartItems(prev => {
+      const next = prev.filter(p => p.id !== productId);
+      saveCartToStorage(next);
+      return next;
+    });
+  };
+
+  const handleUpdateCartQuantity = (productId, newM2) => {
+    setQuoteCartItems(prev => {
+      const next = prev.map(p => p.id === productId ? { ...p, quantityM2: newM2 } : p);
+      saveCartToStorage(next);
+      return next;
+    });
+  };
+
+  const handleClearCart = () => {
+    setQuoteCartItems([]);
+    saveCartToStorage([]);
+  };
 
   // Podium Spotlight Modal State
   const [podiumData, setPodiumData] = useState(null);
@@ -4123,6 +4185,36 @@ export default function Home() {
               </button>
             ) : (
               <>
+                <button 
+                  className="header-btn quote-cart-btn" 
+                  onClick={() => setShowQuoteCartDrawer(true)}
+                  title="Teklif & Numune Sepeti"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    position: 'relative',
+                    borderColor: quoteCartItems.length > 0 ? 'var(--accent-gold)' : undefined
+                  }}
+                >
+                  <ShoppingBag size={16} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
+                  <span>Teklif Sepetim</span>
+                  {quoteCartItems.length > 0 && (
+                    <span 
+                      style={{
+                        background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                        color: '#ffffff',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        borderRadius: '10px',
+                        padding: '1px 6px',
+                        marginLeft: '2px'
+                      }}
+                    >
+                      {quoteCartItems.length}
+                    </span>
+                  )}
+                </button>
                 <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
                   <HeartIcon size={16} className="heart-icon-gold" />
                   <span>Favorilerim</span>
@@ -4188,6 +4280,16 @@ export default function Home() {
               onDetectLocation={detectUserLocation}
               isLocating={isLocating}
             />
+            <button 
+              type="button"
+              className="mobile-header-action-btn"
+              onClick={() => setShowQuoteCartDrawer(true)}
+              aria-label="Teklif Sepeti"
+              title="Teklif & Numune Sepeti"
+            >
+              <ShoppingBag size={17} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
+              {quoteCartItems.length > 0 && <span className="mobile-header-badge" style={{ background: 'var(--accent-gold)' }}>{quoteCartItems.length}</span>}
+            </button>
             <button 
               type="button"
               className="mobile-header-action-btn" 
@@ -5824,6 +5926,8 @@ export default function Home() {
                         navigateToDealers={navigateToDealers}
                         getProductBadge={getProductBadge}
                         handleProductCardClick={handleProductCardClick}
+                        onAddToCart={handleToggleCartItem}
+                        isInCart={quoteCartItems.some(c => c.id === product.id)}
                       />
                     ))
                   )}
@@ -7299,6 +7403,27 @@ export default function Home() {
                   <div className="detail-secondary-actions-grid">
                     <button 
                       onClick={() => {
+                        handleToggleCartItem(detailProduct);
+                      }}
+                      className="detail-action-btn btn-action-cart"
+                      style={{
+                        background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#ecfdf5' : '#fffdfa',
+                        borderColor: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#b38e47'
+                      }}
+                    >
+                      <div className="btn-action-icon-circle" style={{ background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#b38e47', color: '#fff' }}>
+                        <ShoppingBag size={16} />
+                      </div>
+                      <div className="btn-text-group">
+                        <span className="btn-title" style={{ color: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#b38e47' }}>
+                          {quoteCartItems.some(c => c.id === detailProduct.id) ? '✓ Teklif Sepetinde' : '+ Teklif Sepetine Ekle'}
+                        </span>
+                        <span className="btn-subtext">Çoklu Liste & Keşif</span>
+                      </div>
+                    </button>
+
+                    <button 
+                      onClick={() => {
                         setShowDetailModal(false);
                         navigateToDealers(detailProduct);
                       }}
@@ -8453,6 +8578,18 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* QUOTE CART DRAWER (TEKLİF & NUMUNE SEPETİ) */}
+      <QuoteCartDrawer 
+        isOpen={showQuoteCartDrawer}
+        onClose={() => setShowQuoteCartDrawer(false)}
+        cartItems={quoteCartItems}
+        onRemoveItem={handleRemoveCartItem}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onClearCart={handleClearCart}
+        userLocationName={userLocationName}
+        userCoords={userCoords}
+      />
 
 
 

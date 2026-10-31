@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart as HeartIcon } from 'lucide-react';
+import { Heart as HeartIcon, ShoppingBag } from 'lucide-react';
 import TileVisualPreview from './TileVisualPreview';
 import { useLanguage } from '@/lib/languageContext';
 
@@ -15,7 +15,9 @@ export default function ProductCard({
   navigateTo3DStudio,
   navigateToDealers,
   getProductBadge,
-  handleProductCardClick
+  handleProductCardClick,
+  onAddToCart,
+  isInCart = false
 }) {
   const { t, translateFinish, translateStyle } = useLanguage();
   const hasAd = product.campaigns && product.campaigns.length > 0;
@@ -95,26 +97,51 @@ export default function ProductCard({
         
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
           <p className="card-brand-new" style={{ margin: 0 }}>{product.brand?.name}</p>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
-            title={t('comparePrices')}
-            style={{
-              background: isCompared ? 'var(--accent-gold)' : 'transparent',
-              color: isCompared ? '#ffffff' : 'var(--text-muted)',
-              border: isCompared ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
-              borderRadius: '6px',
-              padding: '2px 7px',
-              fontSize: '0.68rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '3px'
-            }}
-          >
-            <span>{isCompared ? '✓ Kıyas' : '+ Kıyas'}</span>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {onAddToCart && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
+                title={isInCart ? 'Teklif Sepetinden Çıkar' : 'Teklif Sepetine Ekle'}
+                style={{
+                  background: isInCart ? '#059669' : 'rgba(179, 142, 71, 0.1)',
+                  color: isInCart ? '#ffffff' : '#b38e47',
+                  border: isInCart ? '1px solid #059669' : '1px solid rgba(179, 142, 71, 0.3)',
+                  borderRadius: '6px',
+                  padding: '2px 7px',
+                  fontSize: '0.68rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px'
+                }}
+              >
+                <ShoppingBag size={11} />
+                <span>{isInCart ? '✓ Sepette' : '+ Teklif'}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
+              title={t('comparePrices')}
+              style={{
+                background: isCompared ? 'var(--accent-gold)' : 'transparent',
+                color: isCompared ? '#ffffff' : 'var(--text-muted)',
+                border: isCompared ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '2px 7px',
+                fontSize: '0.68rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}
+            >
+              <span>{isCompared ? '✓ Kıyas' : '+ Kıyas'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check } from 'lucide-react';
+import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check, FileText } from 'lucide-react';
 import { useLanguage } from '@/lib/languageContext';
+import { exportMetrajReportToPdf } from '@/lib/pdfReportExporter';
 
 export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
   const router = useRouter();
@@ -377,31 +378,80 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             </div>
           </div>
 
-          <button 
-            type="button" 
-            onClick={handleRequestQuote} 
-            className="calc-cta-button"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)',
-              color: '#ffffff',
-              fontWeight: 800,
-              fontSize: '0.84rem',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(179, 142, 71, 0.3)',
-              boxSizing: 'border-box',
-              padding: '10px 16px',
-              gap: '6px'
-            }}
-          >
-            <span>Bayilerden Fiyat Teklifi Al</span>
-            <ArrowRight size={15} style={{ flexShrink: 0 }} />
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              type="button" 
+              onClick={() => {
+                exportMetrajReportToPdf({
+                  projectName: `${roomType.toUpperCase()} Seramik & Metraj Keşfi`,
+                  clientName: 'SeramikBak Ziyaretçisi',
+                  products: [
+                    {
+                      name: `${tileSizeConfigMap[tileSize]?.label || tileSize} ${tileStyle.toUpperCase()} Seramik`,
+                      width: parseInt(tileSize.split('x')[0]) || 60,
+                      height: parseInt(tileSize.split('x')[1]) || 120,
+                      quantityM2: areaM2,
+                      boxCount: requiredBoxes,
+                      finish: tileStyle === 'mermer' ? 'Parlak' : 'Mat',
+                      price: Math.round((stylePriceRangeMap[tileStyle]?.min + stylePriceRangeMap[tileStyle]?.max) / 2)
+                    }
+                  ],
+                  calcSummary: {
+                    adhesiveBags,
+                    groutBags: groutPacks,
+                    wastagePercent: layingConfigMap[layingStyle]?.wastage || 10
+                  },
+                  notes: includeLabor ? `Usta işçilik dahildir (Tahmini ${dynamicLaborRatePerM2} ₺/m²).` : 'Yalnızca malzeme keşfidir.'
+                });
+              }}
+              className="calc-pdf-button"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#f8fafc',
+                color: '#334155',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.80rem',
+                cursor: 'pointer',
+                padding: '10px 14px',
+                gap: '6px',
+                boxSizing: 'border-box'
+              }}
+              title="Keşif Listesi PDF İndir"
+            >
+              <FileText size={15} style={{ color: '#b38e47', flexShrink: 0 }} />
+              <span>PDF İndir</span>
+            </button>
+
+            <button 
+              type="button" 
+              onClick={handleRequestQuote} 
+              className="calc-cta-button"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+                background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)',
+                color: '#ffffff',
+                fontWeight: 800,
+                fontSize: '0.84rem',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(179, 142, 71, 0.3)',
+                boxSizing: 'border-box',
+                padding: '10px 16px',
+                gap: '6px'
+              }}
+            >
+              <span>Bayilerden Fiyat Teklifi Al</span>
+              <ArrowRight size={15} style={{ flexShrink: 0 }} />
+            </button>
+          </div>
         </div>
       </div>
 
