@@ -5310,23 +5310,26 @@ export default function Home() {
 
                 {/* Konum / Şehir Filtre Kartı */}
                 <div style={{
-                  padding: '12px 14px',
+                  padding: '10px 12px',
                   borderRadius: '12px',
                   background: 'linear-gradient(135deg, rgba(179,142,71,0.08) 0%, rgba(255,255,255,0.8) 100%)',
                   border: '1px solid rgba(179,142,71,0.25)',
                   marginBottom: '10px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px'
+                  gap: '8px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <MapPin size={15} style={{ color: '#b38e47' }} />
-                      <span style={{ fontSize: '0.80rem', fontWeight: '800', color: '#0f172a' }}>Teslimat Şehri</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', boxSizing: 'border-box' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                      <MapPin size={14} style={{ color: '#b38e47', flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap' }}>Teslimat Şehri</span>
                     </div>
-                    <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700' }}>{userLocationName || 'İstanbul'}</span>
+                    <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{userLocationName || 'İstanbul'}</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
+                  <div style={{ display: 'flex', gap: '6px', width: '100%', boxSizing: 'border-box', alignItems: 'stretch' }}>
                     <select
                       value={userLocationName ? userLocationName.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() : 'İstanbul'}
                       onChange={(e) => {
@@ -5334,7 +5337,9 @@ export default function Home() {
                         handleLocationChange(targetCity.name, targetCity.lat, targetCity.lng);
                       }}
                       style={{
-                        flex: 1,
+                        flex: '1 1 auto',
+                        minWidth: 0,
+                        width: '100%',
                         padding: '6px 8px',
                         borderRadius: '8px',
                         border: '1px solid #cbd5e1',
@@ -5343,7 +5348,8 @@ export default function Home() {
                         color: '#1e293b',
                         background: '#ffffff',
                         outline: 'none',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        boxSizing: 'border-box'
                       }}
                     >
                       {TURKEY_CITIES.map(c => (
@@ -5357,24 +5363,27 @@ export default function Home() {
                       title="Mevcut Konumumu Algıla (GPS)"
                       aria-label="Mevcut Konumumu Algıla"
                       style={{
-                        padding: '6px 10px',
+                        flexShrink: 0,
+                        padding: '0 8px',
+                        height: '32px',
                         borderRadius: '8px',
                         border: '1px solid #b38e47',
                         background: '#b38e47',
                         color: '#ffffff',
                         cursor: isLocating ? 'wait' : 'pointer',
-                        display: 'flex',
+                        display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '5px',
-                        fontSize: '0.74rem',
+                        gap: '4px',
+                        fontSize: '0.72rem',
                         fontWeight: '700',
                         whiteSpace: 'nowrap',
+                        boxSizing: 'border-box',
                         transition: 'all 0.2s ease'
                       }}
                     >
                       <Navigation size={12} className={isLocating ? 'animate-spin' : ''} />
-                      <span>{isLocating ? 'Bulunuyor...' : 'GPS'}</span>
+                      <span>{isLocating ? '...' : 'GPS'}</span>
                     </button>
                   </div>
                 </div>
@@ -9140,23 +9149,26 @@ export default function Home() {
         <div className="filters-scroll-area">
           {/* Mobile Konum / Şehir Filtre Kartı */}
           <div style={{
-            padding: '12px 14px',
+            padding: '10px 12px',
             borderRadius: '12px',
             background: 'linear-gradient(135deg, rgba(179,142,71,0.08) 0%, rgba(255,255,255,0.8) 100%)',
             border: '1px solid rgba(179,142,71,0.25)',
             marginBottom: '12px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px'
+            gap: '8px',
+            width: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <MapPin size={15} style={{ color: '#b38e47' }} />
-                <span style={{ fontSize: '0.80rem', fontWeight: '800', color: '#0f172a' }}>Teslimat Şehri</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                <MapPin size={14} style={{ color: '#b38e47', flexShrink: 0 }} />
+                <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap' }}>Teslimat Şehri</span>
               </div>
-              <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700' }}>{userLocationName || 'İstanbul'}</span>
+              <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{userLocationName || 'İstanbul'}</span>
             </div>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '6px', width: '100%', boxSizing: 'border-box', alignItems: 'stretch' }}>
               <select
                 value={userLocationName ? userLocationName.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() : 'İstanbul'}
                 onChange={(e) => {
@@ -9164,7 +9176,9 @@ export default function Home() {
                   handleLocationChange(targetCity.name, targetCity.lat, targetCity.lng);
                 }}
                 style={{
-                  flex: 1,
+                  flex: '1 1 auto',
+                  minWidth: 0,
+                  width: '100%',
                   padding: '6px 8px',
                   borderRadius: '8px',
                   border: '1px solid #cbd5e1',
@@ -9173,7 +9187,8 @@ export default function Home() {
                   color: '#1e293b',
                   background: '#ffffff',
                   outline: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxSizing: 'border-box'
                 }}
               >
                 {TURKEY_CITIES.map(c => (
@@ -9187,24 +9202,27 @@ export default function Home() {
                 title="Mevcut Konumumu Algıla (GPS)"
                 aria-label="Mevcut Konumumu Algıla"
                 style={{
-                  padding: '6px 10px',
+                  flexShrink: 0,
+                  padding: '0 8px',
+                  height: '32px',
                   borderRadius: '8px',
                   border: '1px solid #b38e47',
                   background: '#b38e47',
                   color: '#ffffff',
                   cursor: isLocating ? 'wait' : 'pointer',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '5px',
-                  fontSize: '0.74rem',
+                  gap: '4px',
+                  fontSize: '0.72rem',
                   fontWeight: '700',
                   whiteSpace: 'nowrap',
+                  boxSizing: 'border-box',
                   transition: 'all 0.2s ease'
                 }}
               >
                 <Navigation size={12} className={isLocating ? 'animate-spin' : ''} />
-                <span>{isLocating ? 'Bulunuyor...' : 'GPS'}</span>
+                <span>{isLocating ? '...' : 'GPS'}</span>
               </button>
             </div>
           </div>
