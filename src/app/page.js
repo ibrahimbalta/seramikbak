@@ -4,8 +4,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
-import GlobalExportHub from '@/components/GlobalExportHub';
-import HowItWorksModal from '@/components/HowItWorksModal';
 import { useLanguage } from '@/lib/languageContext';
 
 import { 
@@ -70,7 +68,12 @@ import {
   Box
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
+
+const GlobalExportHub = dynamic(() => import('@/components/GlobalExportHub'), { ssr: false });
+const HowItWorksModal = dynamic(() => import('@/components/HowItWorksModal'), { ssr: false });
+const BimSpecDownloadModal = dynamic(() => import('@/components/BimSpecDownloadModal'), { ssr: false });
+const TileCalculatorWidget = dynamic(() => import('@/components/TileCalculatorWidget'), { ssr: false });
+const HomeTrustFaqSection = dynamic(() => import('@/components/HomeTrustFaqSection'), { ssr: false });
 
 // Dynamically import Room Renovation (Mekânımda Gör & Dene) modal
 const RoomRenovationModal = dynamic(() => import('@/components/RoomRenovationModal'), { 
@@ -111,10 +114,8 @@ const ModelViewerAR = dynamic(() => import('@/components/ModelViewerAR'), {
 import TileVisualPreview from '@/components/TileVisualPreview';
 import BathroomMockupPreview from '@/components/BathroomMockupPreview';
 import ProductCard from '@/components/ProductCard';
-import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
-import HomeTrustFaqSection from '@/components/HomeTrustFaqSection';
 
 const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
