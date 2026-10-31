@@ -766,6 +766,8 @@ export default function Home() {
 
   // New visual and search states
   const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const [heroTouchStart, setHeroTouchStart] = useState({ x: 0, y: 0 });
+  const [drawerTouchStart, setDrawerTouchStart] = useState({ x: 0, y: 0 });
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(0);
@@ -4602,7 +4604,28 @@ export default function Home() {
           return (
           <div className="search-portal animate-fade-in">
             {/* Wide Centered Hero Section with Showroom Image Background */}
-            <div className="showroom-hero-banner glass-panel" style={{ backgroundImage: `url(${currentHeroBg})`, transition: 'background-image 0.8s ease' }}>
+            <div 
+              className="showroom-hero-banner glass-panel" 
+              style={{ backgroundImage: `url(${currentHeroBg})`, transition: 'background-image 0.8s ease' }}
+              onTouchStart={(e) => {
+                if (e.touches && e.touches[0]) {
+                  setHeroTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+                }
+              }}
+              onTouchEnd={(e) => {
+                if (!e.changedTouches || !e.changedTouches[0]) return;
+                const deltaX = e.changedTouches[0].clientX - heroTouchStart.x;
+                const deltaY = e.changedTouches[0].clientY - heroTouchStart.y;
+                if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+                  const total = activeHeroSlides.length || 3;
+                  if (deltaX < 0) {
+                    setHeroSlideIndex(prev => (prev + 1) % total);
+                  } else {
+                    setHeroSlideIndex(prev => (prev - 1 + total) % total);
+                  }
+                }
+              }}
+            >
               <div className="hero-dark-overlay" />
               <div className="hero-banner-content">
                 <div className="hero-badge-capsule">
@@ -9129,8 +9152,26 @@ export default function Home() {
       <aside 
         className={`filters-sidebar-new glass-panel mobile-sidebar ${showMobileFilters ? 'open' : ''}`} 
         style={showMobileFilters ? { position: 'fixed', transform: 'translateX(0)' } : { position: 'fixed', transform: 'translateX(-100%)', pointerEvents: 'none' }}
+        onTouchStart={(e) => {
+          if (e.touches && e.touches[0]) {
+            setDrawerTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+          }
+        }}
+        onTouchEnd={(e) => {
+          if (!e.changedTouches || !e.changedTouches[0]) return;
+          const deltaX = e.changedTouches[0].clientX - drawerTouchStart.x;
+          const deltaY = e.changedTouches[0].clientY - drawerTouchStart.y;
+          // Swipe left (away) or drag handle down closes filter drawer
+          if (deltaX < -50 || (deltaY > 60 && Math.abs(deltaY) > Math.abs(deltaX))) {
+            setShowMobileFilters(false);
+          }
+        }}
       >
-        <div className="bottom-sheet-handle-wrapper">
+        <div 
+          className="bottom-sheet-handle-wrapper"
+          onClick={() => setShowMobileFilters(false)}
+          title="Filtreleri Kapat"
+        >
           <div className="bottom-sheet-handle" />
         </div>
         <div className="filter-header-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '12px' }}>

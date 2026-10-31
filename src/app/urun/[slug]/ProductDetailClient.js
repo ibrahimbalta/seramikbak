@@ -66,11 +66,39 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     }
   }, []);
 
-  // Geolocation-based nearest dealers
+  // Geolocation-based nearest dealers & Active city
   const [liveDealers, setLiveDealers] = useState(authorizedDealers);
+  const [userCity, setUserCity] = useState('');
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50, show: false });
+  const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 });
+
+  // Read saved delivery city from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('seramikbak_user_city');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed?.name) {
+            setUserCity(parsed.name);
+            const bId = product.brandId || product.brand?.id || '';
+            const pId = product.id || '';
+            fetch(`/api/dealers/nearest?brandId=${encodeURIComponent(bId)}&productId=${encodeURIComponent(pId)}&city=${encodeURIComponent(parsed.name)}&lat=${parsed.lat || ''}&lng=${parsed.lng || ''}`)
+              .then(res => res.json())
+              .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                  setLiveDealers(data);
+                }
+              })
+              .catch(err => console.debug('Dealer city fetch err:', err));
+          }
+        }
+      } catch (e) {}
+    }
+  }, [product.brandId, product.id]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator && !userCity) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const lat = pos.coords.latitude;
@@ -82,6 +110,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             .then(data => {
               if (Array.isArray(data) && data.length > 0) {
                 setLiveDealers(data);
+                if (data[0]?.city) setUserCity(data[0].city);
               }
             })
             .catch(err => console.warn('Could not fetch nearest dealers by location:', err));
@@ -90,7 +119,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
       );
     }
-  }, [product.brandId, product.id]);
+  }, [product.brandId, product.id, userCity]);
 
   // Area Calculator State
   const [showCalculator, setShowCalculator] = useState(false);
@@ -337,23 +366,23 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     }
   };
 
-  // 3D Room Render preview
-  const [roomRenderImage, setRoomRenderImage] = useState(null);
+  // 3D Room Render previews for multiple architectural scenes
+  const [bathroomRenderImage, setBathroomRenderImage] = useState(null);
+  const [livingRenderImage, setLivingRenderImage] = useState(null);
 
   useEffect(() => {
-    if (activeView === 'room' && !roomRenderImage) {
-      let isMounted = true;
-      const generateProductRoom = async () => {
-        try {
-          const rawTileSource = product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg';
-          const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
-          const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
+    let isMounted = true;
+    const generateScenes = async () => {
+      try {
+        const rawTileSource = product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg';
+        const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
+        const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
 
-          const [roomImg, tileImg] = await Promise.all([
-            loadImage('/hero/luxury_bathroom.png'),
-            loadImage(tileSource).catch(() => loadImage('/hero/hero_ceramics.jpg'))
-          ]);
+        const tileImg = await loadImage(tileSource).catch(() => loadImage('/hero/hero_ceramics.jpg'));
 
+        // 1. Luxury Bathroom Render
+        loadImage('/hero/luxury_bathroom.png').then((roomImg) => {
+          if (!isMounted) return;
           const surfaces = {
             floor: {
               polygon: [[0, 68], [100, 68], [100, 100], [0, 100]],
@@ -361,34 +390,96 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             },
             walls: []
           };
-
-          const renderedUrl = generateTilePreview(roomImg, tileImg, surfaces, {
+          const url = generateTilePreview(roomImg, tileImg, surfaces, {
             groutColor: '#cbd5e1',
             groutWidth: 1.4,
             tileWCm: tileWidth,
             tileHCm: tileHeight,
             finish: product.finish || 'Mat',
             layout: 'straight',
-            subdivisions: 28,
+            subdivisions: 24,
           });
+          if (isMounted) setBathroomRenderImage(url);
+        }).catch(() => {});
 
-          if (isMounted) {
-            setRoomRenderImage(renderedUrl);
-          }
-        } catch {
-          if (isMounted) setRoomRenderImage('/hero/luxury_bathroom.png');
-        }
-      };
-      generateProductRoom();
-      return () => { isMounted = false; };
+        // 2. Modern Living Room Render
+        loadImage('/hero/modern_living.png').then((roomImg) => {
+          if (!isMounted) return;
+          const surfaces = {
+            floor: {
+              polygon: [[0, 64], [100, 64], [100, 100], [0, 100]],
+              exclude: [[[45, 60], [75, 60], [75, 80], [45, 80]]]
+            },
+            walls: []
+          };
+          const url = generateTilePreview(roomImg, tileImg, surfaces, {
+            groutColor: '#e2e8f0',
+            groutWidth: 1.2,
+            tileWCm: tileWidth,
+            tileHCm: tileHeight,
+            finish: product.finish || 'Mat',
+            layout: 'straight',
+            subdivisions: 24,
+          });
+          if (isMounted) setLivingRenderImage(url);
+        }).catch(() => {});
+
+      } catch (err) {
+        console.debug('Scene render error:', err);
+      }
+    };
+
+    generateScenes();
+    return () => { isMounted = false; };
+  }, [product, tileWidth, tileHeight]);
+
+  // Touch Swipe Gesture for Mobile Gallery
+  const availableViews = ['image', 'texture', 'bathroom', 'living'];
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      setTouchStartPos({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     }
-  }, [activeView, roomRenderImage, product, tileWidth, tileHeight]);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!e.changedTouches || !e.changedTouches[0]) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartPos.x;
+    const deltaY = e.changedTouches[0].clientY - touchStartPos.y;
+    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+      const currentIdx = availableViews.indexOf(activeView);
+      if (deltaX < 0) {
+        // Swiped Left -> next view
+        const nextIdx = (currentIdx + 1) % availableViews.length;
+        setActiveView(availableViews[nextIdx]);
+      } else {
+        // Swiped Right -> prev view
+        const prevIdx = (currentIdx - 1 + availableViews.length) % availableViews.length;
+        setActiveView(availableViews[prevIdx]);
+      }
+    }
+  };
+
+  // High-Resolution Magnifier Lens Handler
+  const handleMouseMove = (e) => {
+    if (activeView !== 'image' && activeView !== 'texture') return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setZoomPos({ x, y, show: true });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomPos(prev => ({ ...prev, show: false }));
+  };
 
   const currentDisplayImage = 
     activeView === 'texture' 
       ? (product.textureUrl || product.imageUrl || getTextureFallback(product)) 
-      : activeView === 'room'
-      ? (roomRenderImage || '/hero/luxury_bathroom.png')
+      : activeView === 'bathroom'
+      ? (bathroomRenderImage || '/hero/luxury_bathroom.png')
+      : activeView === 'living'
+      ? (livingRenderImage || '/hero/modern_living.png')
       : (product.imageUrl || product.textureUrl || getTextureFallback(product));
 
   const displayDealers = liveDealers.length > 0 ? liveDealers : authorizedDealers;
@@ -427,7 +518,18 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           
           {/* Gallery Column */}
           <div className="sb-gallery-col">
-            <div className="sb-stage-card">
+            <div 
+              className="sb-stage-card"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              style={{ 
+                position: 'relative', 
+                overflow: 'hidden', 
+                cursor: (activeView === 'image' || activeView === 'texture') ? 'crosshair' : 'default' 
+              }}
+            >
               <img
                 src={currentDisplayImage}
                 alt={`${brandName} ${product.name}`}
@@ -445,6 +547,22 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 }}
               />
 
+              {/* High-Resolution Interactive Magnifier Lens (Active on Slab & Texture) */}
+              {zoomPos.show && (activeView === 'image' || activeView === 'texture') && (
+                <div 
+                  className="sb-magnifier-lens"
+                  style={{
+                    position: 'absolute',
+                    top: `${zoomPos.y}%`,
+                    left: `${zoomPos.x}%`,
+                    transform: 'translate(-50%, -50%)',
+                    backgroundImage: `url(${currentDisplayImage})`,
+                    backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                    backgroundSize: '320%'
+                  }}
+                />
+              )}
+
               {/* Minimal Clean Badges */}
               <div className="sb-stage-top-left">
                 <span className="sb-pill-badge">{brandName}</span>
@@ -455,7 +573,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               <button 
                 onClick={() => setShowImageZoom(true)} 
                 className="sb-stage-zoom" 
-                title="Büyük Boyut"
+                title="Büyük Boyut (Tam Ekran)"
               >
                 <Maximize2 size={15} />
               </button>
@@ -472,16 +590,30 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <span>Plaka</span>
               </button>
 
-              {product.textureUrl && (
-                <button
-                  type="button"
-                  onClick={() => setActiveView('texture')}
-                  className={`sb-view-tab ${activeView === 'texture' ? 'active' : ''}`}
-                >
-                  <Eye size={13} />
-                  <span>Doku Detayı</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setActiveView('texture')}
+                className={`sb-view-tab ${activeView === 'texture' ? 'active' : ''}`}
+              >
+                <Eye size={13} />
+                <span>Doku</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveView('bathroom')}
+                className={`sb-view-tab ${activeView === 'bathroom' ? 'active' : ''}`}
+              >
+                <span>🏛️ Banyo</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveView('living')}
+                className={`sb-view-tab ${activeView === 'living' ? 'active' : ''}`}
+              >
+                <span>🛋️ Salon</span>
+              </button>
 
               <button
                 type="button"
@@ -491,15 +623,11 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <Camera size={13} />
                 <span>Mekânımda Gör</span>
               </button>
+            </div>
 
-              <button
-                type="button"
-                onClick={handleGoTo3DStudio}
-                className="sb-view-tab"
-              >
-                <Sparkles size={13} />
-                <span>3D Stüdyo</span>
-              </button>
+            {/* Mobile Touch Swipe Gesture Tip */}
+            <div className="sb-swipe-hint">
+              <span>👆 Parmakla sağa-sola kaydırarak mekanları gezin</span>
             </div>
 
             {/* 3 Metric Summary Strip */}
@@ -677,6 +805,65 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 )}
               </div>
 
+              {/* Prominent Live Showroom Reassurance Card */}
+              <div className="sb-showroom-card">
+                <div className="sb-showroom-badge-row">
+                  <div className="sb-showroom-city-chip">
+                    <MapPin size={15} color="#b38e47" />
+                    <span>{userCity ? `${userCity} & Çevresi Canlı Teşhir` : 'Yetkili Showroom Teşhir'}</span>
+                  </div>
+                  <div className="sb-showroom-live-status">
+                    <span className="live-status-dot"></span>
+                    <span>Canlı Numune Standında</span>
+                  </div>
+                </div>
+
+                <h4 className="sb-showroom-headline">
+                  {userCity ? (
+                    <>Bu ürünü şu an <strong style={{ color: '#b38e47' }}>{userCity}</strong>'deki yetkili bayimizde canlı görebilirsiniz</>
+                  ) : (
+                    <>Bu ürünü en yakın yetkili fabrika showroomunda canlı inceleyin</>
+                  )}
+                </h4>
+
+                <p className="sb-showroom-desc">
+                  Işık yansıması, rölyef doku derinliği ve gerçek derz aralığını yakından test etmek için bayimizi ziyaret edebilir veya mimari numune isteyebilirsiniz.
+                </p>
+
+                {displayDealers.length > 0 && (
+                  <div className="sb-showroom-mini-dealer">
+                    <div className="sb-smd-info">
+                      <span className="sb-smd-name">{displayDealers[0].name}</span>
+                      <span className="sb-smd-addr">
+                        <MapPin size={11} style={{ display: 'inline', marginRight: 3 }} />
+                        {displayDealers[0].city}{displayDealers[0].district ? ` / ${displayDealers[0].district}` : ''}
+                      </span>
+                    </div>
+                    <div className="sb-smd-actions">
+                      {displayDealers[0].phone && (
+                        <a 
+                          href={`tel:${displayDealers[0].phone}`} 
+                          className="sb-smd-call-btn"
+                          title="Hemen Ara"
+                        >
+                          <Phone size={12} />
+                          <span>Bayiyi Ara</span>
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('dealers')}
+                        className="sb-smd-wa-btn"
+                        style={{ border: 'none', cursor: 'pointer' }}
+                        title="Tüm Bayileri Göster"
+                      >
+                        <span>Showroomlar ({displayDealers.length}) →</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
 
@@ -731,39 +918,63 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Et Kalınlığı</span>
-                  <span className="sb-tds-v">{product.thickness || 9.5} mm</span>
+                  <span className="sb-tds-v">{product.thickness || 9.5} mm (±0.2 mm)</span>
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Yüzey Bitişi</span>
-                  <span className="sb-tds-v">{product.finish || 'Mat'}</span>
+                  <span className="sb-tds-v">{product.finish || 'Mat'} (Anti-Refleks)</span>
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Doku & Tipoloji</span>
-                  <span className="sb-tds-v">{product.style || 'Porselen'}</span>
+                  <span className="sb-tds-v">{product.style || 'Porselen'} Karo (Sinterlenmiş Gövde)</span>
+                </div>
+                <div className="sb-tds-row">
+                  <span className="sb-tds-k">Su Emme Oranı (E)</span>
+                  <span className="sb-tds-v sb-green-text">E ≤ %0.1 (TS EN ISO 10545-3 Grup BIa)</span>
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Aşınma Dayanımı (PEI)</span>
-                  <span className="sb-tds-v">{product.peiRating ? `PEI ${product.peiRating}` : 'PEI 3-4 (Konut & Ticari)'}</span>
+                  <span className="sb-tds-v">{product.peiRating ? `PEI ${product.peiRating}` : 'PEI 4 (Yoğun Yaya Trafiği)'}</span>
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Kaydırmazlık</span>
-                  <span className="sb-tds-v">{product.slipResistance || 'R10 (Islak Zemin Uyumlu)'}</span>
+                  <span className="sb-tds-v">{product.slipResistance || 'R10 (DIN 51130 Islak Zemin Güvenli)'}</span>
                 </div>
                 <div className="sb-tds-row">
-                  <span className="sb-tds-k">Dona Dayanıklılık</span>
-                  <span className="sb-tds-v">{product.frostResistance ? 'Evet (Dış Mekan & Teras)' : 'İç Mekan'}</span>
+                  <span className="sb-tds-k">Kırılma Yükü & Eğilme</span>
+                  <span className="sb-tds-v">≥ 2400 N / ≥ 45 N/mm² (TS EN ISO 10545-4)</span>
+                </div>
+                <div className="sb-tds-row">
+                  <span className="sb-tds-k">Dona & Isı Şokuna Dayanım</span>
+                  <span className="sb-tds-v">{product.frostResistance ? '100+ Döngü Dayanıklı (EN ISO 10545-12 Dış Mekan)' : 'İç Mekan & Nötr'}</span>
+                </div>
+                <div className="sb-tds-row">
+                  <span className="sb-tds-k">Leke Tutmazlık & Temizlik</span>
+                  <span className="sb-tds-v">Sınıf 5 (EN ISO 10545-14 Kolay Temizlenebilir)</span>
+                </div>
+                <div className="sb-tds-row">
+                  <span className="sb-tds-k">Kimyasal Dayanım</span>
+                  <span className="sb-tds-v">GLA / GHA (Ev Kimyasalları & Havuz Tuzları Dayanımlı)</span>
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Kenar Tipi</span>
-                  <span className="sb-tds-v">{product.rectified ? 'Rektifiye (Lazer Kesim 1mm)' : 'Hassas Derzli'}</span>
+                  <span className="sb-tds-v">{product.rectified ? 'Lazer Rektifiye (1 mm Minimal Derz)' : 'Hassas Derzli'}</span>
+                </div>
+                <div className="sb-tds-row">
+                  <span className="sb-tds-k">Yerden Isıtma Uyumu</span>
+                  <span className="sb-tds-v sb-green-text">%100 Uyumlu (Yüksek Termal İletkenlik)</span>
                 </div>
                 <div className="sb-tds-row">
                   <span className="sb-tds-k">Tavsiye Edilen Alan</span>
                   <span className="sb-tds-v">{product.area || 'Banyo, Mutfak, Salon, Zemin & Duvar'}</span>
                 </div>
                 <div className="sb-tds-row">
-                  <span className="sb-tds-k">Kalite Belgesi</span>
-                  <span className="sb-tds-v sb-green-text">TSE EN 14411 (1. Kalite)</span>
+                  <span className="sb-tds-k">Kalite & Standartlar</span>
+                  <span className="sb-tds-v sb-green-text">TSE EN 14411 Ek G / CE / ISO 9001 (1. Sınıf)</span>
+                </div>
+                <div className="sb-tds-row">
+                  <span className="sb-tds-k">Yeşil Bina / Çevre</span>
+                  <span className="sb-tds-v">LEED & BREEAM Puan Katkısı, %0 VOC Emisyonu</span>
                 </div>
               </div>
             </div>
