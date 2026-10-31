@@ -68,6 +68,7 @@ import {
   Compass,
   Activity,
   CheckCircle,
+  ShieldCheck,
   Box
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -8620,7 +8621,7 @@ export default function Home() {
 
 
 
-      {/* Premium Footer Section */}
+      {/* Premium Modern Footer Section */}
       <footer className="site-footer">
         <div className="footer-grid">
           
@@ -8628,35 +8629,38 @@ export default function Home() {
           <div className="footer-col brand-col">
             <div className="footer-logo" onClick={() => setActiveTab('search')}>
               <div className="logo-icon">SB</div>
-              <span className="logo-text">SeramikBak</span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span className="logo-text">Seramik<span style={{ color: 'var(--accent-gold)' }}>Bak</span></span>
+                <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', color: '#94a3b8', textTransform: 'uppercase', fontWeight: '700' }}>Uluslararası Seramik Platformu</span>
+              </div>
             </div>
             <p className="footer-tagline">
-              Türkiye'nin ilk ve lider seramik & showroom ekosistemi. 40+ üretici markanın koleksiyonlarını keşfedin, 3D sanal stüdyoda odanızı tasarlayın ve en yakın yetkili bayiden anında teklif alın.
+              Türkiye'nin öncü seramik, 3D görselleştirme ve showroom ekosistemi. 40+ üretici markanın koleksiyonlarını canlı deneyin, en yakın yetkili bayilerden anında teklif alın.
             </p>
             <div className="footer-socials">
-              <a href="#" className="social-icon-btn" title="Web Sitesi" onClick={(e) => e.preventDefault()}><Globe size={16} /></a>
-              <a href="mailto:destek@seramikbak.com" className="social-icon-btn" title="E-Posta Gönder"><Mail size={16} /></a>
-              <a href="tel:08501234567" className="social-icon-btn" title="Müşteri Hizmetleri Ara"><Phone size={16} /></a>
-              <a href="https://wa.me/908501234567" target="_blank" rel="noopener noreferrer" className="social-icon-btn" title="WhatsApp Destek Hattı"><MessageSquare size={16} /></a>
+              <a href="#" className="social-icon-btn" title="Web Sitesi" onClick={(e) => e.preventDefault()}><Globe size={15} /></a>
+              <a href="mailto:destek@seramikbak.com" className="social-icon-btn" title="E-Posta Gönder"><Mail size={15} /></a>
+              <a href="tel:08501234567" className="social-icon-btn" title="Müşteri Hizmetleri Ara"><Phone size={15} /></a>
+              <a href="https://wa.me/908501234567" target="_blank" rel="noopener noreferrer" className="social-icon-btn" title="WhatsApp Destek Hattı"><MessageSquare size={15} /></a>
             </div>
           </div>
 
           {/* Column 2: Seramik Kategorileri */}
           <div className="footer-col">
-            <h4>Seramik Kategorileri</h4>
+            <h4>Kategoriler</h4>
             <ul>
               <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mermer Görünümlü', 'style', 'Mermer'); }}>Mermer Görünümlü Karolar</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Beton Görünümlü', 'style', 'Beton'); }}>Beton Görünümlü Seramikler</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Ahşap Dokulu', 'style', 'Ahşap'); }}>Ahşap Görünümlü Seramikler</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('60x120', 'size', '60x120'); }}>60x120 Geniş Ebatlı Porselen</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Parlak', 'finish', 'Parlak'); }}>Parlak Cilalı Koleksiyonlar</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('60x120', 'size', '60x120'); }}>60x120 Geniş Ebat Porselen</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Parlak', 'finish', 'Parlak'); }}>Parlak & Full Lappato</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mat', 'finish', 'Mat'); }}>Mat & R10 Kaymaz Karolar</a></li>
             </ul>
           </div>
 
           {/* Column 3: Popüler Seramik Markaları */}
           <div className="footer-col">
-            <h4>Popüler Markalar</h4>
+            <h4>Lider Markalar</h4>
             <ul>
               {brands.slice(0, 6).map(brand => (
                 <li key={brand.id}>
@@ -8667,28 +8671,33 @@ export default function Home() {
               ))}
               {brands.length === 0 && (
                 <>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>NG Kütahya Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Vitra Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Bien Seramik</a></li>
                   <li><a href="#" onClick={(e) => e.preventDefault()}>Çanakkale Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Ege Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>NG Kütahya Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>VitrA Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>Bien Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>Yurtbay Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>Seramiksan</a></li>
                 </>
               )}
             </ul>
           </div>
 
-          {/* Column 4: Kurumsal & Portallar */}
+          {/* Column 4: Portallar & Çözümler */}
           <div className="footer-col">
-            <h4>Kurumsal & Portallar</h4>
+            <h4>Portallar & Çözümler</h4>
             <ul>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); }}>Arama Motoru</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>3D Sanal Stüdyo</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('dealers'); }}>Bayi Bulucu</a></li>
-              <li><Link href="/bayiler">Yetkili Bayi Rehberi</Link></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Arama Motoru & Filtreler</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>3D Sanal Stüdyo & AR</a></li>
+              <li><Link href="/bayiler">Yetkili Bayi Bulucu</Link></li>
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
-              <li><Link href="/marka">B2B Marka Portalı</Link></li>
-              <li><Link href="/mimar" style={{ color: '#d4af37', fontWeight: '700' }}>📐 Mimar Portalı (ArchStudio)</Link></li>
+              <li><Link href="/marka">Üretici Marka Portalı</Link></li>
+              <li>
+                <Link href="/mimar" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#d4af37', fontWeight: '700' }}>
+                  <span>Mimar Portalı</span>
+                  <span style={{ fontSize: '0.62rem', background: 'rgba(212,175,55,0.18)', border: '1px solid rgba(212,175,55,0.3)', padding: '1px 6px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>PRO</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -8699,7 +8708,7 @@ export default function Home() {
               <li><Link href="/hakkimizda">Hakkımızda</Link></li>
               <li><Link href="/iletisim">İletişim & SSS</Link></li>
               <li><Link href="/ilham">İlham Galerisi & Trendler</Link></li>
-              <li><Link href="/yasal?tab=kvkk">KVKK & Gizlilik</Link></li>
+              <li><Link href="/yasal?tab=kvkk">KVKK & Gizlilik Politikası</Link></li>
               <li><Link href="/yasal?tab=kullanim">Kullanım Koşulları</Link></li>
               <li><Link href="/yasal?tab=cerez">Çerez Politikası</Link></li>
             </ul>
@@ -8707,22 +8716,30 @@ export default function Home() {
 
         </div>
 
-
-
         {/* Trademark & Independent Platform Notice */}
-        <div className="footer-disclaimer-notice" style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '11px', color: '#94a3b8', lineHeight: '1.6', textAlign: 'center' }}>
-          <p>
-            <strong style={{ color: '#cbd5e1' }}>Marka ve Bağımsızlık Bildirimi:</strong> Sitede ve dijital kataloglarda yer alan tüm üretici marka adları, şirket logoları, model serileri ve tescilli ticari markalar ilgili üretici hak sahiplerine aittir. SeramikBak, 6769 sayılı Sınai Mülkiyet Kanunu m. 7/5 uyarınca dürüstçe ve tasviri kullanım kapsamında bağımsız bir dijital tanıtım, sergi, karşılaştırma ve 3D görselleştirme teknolojisi platformudur; adı geçen markalarla doğrudan veya resmi bir ortaklık, distribütörlük ya da temsilcilik bağı bulunmamaktadır.
-          </p>
+        <div className="footer-disclaimer-notice">
+          <div className="disclaimer-badge">
+            <span className="disclaimer-icon">⚖️</span>
+            <p>
+              <strong>Marka ve Bağımsızlık Bildirimi:</strong> Sitede ve dijital kataloglarda yer alan tüm üretici marka adları, şirket logoları, model serileri ve tescilli ticari markalar ilgili üretici hak sahiplerine aittir. SeramikBak, 6769 sayılı Sınai Mülkiyet Kanunu m. 7/5 uyarınca dürüstçe ve tasviri kullanım kapsamında bağımsız bir dijital tanıtım, sergi, karşılaştırma ve 3D görselleştirme teknolojisi platformudur; adı geçen markalarla doğrudan veya resmi bir ortaklık, distribütörlük ya da temsilcilik bağı bulunmamaktadır.
+            </p>
+          </div>
         </div>
 
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <div className="footer-bottom-left">
-            <p>© 2026 SeramikBak Global. Tüm hakları saklıdır. Türkiye'nin Uluslararası Seramik Portalı.</p>
+            <p>© 2026 SeramikBak Global A.Ş. Tüm hakları saklıdır. Türkiye'nin Uluslararası Seramik Ekosistemi.</p>
           </div>
-          <div className="footer-bottom-right">
-            <span className="footer-security-tag">🔒 256-Bit SSL Güvenli Bağlantı</span>
+          <div className="footer-bottom-badges">
+            <span className="footer-security-tag">
+              <ShieldCheck size={13} style={{ color: '#10b981' }} />
+              <span>256-Bit SSL Güvenli Bağlantı</span>
+            </span>
+            <span className="footer-security-tag">
+              <CheckCircle size={13} style={{ color: '#d4af37' }} />
+              <span>81 İl Yetkili Bayi Ağı</span>
+            </span>
           </div>
         </div>
       </footer>
@@ -17162,18 +17179,19 @@ export default function Home() {
           display: none;
         }
 
-        /* PREMIUM FOOTER STYLES */
+        /* PREMIUM LUXURY FOOTER STYLES */
         .site-footer {
-          background: linear-gradient(180deg, #090d16 0%, #03050a 100%);
-          border-top: 2px solid rgba(179, 142, 71, 0.35);
+          background: linear-gradient(180deg, #0d121d 0%, #05070c 100%);
+          border-top: 1px solid rgba(212, 175, 55, 0.25);
           border-radius: var(--border-radius-lg);
-          padding: 60px 48px 30px 48px;
-          color: #8a99ad;
+          padding: 64px 48px 32px 48px;
+          color: #94a3b8;
           display: flex;
           flex-direction: column;
-          gap: 48px;
-          margin-top: 40px;
-          box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.4);
+          gap: 40px;
+          margin-top: 48px;
+          box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+          position: relative;
         }
 
         .footer-grid {
@@ -17182,37 +17200,44 @@ export default function Home() {
           gap: 40px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
           .footer-grid {
             grid-template-columns: 1fr 1fr;
+            gap: 32px;
           }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
+          .site-footer {
+            padding: 40px 20px 24px 20px;
+            gap: 32px;
+          }
           .footer-grid {
             grid-template-columns: 1fr;
+            gap: 28px;
           }
         }
 
         .footer-col h4 {
-          color: #ffffff;
+          color: #f8fafc;
           font-family: var(--font-title);
-          font-size: 0.9rem;
-          font-weight: 700;
+          font-size: 0.82rem;
+          font-weight: 800;
           margin-bottom: 20px;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           position: relative;
+          padding-bottom: 8px;
         }
 
         .footer-col h4::after {
           content: '';
           position: absolute;
           left: 0;
-          bottom: -6px;
-          width: 32px;
+          bottom: 0;
+          width: 24px;
           height: 2px;
-          background: linear-gradient(90deg, var(--accent-gold) 0%, rgba(179, 142, 71, 0.2) 100%);
+          background: linear-gradient(90deg, #d4af37 0%, rgba(212, 175, 55, 0.1) 100%);
           border-radius: 2px;
         }
 
@@ -17226,24 +17251,25 @@ export default function Home() {
         }
 
         .footer-col ul :global(a) {
-          color: #8a99ad;
+          color: #94a3b8;
           text-decoration: none;
           font-size: 0.82rem;
           font-family: var(--font-body);
           font-weight: 500;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
           display: inline-block;
+          line-height: 1.4;
         }
 
         .footer-col ul :global(a):hover {
-          color: var(--accent-gold);
-          transform: translateX(6px);
+          color: #ffffff;
+          transform: translateX(5px);
         }
 
         .brand-col {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 18px;
         }
 
         .footer-logo {
@@ -17254,9 +17280,9 @@ export default function Home() {
         }
 
         .footer-logo .logo-icon {
-          width: 40px;
-          height: 40px;
-          background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+          width: 38px;
+          height: 38px;
+          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
           border: 1.5px solid #d4af37;
           border-radius: 10px;
           display: flex;
@@ -17265,20 +17291,21 @@ export default function Home() {
           font-family: var(--font-title);
           font-weight: 850;
           color: #ffffff;
-          font-size: 1.20rem;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25), 0 0 10px rgba(212, 175, 55, 0.15);
+          font-size: 1.15rem;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 12px rgba(212, 175, 55, 0.2);
         }
 
         .footer-logo .logo-text {
           font-family: var(--font-title);
-          font-size: 1.4rem;
+          font-size: 1.35rem;
           font-weight: 800;
           color: #ffffff;
-          letter-spacing: -0.010em;
+          letter-spacing: -0.01em;
+          line-height: 1.2;
         }
 
         .footer-tagline {
-          font-size: 0.82rem;
+          font-size: 0.80rem;
           line-height: 1.65;
           color: #64748b;
           margin: 0;
@@ -17287,61 +17314,100 @@ export default function Home() {
 
         .footer-socials {
           display: flex;
-          gap: 10px;
+          gap: 8px;
         }
 
         .social-icon-btn {
           width: 36px;
           height: 36px;
-          border-radius: 50%;
+          border-radius: 9px;
           background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.07);
           color: #94a3b8;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .social-icon-btn:hover {
-          background: var(--accent-gold);
-          border-color: transparent;
-          color: #ffffff;
+          background: #d4af37;
+          border-color: #d4af37;
+          color: #0b0f19;
           transform: translateY(-3px);
-          box-shadow: 0 6px 12px rgba(179, 142, 71, 0.35);
+          box-shadow: 0 6px 16px rgba(212, 175, 55, 0.25);
+        }
+
+        .footer-disclaimer-notice {
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 100%;
+        }
+
+        .disclaimer-badge {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 12px;
+          padding: 14px 18px;
+          display: flex;
+          gap: 12px;
+          align-items: flex-start;
+          text-align: left;
+        }
+
+        .disclaimer-icon {
+          font-size: 0.95rem;
+          flex-shrink: 0;
+          line-height: 1.4;
+          opacity: 0.8;
+        }
+
+        .disclaimer-badge p {
+          margin: 0;
+          font-size: 0.70rem;
+          line-height: 1.6;
+          color: #64748b;
+        }
+
+        .disclaimer-badge strong {
+          color: #94a3b8;
+          font-weight: 700;
         }
 
         .footer-bottom {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
           padding-top: 24px;
           font-size: 0.76rem;
-          color: #475569;
+          color: #64748b;
           flex-wrap: wrap;
-          gap: 12px;
+          gap: 14px;
         }
 
         .footer-bottom-left p {
           margin: 0;
         }
 
-        .footer-bottom-link:hover {
-          color: #ffffff !important;
+        .footer-bottom-badges {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
         }
 
         .footer-security-tag {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 4px 12px;
-          background: rgba(179, 142, 71, 0.08);
-          border: 1px solid rgba(179, 142, 71, 0.15);
+          padding: 5px 12px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 20px;
-          color: #b38e47;
+          color: #94a3b8;
           font-size: 0.72rem;
-          font-weight: 700;
+          font-weight: 600;
         }
 
 
