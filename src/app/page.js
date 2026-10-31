@@ -4154,18 +4154,18 @@ export default function Home() {
           ) : (
             <>
               <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <SearchIcon size={14} />
+                <SearchIcon size={16} />
                 <span>{t('products')}</span>
               </button>
               <button 
                 className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
-                <Palette size={14} />
+                <Palette size={16} />
                 <span>{t('studio3d')}</span>
               </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <MapPin size={14} />
+                <MapPin size={16} />
                 <span>{t('dealers')}</span>
               </button>
             </>
@@ -10996,12 +10996,12 @@ export default function Home() {
 
         .header-nav {
           display: flex;
-          background: rgba(0, 0, 0, 0.035);
-          padding: 3px;
-          border-radius: 20px;
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          background: rgba(0, 0, 0, 0.04);
+          padding: 4px;
+          border-radius: 24px;
+          border: 1px solid rgba(0, 0, 0, 0.05);
           backdrop-filter: blur(5px);
-          gap: 2px;
+          gap: 3px;
           flex-shrink: 0;
         }
 
@@ -11009,18 +11009,18 @@ export default function Home() {
           background: transparent;
           border: none;
           color: #475569;
-          padding: 6px 14px;
-          border-radius: 16px;
+          padding: 8px 18px;
+          border-radius: 20px;
           cursor: pointer;
           font-family: var(--font-title);
-          font-weight: 700 !important;
-          font-size: 0.78rem;
+          font-weight: 750 !important;
+          font-size: 0.92rem;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           display: inline-flex !important;
           flex-direction: row !important;
           align-items: center !important;
-          gap: 6px !important;
-          letter-spacing: 0.01em;
+          gap: 8px !important;
+          letter-spacing: -0.01em;
           white-space: nowrap !important;
           flex-shrink: 0;
           text-decoration: none !important;
@@ -11031,7 +11031,8 @@ export default function Home() {
           word-break: keep-all !important;
           line-height: 1 !important;
           display: inline-block !important;
-          font-weight: 700 !important;
+          font-weight: 750 !important;
+          font-size: 0.92rem !important;
           color: inherit !important;
         }
 
