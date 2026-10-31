@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
+import HeaderLocationPicker from '@/components/HeaderLocationPicker';
+import { findNearestCity, TURKEY_CITIES } from '@/lib/turkeyCities';
 import { useLanguage } from '@/lib/languageContext';
 
 import { 
@@ -119,21 +121,24 @@ import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
 
 const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
-function enrichProductData(p) {
+function enrichProductData(p, userCity = 'İstanbul') {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
+  const brandName = p.brand?.name || 'Seramik';
   
+  const cleanCity = userCity ? userCity.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() : 'İstanbul';
+
   const dealerOffers = [
-    { dealerName: 'Kadıköy VitrA Konsept Showroom', price: Math.round(basePrice * 0.95), stock: 'Stokta Var' },
-    { dealerName: 'Beşiktaş Çanakkale Seramik Showroom', price: Math.round(basePrice), stock: 'Stokta Var' },
-    { dealerName: 'VitrA Nişantaşı Concept Store', price: Math.round(basePrice * 1.05), stock: 'Sınırlı Stok' }
+    { dealerName: `${cleanCity} ${brandName} Yetkili Showroom`, price: Math.round(basePrice * 0.95), stock: 'Hemen Teslim' },
+    { dealerName: `${cleanCity} Merkez Konsept Mağaza`, price: Math.round(basePrice), stock: 'Stokta Var' },
+    { dealerName: `${brandName} Fabrika Ana Dağıtım Deposu`, price: Math.round(basePrice * 1.05), stock: 'Hızlı Sevkiyat' }
   ];
 
   const sortedOffers = [...dealerOffers].sort((a, b) => a.price - b.price);
-  const brandName = p.brand?.name || 'Seramik';
   const searchKeyword = `${brandName} ${p.name}`;
 
   return {
     ...p,
+    city: cleanCity,
     offers: dealerOffers,
     cheapestOffer: sortedOffers[0]
   };
@@ -2208,7 +2213,7 @@ export default function Home() {
       const data = await res.json();
       
       // Pricing simulation
-      const simulatedData = Array.isArray(data) ? data.map(enrichProductData) : [];
+      const simulatedData = Array.isArray(data) ? data.map(item => enrichProductData(item, userLocationName)) : [];
 
       let sortedData = [...simulatedData];
       if (sortBy === 'price_asc') {
@@ -2564,8 +2569,17 @@ export default function Home() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const nearestCityObj = findNearestCity(latitude, longitude);
+        const detectedCityName = nearestCityObj.name;
         setUserCoords({ lat: latitude, lng: longitude });
-        setUserLocationName('Cihaz Konumunuz (GPS)');
+        setUserLocationName(detectedCityName);
+        try {
+          localStorage.setItem('seramikbak_user_city', JSON.stringify({
+            name: detectedCityName,
+            lat: latitude,
+            lng: longitude
+          }));
+        } catch (e) {}
         setIsLocating(false);
         const targetBrandId = locatorBrandId || (activeProduct ? activeProduct.brandId : (brands.length > 0 ? brands[0].id : null));
         if (targetBrandId) {
@@ -2581,9 +2595,9 @@ export default function Home() {
         setLocationError(errorMsg);
         setIsLocating(false);
         
-        // Fallback: Kadıköy by default if not set yet
-        setUserCoords({ lat: 40.9901, lng: 29.0278 });
-        setUserLocationName('Kadıköy Merkez (Varsayılan)');
+        // Fallback: İstanbul by default if not set yet
+        setUserCoords({ lat: 41.0082, lng: 28.9784 });
+        setUserLocationName('İstanbul');
       },
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
@@ -2592,6 +2606,13 @@ export default function Home() {
   const handleLocationChange = (locName, lat, lng) => {
     setUserLocationName(locName);
     setUserCoords({ lat, lng });
+    try {
+      localStorage.setItem('seramikbak_user_city', JSON.stringify({
+        name: locName,
+        lat,
+        lng
+      }));
+    } catch (e) {}
     const targetBrandId = locatorBrandId || (activeProduct ? activeProduct.brandId : (brands.length > 0 ? brands[0].id : null));
     if (targetBrandId) {
       fetchNearestDealers(targetBrandId, lat, lng);
@@ -4150,9 +4171,23 @@ export default function Home() {
                 )}
               </>
             )}
+            <HeaderLocationPicker 
+              userLocationName={userLocationName}
+              userCoords={userCoords}
+              onLocationChange={handleLocationChange}
+              onDetectLocation={detectUserLocation}
+              isLocating={isLocating}
+            />
             <LanguageSelector />
           </div>
           <div className="mobile-header-actions">
+            <HeaderLocationPicker 
+              userLocationName={userLocationName}
+              userCoords={userCoords}
+              onLocationChange={handleLocationChange}
+              onDetectLocation={detectUserLocation}
+              isLocating={isLocating}
+            />
             <button 
               type="button"
               className="mobile-header-action-btn" 
@@ -5160,6 +5195,70 @@ export default function Home() {
                     )}
                   </div>
                 )}
+
+                {/* Konum / Şehir Filtre Kartı */}
+                <div style={{
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, rgba(179,142,71,0.08) 0%, rgba(255,255,255,0.8) 100%)',
+                  border: '1px solid rgba(179,142,71,0.25)',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MapPin size={15} style={{ color: '#b38e47' }} />
+                      <span style={{ fontSize: '0.80rem', fontWeight: '800', color: '#0f172a' }}>Teslimat Şehri</span>
+                    </div>
+                    <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700' }}>{userLocationName || 'İstanbul'}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <select
+                      value={userLocationName ? userLocationName.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() : 'İstanbul'}
+                      onChange={(e) => {
+                        const targetCity = TURKEY_CITIES.find(c => c.name === e.target.value) || { name: e.target.value, lat: 41.0082, lng: 28.9784 };
+                        handleLocationChange(targetCity.name, targetCity.lat, targetCity.lng);
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '6px 8px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.78rem',
+                        fontWeight: '600',
+                        color: '#1e293b',
+                        background: '#ffffff',
+                        outline: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {TURKEY_CITIES.map(c => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={detectUserLocation}
+                      disabled={isLocating}
+                      title="GPS ile Bul"
+                      style={{
+                        padding: '6px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid #b38e47',
+                        background: '#b38e47',
+                        color: '#ffffff',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Navigation size={13} className={isLocating ? 'animate-pulse' : ''} />
+                    </button>
+                  </div>
+                </div>
 
                 {/* Standalone Premium Series Switch */}
                 <div className="premium-toggle-card" style={{ 
@@ -8884,6 +8983,70 @@ export default function Home() {
 
         {/* Scrollable Filters Content Wrapper */}
         <div className="filters-scroll-area">
+          {/* Mobile Konum / Şehir Filtre Kartı */}
+          <div style={{
+            padding: '12px 14px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, rgba(179,142,71,0.08) 0%, rgba(255,255,255,0.8) 100%)',
+            border: '1px solid rgba(179,142,71,0.25)',
+            marginBottom: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MapPin size={15} style={{ color: '#b38e47' }} />
+                <span style={{ fontSize: '0.80rem', fontWeight: '800', color: '#0f172a' }}>Teslimat Şehri</span>
+              </div>
+              <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700' }}>{userLocationName || 'İstanbul'}</span>
+            </div>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <select
+                value={userLocationName ? userLocationName.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() : 'İstanbul'}
+                onChange={(e) => {
+                  const targetCity = TURKEY_CITIES.find(c => c.name === e.target.value) || { name: e.target.value, lat: 41.0082, lng: 28.9784 };
+                  handleLocationChange(targetCity.name, targetCity.lat, targetCity.lng);
+                }}
+                style={{
+                  flex: 1,
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  background: '#ffffff',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                {TURKEY_CITIES.map(c => (
+                  <option key={c.name} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={detectUserLocation}
+                disabled={isLocating}
+                title="GPS ile Bul"
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: '8px',
+                  border: '1px solid #b38e47',
+                  background: '#b38e47',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Navigation size={13} className={isLocating ? 'animate-pulse' : ''} />
+              </button>
+            </div>
+          </div>
+
           {/* Standalone Premium Series Switch */}
           <div className="premium-toggle-card" style={{ 
             display: 'flex', 
