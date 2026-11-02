@@ -4128,17 +4128,6 @@ export default function Home() {
 
           {/* Right Action Controls */}
           <div className="luxury-header-actions">
-            {/* Teklif Al Gold Button */}
-            <button 
-              type="button" 
-              className="luxury-teklif-cta-btn"
-              onClick={() => setShowQuoteCartDrawer(true)}
-              title="Fiyat Teklifi Al"
-            >
-              <Send size={13} style={{ transform: 'rotate(-20deg)' }} />
-              <span>Teklif Al</span>
-            </button>
-
             {/* Favorites Icon */}
             <button 
               type="button" 
@@ -10333,34 +10322,35 @@ export default function Home() {
         }
 
         :global(.luxury-header-inner) {
-          max-width: 1440px;
+          max-width: 100%;
           margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 16px;
+          gap: 10px;
+          padding: 0 4px;
         }
 
         :global(.luxury-header-brand) {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           cursor: pointer;
           user-select: none;
           flex-shrink: 0;
         }
 
         :global(.luxury-logo-badge) {
-          width: 44px;
-          height: 44px;
+          width: 40px;
+          height: 40px;
           background: linear-gradient(135deg, #1e293b 0%, #0b1120 100%);
           border: 2px solid #d4af37;
-          border-radius: 12px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 900;
-          font-size: 1.2rem;
+          font-size: 1.1rem;
           color: #fef08a;
           box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
@@ -10371,7 +10361,7 @@ export default function Home() {
         }
 
         :global(.luxury-logo-title) {
-          font-size: 1.45rem;
+          font-size: 1.3rem;
           font-weight: 900;
           letter-spacing: -0.02em;
           color: #ffffff;
@@ -10379,7 +10369,7 @@ export default function Home() {
         }
 
         :global(.luxury-logo-subtitle) {
-          font-size: 0.70rem;
+          font-size: 0.68rem;
           color: #cbd5e1;
           font-weight: 500;
           letter-spacing: 0.02em;
@@ -10388,21 +10378,22 @@ export default function Home() {
         :global(.luxury-header-nav) {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 3px;
           flex-wrap: nowrap;
+          flex-shrink: 1;
         }
 
         :global(.luxury-nav-pill) {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 5px;
           background: rgba(212, 175, 55, 0.22);
           border: 1.5px solid rgba(212, 175, 55, 0.5);
           color: #fef08a;
-          padding: 7px 16px;
+          padding: 6px 13px;
           border-radius: 9999px;
           font-weight: 700;
-          font-size: 0.84rem;
+          font-size: 0.81rem;
           cursor: pointer;
           transition: all 0.2s ease;
           box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
@@ -10417,10 +10408,10 @@ export default function Home() {
           background: transparent;
           border: none;
           color: #f1f5f9;
-          padding: 7px 12px;
+          padding: 6px 9px;
           border-radius: 8px;
           font-weight: 600;
-          font-size: 0.84rem;
+          font-size: 0.81rem;
           cursor: pointer;
           transition: all 0.2s ease;
           text-decoration: none;
@@ -11427,6 +11418,24 @@ export default function Home() {
             font-size: 0.72rem;
           }
 
+          /* Medium Screens / Laptops (< 1200px) */
+          @media (max-width: 1200px) {
+            :global(.luxury-logo-subtitle) {
+              display: none;
+            }
+            :global(.luxury-header-nav) {
+              gap: 2px;
+            }
+            :global(.luxury-nav-link) {
+              padding: 5px 6px;
+              font-size: 0.76rem;
+            }
+            :global(.luxury-nav-pill) {
+              padding: 5px 10px;
+              font-size: 0.76rem;
+            }
+          }
+
           /* Luxury Dark Header Mobile */
           :global(.luxury-dark-header) {
             padding: 8px 14px;
@@ -11435,12 +11444,6 @@ export default function Home() {
           :global(.luxury-header-nav) {
             display: none !important;
           }
-          :global(.luxury-teklif-cta-btn span) {
-            display: none;
-          }
-          :global(.luxury-teklif-cta-btn) {
-            padding: 7px 10px;
-          }
           :global(.luxury-logo-subtitle) {
             display: none;
           }
@@ -11448,9 +11451,6 @@ export default function Home() {
             display: flex !important;
             align-items: center;
             justify-content: center;
-          }
-          :global(.sun-toggle-btn) {
-            display: none !important;
           }
 
           /* Showcase Carousel Mobile */
