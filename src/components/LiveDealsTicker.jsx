@@ -124,20 +124,18 @@ export default function LiveDealsTicker() {
 
       <style jsx>{`
         .live-ticker-fullwidth-wrapper {
-          width: 100vw;
-          position: relative;
-          left: 50%;
-          right: 50%;
-          margin-left: -50vw;
-          margin-right: -50vw;
-          margin-top: 14px;
-          margin-bottom: 20px;
+          width: 100%;
+          max-width: 100%;
+          margin-top: 10px;
+          margin-bottom: 16px;
           overflow: hidden;
           z-index: 90;
+          box-sizing: border-box;
         }
 
         .live-ticker-bar {
-          width: 100vw;
+          width: 100%;
+          max-width: 100%;
           background: #ffffff;
           border-top: 1px solid #e2e8f0;
           border-bottom: 1px solid #e2e8f0;
@@ -320,11 +318,28 @@ export default function LiveDealsTicker() {
 
         @media (max-width: 960px) {
           .ticker-social-proof {
-            display: none;
+            display: none !important;
+          }
+          .live-ticker-fullwidth-wrapper {
+            margin-top: 8px;
+            margin-bottom: 12px;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
           }
           .live-ticker-bar {
-            padding: 8px 12px;
-            gap: 12px;
+            padding: 6px 10px !important;
+            gap: 8px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          .live-badge-content {
+            padding: 4px 8px !important;
+            font-size: 0.70rem !important;
+            gap: 5px !important;
           }
         }
       `}</style>

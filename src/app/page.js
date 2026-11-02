@@ -4289,23 +4289,23 @@ export default function Home() {
         <div className="showcase-trust-ai-island">
           <div className="showcase-trust-items-pill">
             <div className="trust-island-item">
-              <Sparkles size={16} className="trust-icon-gold" style={{ color: '#d4af37' }} />
-              <span><strong>17 Lider Seramik Markası</strong> Tek Çatı Altında</span>
+              <Sparkles size={15} className="trust-icon-gold" style={{ color: '#d4af37', flexShrink: 0 }} />
+              <span><strong>17 Lider Marka</strong> <span className="trust-desk-text">Tek Çatı Altında</span></span>
             </div>
             <div className="trust-island-divider" />
             <div className="trust-island-item">
-              <Store size={16} className="trust-icon-amber" style={{ color: '#d97706' }} />
-              <span><strong>81 İlde</strong> Yetkili Bayi Ağı</span>
+              <Store size={15} className="trust-icon-amber" style={{ color: '#d97706', flexShrink: 0 }} />
+              <span><strong>81 İlde</strong> <span className="trust-desk-text">Yetkili</span> Bayi Ağı</span>
             </div>
             <div className="trust-island-divider" />
             <div className="trust-island-item">
-              <ShieldCheck size={16} className="trust-icon-green" style={{ color: '#10b981' }} />
-              <span><strong>%100 Ücretsiz</strong> Fiyat Teklifi</span>
+              <ShieldCheck size={15} className="trust-icon-green" style={{ color: '#10b981', flexShrink: 0 }} />
+              <span><strong>%100 Ücretsiz</strong> <span className="trust-desk-text">Fiyat</span> Teklifi</span>
             </div>
             <div className="trust-island-divider" />
             <div className="trust-island-item">
-              <Box size={16} className="trust-icon-blue" style={{ color: '#3b82f6' }} />
-              <span><strong>3D Sanal Stüdyo</strong> & AR</span>
+              <Box size={15} className="trust-icon-blue" style={{ color: '#3b82f6', flexShrink: 0 }} />
+              <span><strong>3D Stüdyo</strong> &amp; AR</span>
             </div>
           </div>
 
@@ -11419,97 +11419,212 @@ export default function Home() {
             font-size: 0.72rem;
           }
 
-          /* Medium Screens / Laptops (< 1200px) */
-          @media (max-width: 1200px) {
-            :global(.luxury-logo-subtitle) {
-              display: none;
-            }
-            :global(.luxury-header-nav) {
-              gap: 2px;
-            }
-            :global(.luxury-nav-link) {
-              padding: 5px 6px;
-              font-size: 0.76rem;
-            }
-            :global(.luxury-nav-pill) {
-              padding: 5px 10px;
-              font-size: 0.76rem;
-            }
+        /* ==========================================================================
+           RESPONSIVE & MOBILE ADAPTATION
+           ========================================================================== */
+        @media (max-width: 1200px) {
+          :global(.luxury-logo-subtitle) {
+            display: none;
           }
+          :global(.luxury-header-nav) {
+            gap: 2px;
+          }
+          :global(.luxury-nav-link) {
+            padding: 5px 6px;
+            font-size: 0.76rem;
+          }
+          :global(.luxury-nav-pill) {
+            padding: 5px 10px;
+            font-size: 0.76rem;
+          }
+        }
 
-          /* Luxury Dark Header Mobile */
+        @media (max-width: 768px) {
+          /* Top Header Mobile Clean Fit (No Overflow) */
           :global(.luxury-dark-header) {
-            padding: 8px 14px;
-            border-radius: 0 0 18px 18px;
+            padding: 8px 12px !important;
+            border-radius: 0 0 16px 16px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          :global(.luxury-header-inner) {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            gap: 6px !important;
+            padding: 0 !important;
+          }
+          :global(.luxury-header-brand) {
+            gap: 6px !important;
+            flex-shrink: 0 !important;
+          }
+          :global(.luxury-logo-badge) {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 0.95rem !important;
+            border-radius: 8px !important;
+          }
+          :global(.luxury-logo-title) {
+            font-size: 1.05rem !important;
+          }
+          :global(.luxury-logo-subtitle) {
+            display: none !important;
           }
           :global(.luxury-header-nav) {
             display: none !important;
           }
-          :global(.luxury-logo-subtitle) {
-            display: none;
+          :global(.luxury-header-actions) {
+            gap: 6px !important;
+            flex-shrink: 0 !important;
+            align-items: center !important;
+          }
+          :global(.luxury-header-actions .luxury-icon-circle-btn[title="Favorilerim"]) {
+            display: none !important;
+          }
+          :global(.luxury-header-actions .lang-selector-wrapper),
+          :global(.luxury-header-actions .lang-trigger-btn) {
+            display: none !important;
+          }
+          :global(.luxury-header-actions .header-location-btn) {
+            height: 30px !important;
+            padding: 0 6px !important;
+            font-size: 0.70rem !important;
+            gap: 3px !important;
+            border-radius: 12px !important;
+          }
+          :global(.luxury-header-actions .header-location-btn span) {
+            max-width: 58px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          :global(.luxury-header-actions .luxury-icon-circle-btn) {
+            width: 32px !important;
+            height: 32px !important;
           }
           :global(.luxury-hamburger-btn) {
             display: flex !important;
-            align-items: center;
-            justify-content: center;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0 !important;
+            color: #0f172a !important;
           }
 
-          /* Showcase Carousel Mobile */
+          /* Showcase Zone Mobile */
+          :global(.showcase-luxury-hero-zone) {
+            margin: 8px auto 10px auto !important;
+            padding: 0 10px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
           :global(.showcase-cards-grid) {
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 10px !important;
+            gap: 8px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           :global(.showcase-luxury-card:nth-child(n+3)) {
-            display: none;
+            display: none !important;
           }
           :global(.showcase-arrow-btn) {
             display: none !important;
           }
           :global(.showcase-luxury-card) {
-            height: 155px;
-            border-radius: 16px;
-            padding: 10px;
+            height: 155px !important;
+            border-radius: 16px !important;
+            padding: 10px !important;
           }
           :global(.showcase-card-brand) {
-            font-size: 0.82rem;
+            font-size: 0.82rem !important;
           }
           :global(.showcase-card-model) {
-            font-size: 0.72rem;
+            font-size: 0.72rem !important;
           }
           :global(.showcase-card-badge) {
-            font-size: 0.62rem;
-            padding: 2px 7px;
+            font-size: 0.58rem !important;
+            padding: 2px 6px !important;
           }
           :global(.showcase-card-action-btn) {
-            width: 28px;
-            height: 28px;
-            bottom: 8px;
-            right: 8px;
+            width: 28px !important;
+            height: 28px !important;
+            bottom: 8px !important;
+            right: 8px !important;
           }
 
-          /* Trust Island Mobile */
+          /* Trust Island Mobile - Symmetrical 2x2 Grid No Overflow */
           :global(.showcase-trust-ai-island) {
             flex-direction: column !important;
-            gap: 10px !important;
+            gap: 8px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
           }
           :global(.showcase-trust-items-pill) {
-            border-radius: 18px !important;
-            padding: 12px 14px !important;
+            border-radius: 16px !important;
+            padding: 10px !important;
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 10px !important;
+            gap: 8px 10px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
           }
           :global(.trust-island-divider) {
             display: none !important;
           }
           :global(.trust-island-item) {
-            font-size: 0.74rem !important;
+            font-size: 0.70rem !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.25 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
           }
+          :global(.trust-island-item span) {
+            min-width: 0 !important;
+            word-break: break-word !important;
+          }
+          :global(.trust-desk-text) {
+            display: none !important;
+          }
+
+          /* AI Mini Banner Mobile */
           :global(.showcase-ai-mini-banner) {
             width: 100% !important;
-            justify-content: space-between !important;
-            padding: 4px 14px 4px 6px !important;
+            max-width: 100% !important;
             box-sizing: border-box !important;
+            justify-content: space-between !important;
+            padding: 4px 12px 4px 5px !important;
+            height: 46px !important;
+          }
+          :global(.ai-mini-title) {
+            font-size: 0.82rem !important;
+          }
+          :global(.ai-mini-sub) {
+            font-size: 0.64rem !important;
+          }
+          :global(.ai-mini-cta-arrow) {
+            width: 26px !important;
+            height: 26px !important;
+          }
+          :global(.ai-mini-thumb) {
+            width: 34px !important;
+            height: 34px !important;
+          }
+          :global(.ai-mini-thumb img) {
+            width: 34px !important;
+            height: 34px !important;
           }
         }
         /* ==========================================================================
