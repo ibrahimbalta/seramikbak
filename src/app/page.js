@@ -3985,6 +3985,9 @@ export default function Home() {
         </div>
       </div>
 
+      {/* CANLI FIRSAT RADARI & CANLI İNDİRİM ŞERİDİ (Vitrin Banner'ının Hemen Altı) */}
+      <LiveDealsTicker />
+
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar">
@@ -5055,11 +5058,6 @@ export default function Home() {
                 </div>
               )}
             </section>
-
-            {/* Canlı Teklif & Fırsat Bildirim Şeridi (Sosyal Kanıt) */}
-            <div style={{ margin: '14px 0' }}>
-              <LiveDealsTicker />
-            </div>
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
