@@ -72,7 +72,9 @@ import {
   Activity,
   CheckCircle,
   ShieldCheck,
-  Box
+  Box,
+  Star,
+  Crown
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -2880,13 +2882,13 @@ export default function Home() {
   };
 
   const DEFAULT_VITRIN_ITEMS = [
-    { code: 'BIEN-YUT-WHT', brand: 'Bien Seramik', name: 'Bien Yuta Beyaz 30x60', img: '/hero/luxury_bathroom.png', badge: 'Öne Çıkan', badgeIcon: '⭐' },
-    { code: 'KUT-CAL-GLD', brand: 'NG Kütahya Seramik', name: 'Calacatta Gold', img: '/hero/scandinavian_kitchen.png', badge: 'Yeni Sezon', badgeIcon: '🍂' },
-    { code: 'VIT-CON-GRY', brand: 'Vitra', name: 'Concrete Light Grey', img: '/hero/hero_ceramics.jpg', badge: 'Yeni Sezon', badgeIcon: '👑' },
-    { code: 'BIEN-NAT-OAK', brand: 'Bien', name: 'Natural Oak', img: '/hero/modern_living.png', badge: 'Yeni Sezon', badgeIcon: '💎' },
-    { code: 'EGE-TRA-CLA', brand: 'Ege Seramik', name: 'Travertino Classico', img: '/hero/luxury_bathroom.png', badge: 'Öne Çıkan', badgeIcon: '⭐' },
-    { code: 'HITIT-NEXOS-ANTRASIT-LAPPATO-60X120', brand: 'Hitit Seramik', name: 'Nexos Antrasit Lappato', img: '/hero/modern_living.png', badge: 'Yeni Sezon', badgeIcon: '✨' },
-    { code: 'BIEN-BOR-ANT', brand: 'Bien', name: 'Borneo Antrasit', img: '/hero/scandinavian_kitchen.png', badge: 'Yeni Sezon', badgeIcon: '💎' },
+    { code: 'BIEN-YUT-WHT', brand: 'Bien Seramik', name: 'Bien Yuta Beyaz 30x60', img: '/hero/luxury_bathroom.png', badge: 'Öne Çıkan', badgeType: 'featured' },
+    { code: 'KUT-CAL-GLD', brand: 'NG Kütahya Seramik', name: 'Calacatta Gold', img: '/hero/scandinavian_kitchen.png', badge: 'Yeni Sezon', badgeType: 'new' },
+    { code: 'VIT-CON-GRY', brand: 'Vitra', name: 'Concrete Light Grey', img: '/hero/hero_ceramics.jpg', badge: 'Mimari Seri', badgeType: 'architect' },
+    { code: 'BIEN-NAT-OAK', brand: 'Bien', name: 'Natural Oak', img: '/hero/modern_living.png', badge: 'Doğal Doku', badgeType: 'natural' },
+    { code: 'EGE-TRA-CLA', brand: 'Ege Seramik', name: 'Travertino Classico', img: '/hero/luxury_bathroom.png', badge: 'Premium Mermer', badgeType: 'premium' },
+    { code: 'HITIT-NEXOS-ANTRASIT-LAPPATO-60X120', brand: 'Hitit Seramik', name: 'Nexos Antrasit Lappato', img: '/hero/modern_living.png', badge: 'Lappato Yüzey', badgeType: 'surface' },
+    { code: 'BIEN-BOR-ANT', brand: 'Bien', name: 'Borneo Antrasit', img: '/hero/scandinavian_kitchen.png', badge: 'Büyük Ebat 60×120', badgeType: 'format' },
   ];
 
   const displayVitrinItems = useMemo(() => {
@@ -2900,8 +2902,8 @@ export default function Home() {
         brand: c.product.brand?.name || 'Seçkin Marka',
         name: c.product.name,
         img: c.product.imageUrl || '/hero/hero_ceramics.jpg',
-        badge: 'Yeni Sezon',
-        badgeIcon: '👑',
+        badge: 'Öne Çıkan',
+        badgeType: 'featured',
         isSponsored: true,
         product: c.product
       }));
@@ -4231,9 +4233,21 @@ export default function Home() {
               >
                 <div className="showcase-card-overlay" />
                 <div className="showcase-card-content">
-                  <div className="showcase-card-badge">
-                    <span>{item.badgeIcon || '⭐'}</span>
-                    <span>{item.badge || 'Öne Çıkan'}</span>
+                  <div className={`showcase-card-badge ${item.badgeType || 'new'}`}>
+                    <span className="badge-vector-icon" aria-hidden="true">
+                      {item.badgeType === 'featured' ? (
+                        <Star size={10} strokeWidth={2.4} fill="#d4af37" />
+                      ) : item.badgeType === 'architect' ? (
+                        <Layers size={10} strokeWidth={2.4} />
+                      ) : item.badgeType === 'premium' ? (
+                        <Crown size={10} strokeWidth={2.4} />
+                      ) : item.badgeType === 'format' ? (
+                        <Box size={10} strokeWidth={2.4} />
+                      ) : (
+                        <Sparkles size={10} strokeWidth={2.4} />
+                      )}
+                    </span>
+                    <span className="badge-text">{item.badge || 'Yeni Sezon'}</span>
                   </div>
                   <div className="showcase-card-text-block">
                     <span className="showcase-card-brand">{item.brand}</span>
@@ -10632,15 +10646,55 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          background: rgba(180, 130, 40, 0.92);
-          backdrop-filter: blur(4px);
+          background: rgba(15, 23, 42, 0.82);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           color: #ffffff;
-          font-size: 0.70rem;
-          font-weight: 800;
-          padding: 4px 10px;
+          font-size: 0.63rem;
+          font-weight: 750;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          padding: 3px 9px 3px 7px;
           border-radius: 9999px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
           align-self: flex-start;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          user-select: none;
+        }
+
+        :global(.showcase-card-badge .badge-vector-icon) {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #d4af37;
+          flex-shrink: 0;
+        }
+
+        :global(.showcase-card-badge.featured .badge-vector-icon) {
+          color: #f59e0b;
+        }
+
+        :global(.showcase-card-badge.architect .badge-vector-icon) {
+          color: #60a5fa;
+        }
+
+        :global(.showcase-card-badge.premium .badge-vector-icon) {
+          color: #fef08a;
+        }
+
+        :global(.showcase-card-badge.format .badge-vector-icon) {
+          color: #fde68a;
+        }
+
+        :global(.showcase-card-badge .badge-text) {
+          line-height: 1.1;
+        }
+
+        :global(.showcase-luxury-card:hover .showcase-card-badge) {
+          background: #0f172a;
+          border-color: rgba(212, 175, 55, 0.7);
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
         }
 
         :global(.showcase-card-text-block) {
