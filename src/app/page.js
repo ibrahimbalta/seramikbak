@@ -3944,20 +3944,6 @@ export default function Home() {
               }}
             >
               <span>Ürünler</span>
-              <ChevronDown size={12} />
-            </button>
-
-            <button 
-              type="button" 
-              className="luxury-nav-link"
-              onClick={() => {
-                setActiveTab('search');
-                const brandEl = document.querySelector('.brand-slider-container') || document.querySelector('.categories-showcase-container');
-                if (brandEl) brandEl.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              <span>Markalar</span>
-              <ChevronDown size={12} />
             </button>
 
             <button 
@@ -3965,25 +3951,180 @@ export default function Home() {
               className={`luxury-nav-link ${activeTab === 'studio' ? 'active' : ''}`}
               onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
+              <Palette size={14} style={{ color: '#d4af37' }} />
               <span>3D Mekân</span>
             </button>
 
-            <Link href="/katalog-prototip" className="luxury-nav-link">
-              <span>Dijital Katalog</span>
-            </Link>
-
-            <button 
-              type="button" 
-              className={`luxury-nav-link ${activeTab === 'dealers' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('dealers'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            {/* Portallar Dropdown (Bayi, Marka, Mimar, B2B Proje) */}
+            <div 
+              className="utility-dropdown-wrapper luxury-dropdown-wrapper"
+              onMouseEnter={() => handleUtilityDropdownOpen('portallar')}
+              onMouseLeave={handleUtilityDropdownClose}
             >
-              <span>Bayiler</span>
-            </button>
+              <button 
+                type="button" 
+                className={`luxury-nav-link luxury-dropdown-trigger ${activeUtilityDropdown === 'portallar' ? 'active' : ''}`}
+                onClick={() => toggleUtilityDropdown('portallar')}
+              >
+                <Store size={14} />
+                <span>Portallar</span>
+                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'portallar' ? 'rotated' : ''}`} />
+              </button>
 
-            <Link href="/hakkimizda" className="luxury-nav-link">
-              <span>Hakkımızda</span>
-              <ChevronDown size={12} />
+              {activeUtilityDropdown === 'portallar' && (
+                <div className="luxury-dark-dropdown-menu animate-fade-in">
+                  <Link href="/bayi" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon blue-icon">
+                      <UserIcon size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Bayi Portalı</span>
+                        <span className="dropdown-item-badge blue-badge">B2B</span>
+                      </div>
+                      <span className="dropdown-item-desc">Bayi stok borsası ve sipariş paneli</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/marka" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon purple-icon">
+                      <TrendingUp size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Marka Portalı</span>
+                        <span className="dropdown-item-badge purple-badge">Üretici</span>
+                      </div>
+                      <span className="dropdown-item-desc">Üretici fabrika kataloğu ve analitikler</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/mimar" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon gold-icon" style={{ background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37' }}>
+                      <Compass size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Mimar Portalı</span>
+                        <span className="dropdown-item-badge gold-badge">ArchStudio</span>
+                      </div>
+                      <span className="dropdown-item-desc">3D BIM, moodboard ve şartname motoru</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/proje-talep" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon amber-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
+                      <Building2 size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Proje Talebi (B2B)</span>
+                        <span className="dropdown-item-badge amber-badge">Teklif</span>
+                      </div>
+                      <span className="dropdown-item-desc">Müteahhit ve toplu alım şartname talepleri</span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Outlet & Fırsatlar */}
+            <Link href="/outlet" className="luxury-nav-link luxury-outlet-link">
+              <Sparkles size={14} style={{ color: '#ef4444' }} />
+              <span>Outlet &amp; Fırsatlar</span>
+              <span className="luxury-firsat-badge">Fırsat</span>
             </Link>
+
+            {/* Seramik Ustaları */}
+            <Link href="/ustalar" className="luxury-nav-link">
+              <Wrench size={14} style={{ color: '#f59e0b' }} />
+              <span>Ustalar</span>
+            </Link>
+
+            {/* İlham & Trendler */}
+            <Link href="/ilham" className="luxury-nav-link">
+              <Sparkles size={14} style={{ color: '#a855f7' }} />
+              <span>İlham</span>
+            </Link>
+
+            {/* Kurumsal Dropdown (Nasıl Çalışır, Hakkımızda, Dijital Katalog, Global) */}
+            <div 
+              className="utility-dropdown-wrapper luxury-dropdown-wrapper"
+              onMouseEnter={() => handleUtilityDropdownOpen('kurumsal')}
+              onMouseLeave={handleUtilityDropdownClose}
+            >
+              <button 
+                type="button" 
+                className={`luxury-nav-link luxury-dropdown-trigger ${activeUtilityDropdown === 'kurumsal' ? 'active' : ''}`}
+                onClick={() => toggleUtilityDropdown('kurumsal')}
+              >
+                <Info size={14} />
+                <span>Kurumsal</span>
+                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'kurumsal' ? 'rotated' : ''}`} />
+              </button>
+
+              {activeUtilityDropdown === 'kurumsal' && (
+                <div className="luxury-dark-dropdown-menu animate-fade-in">
+                  <button 
+                    type="button"
+                    className="luxury-dropdown-item"
+                    onClick={() => { 
+                      setShowHowItWorksModal(true); 
+                      setHowItWorksActiveTab('customers'); 
+                      setActiveUtilityDropdown(null); 
+                    }}
+                  >
+                    <div className="dropdown-item-icon gold-icon" style={{ background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37' }}>
+                      <HelpCircle size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Nasıl Çalışır?</span>
+                        <span className="dropdown-item-badge gold-badge">Rehber</span>
+                      </div>
+                      <span className="dropdown-item-desc">3D stüdyo ve platform kullanım rehberi</span>
+                    </div>
+                  </button>
+
+                  <Link href="/hakkimizda" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon">
+                      <Info size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Hakkımızda</span>
+                      </div>
+                      <span className="dropdown-item-desc">SeramikBak vizyonu ve kurumsal bilgiler</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/katalog-prototip" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon blue-icon">
+                      <FileText size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Dijital Katalog</span>
+                      </div>
+                      <span className="dropdown-item-desc">Tüm marka ve koleksiyon PDF katalogları</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/global-tanitim" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon green-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+                      <Globe size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Global Export Hub</span>
+                        <span className="dropdown-item-badge green-badge">🌍 Global</span>
+                      </div>
+                      <span className="dropdown-item-desc">Uluslararası B2B seramik ihracatı ve lojistik</span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right Action Controls */}
@@ -4206,179 +4347,7 @@ export default function Home() {
       {/* 4. CANLI FIRSAT RADARI (Vitrin Alanının Hemen Altı) */}
       <LiveDealsTicker />
 
-      {/* Top Utility Bar (B2B and Corporate Portal Links) */}
-      {!isKioskMode && (
-        <div className="top-utility-bar">
-          <div className="utility-left">
-            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
-              <HomeIcon size={13} />
-              <span style={{ fontWeight: '800' }}>{t('home')}</span>
-            </Link>
 
-            {/* Kurumsal Dropdown (Nasıl Çalışır? & Hakkımızda) */}
-            <div 
-              className="utility-dropdown-wrapper"
-              onMouseEnter={() => handleUtilityDropdownOpen('kurumsal')}
-              onMouseLeave={handleUtilityDropdownClose}
-            >
-              <button 
-                type="button"
-                className={`utility-item utility-dropdown-btn ${activeUtilityDropdown === 'kurumsal' ? 'active' : ''}`}
-                onClick={() => toggleUtilityDropdown('kurumsal')}
-                aria-haspopup="true"
-                aria-expanded={activeUtilityDropdown === 'kurumsal'}
-              >
-                <Info size={13} />
-                <span>{t('corporate') || 'Kurumsal'}</span>
-                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'kurumsal' ? 'rotated' : ''}`} />
-              </button>
-
-              {activeUtilityDropdown === 'kurumsal' && (
-                <div className="utility-dropdown-menu">
-                  <button 
-                    type="button"
-                    className="utility-dropdown-item"
-                    onClick={() => { 
-                      setShowHowItWorksModal(true); 
-                      setHowItWorksActiveTab('customers'); 
-                      setActiveUtilityDropdown(null); 
-                    }}
-                  >
-                    <div className="dropdown-item-icon gold-icon">
-                      <HelpCircle size={14} />
-                    </div>
-                    <div className="dropdown-item-content">
-                      <div className="dropdown-title-row">
-                        <span className="dropdown-item-title">{t('howItWorks') || 'Nasıl Çalışır?'}</span>
-                        <span className="dropdown-item-badge gold-badge">Rehber</span>
-                      </div>
-                      <span className="dropdown-item-desc">3D stüdyo ve platform kullanım rehberi</span>
-                    </div>
-                  </button>
-
-                  <Link 
-                    href="/hakkimizda" 
-                    className="utility-dropdown-item"
-                    onClick={() => setActiveUtilityDropdown(null)}
-                  >
-                    <div className="dropdown-item-icon">
-                      <Info size={14} />
-                    </div>
-                    <div className="dropdown-item-content">
-                      <div className="dropdown-title-row">
-                        <span className="dropdown-item-title">{t('about')}</span>
-                      </div>
-                      <span className="dropdown-item-desc">SeramikBak vizyonu ve kurumsal bilgiler</span>
-                    </div>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={13} />
-              <span>{t('b2bQuotes')}</span>
-            </Link>
-
-            {/* Portallar Dropdown (Bayi Portalı & Marka Portalı) */}
-            <div 
-              className="utility-dropdown-wrapper"
-              onMouseEnter={() => handleUtilityDropdownOpen('portallar')}
-              onMouseLeave={handleUtilityDropdownClose}
-            >
-              <button 
-                type="button"
-                className={`utility-item utility-dropdown-btn ${activeUtilityDropdown === 'portallar' ? 'active' : ''}`}
-                onClick={() => toggleUtilityDropdown('portallar')}
-                aria-haspopup="true"
-                aria-expanded={activeUtilityDropdown === 'portallar'}
-              >
-                <Store size={13} />
-                <span>{t('portals') || 'Portallar'}</span>
-                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'portallar' ? 'rotated' : ''}`} />
-              </button>
-
-              {activeUtilityDropdown === 'portallar' && (
-                <div className="utility-dropdown-menu">
-                  <Link 
-                    href="/bayi" 
-                    className="utility-dropdown-item"
-                    onClick={() => setActiveUtilityDropdown(null)}
-                  >
-                    <div className="dropdown-item-icon blue-icon">
-                      <UserIcon size={14} />
-                    </div>
-                    <div className="dropdown-item-content">
-                      <div className="dropdown-title-row">
-                        <span className="dropdown-item-title">{t('dealerPortal')}</span>
-                        <span className="dropdown-item-badge blue-badge">B2B</span>
-                      </div>
-                      <span className="dropdown-item-desc">Bayi yönetim paneli ve stok borsası</span>
-                    </div>
-                  </Link>
-
-                  <Link 
-                    href="/marka" 
-                    className="utility-dropdown-item"
-                    onClick={() => setActiveUtilityDropdown(null)}
-                  >
-                    <div className="dropdown-item-icon purple-icon">
-                      <TrendingUp size={14} />
-                    </div>
-                    <div className="dropdown-item-content">
-                      <div className="dropdown-title-row">
-                        <span className="dropdown-item-title">{t('brandPortal')}</span>
-                        <span className="dropdown-item-badge purple-badge">Üretici</span>
-                      </div>
-                      <span className="dropdown-item-desc">Üretici marka kataloğu ve analitikler</span>
-                    </div>
-                  </Link>
-
-                  <Link 
-                    href="/mimar" 
-                    className="utility-dropdown-item"
-                    onClick={() => setActiveUtilityDropdown(null)}
-                  >
-                    <div className="dropdown-item-icon gold-icon" style={{ background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37' }}>
-                      <Compass size={14} />
-                    </div>
-                    <div className="dropdown-item-content">
-                      <div className="dropdown-title-row">
-                        <span className="dropdown-item-title">Mimar Portalı</span>
-                        <span className="dropdown-item-badge gold-badge" style={{ background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37' }}>ArchStudio</span>
-                      </div>
-                      <span className="dropdown-item-desc">3D BIM, moodboard ve şartname motoru</span>
-                    </div>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="utility-right">
-            <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={13} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
-              <span className="outlet-small-badge">Fırsat</span>
-            </Link>
-            <Link href="/ustalar" className="utility-item ustalar-btn-link">
-              <Wrench size={13} style={{ color: '#b45309' }} />
-              <span style={{ color: '#b45309', fontWeight: '800' }}>{t('installers')}</span>
-            </Link>
-            <Link href="/ilham" className="utility-item ilham-btn-link">
-              <Sparkles size={13} style={{ color: '#8b5cf6' }} />
-              <span>{t('inspiration')}</span>
-            </Link>
-            <Link 
-              href="/global-tanitim" 
-              className="utility-item global-highlight-btn"
-            >
-              <Globe size={13} style={{ color: '#d4af37' }} />
-              <span style={{ color: '#fef08a', fontWeight: '800' }}>🌍 Global</span>
-            </Link>
-          </div>
-        </div>
-      )}
 
 
 
@@ -10470,6 +10439,159 @@ export default function Home() {
         :global(.luxury-nav-link:hover) {
           color: #d4af37;
           background: rgba(255, 255, 255, 0.06);
+        }
+
+        :global(.luxury-dropdown-wrapper) {
+          position: relative;
+        }
+
+        :global(.luxury-dark-dropdown-menu) {
+          position: absolute;
+          top: calc(100% + 10px);
+          left: 0;
+          min-width: 290px;
+          background: #0f172a;
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          border-radius: 16px;
+          padding: 8px;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+          z-index: 1200;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        :global(.luxury-dropdown-item) {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 9px 12px;
+          border-radius: 12px;
+          color: #f1f5f9;
+          text-decoration: none;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          width: 100%;
+          text-align: left;
+          box-sizing: border-box;
+        }
+
+        :global(.luxury-dropdown-item:hover) {
+          background: rgba(255, 255, 255, 0.08);
+          color: #d4af37;
+        }
+
+        :global(.luxury-dropdown-item .dropdown-title-row) {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        :global(.luxury-dropdown-item .dropdown-item-title) {
+          font-weight: 700;
+          font-size: 0.86rem;
+          color: #ffffff;
+        }
+
+        :global(.luxury-dropdown-item .dropdown-item-desc) {
+          font-size: 0.72rem;
+          color: #94a3b8;
+          line-height: 1.3;
+          margin-top: 2px;
+        }
+
+        :global(.luxury-dropdown-item .dropdown-item-icon) {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          background: rgba(255, 255, 255, 0.06);
+          color: #cbd5e1;
+        }
+
+        :global(.luxury-dropdown-item .blue-icon) {
+          background: rgba(59, 130, 246, 0.15);
+          color: #60a5fa;
+        }
+
+        :global(.luxury-dropdown-item .purple-icon) {
+          background: rgba(168, 85, 247, 0.15);
+          color: #c084fc;
+        }
+
+        :global(.luxury-dropdown-item .gold-icon) {
+          background: rgba(212, 175, 55, 0.18);
+          color: #d4af37;
+        }
+
+        :global(.luxury-dropdown-item .amber-icon) {
+          background: rgba(245, 158, 11, 0.18);
+          color: #fbbf24;
+        }
+
+        :global(.luxury-dropdown-item .green-icon) {
+          background: rgba(16, 185, 129, 0.18);
+          color: #34d399;
+        }
+
+        :global(.luxury-dropdown-item .dropdown-item-badge) {
+          font-size: 0.62rem;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 9999px;
+        }
+
+        :global(.luxury-dropdown-item .blue-badge) {
+          background: rgba(59, 130, 246, 0.2);
+          color: #93c5fd;
+        }
+
+        :global(.luxury-dropdown-item .purple-badge) {
+          background: rgba(168, 85, 247, 0.2);
+          color: #e9d5ff;
+        }
+
+        :global(.luxury-dropdown-item .gold-badge) {
+          background: rgba(212, 175, 55, 0.25);
+          color: #fef08a;
+        }
+
+        :global(.luxury-dropdown-item .amber-badge) {
+          background: rgba(245, 158, 11, 0.25);
+          color: #fef08a;
+        }
+
+        :global(.luxury-dropdown-item .green-badge) {
+          background: rgba(16, 185, 129, 0.25);
+          color: #a7f3d0;
+        }
+
+        :global(.luxury-outlet-link) {
+          position: relative;
+        }
+
+        :global(.luxury-firsat-badge) {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          color: #ffffff;
+          font-size: 0.60rem;
+          font-weight: 900;
+          padding: 2px 7px;
+          border-radius: 9999px;
+          margin-left: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45);
+          animation: firsatPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes firsatPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.08); opacity: 0.88; }
         }
 
         :global(.luxury-header-actions) {
