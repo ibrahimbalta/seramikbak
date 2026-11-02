@@ -27,6 +27,8 @@ import {
   Map, 
   Settings, 
   Layers2,
+  BrickWall,
+  PaintRoller,
   FileText,
   HelpCircle,
   ArrowRight,
@@ -347,25 +349,28 @@ function generateMoodboardFromProduct(product, index) {
 
 const heroSlides = [
   {
-    title: "Türkiye'nin Seramik Arama Motoru",
-    subtitle: "40+ seçkin üretici markanın binlerce seramik modelini keşfedin, 3D stüdyoda odanıza uygulayın ve 81 ildeki yetkili bayilerden doğrudan teklif alın.",
+    title: "Seramiği",
+    highlight: "Evinizde Görün",
+    subtitle: "Beğendiğiniz seramiği odanızda deneyin. 3D tasarlayın, bayilerden teklif alın.",
+    bg: "/hero/modern_living.png",
+    tag: "3D DİJİTAL ODA SİMÜLASYONU",
+    ctaText: "3D'de Dene"
+  },
+  {
+    title: "Türkiye'nin",
+    highlight: "Seramik Arama Motoru",
+    subtitle: "17 seçkin üretici markanın 25.000+ seramik modelini keşfedin, yetkili bayilerden doğrudan teklif alın.",
     bg: "/hero/luxury_bathroom.png",
     tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
-    highlight: "Yetkili Bayilerden Teklif Alın"
+    ctaText: "3D'de Dene"
   },
   {
-    title: "Seramikleri Evinizde Canlı Deneyin",
-    subtitle: "Seçtiğiniz fayans veya karoyu interaktif 3D Sanal Stüdyo'da döşeyin; derz genişliğini, rengini, döşeme desenini ve oda ışıklarını özelleştirin.",
+    title: "Kendi Odanızı",
+    highlight: "AI ile Tasarlayın",
+    subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; yapay zeka seçtiğiniz seramikleri odanıza giydirsin.",
     bg: "/hero/scandinavian_kitchen.png",
-    tag: "3D DİJİTAL ODA SİMÜLASYONU",
-    highlight: "3D Sanal Stüdyo Modu"
-  },
-  {
-    title: "Kendi Odanızı AI ile Tasarlayın",
-    subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; Google Gemini yapay zekası zemin/duvar sınırlarını maskeleyip seçtiğiniz seramikleri giydirsin.",
-    bg: "/hero/modern_living.png",
     tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME",
-    highlight: "AI Tasarım Asistanı"
+    ctaText: "3D'de Dene"
   }
 ];
 
@@ -3877,13 +3882,6 @@ export default function Home() {
 
   return (
     <main className="main-layout">
-      {/* Search Engine Optimized Opening Snippet Source */}
-      <section className="sr-intro-snippet-bar" aria-label="SeramikBak Hakkında" style={{ background: '#090d16', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '8px 16px', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.4', maxWidth: '1100px', marginInline: 'auto' }}>
-          <strong style={{ color: '#ffffff' }}>SeramikBak:</strong> 17 lider Türk seramik markasının binlerce modelini 3D mekân stüdyosunda deneyin, 81 ildeki yetkili bayilerden anında ücretsiz fiyat teklifi alın.
-        </p>
-      </section>
-
       {/* Platform Trust & Reassurance Bar */}
       <div className="live-analytics-top-bar" style={{ background: '#0b1120', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', minHeight: '32px' }}>
         {/* Desktop View: All 4 in one row */}
@@ -4620,10 +4618,10 @@ export default function Home() {
 
           return (
           <div className="search-portal animate-fade-in">
-            {/* Wide Centered Hero Section with Showroom Image Background */}
+            {/* HERO BANNER - Clean Modern Aesthetic Matching Image 1 */}
             <div 
-              className="showroom-hero-banner glass-panel" 
-              style={{ backgroundImage: `url(${currentHeroBg})`, transition: 'background-image 0.8s ease' }}
+              className="clean-hero-card" 
+              style={{ backgroundImage: `url(${currentHeroBg || '/hero/modern_living.png'})` }}
               onTouchStart={(e) => {
                 if (e.touches && e.touches[0]) {
                   setHeroTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
@@ -4643,263 +4641,252 @@ export default function Home() {
                 }
               }}
             >
-              <div className="hero-dark-overlay" />
-              <div className="hero-banner-content">
-                <div className="hero-badge-capsule">
-                  <Sparkles size={12} className="badge-icon-gold" />
-                  <span>{currentHeroSlide.tag}</span>
+              <div className="clean-hero-overlay" />
+              
+              <div className="clean-hero-content">
+                <h1 className="clean-hero-heading">
+                  {currentHeroSlide.title} <br />
+                  <span className="clean-hero-highlight">{currentHeroSlide.highlight}</span>
+                </h1>
+                
+                <div className="clean-hero-gold-swoosh">
+                  <svg width="140" height="9" viewBox="0 0 140 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 6.5C40 2 100 2 138 6.5" stroke="#c58f27" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
                 </div>
-                
-                <h1 style={{ minHeight: '84px' }}>{currentHeroSlide.title} <br /><span className="highlight-text">{currentHeroSlide.highlight}</span></h1>
-                
-                <p className="hero-banner-subtitle">
+
+                <p className="clean-hero-sub">
                   {currentHeroSlide.subtitle}
                 </p>
 
-                {/* Wide Centered Search Bar */}
-                <form onSubmit={handleSearchSubmit} className="wide-search-bar-form" style={{ position: 'relative' }}>
-                  <div className="search-bar-inner-container">
-                    {visualSearchLoading ? (
-                      <Loader2 size={20} className="search-bar-icon-left animate-spin" style={{ color: 'var(--accent-gold)' }} />
-                    ) : (
-                      <SearchIcon size={20} className="search-bar-icon-left" />
-                    )}
-                    <input 
-                      type="text" 
-                      placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : (t('searchPlaceholder') || "Seramik, mermer, model veya marka ara...")}
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
-                      onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                      className="wide-search-input"
-                      disabled={!!uploadedImagePreview}
-                      style={{ paddingLeft: uploadedImagePreview ? '90px' : undefined }}
-                    />
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setActiveTab('studio');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="clean-hero-primary-btn"
+                  aria-label="3D'de Dene"
+                >
+                  <Box size={18} />
+                  <span>{currentHeroSlide.ctaText || "3D'de Dene"}</span>
+                  <ChevronRight size={16} />
+                </button>
 
-                    {/* Image Preview Thumbnail Overlay */}
-                    {uploadedImagePreview && (
-                      <div style={{
-                        position: 'absolute',
-                        left: '42px',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: '#f1f5f9',
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
-                        zIndex: 10
-                      }}>
-                        <img 
-                          src={uploadedImagePreview} 
-                          alt="Görsel Arama" 
-                          style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} 
-                        />
-                        <button 
-                          type="button" 
-                          onClick={handleClearSearch}
-                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', padding: '0 2px' }}
-                          title="Görseli Kaldır"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                    
-                    {/* Inline Image Upload (Görsel Arama) */}
-                    <div className="search-camera-trigger" title="Görsel ile Arama Yap (Seramik Shazam)">
-                      <ImageIcon size={20} className="camera-trigger-icon" />
-                      <input 
-                        type="file" 
-                        id="hero-visual-search-input"
-                        accept="image/*" 
-                        onChange={handleVisualSearch} 
-                        className="invisible-file-upload-input"
-                      />
-                    </div>
-                    
-                    <button type="submit" className="wide-search-submit-btn" disabled={visualSearchLoading}>
-                      {visualSearchLoading ? (t('searching') || 'Aranıyor...') : (t('search') || 'Ara')}
+                {/* Slider Dots */}
+                <div className="clean-hero-slider-dots">
+                  {activeHeroSlides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setHeroSlideIndex(idx)}
+                      aria-label={`Slayt ${idx + 1}`}
+                      className={`clean-slider-dot ${heroSlideIndex % activeHeroSlides.length === idx ? 'active' : ''}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* 3D Cube Badge Watermark (Right Side) */}
+              <div 
+                className="clean-hero-3d-badge"
+                onClick={() => {
+                  setActiveTab('studio');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                title="3D Stüdyoda Görüntüle"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveTab('studio');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+              >
+                <div className="clean-3d-badge-inner">
+                  <div className="clean-3d-rings" />
+                  <Box size={52} strokeWidth={1.8} className="clean-3d-box-icon" />
+                  <span className="clean-3d-badge-text">3D</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CLEAN SEARCH PILL - Dedicated Clean Container Matching Image 1 */}
+            <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative' }}>
+              <div className="clean-search-pill-box">
+                <SearchIcon size={20} className="clean-search-icon-left" />
+                
+                <input 
+                  type="text" 
+                  placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : (t('searchPlaceholder') || "Seramik, marka veya model ara...")}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  className="clean-search-text-input"
+                  disabled={!!uploadedImagePreview}
+                  style={{ paddingLeft: uploadedImagePreview ? '80px' : undefined }}
+                />
+
+                {/* Image Preview Thumbnail Overlay */}
+                {uploadedImagePreview && (
+                  <div className="clean-search-thumb-badge">
+                    <img 
+                      src={uploadedImagePreview} 
+                      alt="Görsel Arama" 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={handleClearSearch}
+                      title="Görseli Kaldır"
+                    >
+                      ✕
                     </button>
                   </div>
+                )}
 
-                  {/* Instant Search Suggestions Dropdown */}
-                  {showSuggestions && searchSuggestions.length > 0 && (
-                    <div className="search-suggestions-dropdown glass-panel" style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: '0',
-                      right: '0',
-                      background: '#ffffff',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '16px',
-                      marginTop: '8px',
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                      zIndex: '99',
-                      maxHeight: '320px',
-                      overflowY: 'auto',
-                      padding: '8px 0'
-                    }}>
-                      {searchSuggestions.map(p => (
-                        <div 
-                          key={p.id} 
-                          className="suggestion-item"
-                          onClick={() => {
-                            setSearchQuery(p.name);
-                            setShowSuggestions(false);
-                            handleProductCardClick(p);
-                          }}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            padding: '10px 16px',
-                            cursor: 'pointer',
-                            transition: 'background 0.2s ease',
-                            borderBottom: '1px solid #f1f3f7'
-                          }}
-                        >
-                          <img 
-                            src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
-                            alt={p.name} 
-                            style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }}
-                          />
-                          <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} • {p.code} • {p.width}x{p.height} cm</span>
-                          </div>
-                          <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>↗</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </form>
+                <div className="clean-search-v-divider" />
 
-                {/* Popular Searches */}
-                <div className="hero-popular-tags">
-                  <span className="pop-tags-label">{t('popularSearches') || 'Popüler Aramalar'}:</span>
-                  <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 {translateStyle('Mermer') || 'Mermer'}</button>
-                  <button onClick={() => handleTagClick('Calacatta Gold', 'style', 'Mermer')} className="pop-tag-capsule">Calacatta Gold</button>
-                  <button onClick={() => handleTagClick('Ahşap', 'style', 'Ahşap')} className="pop-tag-capsule">{translateFinish('Mat') || 'Mat'} {translateStyle('Ahşap') || 'Ahşap'}</button>
-                  <button onClick={() => handleTagClick('Beton', 'style', 'Beton')} className="pop-tag-capsule">{translateStyle('Beton') || 'Gri Beton'}</button>
-                  <button onClick={() => handleTagClick('Traverten', 'style', 'Beton')} className="pop-tag-capsule">{translateStyle('Traverten') || 'Traverten'}</button>
-                  <button onClick={() => handleTagClick('Beyaz', 'style', 'Mermer')} className="pop-tag-capsule">{translateFinish('Parlak') || 'Parlak'} {translateStyle('Mermer') || 'Mermer'}</button>
-                </div>
-
-                {/* Feature Columns Row */}
-                <div className="hero-feature-stats-row">
-                  <div className="feature-stat-capsule">
-                    <Layers2 size={15} style={{ color: '#94a3b8' }} />
-                    <span>25.000+ Seramik Ürün</span>
-                  </div>
-                  <div className="feature-stat-capsule">
-                    <Activity size={15} style={{ color: '#94a3b8' }} />
-                    <span>150+ Marka</span>
-                  </div>
-
-                  <label htmlFor="hero-visual-search-input" className="hero-feature-btn gold-theme" title="Fotoğraf Yükleyerek Yapay Zeka ile Seramik Bul">
-                    <Camera size={15} />
-                    <span>AI Seramik Shazam</span>
-                  </label>
-
-                  <Link 
-                    href="/teklif-al" 
-                    className="hero-feature-btn quote-primary-btn" 
-                    title="81 İldeki Yetkili Bayilerden Ücretsiz Fiyat Teklifi Al"
-                    style={{
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      color: '#ffffff',
-                      fontWeight: '800',
-                      border: 'none',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <FileText size={15} color="#ffffff" />
-                    <span>⚡ Bayiden Teklif Al</span>
-                  </Link>
-
-                  <button 
-                    onClick={() => {
-                      setActiveTab('studio');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }} 
-                    className="hero-feature-btn gold-theme"
-                    title="Canlı 3D Mekan & Seramik Tasarım Stüdyosunu Aç"
-                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.08) 100%)', border: '1px solid #d4af37', color: '#d4af37', fontWeight: '800' }}
-                  >
-                    <Sparkles size={15} color="#d4af37" />
-                    <span>✨ 3D Tasarım Stüdyosu</span>
-                  </button>
-                </div>
+                {/* Camera Button (Fotoğraftan Bul) */}
+                <label htmlFor="clean-hero-visual-search-input" className="clean-search-camera-label" title="Fotoğraftan Bul (Seramik Shazam)">
+                  <Camera size={22} className="clean-camera-icon" />
+                  <span className="clean-camera-text">Fotoğraftan<br />Bul</span>
+                </label>
+                <input 
+                  type="file" 
+                  id="clean-hero-visual-search-input"
+                  accept="image/*" 
+                  onChange={handleVisualSearch} 
+                  style={{ display: 'none' }}
+                />
               </div>
 
-              {/* Display Stand with Upright 3D Slabs */}
-              <div className="hero-display-stand-container">
-                <div className="display-stand-platform">
-                  {/* Slab 1 (Left - Active or Calacatta Gold) */}
-                  <div className="display-slab-wrapper left-slab">
-                    <div className="slab-visual-container">
-                      <TileVisualPreview 
-                        style={activeProduct?.style || "Mermer"} 
-                        color={activeProduct?.color || "Beyaz"} 
-                        finish={activeProduct?.finish || "Mat"} 
-                        width={activeProduct?.width || 60} 
-                        height={activeProduct?.height || 120} 
-                        imageUrl={activeProduct?.imageUrl || "/textures/calacatta_gold.jpg"} 
+              {/* Instant Search Suggestions Dropdown */}
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <div className="search-suggestions-dropdown glass-panel" style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  right: '0',
+                  background: '#ffffff',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '16px',
+                  marginTop: '8px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  zIndex: '99',
+                  maxHeight: '320px',
+                  overflowY: 'auto',
+                  padding: '8px 0'
+                }}>
+                  {searchSuggestions.map(p => (
+                    <div 
+                      key={p.id} 
+                      className="suggestion-item"
+                      onClick={() => {
+                        setSearchQuery(p.name);
+                        setShowSuggestions(false);
+                        handleProductCardClick(p);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px 16px',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s ease',
+                        borderBottom: '1px solid #f1f3f7'
+                      }}
+                    >
+                      <img 
+                        src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
+                        alt={p.name} 
+                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }}
                       />
-                      <div className="slab-badge-overlay">
-                        <span className="slab-badge-title">{activeProduct?.name || "Calacatta Gold"}</span>
-                        <span className="slab-badge-specs">{activeProduct?.width || 60}x{activeProduct?.height || 120} cm</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
+                        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} • {p.code} • {p.width}x{p.height} cm</span>
                       </div>
+                      <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>↗</span>
                     </div>
-                  </div>
-
-                  {/* Slab 2 (Right - Featured or Borneo Antrasit) */}
-                  <div className="display-slab-wrapper right-slab">
-                    <div className="slab-visual-container">
-                      <TileVisualPreview style="Mermer" color="Antrasit" finish="Mat" width={60} height={120} imageUrl="/textures/borneo_antrasit.jpg" />
-                      <div className="slab-badge-overlay">
-                        <span className="slab-badge-title">Borneo Antrasit</span>
-                        <span className="slab-badge-specs">60x120 cm</span>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
+              )}
+            </form>
+
+            {/* 4 QUICK ACTION CARDS - Matching Image 1 */}
+            <div className="clean-quick-nav-cards">
+              {/* Card 1: Seramik Bul */}
+              <div 
+                className="clean-nav-card-item"
+                onClick={() => {
+                  const catalogEl = document.querySelector('.categories-showcase-container') || document.querySelector('.categories-wrapper');
+                  if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+                  else window.scrollTo({ top: 500, behavior: 'smooth' });
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.scrollTo({ top: 500, behavior: 'smooth' }); } }}
+                title="Seramik Modellerini Keşfet"
+              >
+                <div className="clean-nav-card-icon">
+                  <BrickWall size={26} strokeWidth={2.2} />
+                </div>
+                <span className="clean-nav-card-title">Seramik<br />Bul</span>
               </div>
 
-              {/* Slider Dots */}
-              <div style={{
-                position: 'absolute',
-                bottom: '16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                gap: '8px',
-                zIndex: '3'
-              }}>
-                {heroSlides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setHeroSlideIndex(idx)}
-                    aria-label={`Slayt ${idx + 1}`}
-                    aria-current={heroSlideIndex === idx ? 'true' : undefined}
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      border: 'none',
-                      background: heroSlideIndex === idx ? 'var(--accent-gold)' : 'rgba(255,255,255,0.4)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                ))}
+              {/* Card 2: 3D Tasarım Yap */}
+              <div 
+                className="clean-nav-card-item"
+                onClick={() => {
+                  setActiveTab('studio');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
+                title="3D Mekân ve Seramik Tasarım Stüdyosu"
+              >
+                <div className="clean-nav-card-icon">
+                  <PaintRoller size={26} strokeWidth={2.2} />
+                </div>
+                <span className="clean-nav-card-title">3D Tasarım<br />Yap</span>
+              </div>
+
+              {/* Card 3: Fotoğraftan Bul */}
+              <div 
+                className="clean-nav-card-item"
+                onClick={() => {
+                  document.getElementById('clean-hero-visual-search-input')?.click();
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('clean-hero-visual-search-input')?.click(); } }}
+                title="Fotoğraf Yükleyerek Seramik Bul (Seramik Shazam)"
+              >
+                <div className="clean-nav-card-icon">
+                  <Camera size={26} strokeWidth={2.2} />
+                </div>
+                <span className="clean-nav-card-title">Fotoğraftan<br />Bul</span>
+              </div>
+
+              {/* Card 4: Bayi Bul */}
+              <div 
+                className="clean-nav-card-item"
+                onClick={() => {
+                  setActiveTab('dealers');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('dealers'); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
+                title="En Yakın Yetkili Seramik Bayisini Bul"
+              >
+                <div className="clean-nav-card-icon">
+                  <MapPin size={26} strokeWidth={2.2} />
+                </div>
+                <span className="clean-nav-card-title">Bayi<br />Bul</span>
               </div>
             </div>
 
@@ -10299,6 +10286,375 @@ export default function Home() {
 
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
+        /* ==========================================================================
+           CLEAN MODERN HERO BANNER (MATCHING IMAGE 1)
+           ========================================================================== */
+        :global(.clean-hero-card) {
+          position: relative;
+          border-radius: 24px;
+          background-size: cover;
+          background-position: center right;
+          background-repeat: no-repeat;
+          padding: 36px 42px;
+          min-height: 290px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+          margin-bottom: 16px;
+        }
+
+        :global(.clean-hero-overlay) {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 45%, rgba(255, 255, 255, 0.2) 100%);
+          z-index: 1;
+        }
+
+        :global(.clean-hero-content) {
+          position: relative;
+          z-index: 2;
+          max-width: 460px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
+        }
+
+        :global(.clean-hero-heading) {
+          font-size: 2.3rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.15;
+          margin: 0;
+          letter-spacing: -0.025em;
+          text-shadow: none;
+        }
+
+        :global(.clean-hero-highlight) {
+          color: #c58f27;
+          font-weight: 800;
+        }
+
+        :global(.clean-hero-gold-swoosh) {
+          margin: -2px 0 2px 0;
+          line-height: 1;
+        }
+
+        :global(.clean-hero-sub) {
+          font-size: 0.90rem;
+          color: #334155;
+          line-height: 1.45;
+          margin: 0 0 10px 0;
+          max-width: 380px;
+        }
+
+        :global(.clean-hero-primary-btn) {
+          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%);
+          color: #ffffff;
+          border: none;
+          border-radius: 9999px;
+          padding: 10px 22px;
+          font-size: 0.94rem;
+          font-weight: 700;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 14px rgba(197, 143, 39, 0.35);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        :global(.clean-hero-primary-btn:hover) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(197, 143, 39, 0.45);
+        }
+
+        :global(.clean-hero-slider-dots) {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 10px;
+        }
+
+        :global(.clean-slider-dot) {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          border: none;
+          background: #cbd5e1;
+          padding: 0;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+
+        :global(.clean-slider-dot.active) {
+          width: 24px;
+          height: 8px;
+          border-radius: 4px;
+          background: #c58f27;
+        }
+
+        /* 3D FLOATING BADGE */
+        :global(.clean-hero-3d-badge) {
+          position: relative;
+          z-index: 2;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding-right: 40px;
+          user-select: none;
+        }
+
+        :global(.clean-3d-badge-inner) {
+          position: relative;
+          width: 120px;
+          height: 120px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          color: #ffffff;
+          filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.25));
+        }
+
+        :global(.clean-3d-rings) {
+          position: absolute;
+          inset: -8px;
+          border: 2px dashed rgba(255, 255, 255, 0.7);
+          border-radius: 50%;
+          animation: cleanSpin 20s linear infinite;
+        }
+
+        @keyframes cleanSpin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        :global(.clean-3d-box-icon) {
+          color: #ffffff;
+          stroke: #ffffff;
+          filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.35));
+        }
+
+        :global(.clean-3d-badge-text) {
+          font-size: 1.25rem;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          color: #ffffff;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          margin-top: 2px;
+        }
+
+        /* CLEAN SEARCH PILL CONTAINER */
+        :global(.clean-search-container) {
+          width: 100%;
+          margin-bottom: 14px;
+        }
+
+        :global(.clean-search-pill-box) {
+          display: flex;
+          align-items: center;
+          background: #ffffff;
+          border-radius: 9999px;
+          border: 1px solid #e2e8f0;
+          padding: 4px 14px 4px 18px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+          gap: 10px;
+          height: 54px;
+          box-sizing: border-box;
+        }
+
+        :global(.clean-search-icon-left) {
+          color: #0f172a;
+          flex-shrink: 0;
+        }
+
+        :global(.clean-search-text-input) {
+          flex: 1;
+          border: none;
+          outline: none;
+          font-size: 0.94rem;
+          color: #0f172a;
+          background: transparent;
+          padding: 6px 0;
+          font-family: inherit;
+        }
+
+        :global(.clean-search-text-input::placeholder) {
+          color: #94a3b8;
+          font-size: 0.90rem;
+        }
+
+        :global(.clean-search-thumb-badge) {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: #f1f5f9;
+          border: 1px solid #cbd5e1;
+          padding: 3px 6px;
+          border-radius: 8px;
+          margin-right: 6px;
+        }
+
+        :global(.clean-search-thumb-badge img) {
+          width: 26px;
+          height: 26px;
+          border-radius: 4px;
+          object-fit: cover;
+        }
+
+        :global(.clean-search-thumb-badge button) {
+          background: none;
+          border: none;
+          color: #ef4444;
+          font-weight: bold;
+          cursor: pointer;
+          padding: 0 2px;
+        }
+
+        :global(.clean-search-v-divider) {
+          width: 1px;
+          height: 32px;
+          background: #e2e8f0;
+          margin: 0 4px;
+          flex-shrink: 0;
+        }
+
+        :global(.clean-search-camera-label) {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: #0f172a;
+          padding: 0 6px 0 8px;
+          flex-shrink: 0;
+          text-align: center;
+          user-select: none;
+        }
+
+        :global(.clean-camera-icon) {
+          color: #0f172a;
+        }
+
+        :global(.clean-camera-text) {
+          font-size: 0.60rem;
+          font-weight: 700;
+          line-height: 1.1;
+          color: #0f172a;
+          margin-top: 1px;
+        }
+
+        /* 4 QUICK ACTION CARDS GRID */
+        :global(.clean-quick-nav-cards) {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          width: 100%;
+          margin-bottom: 22px;
+        }
+
+        :global(.clean-nav-card-item) {
+          background: #ffffff;
+          border: 1px solid #eef2f6;
+          border-radius: 18px;
+          padding: 16px 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+          transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+          user-select: none;
+        }
+
+        :global(.clean-nav-card-item:hover) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+          border-color: #cbd5e1;
+        }
+
+        :global(.clean-nav-card-icon) {
+          color: #111e38;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        :global(.clean-nav-card-title) {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #111e38;
+          line-height: 1.25;
+        }
+
+        /* MOBILE ADAPTATION (< 768px) */
+        @media (max-width: 768px) {
+          :global(.clean-hero-card) {
+            padding: 18px 16px;
+            min-height: 220px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+          }
+          :global(.clean-hero-overlay) {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.88) 55%, rgba(255, 255, 255, 0.35) 100%);
+          }
+          :global(.clean-hero-heading) {
+            font-size: 1.55rem;
+          }
+          :global(.clean-hero-sub) {
+            font-size: 0.74rem;
+            line-height: 1.35;
+            max-width: 220px;
+          }
+          :global(.clean-hero-primary-btn) {
+            padding: 7px 16px;
+            font-size: 0.80rem;
+          }
+          :global(.clean-3d-badge-inner) {
+            width: 80px;
+            height: 80px;
+          }
+          :global(.clean-3d-box-icon) {
+            width: 36px;
+            height: 36px;
+          }
+          :global(.clean-3d-badge-text) {
+            font-size: 0.95rem;
+          }
+          :global(.clean-search-pill-box) {
+            height: 48px;
+            padding: 3px 12px 3px 14px;
+          }
+          :global(.clean-search-text-input) {
+            font-size: 0.80rem;
+          }
+          :global(.clean-search-text-input::placeholder) {
+            font-size: 0.76rem;
+          }
+          :global(.clean-quick-nav-cards) {
+            gap: 8px;
+            margin-bottom: 16px;
+          }
+          :global(.clean-nav-card-item) {
+            border-radius: 14px;
+            padding: 12px 4px;
+            gap: 6px;
+          }
+          :global(.clean-nav-card-icon svg) {
+            width: 22px;
+            height: 22px;
+          }
+          :global(.clean-nav-card-title) {
+            font-size: 0.72rem;
+          }
+        }
         /* ==========================================================================
            PERSONA GATEWAY CARDS & DYNAMIC FILTER STYLES
            ========================================================================== */
