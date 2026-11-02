@@ -37,7 +37,6 @@ import {
   ChevronDown,
   ChevronRight,
   ChevronLeft,
-  Sun,
   Info,
   Home as HomeIcon,
   Heart as HeartIcon,
@@ -3931,7 +3930,7 @@ export default function Home() {
               onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               <HomeIcon size={14} />
-              <span>Ana Sayfa</span>
+              <span style={{ whiteSpace: 'nowrap' }}>Anasayfa</span>
             </button>
 
             <button 
@@ -4195,16 +4194,6 @@ export default function Home() {
                 <UserIcon size={16} />
               </button>
             )}
-
-            {/* Sun / Theme decorative icon */}
-            <button 
-              type="button" 
-              className="luxury-icon-circle-btn sun-toggle-btn"
-              onClick={() => {}}
-              title="Görünüm"
-            >
-              <Sun size={15} />
-            </button>
 
             {/* Location & Language */}
             <HeaderLocationPicker 
@@ -10417,6 +10406,8 @@ export default function Home() {
           cursor: pointer;
           transition: all 0.2s ease;
           box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+          white-space: nowrap;
+          flex-shrink: 0;
         }
 
         :global(.luxury-nav-link) {
