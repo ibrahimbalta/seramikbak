@@ -4295,7 +4295,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Mekânını Yenile AI Mini Banner */}
+          {/* Mekânını Yenile AI Mini Banner - Ultra Sleek Symmetric Luxury Pill */}
           <div 
             className="showcase-ai-mini-banner"
             onClick={() => {
@@ -4308,15 +4308,16 @@ export default function Home() {
           >
             <div className="ai-mini-thumb">
               <img src="/hero/modern_living.png" alt="Mekânını Yenile" />
+              <div className="ai-mini-thumb-sparkle" aria-hidden="true">
+                <Sparkles size={9} />
+              </div>
             </div>
-            <div className="ai-mini-cta-pill">
-              <div className="ai-mini-cta-text">
-                <span className="ai-mini-title">Mekânını Yenile</span>
-                <span className="ai-mini-sub">AI ile Seramiği Deneyimle</span>
-              </div>
-              <div className="ai-mini-cta-arrow">
-                <ArrowRight size={13} />
-              </div>
+            <div className="ai-mini-cta-text">
+              <span className="ai-mini-title">Mekânını Yenile</span>
+              <span className="ai-mini-sub">AI ile Seramiği Deneyimle</span>
+            </div>
+            <div className="ai-mini-cta-arrow">
+              <ArrowRight size={14} strokeWidth={2.4} />
             </div>
           </div>
         </div>
@@ -10727,68 +10728,123 @@ export default function Home() {
         }
 
         :global(.showcase-ai-mini-banner) {
-          background: #ffffff;
-          border: 1px solid #eef2f6;
+          position: relative;
+          background: linear-gradient(135deg, #d4af37 0%, #b8860b 55%, #946914 100%);
+          border: 1px solid rgba(255, 255, 255, 0.4);
           border-radius: 9999px;
-          padding: 4px 6px 4px 6px;
-          display: flex;
+          height: 48px;
+          padding: 4px 12px 4px 5px;
+          display: inline-flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
           cursor: pointer;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          box-shadow: 0 4px 18px rgba(184, 134, 11, 0.28), 0 2px 6px rgba(15, 23, 42, 0.08);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
           user-select: none;
           flex-shrink: 0;
+          overflow: hidden;
+        }
+
+        :global(.showcase-ai-mini-banner::after) {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+          transform: skewX(-20deg);
+          transition: left 0.6s ease;
+          pointer-events: none;
         }
 
         :global(.showcase-ai-mini-banner:hover) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(197, 143, 39, 0.22);
+          box-shadow: 0 8px 26px rgba(184, 134, 11, 0.42), 0 0 16px rgba(212, 175, 55, 0.35);
+          border-color: rgba(255, 255, 255, 0.65);
+        }
+
+        :global(.showcase-ai-mini-banner:hover::after) {
+          left: 150%;
+        }
+
+        :global(.ai-mini-thumb) {
+          position: relative;
+          width: 38px;
+          height: 38px;
+          flex-shrink: 0;
         }
 
         :global(.ai-mini-thumb img) {
-          width: 64px;
-          height: 40px;
-          border-radius: 9999px;
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
           object-fit: cover;
           display: block;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        :global(.ai-mini-cta-pill) {
-          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%);
-          border-radius: 9999px;
-          padding: 6px 16px 6px 18px;
+        :global(.ai-mini-thumb-sparkle) {
+          position: absolute;
+          bottom: -2px;
+          right: -2px;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #0f172a;
+          color: #d4af37;
+          border: 1.5px solid #ffffff;
           display: flex;
           align-items: center;
-          gap: 8px;
-          color: #ffffff;
+          justify-content: center;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         :global(.ai-mini-cta-text) {
           display: flex;
           flex-direction: column;
+          justify-content: center;
+          line-height: 1.15;
+          text-align: left;
         }
 
         :global(.ai-mini-title) {
-          font-size: 0.86rem;
+          font-size: 0.88rem;
           font-weight: 800;
-          line-height: 1.1;
+          color: #ffffff;
+          letter-spacing: -0.015em;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          white-space: nowrap;
         }
 
         :global(.ai-mini-sub) {
-          font-size: 0.66rem;
-          opacity: 0.92;
-          font-weight: 500;
+          font-size: 0.68rem;
+          color: rgba(255, 255, 255, 0.92);
+          font-weight: 600;
+          letter-spacing: 0.01em;
+          margin-top: 1px;
+          white-space: nowrap;
         }
 
         :global(.ai-mini-cta-arrow) {
-          width: 20px;
-          height: 20px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.25);
+          background: rgba(255, 255, 255, 0.22);
+          border: 1px solid rgba(255, 255, 255, 0.45);
+          backdrop-filter: blur(4px);
           display: flex;
           align-items: center;
           justify-content: center;
+          color: #ffffff;
+          flex-shrink: 0;
+          transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        :global(.showcase-ai-mini-banner:hover .ai-mini-cta-arrow) {
+          transform: translateX(2px);
+          background: rgba(255, 255, 255, 0.35);
         }
         /* ==========================================================================
            CLEAN MODERN HERO BANNER (MATCHING IMAGE 1)
@@ -11367,6 +11423,7 @@ export default function Home() {
           :global(.showcase-ai-mini-banner) {
             width: 100% !important;
             justify-content: space-between !important;
+            padding: 4px 14px 4px 6px !important;
             box-sizing: border-box !important;
           }
         }
