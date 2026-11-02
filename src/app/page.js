@@ -4716,22 +4716,35 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CLEAN SEARCH PILL - Dedicated Clean Container Matching Image 1 */}
+            {/* MODERN ULTRA-SLEEK SEARCH CONTAINER */}
             <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative' }}>
               <div className="clean-search-pill-box">
-                <SearchIcon size={20} className="clean-search-icon-left" />
+                <div className="modern-search-icon-circle">
+                  <SearchIcon size={20} strokeWidth={2.4} />
+                </div>
                 
                 <input 
                   type="text" 
-                  placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : (t('searchPlaceholder') || "Seramik, marka veya model ara...")}
+                  placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : "Seramik modeli, ebat (60x120), marka veya renk arayın..."}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   className="clean-search-text-input"
                   disabled={!!uploadedImagePreview}
-                  style={{ paddingLeft: uploadedImagePreview ? '80px' : undefined }}
                 />
+
+                {/* Clear Input Button (when search text is present) */}
+                {searchQuery && !uploadedImagePreview && (
+                  <button 
+                    type="button" 
+                    onClick={() => { setSearchQuery(''); fetchProducts(''); }}
+                    className="modern-search-clear-btn"
+                    title="Aramayı Temizle"
+                  >
+                    ✕
+                  </button>
+                )}
 
                 {/* Image Preview Thumbnail Overlay */}
                 {uploadedImagePreview && (
@@ -4753,9 +4766,9 @@ export default function Home() {
                 <div className="clean-search-v-divider" />
 
                 {/* Camera Button (Fotoğraftan Bul) */}
-                <label htmlFor="clean-hero-visual-search-input" className="clean-search-camera-label" title="Fotoğraftan Bul (Seramik Shazam)">
-                  <Camera size={22} className="clean-camera-icon" />
-                  <span className="clean-camera-text">Fotoğraftan<br />Bul</span>
+                <label htmlFor="clean-hero-visual-search-input" className="modern-camera-pill-btn" title="Fotoğraftan Bul (Seramik Shazam)">
+                  <Camera size={18} strokeWidth={2} className="modern-camera-icon" />
+                  <span className="modern-camera-text">Fotoğraftan Bul</span>
                 </label>
                 <input 
                   type="file" 
@@ -4764,6 +4777,18 @@ export default function Home() {
                   onChange={handleVisualSearch} 
                   style={{ display: 'none' }}
                 />
+
+                {/* Direct Search Submit Action Button */}
+                <button type="submit" className="modern-search-submit-btn" disabled={visualSearchLoading}>
+                  {visualSearchLoading ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <>
+                      <span>Ara</span>
+                      <ArrowRight size={15} />
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Instant Search Suggestions Dropdown */}
@@ -10289,18 +10314,18 @@ export default function Home() {
            ========================================================================== */
         :global(.clean-hero-card) {
           position: relative;
-          border-radius: 24px;
+          border-radius: 28px;
           background-size: cover;
           background-position: center right;
           background-repeat: no-repeat;
-          padding: 36px 42px;
-          min-height: 290px;
+          padding: 48px 56px;
+          min-height: 420px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-          margin-bottom: 16px;
+          box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04);
+          margin-bottom: 20px;
         }
 
         :global(.clean-hero-overlay) {
@@ -10402,8 +10427,13 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding-right: 40px;
+          margin-right: 36px;
           user-select: none;
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        :global(.clean-hero-3d-badge:hover) {
+          transform: scale(1.06);
         }
 
         :global(.clean-3d-badge-inner) {
@@ -10446,10 +10476,13 @@ export default function Home() {
           margin-top: 2px;
         }
 
-        /* CLEAN SEARCH PILL CONTAINER */
+        /* ==========================================================================
+           MODERN ULTRA-SLEEK SEARCH CONTAINER
+           ========================================================================== */
         :global(.clean-search-container) {
           width: 100%;
-          margin-bottom: 14px;
+          margin-bottom: 20px;
+          position: relative;
         }
 
         :global(.clean-search-pill-box) {
@@ -10457,33 +10490,78 @@ export default function Home() {
           align-items: center;
           background: #ffffff;
           border-radius: 9999px;
-          border: 1px solid #e2e8f0;
-          padding: 4px 14px 4px 18px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+          border: 1.5px solid rgba(226, 232, 240, 0.9);
+          padding: 6px 8px 6px 14px;
+          box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(0, 0, 0, 0.03);
           gap: 10px;
-          height: 54px;
+          height: 62px;
           box-sizing: border-box;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
         }
 
-        :global(.clean-search-icon-left) {
-          color: #0f172a;
+        :global(.clean-search-pill-box:focus-within) {
+          border-color: #c58f27;
+          box-shadow: 0 16px 44px -4px rgba(197, 143, 39, 0.22), 0 0 0 3px rgba(197, 143, 39, 0.12);
+        }
+
+        :global(.modern-search-icon-circle) {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(197, 143, 39, 0.14) 0%, rgba(197, 143, 39, 0.05) 100%);
+          color: #c58f27;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
+          transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        :global(.clean-search-pill-box:focus-within .modern-search-icon-circle) {
+          transform: scale(1.06);
+          background: #c58f27;
+          color: #ffffff;
         }
 
         :global(.clean-search-text-input) {
           flex: 1;
           border: none;
           outline: none;
-          font-size: 0.94rem;
+          font-size: 0.98rem;
+          font-weight: 500;
           color: #0f172a;
           background: transparent;
-          padding: 6px 0;
+          padding: 6px 8px;
           font-family: inherit;
         }
 
         :global(.clean-search-text-input::placeholder) {
           color: #94a3b8;
-          font-size: 0.90rem;
+          font-size: 0.92rem;
+          font-weight: 400;
+        }
+
+        :global(.modern-search-clear-btn) {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: #f1f5f9;
+          border: none;
+          color: #64748b;
+          font-size: 11px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+          margin-right: 4px;
+        }
+
+        :global(.modern-search-clear-btn:hover) {
+          background: #e2e8f0;
+          color: #0f172a;
+          transform: scale(1.08);
         }
 
         :global(.clean-search-thumb-badge) {
@@ -10492,14 +10570,14 @@ export default function Home() {
           gap: 6px;
           background: #f1f5f9;
           border: 1px solid #cbd5e1;
-          padding: 3px 6px;
+          padding: 3px 8px;
           border-radius: 8px;
           margin-right: 6px;
         }
 
         :global(.clean-search-thumb-badge img) {
-          width: 26px;
-          height: 26px;
+          width: 28px;
+          height: 28px;
           border-radius: 4px;
           object-fit: cover;
         }
@@ -10511,6 +10589,7 @@ export default function Home() {
           font-weight: bold;
           cursor: pointer;
           padding: 0 2px;
+          font-size: 13px;
         }
 
         :global(.clean-search-v-divider) {
@@ -10521,29 +10600,71 @@ export default function Home() {
           flex-shrink: 0;
         }
 
-        :global(.clean-search-camera-label) {
+        :global(.modern-camera-pill-btn) {
           display: flex;
-          flex-direction: column;
           align-items: center;
-          justify-content: center;
+          gap: 7px;
+          padding: 9px 18px;
+          border-radius: 9999px;
+          background: #f8fafc;
+          border: 1.5px solid #e2e8f0;
+          color: #1e293b;
+          font-weight: 700;
+          font-size: 0.85rem;
           cursor: pointer;
-          color: #0f172a;
-          padding: 0 6px 0 8px;
+          transition: all 0.2s ease;
+          white-space: nowrap;
           flex-shrink: 0;
-          text-align: center;
           user-select: none;
         }
 
-        :global(.clean-camera-icon) {
+        :global(.modern-camera-pill-btn:hover) {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
           color: #0f172a;
+          transform: translateY(-1px);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
-        :global(.clean-camera-text) {
-          font-size: 0.60rem;
+        :global(.modern-camera-icon) {
+          color: #c58f27;
+          transition: transform 0.2s ease;
+        }
+
+        :global(.modern-camera-pill-btn:hover .modern-camera-icon) {
+          transform: scale(1.12);
+        }
+
+        :global(.modern-camera-text) {
           font-weight: 700;
-          line-height: 1.1;
-          color: #0f172a;
-          margin-top: 1px;
+          letter-spacing: -0.01em;
+        }
+
+        :global(.modern-search-submit-btn) {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 11px 24px;
+          border-radius: 9999px;
+          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%);
+          color: #ffffff;
+          border: none;
+          font-weight: 700;
+          font-size: 0.92rem;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(197, 143, 39, 0.35);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        :global(.modern-search-submit-btn:hover) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 22px rgba(197, 143, 39, 0.45);
+        }
+
+        :global(.modern-search-submit-btn:active) {
+          transform: translateY(0);
         }
 
         /* 4 QUICK ACTION CARDS GRID */
@@ -10595,46 +10716,69 @@ export default function Home() {
         /* MOBILE ADAPTATION (< 768px) */
         @media (max-width: 768px) {
           :global(.clean-hero-card) {
-            padding: 18px 16px;
-            min-height: 220px;
-            border-radius: 18px;
-            margin-bottom: 12px;
+            padding: 24px 20px;
+            min-height: 270px;
+            border-radius: 20px;
+            margin-bottom: 14px;
           }
           :global(.clean-hero-overlay) {
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.88) 55%, rgba(255, 255, 255, 0.35) 100%);
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.90) 60%, rgba(255, 255, 255, 0.4) 100%);
           }
           :global(.clean-hero-heading) {
-            font-size: 1.55rem;
+            font-size: 1.65rem;
           }
           :global(.clean-hero-sub) {
-            font-size: 0.74rem;
+            font-size: 0.78rem;
             line-height: 1.35;
-            max-width: 220px;
+            max-width: 240px;
           }
           :global(.clean-hero-primary-btn) {
-            padding: 7px 16px;
-            font-size: 0.80rem;
+            padding: 8px 18px;
+            font-size: 0.82rem;
+          }
+          :global(.clean-hero-3d-badge) {
+            margin-right: 8px;
           }
           :global(.clean-3d-badge-inner) {
-            width: 80px;
-            height: 80px;
+            width: 86px;
+            height: 86px;
           }
           :global(.clean-3d-box-icon) {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
           }
           :global(.clean-3d-badge-text) {
             font-size: 0.95rem;
           }
           :global(.clean-search-pill-box) {
-            height: 48px;
-            padding: 3px 12px 3px 14px;
+            height: 52px;
+            padding: 4px 6px 4px 8px;
+            gap: 6px;
+          }
+          :global(.modern-search-icon-circle) {
+            width: 34px;
+            height: 34px;
           }
           :global(.clean-search-text-input) {
-            font-size: 0.80rem;
+            font-size: 0.82rem;
+            padding: 4px;
           }
           :global(.clean-search-text-input::placeholder) {
             font-size: 0.76rem;
+          }
+          :global(.clean-search-v-divider) {
+            display: none;
+          }
+          :global(.modern-camera-pill-btn) {
+            padding: 7px 10px;
+            gap: 4px;
+          }
+          :global(.modern-camera-text) {
+            display: none;
+          }
+          :global(.modern-search-submit-btn) {
+            padding: 8px 14px;
+            font-size: 0.80rem;
           }
           :global(.clean-quick-nav-cards) {
             gap: 8px;
