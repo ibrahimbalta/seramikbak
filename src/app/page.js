@@ -10166,20 +10166,23 @@ export default function Home() {
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
         /* ==========================================================================
-           LUXURY OBSIDIAN TOP HEADER (MATCHING IMAGE 1)
+           LUXURY LIGHT TWO-TONE TOP NAVBAR & DROPDOWNS
            ========================================================================== */
         :global(.luxury-dark-header) {
-          background: #0f172a;
-          border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+          background: rgba(255, 255, 255, 0.97);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-bottom: 2px solid rgba(212, 175, 55, 0.45);
           border-radius: 0 0 24px 24px;
           padding: 10px 24px;
-          color: #ffffff;
+          color: #0f172a;
           position: sticky;
           top: 0;
           z-index: 1000;
-          box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
           width: 100%;
           box-sizing: border-box;
+          transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         :global(.luxury-header-inner) {
@@ -10204,7 +10207,7 @@ export default function Home() {
         :global(.luxury-logo-badge) {
           width: 40px;
           height: 40px;
-          background: linear-gradient(135deg, #1e293b 0%, #0b1120 100%);
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
           border: 2px solid #d4af37;
           border-radius: 10px;
           display: flex;
@@ -10213,7 +10216,7 @@ export default function Home() {
           font-weight: 900;
           font-size: 1.1rem;
           color: #fef08a;
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+          box-shadow: 0 3px 10px rgba(212, 175, 55, 0.25);
         }
 
         :global(.luxury-logo-text-col) {
@@ -10225,14 +10228,14 @@ export default function Home() {
           font-size: 1.3rem;
           font-weight: 900;
           letter-spacing: -0.02em;
-          color: #ffffff;
+          color: #0f172a;
           line-height: 1.1;
         }
 
         :global(.luxury-logo-subtitle) {
           font-size: 0.68rem;
-          color: #cbd5e1;
-          font-weight: 500;
+          color: #64748b;
+          font-weight: 600;
           letter-spacing: 0.02em;
         }
 
@@ -10248,16 +10251,16 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 5px;
-          background: rgba(212, 175, 55, 0.22);
-          border: 1.5px solid rgba(212, 175, 55, 0.5);
-          color: #fef08a;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1.5px solid #d4af37;
+          color: #926410;
           padding: 6px 13px;
           border-radius: 9999px;
           font-weight: 700;
           font-size: 0.81rem;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+          box-shadow: 0 2px 8px rgba(212, 175, 55, 0.18);
           white-space: nowrap;
           flex-shrink: 0;
         }
@@ -10268,7 +10271,7 @@ export default function Home() {
           gap: 4px;
           background: transparent;
           border: none;
-          color: #f1f5f9;
+          color: #334155;
           padding: 6px 9px;
           border-radius: 8px;
           font-weight: 600;
@@ -10280,12 +10283,17 @@ export default function Home() {
         }
 
         :global(.luxury-nav-link:hover) {
-          color: #d4af37;
-          background: rgba(255, 255, 255, 0.06);
+          color: #b8860b;
+          background: rgba(212, 175, 55, 0.08);
         }
 
         :global(.luxury-dropdown-wrapper) {
           position: relative;
+        }
+
+        :global(.luxury-dropdown-trigger.active) {
+          color: #b8860b;
+          background: rgba(212, 175, 55, 0.1);
         }
 
         :global(.luxury-dark-dropdown-menu) {
@@ -10293,11 +10301,11 @@ export default function Home() {
           top: calc(100% + 10px);
           left: 0;
           min-width: 290px;
-          background: #0f172a;
-          border: 1px solid rgba(212, 175, 55, 0.4);
+          background: #ffffff;
+          border: 1.5px solid rgba(212, 175, 55, 0.35);
           border-radius: 16px;
           padding: 8px;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+          box-shadow: 0 18px 44px rgba(15, 23, 42, 0.14), 0 2px 10px rgba(0, 0, 0, 0.04);
           z-index: 1200;
           display: flex;
           flex-direction: column;
@@ -10310,7 +10318,7 @@ export default function Home() {
           gap: 12px;
           padding: 9px 12px;
           border-radius: 12px;
-          color: #f1f5f9;
+          color: #1e293b;
           text-decoration: none;
           background: transparent;
           border: none;
@@ -10322,8 +10330,9 @@ export default function Home() {
         }
 
         :global(.luxury-dropdown-item:hover) {
-          background: rgba(255, 255, 255, 0.08);
-          color: #d4af37;
+          background: #f8fafc;
+          color: #b8860b;
+          transform: translateX(2px);
         }
 
         :global(.luxury-dropdown-item .dropdown-title-row) {
@@ -10335,12 +10344,17 @@ export default function Home() {
         :global(.luxury-dropdown-item .dropdown-item-title) {
           font-weight: 700;
           font-size: 0.86rem;
-          color: #ffffff;
+          color: #0f172a;
+          transition: color 0.2s ease;
+        }
+
+        :global(.luxury-dropdown-item:hover .dropdown-item-title) {
+          color: #b8860b;
         }
 
         :global(.luxury-dropdown-item .dropdown-item-desc) {
           font-size: 0.72rem;
-          color: #94a3b8;
+          color: #64748b;
           line-height: 1.3;
           margin-top: 2px;
         }
@@ -10353,33 +10367,39 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          background: rgba(255, 255, 255, 0.06);
-          color: #cbd5e1;
+          background: #f1f5f9;
+          color: #475569;
+          border: 1px solid #e2e8f0;
         }
 
         :global(.luxury-dropdown-item .blue-icon) {
-          background: rgba(59, 130, 246, 0.15);
-          color: #60a5fa;
+          background: #eff6ff;
+          color: #2563eb;
+          border-color: #dbeafe;
         }
 
         :global(.luxury-dropdown-item .purple-icon) {
-          background: rgba(168, 85, 247, 0.15);
-          color: #c084fc;
+          background: #faf5ff;
+          color: #9333ea;
+          border-color: #f3e8ff;
         }
 
         :global(.luxury-dropdown-item .gold-icon) {
-          background: rgba(212, 175, 55, 0.18);
-          color: #d4af37;
+          background: #fefce8;
+          color: #b45309;
+          border-color: #fef08a;
         }
 
         :global(.luxury-dropdown-item .amber-icon) {
-          background: rgba(245, 158, 11, 0.18);
-          color: #fbbf24;
+          background: #fffbeb;
+          color: #d97706;
+          border-color: #fde68a;
         }
 
         :global(.luxury-dropdown-item .green-icon) {
-          background: rgba(16, 185, 129, 0.18);
-          color: #34d399;
+          background: #ecfdf5;
+          color: #059669;
+          border-color: #a7f3d0;
         }
 
         :global(.luxury-dropdown-item .dropdown-item-badge) {
@@ -10390,28 +10410,33 @@ export default function Home() {
         }
 
         :global(.luxury-dropdown-item .blue-badge) {
-          background: rgba(59, 130, 246, 0.2);
-          color: #93c5fd;
+          background: #eff6ff;
+          color: #1d4ed8;
+          border: 1px solid #bfdbfe;
         }
 
         :global(.luxury-dropdown-item .purple-badge) {
-          background: rgba(168, 85, 247, 0.2);
-          color: #e9d5ff;
+          background: #faf5ff;
+          color: #7e22ce;
+          border: 1px solid #e9d5ff;
         }
 
         :global(.luxury-dropdown-item .gold-badge) {
-          background: rgba(212, 175, 55, 0.25);
-          color: #fef08a;
+          background: #fefce8;
+          color: #92400e;
+          border: 1px solid #fef08a;
         }
 
         :global(.luxury-dropdown-item .amber-badge) {
-          background: rgba(245, 158, 11, 0.25);
-          color: #fef08a;
+          background: #fffbeb;
+          color: #92400e;
+          border: 1px solid #fde68a;
         }
 
         :global(.luxury-dropdown-item .green-badge) {
-          background: rgba(16, 185, 129, 0.25);
-          color: #a7f3d0;
+          background: #ecfdf5;
+          color: #047857;
+          border: 1px solid #a7f3d0;
         }
 
         :global(.luxury-outlet-link) {
@@ -10444,35 +10469,13 @@ export default function Home() {
           flex-shrink: 0;
         }
 
-        :global(.luxury-teklif-cta-btn) {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          background: linear-gradient(135deg, #d4af37 0%, #b48520 100%);
-          color: #ffffff;
-          border: none;
-          padding: 8px 20px;
-          border-radius: 9999px;
-          font-weight: 800;
-          font-size: 0.86rem;
-          cursor: pointer;
-          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
-          transition: all 0.2s ease;
-          white-space: nowrap;
-        }
-
-        :global(.luxury-teklif-cta-btn:hover) {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(212, 175, 55, 0.5);
-        }
-
         :global(.luxury-icon-circle-btn) {
           width: 38px;
           height: 38px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #ffffff;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #334155;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -10482,9 +10485,10 @@ export default function Home() {
         }
 
         :global(.luxury-icon-circle-btn:hover) {
-          background: rgba(255, 255, 255, 0.18);
+          background: #ffffff;
           border-color: #d4af37;
-          color: #d4af37;
+          color: #b8860b;
+          box-shadow: 0 2px 8px rgba(212, 175, 55, 0.18);
         }
 
         :global(.luxury-badge-count) {
@@ -10492,7 +10496,7 @@ export default function Home() {
           top: -3px;
           right: -3px;
           background: #d4af37;
-          color: #0f172a;
+          color: #ffffff;
           font-size: 0.62rem;
           font-weight: 900;
           border-radius: 9999px;
@@ -10503,9 +10507,36 @@ export default function Home() {
           display: none;
           background: transparent;
           border: none;
-          color: #ffffff;
+          color: #0f172a;
           cursor: pointer;
           padding: 4px;
+        }
+
+        :global(.luxury-dark-header .user-dropdown-menu) {
+          background: #ffffff !important;
+          border: 1.5px solid rgba(212, 175, 55, 0.35) !important;
+          box-shadow: 0 18px 44px rgba(15, 23, 42, 0.14) !important;
+          color: #0f172a !important;
+        }
+        :global(.luxury-dark-header .user-dropdown-header) {
+          background: #f8fafc !important;
+        }
+        :global(.luxury-dark-header .user-dropdown-name) {
+          color: #0f172a !important;
+          font-weight: 700 !important;
+        }
+        :global(.luxury-dark-header .user-dropdown-email) {
+          color: #64748b !important;
+        }
+        :global(.luxury-dark-header .user-dropdown-item) {
+          color: #334155 !important;
+        }
+        :global(.luxury-dark-header .user-dropdown-item:hover) {
+          background: #f8fafc !important;
+          color: #b8860b !important;
+        }
+        :global(.luxury-dark-header .user-dropdown-divider) {
+          background: #e2e8f0 !important;
         }
 
         /* ==========================================================================
