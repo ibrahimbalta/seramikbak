@@ -4913,171 +4913,31 @@ export default function Home() {
               </div>
             </div>
 
-            {/* PERSONA GATEWAY CARDS: Modern Visual Cards Matching Studio Banner Style */}
-            <section className="persona-gateway-section" aria-label="Kullanıcı Odaklı Hızlı Yönlendirme">
-              <div className="persona-gateway-grid">
-                
-                {/* 1. Evini Yenileyenler - Mekânımda Gör & Dene */}
-                <div 
-                  onClick={() => {
-                    const targetProduct = activeProduct || weeklyProducts?.[0] || products?.[0] || {
-                      name: 'White Silver 60×120 Full Lappato',
-                      brand: 'Güral Seramik',
-                      width: 60,
-                      height: 120,
-                      imageUrl: '/textures/calacatta_gold.jpg',
-                      textureUrl: '/textures/calacatta_gold.jpg',
-                      slug: 'gural-seramik-white-silver-60120-full-lappato'
-                    };
-                    setRenovationProduct(targetProduct);
-                    setShowRenovationModal(true);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      const targetProduct = activeProduct || weeklyProducts?.[0] || products?.[0];
-                      if (targetProduct) { setRenovationProduct(targetProduct); setShowRenovationModal(true); }
-                    }
-                  }}
-                  className="persona-banner-card card-studio"
-                  style={{ textDecoration: 'none', cursor: 'pointer' }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Mekânımda Gör ve Dene ile seramikleri odanızda canlı deneyin"
-                  title="Mekânımda Gör & Dene ile seramikleri odanızda canlı deneyin"
-                >
-                  <div className="promo-text-column">
-                    <div className="promo-top-badge gold">
-                      <Sparkles size={11} className="promo-sparkle-icon" />
-                      <span>AI 3D MEKAN</span>
-                    </div>
-                    <h5 className="persona-card-title">Mekânımda Gör & Dene</h5>
-                    <p className="persona-card-desc">Seramiklerinizi odanızda canlı görün</p>
-                    <div className="promo-action-btn-gold">
-                      <span>Hemen Deneyin</span>
-                      <ArrowRight size={12} />
-                    </div>
+            {/* Collapsible Metraj & Maliyet Robotu Container */}
+            {showCalculatorWidget && (
+              <div ref={calculatorSectionRef} className="calculator-collapsible-wrapper animate-fade-in" style={{ maxWidth: 1280, margin: '20px auto', padding: '0 16px' }}>
+                <div className="calculator-wrapper-header">
+                  <div className="calc-header-left">
+                    <FileText size={18} style={{ color: 'var(--accent-gold)' }} />
+                    <h4>Akıllı Maliyet & Metraj Robotu</h4>
                   </div>
-                  <div className="promo-image-column">
-                    <img src="/hero/luxury_bathroom.png" alt="Mekânımda Gör & Dene" />
-                    <div className="promo-image-badge">3D</div>
-                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowCalculatorWidget(false)}
+                    className="calc-close-btn"
+                  >
+                    Kapat ✕
+                  </button>
                 </div>
-
-                {/* 2. Mimarlar & Müteahhitler */}
-                <div 
-                  className="persona-banner-card card-calculator"
-                  onClick={() => {
-                    setShowCalculatorWidget(prev => !prev);
-                    setTimeout(() => {
-                      calculatorSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 80);
+                <TileCalculatorWidget 
+                  onGoToDealers={(summary) => {
+                    try {
+                      localStorage.setItem('seramikbak_metraj_quote', JSON.stringify(summary));
+                    } catch (e) {}
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setShowCalculatorWidget(prev => !prev);
-                      setTimeout(() => {
-                        calculatorSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }, 80);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Metraj ve Maliyet Robotu ile kutu ve fire ihtiyacını hesaplayın"
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="promo-text-column">
-                    <div className="promo-top-badge blue">
-                      <FileText size={11} className="promo-sparkle-icon" />
-                      <span>MİMAR & METRAJ</span>
-                    </div>
-                    <h5 className="persona-card-title">Metraj & Maliyet Robotu</h5>
-                    <p className="persona-card-desc">Kutu ve fire ihtiyacını anında hesaplayın</p>
-                    <div className="promo-action-btn-gold">
-                      <span>{showCalculatorWidget ? 'Robotu Kapat ✕' : 'Metrajı Başlat'}</span>
-                      <ArrowRight size={12} />
-                    </div>
-                  </div>
-                  <div className="promo-image-column">
-                    <img src="/hero/modern_living.png" alt="BIM ve Metraj" />
-                    <div className="promo-image-badge blue">BIM</div>
-                  </div>
-                </div>
-
-                {/* 3. Hemen Satın Almak İsteyenler */}
-                <div 
-                  className="persona-banner-card card-dealers"
-                  onClick={() => {
-                    setActiveTab('dealers');
-                    setTimeout(() => {
-                      const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      else window.scrollTo({ top: 300, behavior: 'smooth' });
-                    }, 100);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setActiveTab('dealers');
-                      setTimeout(() => {
-                        const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                        else window.scrollTo({ top: 300, behavior: 'smooth' });
-                      }, 100);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="En yakın yetkili seramik bayisini haritada bulun"
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="promo-text-column">
-                    <div className="promo-top-badge emerald">
-                      <Store size={11} className="promo-sparkle-icon" />
-                      <span>YETKİLİ BAYİ AĞI</span>
-                    </div>
-                    <h5 className="persona-card-title">En Yakın Bayiyi Bul</h5>
-                    <p className="persona-card-desc">81 ildeki 150+ showroom ve stoka ulaşın</p>
-                    <div className="promo-action-btn-gold">
-                      <span>Bayi Haritası</span>
-                      <ArrowRight size={12} />
-                    </div>
-                  </div>
-                  <div className="promo-image-column">
-                    <img src="/hero/scandinavian_kitchen.png" alt="Yetkili Bayiler" />
-                    <div className="promo-image-badge emerald">81 İL</div>
-                  </div>
-                </div>
-
+                />
               </div>
-
-              {/* Collapsible Metraj & Maliyet Robotu Container */}
-              {showCalculatorWidget && (
-                <div ref={calculatorSectionRef} className="calculator-collapsible-wrapper animate-fade-in">
-                  <div className="calculator-wrapper-header">
-                    <div className="calc-header-left">
-                      <FileText size={18} style={{ color: 'var(--accent-gold)' }} />
-                      <h4>Akıllı Maliyet & Metraj Robotu</h4>
-                    </div>
-                    <button 
-                      type="button" 
-                      onClick={() => setShowCalculatorWidget(false)}
-                      className="calc-close-btn"
-                    >
-                      Kapat ✕
-                    </button>
-                  </div>
-                  <TileCalculatorWidget 
-                    onGoToDealers={(summary) => {
-                      try {
-                        localStorage.setItem('seramikbak_metraj_quote', JSON.stringify(summary));
-                      } catch (e) {}
-                    }}
-                  />
-                </div>
-              )}
-            </section>
+            )}
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
