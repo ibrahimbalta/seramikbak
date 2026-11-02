@@ -28,14 +28,26 @@ export default function RoomRenovationModal({
   const brandName = typeof currentProduct.brand === 'string'
     ? currentProduct.brand
     : (currentProduct.brand?.name || 'SeramikBak');
-  const tileWidth = Number(currentProduct.width) || 60;
-  const tileHeight = Number(currentProduct.height) || 120;
+  // Intelligent dimension detection: Check explicit fields or extract from title/specs (e.g. 20x20, 60x120, 80x80)
+  let detectedW = Number(currentProduct.width) || 0;
+  let detectedH = Number(currentProduct.height) || 0;
+  if (!detectedW || !detectedH) {
+    const searchString = `${currentProduct.name || ''} ${currentProduct.size || ''} ${currentProduct.dimensions || ''}`;
+    const dimMatch = searchString.match(/(\d{2,3})\s*[x×X/]\s*(\d{2,3})/);
+    if (dimMatch) {
+      detectedW = parseInt(dimMatch[1], 10);
+      detectedH = parseInt(dimMatch[2], 10);
+    }
+  }
+  const tileWidth = detectedW || 60;
+  const tileHeight = detectedH || 120;
+  const finish = currentProduct.finish || 'Parlak';
 
   const rawTexture = currentProduct.textureUrl || currentProduct.imageUrl || '/textures/calacatta_gold.jpg';
   const textureUrl = resolveSafeTextureUrl(rawTexture);
 
   // Visualizer URL with params (explicit index.html ensures direct static serving without router rewrite issues)
-  const visualizerUrl = `/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}&scale=1.0&surface=floor&embed=1&v=4.0.0`;
+  const visualizerUrl = `/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}&finish=${encodeURIComponent(finish)}&scale=1.0&surface=floor&embed=1&v=5.0.0`;
 
   // Lock body scroll when modal is open
   useEffect(() => {

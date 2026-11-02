@@ -23,6 +23,11 @@
     const tileSizeVal     = $('#tile-size-val');
     const groutSlider     = $('#grout-slider');
     const groutVal        = $('#grout-val');
+    const finishSelect    = $('#finish-select');
+    const groutColorInput = $('#grout-color-input');
+    const groutColorVal   = $('#grout-color-val');
+    const groutSwatches   = $('.grout-swatch');
+    const sizeChips       = $('.size-chip');
     const deviceSelect    = $('#device-select');
     const resetSettingsBtn = $('#reset-settings-btn');
     const applySettingsBtn = $('#apply-settings-btn');
@@ -233,8 +238,8 @@
 
     // Update Tile Size readouts
     function updateTileSizeDisplay() {
-        const w = tileWSlider.value;
-        const h = tileHSlider.value;
+        const w = parseInt(tileWSlider.value, 10) || 60;
+        const h = parseInt(tileHSlider.value, 10) || 120;
         tileWNum.textContent = `${w} cm`;
         tileHNum.textContent = `${h} cm`;
         tileSizeVal.textContent = `${w} cm × ${h} cm`;
@@ -242,10 +247,96 @@
         if (tileCardTag) {
             tileCardTag.textContent = `${w}×${h} cm`;
         }
+        sizeChips.forEach((chip) => {
+            const cw = parseInt(chip.dataset.w, 10);
+            const ch = parseInt(chip.dataset.h, 10);
+            chip.classList.toggle('active', cw === w && ch === h);
+        });
     }
 
     tileWSlider.addEventListener('input', updateTileSizeDisplay);
     tileHSlider.addEventListener('input', updateTileSizeDisplay);
+
+    // Quick Size Chips handler
+    sizeChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+            const w = parseInt(chip.dataset.w, 10);
+            const h = parseInt(chip.dataset.h, 10);
+            if (w && tileWSlider) tileWSlider.value = w;
+            if (h && tileHSlider) tileHSlider.value = h;
+            updateTileSizeDisplay();
+            executeVisualization(true);
+        });
+    });
+
+    // Grout Color Swatches handler
+    groutSwatches.forEach((swatch) => {
+        swatch.addEventListener('click', () => {
+            groutSwatches.forEach((s) => s.classList.remove('active'));
+            swatch.classList.add('active');
+            const color = swatch.dataset.color;
+            const name = swatch.dataset.name;
+            if (groutColorInput) groutColorInput.value = color;
+            if (groutColorVal) groutColorVal.textContent = name;
+            executeVisualization(true);
+        });
+    });
+
+    // Finish Select handler
+    if (finishSelect) {
+        finishSelect.addEventListener('change', () => {
+            executeVisualization(true);
+        });
+    }
+
+    // Helper: Hex color to RGB
+    function hexToRgb(hex) {
+        let clean = (hex || '#cfd4dc').replace('#', '').trim();
+        if (clean.length === 3) {
+            clean = clean.split('').map((c) => c + c).join('');
+        }
+        const num = parseInt(clean, 16) || 0xcfd4dc;
+        return {
+            r: (num >> 16) & 255,
+            g: (num >> 8) & 255,
+            b: num & 255
+        };
+    }
+
+    // Helper: Sub-pixel Bilinear Texture Sampling (Eliminates pixelation & aliasing)
+    function sampleBilinear(uNorm, vNorm, texPx, texW, texH) {
+        const u = ((uNorm % 1.0) + 1.0) % 1.0;
+        const v = ((vNorm % 1.0) + 1.0) % 1.0;
+
+        const px = u * (texW - 1);
+        const py = v * (texH - 1);
+
+        const x0 = px | 0;
+        const y0 = py | 0;
+        const x1 = (x0 + 1 < texW) ? x0 + 1 : 0;
+        const y1 = (y0 + 1 < texH) ? y0 + 1 : 0;
+
+        const fx = px - x0;
+        const fy = py - y0;
+        const fx1 = 1.0 - fx;
+        const fy1 = 1.0 - fy;
+
+        const w00 = fx1 * fy1;
+        const w10 = fx * fy1;
+        const w01 = fx1 * fy;
+        const w11 = fx * fy;
+
+        const idx00 = (y0 * texW + x0) * 4;
+        const idx10 = (y0 * texW + x1) * 4;
+        const idx01 = (y1 * texW + x0) * 4;
+        const idx11 = (y1 * texW + x1) * 4;
+
+        const r = texPx[idx00] * w00 + texPx[idx10] * w10 + texPx[idx01] * w01 + texPx[idx11] * w11;
+        const g = texPx[idx00 + 1] * w00 + texPx[idx10 + 1] * w10 + texPx[idx01 + 1] * w01 + texPx[idx11 + 1] * w11;
+        const b = texPx[idx00 + 2] * w00 + texPx[idx10 + 2] * w10 + texPx[idx01 + 2] * w01 + texPx[idx11 + 2] * w11;
+
+        return [r, g, b];
+    }
 
     groutSlider.addEventListener('input', () => {
         groutVal.textContent = `${groutSlider.value} mm`;
@@ -856,7 +947,7 @@
         const w = roomImageEl.naturalWidth;
         const h = roomImageEl.naturalHeight;
 
-        // Base room image data
+        // Base room canvas
         const rCanvas = document.createElement('canvas');
         rCanvas.width = w;
         rCanvas.height = h;
@@ -865,7 +956,7 @@
         const roomImgData = rCtx.getImageData(0, 0, w, h);
         const roomPx = roomImgData.data;
 
-        // Mask pixels - ALWAYS use the verified target surface mask (active mask or manual edits)
+        // Target surface mask
         let maskImgData;
         if (currentLayerView === 'active' || !cachedMasks.active) {
             maskImgData = maskCtx.getImageData(0, 0, w, h);
@@ -874,42 +965,51 @@
         }
         const maskPx = maskImgData.data;
 
-        // Tile sizing from sliders
+        // Metrics from UI
         const twMetric = parseInt(tileWSlider.value, 10) || 60;
         const thMetric = parseInt(tileHSlider.value, 10) || 120;
-        const tileAspect = twMetric / thMetric;
+        const gw = parseInt(groutSlider.value, 10) || 2;
+        const chosenPattern = patternSelect.value || 'offset3'; // 'offset3' | 'brick' | 'grid' | 'diagonal' | 'herringbone'
+        const finishType = finishSelect ? finishSelect.value : 'satin'; // 'glossy' | 'satin' | 'matte'
 
-        const baseTileW = Math.max(30, Math.round(w * 0.085 * (twMetric / 60)));
-        const baseTileH = Math.max(30, Math.round(baseTileW / tileAspect));
+        // Grout color
+        const groutHex = groutColorInput ? groutColorInput.value : '#cfd4dc';
+        const { r: groutR, g: groutG, b: groutB } = hexToRgb(groutHex);
 
-        // Create tile swatch with grout
-        const patCanvas = document.createElement('canvas');
-        patCanvas.width = baseTileW;
-        patCanvas.height = baseTileH;
-        const pCtx = patCanvas.getContext('2d');
-        pCtx.drawImage(tileImageEl, 0, 0, baseTileW, baseTileH);
+        // High-Resolution Tile Texture Canvas (Preserve full crisp photographic detail!)
+        const texNativeW = tileImageEl.naturalWidth || 600;
+        const texNativeH = tileImageEl.naturalHeight || 1200;
+        const maxTexDim = 1600; // Optimal studio balance: extreme sharpness + smooth 60fps performance
+        let texW = texNativeW;
+        let texH = texNativeH;
+        if (texW > maxTexDim || texH > maxTexDim) {
+            const ratio = maxTexDim / Math.max(texW, texH);
+            texW = Math.round(texW * ratio);
+            texH = Math.round(texH * ratio);
+        }
+        const texCanvas = document.createElement('canvas');
+        texCanvas.width = texW;
+        texCanvas.height = texH;
+        const texCtx = texCanvas.getContext('2d');
+        texCtx.drawImage(tileImageEl, 0, 0, texW, texH);
+        const texPx = texCtx.getImageData(0, 0, texW, texH).data;
 
-        // Grout line
-        const gw = parseInt(groutSlider.value, 10) || 3;
-        const groutPxW = Math.max(1, Math.round(gw * 0.7));
-        pCtx.strokeStyle = 'rgba(65, 60, 55, 0.55)';
-        pCtx.lineWidth = groutPxW;
-        pCtx.strokeRect(groutPxW / 2, groutPxW / 2, baseTileW - groutPxW, baseTileH - groutPxW);
-
-        const tilePx = pCtx.getImageData(0, 0, baseTileW, baseTileH).data;
-
-        // Perspective setup - Unified geometry from calibrated room config
-        const conf = getRoomConfig(activeRoomUrl, w, h);
-        const horizonY = Math.round(h * conf.horizonY);
+        // 3D Perspective Geometry from calibrated room parameters
+        const conf = getRoomConfig(activeRoomUrl, w, h, activeRoomName);
         const floorHorizonY = Math.round(h * conf.floorY);
+        const ceilingY = Math.round(h * conf.ceilingY);
         const vx = Math.round(w * conf.vanishingX);
-        const vy = horizonY;
+        const vy = Math.round(h * conf.horizonY);
 
-        const cameraH = Math.max(120, (h - vy) * 0.65);
-        const scaleFloorV = Math.max(160, Math.round(w * 0.40));
-        const scaleFloorU = scaleFloorV * (baseTileW / baseTileH);
+        // Camera and Metric focal scaling for Floor
+        // In realistic interior room photography, bottom width represents ~260cm of floor width
+        const camHeightCm = 145.0; // Human standing eye-level
+        const focalMetricY = (h - vy) * 1.85;
+        const focalMetricX = (w / 260.0) * focalMetricY;
 
-        const chosenPattern = patternSelect.value; // 'brick' | 'grid' | 'diagonal'
+        // Grout & Bevel physical dimensions in centimeters
+        const gHalfCm = Math.max(0.06, gw / 20.0); // e.g. 2mm -> 0.1cm half-width
+        const bevelWidthCm = gHalfCm + 0.16;      // 1.6mm tactile bevel transition
 
         const outImgData = rCtx.createImageData(w, h);
         const outBuf = new Uint32Array(outImgData.data.buffer);
@@ -921,6 +1021,23 @@
             const dy = y - vy;
             const isFloorPlane = y >= floorHorizonY;
 
+            // Pre-calculate per-row perspective depths
+            let zFloorCm = 0;
+            let uFloorScale = 0;
+            let vCoordBase = 0;
+            let yWallCm = 0;
+
+            if (isFloorPlane) {
+                const absDy = Math.max(1.0, dy);
+                zFloorCm = (focalMetricY * camHeightCm) / absDy;
+                uFloorScale = zFloorCm / focalMetricX;
+                vCoordBase = zFloorCm;
+            } else {
+                // Wall plane starts at floor joint (floorHorizonY) and stacks upward!
+                const wallH = Math.max(1, floorHorizonY - ceilingY);
+                yWallCm = (floorHorizonY - y) * (240.0 / wallH);
+            }
+
             for (let x = 0; x < w; x++) {
                 const pxIdx = rowOffset + x;
                 const byteIdx = rowByteOffset + x * 4;
@@ -931,67 +1048,157 @@
                     continue;
                 }
 
-                let srcX = 0;
-                let srcY = 0;
+                let uMetric = 0;
+                let vMetric = 0;
 
                 if (isFloorPlane) {
-                    const absDy = Math.max(1.0, dy);
-                    const z = cameraH / absDy;
-                    const vCoord = z * scaleFloorV;
-                    const uCoord = ((x - vx) / absDy) * scaleFloorU;
-
-                    if (chosenPattern === 'diagonal') {
-                        const diagU = (uCoord + vCoord) * 0.70710678;
-                        const diagV = (vCoord - uCoord) * 0.70710678;
-                        srcX = ((Math.floor(diagU) % baseTileW) + baseTileW) % baseTileW;
-                        srcY = ((Math.floor(diagV) % baseTileH) + baseTileH) % baseTileH;
-                    } else if (chosenPattern === 'brick') {
-                        const rowIdx = Math.floor(vCoord / baseTileH);
-                        const xOffset = (rowIdx % 2 !== 0) ? (baseTileW / 2) : 0;
-                        srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
-                        srcX = ((Math.floor(uCoord + xOffset) % baseTileW) + baseTileW) % baseTileW;
-                    } else {
-                        srcY = ((Math.floor(vCoord) % baseTileH) + baseTileH) % baseTileH;
-                        srcX = ((Math.floor(uCoord) % baseTileW) + baseTileW) % baseTileW;
-                    }
+                    uMetric = (x - vx) * uFloorScale;
+                    vMetric = vCoordBase;
                 } else {
-                    const rowIdx = Math.floor(y / baseTileH);
-                    const xOffset = (chosenPattern === 'brick' && (rowIdx % 2 !== 0)) ? (baseTileW / 2) : 0;
-                    if (chosenPattern === 'diagonal') {
-                        const diagU = ((x + xOffset) + y) * 0.70710678;
-                        const diagV = (y - (x + xOffset)) * 0.70710678;
-                        srcX = ((Math.floor(diagU) % baseTileW) + baseTileW) % baseTileW;
-                        srcY = ((Math.floor(diagV) % baseTileH) + baseTileH) % baseTileH;
-                    } else {
-                        srcX = ((Math.floor(x + xOffset) % baseTileW) + baseTileW) % baseTileW;
-                        srcY = ((Math.floor(y) % baseTileH) + baseTileH) % baseTileH;
-                    }
+                    // Wall metric coordinates: aligned from floor baseline
+                    uMetric = (x - vx) * (260.0 / w);
+                    vMetric = yWallCm;
                 }
 
-                const tileByteIdx = (srcY * baseTileW + srcX) * 4;
-                const tR = tilePx[tileByteIdx];
-                const tG = tilePx[tileByteIdx + 1];
-                const tB = tilePx[tileByteIdx + 2];
+                // Compute local coordinates inside tile according to chosen pattern
+                let locU = 0;
+                let locV = 0;
+
+                if (chosenPattern === 'offset3') {
+                    // 1/3 Stagger (Modern architectural standard for 60x120 tiles)
+                    const rowIdx = Math.floor(vMetric / thMetric);
+                    const shift = (((rowIdx % 3) + 3) % 3) * (twMetric / 3.0);
+                    const colIdx = Math.floor((uMetric + shift) / twMetric);
+                    locU = ((uMetric + shift) - colIdx * twMetric);
+                    locV = (vMetric - rowIdx * thMetric);
+                } else if (chosenPattern === 'brick') {
+                    // 1/2 Stagger (Classic brick pattern)
+                    const rowIdx = Math.floor(vMetric / thMetric);
+                    const shift = (((rowIdx % 2) + 2) % 2) * (twMetric * 0.5);
+                    const colIdx = Math.floor((uMetric + shift) / twMetric);
+                    locU = ((uMetric + shift) - colIdx * twMetric);
+                    locV = (vMetric - rowIdx * thMetric);
+                } else if (chosenPattern === 'diagonal') {
+                    // 45° Diamond rotation
+                    const dU = (uMetric + vMetric) * 0.70710678;
+                    const dV = (vMetric - uMetric) * 0.70710678;
+                    const colIdx = Math.floor(dU / twMetric);
+                    const rowIdx = Math.floor(dV / thMetric);
+                    locU = (dU - colIdx * twMetric);
+                    locV = (dV - rowIdx * thMetric);
+                } else if (chosenPattern === 'herringbone') {
+                    // Balıksırtı / Herringbone parquet pattern
+                    const hU = (uMetric + vMetric) * 0.70710678;
+                    const hV = (vMetric - uMetric) * 0.70710678;
+                    const strip = Math.floor(hU / twMetric);
+                    const isEven = ((strip % 2) + 2) % 2 === 0;
+                    if (isEven) {
+                        const rowIdx = Math.floor(hV / thMetric);
+                        locU = hU - strip * twMetric;
+                        locV = hV - rowIdx * thMetric;
+                    } else {
+                        const rowIdx = Math.floor(hV / twMetric);
+                        const colIdx = Math.floor(hU / thMetric);
+                        locU = hV - rowIdx * twMetric;
+                        locV = hU - colIdx * thMetric;
+                    }
+                } else {
+                    // Standard straight grid
+                    const colIdx = Math.floor(uMetric / twMetric);
+                    const rowIdx = Math.floor(vMetric / thMetric);
+                    locU = (uMetric - colIdx * twMetric);
+                    locV = (vMetric - rowIdx * thMetric);
+                }
+
+                // Wrap locU and locV cleanly in [0, twMetric) and [0, thMetric)
+                locU = ((locU % twMetric) + twMetric) % twMetric;
+                locV = ((locV % thMetric) + thMetric) % thMetric;
+
+                // 3D Beveled Grout & Micro-Depth
+                const distLeft = locU;
+                const distRight = twMetric - locU;
+                const distTop = locV;
+                const distBottom = thMetric - locV;
+
+                const minDistU = Math.min(distLeft, distRight);
+                const minDistV = Math.min(distTop, distBottom);
+                const minDist = Math.min(minDistU, minDistV);
+
+                let tR, tG, tB;
+
+                if (minDist < gHalfCm) {
+                    // Inside the grout joint - apply concave ambient shadow
+                    const depthRelief = 0.80 + 0.20 * (minDist / gHalfCm);
+                    tR = groutR * depthRelief;
+                    tG = groutG * depthRelief;
+                    tB = groutB * depthRelief;
+                } else if (minDist < bevelWidthCm) {
+                    // On the beveled edge of the ceramic tile
+                    const uNorm = (locU - gHalfCm) / Math.max(0.01, twMetric - 2 * gHalfCm);
+                    const vNorm = (locV - gHalfCm) / Math.max(0.01, thMetric - 2 * gHalfCm);
+                    const [sR, sG, sB] = sampleBilinear(uNorm, vNorm, texPx, texW, texH);
+
+                    // Directional 3D bevel lighting (upper-left key light)
+                    const isTopOrLeft = (minDistU === distLeft || minDistV === distTop);
+                    const bevelRatio = (minDist - gHalfCm) / (bevelWidthCm - gHalfCm);
+                    const bevelFactor = isTopOrLeft
+                        ? (1.0 + 0.16 * (1.0 - bevelRatio))  // Soft micro-highlight on top/left
+                        : (1.0 - 0.14 * (1.0 - bevelRatio)); // Subtle micro-shadow on bottom/right
+
+                    tR = Math.min(255, sR * bevelFactor);
+                    tG = Math.min(255, sG * bevelFactor);
+                    tB = Math.min(255, sB * bevelFactor);
+                } else {
+                    // Flat face of the tile - crisp sub-pixel bilinear sampling
+                    const uNorm = (locU - gHalfCm) / Math.max(0.01, twMetric - 2 * gHalfCm);
+                    const vNorm = (locV - gHalfCm) / Math.max(0.01, thMetric - 2 * gHalfCm);
+                    const [sR, sG, sB] = sampleBilinear(uNorm, vNorm, texPx, texW, texH);
+                    tR = sR;
+                    tG = sG;
+                    tB = sB;
+                }
 
                 const rR = roomPx[byteIdx];
                 const rG = roomPx[byteIdx + 1];
                 const rB = roomPx[byteIdx + 2];
 
-                // Natural depth darkening from realism.py
+                // Original room luminance [0, 1]
+                const roomLum = (rR * 0.299 + rG * 0.587 + rB * 0.114) / 255.0;
+
+                // 1. Natural photographic depth falloff for floor plane
                 let depthFactor = 1.0;
                 if (isFloorPlane) {
                     const depthDist = Math.max(0, 1.0 - (dy / Math.max(1, h - floorHorizonY)));
-                    depthFactor = 1.0 - (depthDist * 0.14);
+                    depthFactor = 1.0 - (depthDist * 0.12);
                 }
 
-                // Ambient room luminance preservation
-                const lum = (rR * 0.299 + rG * 0.587 + rB * 0.114) / 255.0;
-                const lightFactor = Math.min(1.15, Math.max(0.18, (lum * 0.82 + 0.18) * depthFactor));
+                // 2. Contact shadow preservation & Ambient Occlusion (under vanity, toilet, baseboard)
+                const shadowFactor = Math.min(1.15, Math.max(0.12, Math.pow(Math.max(0.02, roomLum), 0.72) * 1.08 * depthFactor));
 
-                const shadedR = Math.min(255, Math.round(tR * lightFactor));
-                const shadedG = Math.min(255, Math.round(tG * lightFactor));
-                const shadedB = Math.min(255, Math.round(tB * lightFactor));
+                // 3. Ambient bounce light color tinting (5-8% room ambient warmth/coolness)
+                const lumClamp = Math.max(0.12, roomLum * 255.0);
+                const tintR = 0.94 + 0.06 * (rR / lumClamp);
+                const tintG = 0.94 + 0.06 * (rG / lumClamp);
+                const tintB = 0.94 + 0.06 * (rB / lumClamp);
 
+                let shadedR = Math.min(255, tR * shadowFactor * tintR);
+                let shadedG = Math.min(255, tG * shadowFactor * tintG);
+                let shadedB = Math.min(255, tB * shadowFactor * tintB);
+
+                // 4. Specular Glaze Highlights (reflects ceiling downlights & vanity mirrors)
+                if (finishType === 'glossy' && roomLum > 0.58) {
+                    const spec = Math.pow((roomLum - 0.58) / 0.42, 2.2) * 0.55;
+                    shadedR = Math.min(255, shadedR + 255 * spec);
+                    shadedG = Math.min(255, shadedG + 255 * spec);
+                    shadedB = Math.min(255, shadedB + 255 * spec);
+                } else if (finishType === 'satin' && roomLum > 0.68) {
+                    const spec = Math.pow((roomLum - 0.68) / 0.32, 1.8) * 0.22;
+                    shadedR = Math.min(255, shadedR + 255 * spec);
+                    shadedG = Math.min(255, shadedG + 255 * spec);
+                    shadedB = Math.min(255, shadedB + 255 * spec);
+                }
+
+                // 5. Seamless Mask Alpha Blending
                 const alpha = maskAlpha / 255.0;
                 const outR = Math.round(shadedR * alpha + rR * (1 - alpha));
                 const outG = Math.round(shadedG * alpha + rG * (1 - alpha));
@@ -1003,12 +1210,12 @@
 
         rCtx.putImageData(outImgData, 0, 0);
 
-        // Overlay foreground layer if available for razor-sharp furniture/object edges
+        // Overlay foreground layer if available for razor-sharp furniture/fixture edges
         if (roomFgImageEl) {
             rCtx.drawImage(roomFgImageEl, 0, 0, w, h);
         }
 
-        window.__debugLayers.perspectiveTile = patCanvas.toDataURL('image/png');
+        window.__debugLayers.perspectiveTile = texCanvas.toDataURL('image/png');
         window.__debugLayers.compositeResult = rCanvas.toDataURL('image/png');
 
         return new Promise((resolve) => {
@@ -1154,6 +1361,18 @@
         const widthParam = params.get('width');
         const heightParam = params.get('height');
         const surfaceParam = params.get('surface');
+        const finishParam = params.get('finish');
+
+        if (finishParam && finishSelect) {
+            const fLower = finishParam.toLowerCase();
+            if (fLower.includes('mat')) {
+                finishSelect.value = 'matte';
+            } else if (fLower.includes('parlak') || fLower.includes('gloss')) {
+                finishSelect.value = 'glossy';
+            } else {
+                finishSelect.value = 'satin';
+            }
+        }
 
         if (widthParam && tileWSlider) {
             tileWSlider.value = parseInt(widthParam, 10);
