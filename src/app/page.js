@@ -36,6 +36,8 @@ import {
   UploadCloud,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
+  Sun,
   Info,
   Home as HomeIcon,
   Heart as HeartIcon,
@@ -1759,6 +1761,9 @@ export default function Home() {
   const [activeAdCampaigns, setActiveAdCampaigns] = useState([]);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
 
+  // Top Showcase Luxury Carousel Slide Index
+  const [vitrinIndex, setVitrinIndex] = useState(0);
+
   useEffect(() => {
     if (activeAdCampaigns.length <= 1) return;
     const interval = setInterval(() => {
@@ -1766,6 +1771,13 @@ export default function Home() {
     }, 5000);
     return () => clearInterval(interval);
   }, [activeAdCampaigns]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVitrinIndex((prev) => (prev + 1) % 6);
+    }, 6500);
+    return () => clearInterval(interval);
+  }, []);
 
   // Stripe Sandbox Webhook simulator
   const [stripePlan, setStripePlan] = useState('PRO');
@@ -2869,12 +2881,13 @@ export default function Home() {
   };
 
   const DEFAULT_VITRIN_ITEMS = [
-    { code: 'VIT-CON-GRY', brand: 'VitrA', name: 'Concrete Light Grey', img: '/hero/luxury_bathroom.png', badge: 'YENİ SEZON' },
-    { code: 'BIEN-NAT-OAK', brand: 'Bien', name: 'Natural Oak', img: '/hero/modern_living.png', badge: 'YENİ SEZON' },
-    { code: 'KUT-CAL-GLD', brand: 'Kütahya', name: 'Calacatta Gold', img: '/hero/scandinavian_kitchen.png', badge: 'YENİ SEZON' },
-    { code: 'EGE-TRA-CLA', brand: 'Ege Seramik', name: 'Travertino Classico', img: '/hero/hero_ceramics.jpg', badge: 'YENİ SEZON' },
-    { code: 'HITIT-NEXOS-ANTRASIT-LAPPATO-60X120', brand: 'Hitit Seramik', name: 'Nexos Antrasit Lappato', img: '/hero/luxury_bathroom.png', badge: 'YENİ SEZON' },
-    { code: 'BIEN-BOR-ANT', brand: 'Bien', name: 'Borneo Antrasit', img: '/hero/modern_living.png', badge: 'YENİ SEZON' },
+    { code: 'BIEN-YUT-WHT', brand: 'Bien Seramik', name: 'Bien Yuta Beyaz 30x60', img: '/hero/luxury_bathroom.png', badge: 'Öne Çıkan', badgeIcon: '⭐' },
+    { code: 'KUT-CAL-GLD', brand: 'NG Kütahya Seramik', name: 'Calacatta Gold', img: '/hero/scandinavian_kitchen.png', badge: 'Yeni Sezon', badgeIcon: '🍂' },
+    { code: 'VIT-CON-GRY', brand: 'Vitra', name: 'Concrete Light Grey', img: '/hero/hero_ceramics.jpg', badge: 'Yeni Sezon', badgeIcon: '👑' },
+    { code: 'BIEN-NAT-OAK', brand: 'Bien', name: 'Natural Oak', img: '/hero/modern_living.png', badge: 'Yeni Sezon', badgeIcon: '💎' },
+    { code: 'EGE-TRA-CLA', brand: 'Ege Seramik', name: 'Travertino Classico', img: '/hero/luxury_bathroom.png', badge: 'Öne Çıkan', badgeIcon: '⭐' },
+    { code: 'HITIT-NEXOS-ANTRASIT-LAPPATO-60X120', brand: 'Hitit Seramik', name: 'Nexos Antrasit Lappato', img: '/hero/modern_living.png', badge: 'Yeni Sezon', badgeIcon: '✨' },
+    { code: 'BIEN-BOR-ANT', brand: 'Bien', name: 'Borneo Antrasit', img: '/hero/scandinavian_kitchen.png', badge: 'Yeni Sezon', badgeIcon: '💎' },
   ];
 
   const displayVitrinItems = useMemo(() => {
@@ -2888,7 +2901,8 @@ export default function Home() {
         brand: c.product.brand?.name || 'Seçkin Marka',
         name: c.product.name,
         img: c.product.imageUrl || '/hero/hero_ceramics.jpg',
-        badge: 'YENİ SEZON',
+        badge: 'Yeni Sezon',
+        badgeIcon: '👑',
         isSponsored: true,
         product: c.product
       }));
@@ -2900,6 +2914,18 @@ export default function Home() {
     const combined = [...sponsored, ...filteredDefaults];
     return combined;
   }, [vitrinCampaigns]);
+
+  // Sliced 5 visible cards for luxury carousel with smooth wrap-around
+  const visibleVitrinCards = useMemo(() => {
+    if (!displayVitrinItems || displayVitrinItems.length === 0) return [];
+    const len = displayVitrinItems.length;
+    const count = Math.min(5, len);
+    const items = [];
+    for (let i = 0; i < count; i++) {
+      items.push(displayVitrinItems[(vitrinIndex + i) % len]);
+    }
+    return items;
+  }, [displayVitrinItems, vitrinIndex]);
 
   const handleVitrinItemClick = (item) => {
     if (!item) return;
@@ -3882,110 +3908,302 @@ export default function Home() {
 
   return (
     <main className="main-layout">
-      {/* Platform Trust & Reassurance Bar */}
-      <div className="live-analytics-top-bar" style={{ background: '#0b1120', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '6px 12px', minHeight: '32px' }}>
-        {/* Desktop View: All 4 in one row */}
-        <div className="desktop-trust-strip" style={{ alignItems: 'center', justifyContent: 'center', gap: '24px', fontSize: '0.8rem', color: '#94a3b8' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar1')}
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar2')}
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar3')}
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> {t('topBar4')}
-          </span>
-        </div>
+      {/* 1. LUXURY DARK TOP NAVBAR (MATCHING IMAGE 1) */}
+      <header className="luxury-dark-header">
+        <div className="luxury-header-inner">
+          {/* Brand Logo & Slogan */}
+          <div 
+            className="luxury-header-brand" 
+            onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          >
+            <div className="luxury-logo-badge">SB</div>
+            <div className="luxury-logo-text-col">
+              <span className="luxury-logo-title">SeramikBak</span>
+              <span className="luxury-logo-subtitle">Türkiye&apos;nin Seramik Arama Motoru</span>
+            </div>
+          </div>
 
-        {/* Mobile View: Single Centered Clean Rotating Line (Apple/Nike style) */}
-        <div className="mobile-trust-strip" style={{ alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', color: '#f1f5f9', textAlign: 'center', width: '100%', minHeight: '20px' }}>
-          {topTrustIdx === 0 && (
-            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar1')}
-            </span>
-          )}
-          {topTrustIdx === 1 && (
-            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar2')}
-            </span>
-          )}
-          {topTrustIdx === 2 && (
-            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span> {t('topBar3')}
-            </span>
-          )}
-          {topTrustIdx === 3 && (
-            <span className="animate-fade-in" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#d4af37', fontWeight: 'bold' }}>✦</span> {t('topBar4')}
-            </span>
-          )}
-        </div>
-      </div>
+          {/* Desktop Center Navigation Links */}
+          <nav className="luxury-header-nav">
+            <button 
+              type="button" 
+              className={`luxury-nav-pill ${activeTab === 'search' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            >
+              <HomeIcon size={14} />
+              <span>Ana Sayfa</span>
+            </button>
 
-      {/* Premium Collections Banner (Dynamically loaded with Brand Showcase Ads + Fallback) */}
-      <div className="project-top-banner">
-        <div className="banner-marquee-wrapper">
-          <div className="banner-marquee-track">
-            {/* First set */}
-            {displayVitrinItems.map((item, idx) => (
-              <div 
-                key={`vitrin-set1-${item.id || item.code}-${idx}`} 
-                className="banner-item" 
-                onClick={() => handleVitrinItemClick(item)}
-                title={`${item.brand} - ${item.name}`}
-              >
-                <div className="banner-img-wrapper">
-                  <img 
-                    src={item.img} 
-                    alt={`${item.brand} ${item.name}`} 
-                    className="banner-img"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/hero/hero_ceramics.jpg';
-                    }} 
-                  />
-                  <span className="banner-img-badge">{item.badge || 'YENİ SEZON'}</span>
-                </div>
-                <div className="banner-item-info">
-                  <span className="banner-brand-name">{item.brand}</span>
-                  <span className="banner-product-name">{item.name}</span>
-                </div>
+            <button 
+              type="button" 
+              className="luxury-nav-link"
+              onClick={() => {
+                setActiveTab('search');
+                const catEl = document.querySelector('.categories-showcase-container') || document.querySelector('.clean-quick-nav-cards');
+                if (catEl) catEl.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <span>Ürünler</span>
+              <ChevronDown size={12} />
+            </button>
+
+            <button 
+              type="button" 
+              className="luxury-nav-link"
+              onClick={() => {
+                setActiveTab('search');
+                const brandEl = document.querySelector('.brand-slider-container') || document.querySelector('.categories-showcase-container');
+                if (brandEl) brandEl.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <span>Markalar</span>
+              <ChevronDown size={12} />
+            </button>
+
+            <button 
+              type="button" 
+              className={`luxury-nav-link ${activeTab === 'studio' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            >
+              <span>3D Mekân</span>
+            </button>
+
+            <Link href="/katalog-prototip" className="luxury-nav-link">
+              <span>Dijital Katalog</span>
+            </Link>
+
+            <button 
+              type="button" 
+              className={`luxury-nav-link ${activeTab === 'dealers' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('dealers'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            >
+              <span>Bayiler</span>
+            </button>
+
+            <Link href="/hakkimizda" className="luxury-nav-link">
+              <span>Hakkımızda</span>
+              <ChevronDown size={12} />
+            </Link>
+          </nav>
+
+          {/* Right Action Controls */}
+          <div className="luxury-header-actions">
+            {/* Teklif Al Gold Button */}
+            <button 
+              type="button" 
+              className="luxury-teklif-cta-btn"
+              onClick={() => setShowQuoteCartDrawer(true)}
+              title="Fiyat Teklifi Al"
+            >
+              <Send size={13} style={{ transform: 'rotate(-20deg)' }} />
+              <span>Teklif Al</span>
+            </button>
+
+            {/* Favorites Icon */}
+            <button 
+              type="button" 
+              className="luxury-icon-circle-btn" 
+              onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
+              title="Favorilerim"
+            >
+              <HeartIcon size={16} fill={userFavorites.length > 0 ? '#d4af37' : 'none'} stroke={userFavorites.length > 0 ? '#d4af37' : 'currentColor'} />
+              {userFavorites.length > 0 && <span className="luxury-badge-count">{userFavorites.length}</span>}
+            </button>
+
+            {/* User Account Menu */}
+            {currentUser ? (
+              <div className="user-menu-wrapper">
+                <button className="luxury-icon-circle-btn logged-in" onClick={() => setShowUserMenu(!showUserMenu)} title={currentUser.name}>
+                  <div className="user-avatar-mini" style={{ width: '22px', height: '22px', fontSize: '11px', background: '#d4af37', color: '#0f172a' }}>{currentUser.name.charAt(0).toUpperCase()}</div>
+                </button>
+                {showUserMenu && (
+                  <div className="user-dropdown-menu glass-panel" style={{ right: 0, top: '48px' }}>
+                    <div className="user-dropdown-header">
+                      <div className="user-dropdown-avatar">{currentUser.name.charAt(0).toUpperCase()}</div>
+                      <div>
+                        <div className="user-dropdown-name">{currentUser.name}</div>
+                        <div className="user-dropdown-email">{currentUser.email}</div>
+                      </div>
+                    </div>
+                    <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=overview'; setShowUserMenu(false); }}>
+                      <Activity size={14} /> Panelim
+                    </button>
+                    <button className="user-dropdown-item" onClick={() => { setActiveTab('studio'); setShowUserMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                      <Palette size={14} /> 3D Sanal Stüdyo
+                    </button>
+                    <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
+                      <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
+                    </button>
+                    <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=settings'; setShowUserMenu(false); }}>
+                      <Settings size={14} /> Hesap Ayarları
+                    </button>
+                    <div className="user-dropdown-divider" />
+                    <button className="user-dropdown-item logout-item" onClick={handleLogout}>
+                      <ArrowRight size={14} /> Çıkış Yap
+                    </button>
+                  </div>
+                )}
               </div>
-            ))}
-            {/* Duplicate set for seamless infinite marquee loop */}
-            {displayVitrinItems.map((item, idx) => (
-              <div 
-                key={`vitrin-set2-${item.id || item.code}-${idx}`} 
-                className="banner-item" 
-                onClick={() => handleVitrinItemClick(item)}
-                title={`${item.brand} - ${item.name}`}
+            ) : (
+              <button 
+                type="button" 
+                className="luxury-icon-circle-btn" 
+                onClick={() => window.location.href = '/uyelik'}
+                title="Giriş Yap / Üye Ol"
               >
-                <div className="banner-img-wrapper">
-                  <img 
-                    src={item.img} 
-                    alt={`${item.brand} ${item.name}`} 
-                    className="banner-img"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/hero/hero_ceramics.jpg';
-                    }} 
-                  />
-                  <span className="banner-img-badge">{item.badge || 'YENİ SEZON'}</span>
+                <UserIcon size={16} />
+              </button>
+            )}
+
+            {/* Sun / Theme decorative icon */}
+            <button 
+              type="button" 
+              className="luxury-icon-circle-btn sun-toggle-btn"
+              onClick={() => {}}
+              title="Görünüm"
+            >
+              <Sun size={15} />
+            </button>
+
+            {/* Location & Language */}
+            <HeaderLocationPicker 
+              userLocationName={userLocationName}
+              userCoords={userCoords}
+              onLocationChange={handleLocationChange}
+              onDetectLocation={detectUserLocation}
+              isLocating={isLocating}
+            />
+            <LanguageSelector />
+
+            {/* Mobile Hamburger Menu Button */}
+            <button 
+              type="button" 
+              className="luxury-hamburger-btn" 
+              onClick={() => setShowMobileMenu(!showMobileMenu)} 
+              aria-label="Menü"
+            >
+              <MenuIcon size={22} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. SHOWCASE LUXURY SECTION (MATCHING IMAGE 1) */}
+      <section className="showcase-luxury-hero-zone">
+        <div className="showcase-carousel-wrapper">
+          {/* Previous Arrow */}
+          <button 
+            type="button" 
+            className="showcase-arrow-btn prev"
+            onClick={() => setVitrinIndex(prev => (prev === 0 ? Math.max(0, displayVitrinItems.length - 1) : prev - 1))}
+            aria-label="Önceki Vitrin Ürünü"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* 5 Cards Row */}
+          <div className="showcase-cards-grid">
+            {visibleVitrinCards.map((item, idx) => (
+              <div 
+                key={`vitrin-luxury-${item.code || item.id}-${idx}`}
+                className="showcase-luxury-card animate-fade-in"
+                style={{ backgroundImage: `url(${item.img || '/hero/luxury_bathroom.png'})` }}
+                onClick={() => handleVitrinItemClick(item)}
+              >
+                <div className="showcase-card-overlay" />
+                <div className="showcase-card-content">
+                  <div className="showcase-card-badge">
+                    <span>{item.badgeIcon || '⭐'}</span>
+                    <span>{item.badge || 'Öne Çıkan'}</span>
+                  </div>
+                  <div className="showcase-card-text-block">
+                    <span className="showcase-card-brand">{item.brand}</span>
+                    <span className="showcase-card-model">{item.name}</span>
+                  </div>
                 </div>
-                <div className="banner-item-info">
-                  <span className="banner-brand-name">{item.brand}</span>
-                  <span className="banner-product-name">{item.name}</span>
-                </div>
+                <button type="button" className="showcase-card-action-btn" aria-label="İncele">
+                  <ArrowRight size={14} />
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* CANLI FIRSAT RADARI & CANLI İNDİRİM ŞERİDİ (Vitrin Banner'ının Hemen Altı) */}
+          {/* Next Arrow */}
+          <button 
+            type="button" 
+            className="showcase-arrow-btn next"
+            onClick={() => setVitrinIndex(prev => (prev + 1) % displayVitrinItems.length)}
+            aria-label="Sonraki Vitrin Ürünü"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* Centered Pagination Dots */}
+        <div className="showcase-carousel-dots">
+          {displayVitrinItems.slice(0, Math.min(displayVitrinItems.length, 7)).map((_, dotIdx) => (
+            <button 
+              key={`dot-${dotIdx}`}
+              type="button"
+              className={`showcase-dot ${vitrinIndex === dotIdx ? 'active' : ''}`}
+              onClick={() => setVitrinIndex(dotIdx)}
+              aria-label={`Slayt ${dotIdx + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* 3. WHITE TRUST ISLAND + AI MEKANINI YENILE MINI BANNER (MATCHING IMAGE 1) */}
+        <div className="showcase-trust-ai-island">
+          <div className="showcase-trust-items-pill">
+            <div className="trust-island-item">
+              <Sparkles size={16} className="trust-icon-gold" style={{ color: '#d4af37' }} />
+              <span><strong>17 Lider Seramik Markası</strong> Tek Çatı Altında</span>
+            </div>
+            <div className="trust-island-divider" />
+            <div className="trust-island-item">
+              <Store size={16} className="trust-icon-amber" style={{ color: '#d97706' }} />
+              <span><strong>81 İlde</strong> Yetkili Bayi Ağı</span>
+            </div>
+            <div className="trust-island-divider" />
+            <div className="trust-island-item">
+              <ShieldCheck size={16} className="trust-icon-green" style={{ color: '#10b981' }} />
+              <span><strong>%100 Ücretsiz</strong> Fiyat Teklifi</span>
+            </div>
+            <div className="trust-island-divider" />
+            <div className="trust-island-item">
+              <Box size={16} className="trust-icon-blue" style={{ color: '#3b82f6' }} />
+              <span><strong>3D Sanal Stüdyo</strong> & AR</span>
+            </div>
+          </div>
+
+          {/* Mekânını Yenile AI Mini Banner */}
+          <div 
+            className="showcase-ai-mini-banner"
+            onClick={() => {
+              setActiveTab('studio');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            role="button"
+            tabIndex={0}
+            title="3D Sanal Mekân & AI Görselleştirici"
+          >
+            <div className="ai-mini-thumb">
+              <img src="/hero/modern_living.png" alt="Mekânını Yenile" />
+            </div>
+            <div className="ai-mini-cta-pill">
+              <div className="ai-mini-cta-text">
+                <span className="ai-mini-title">Mekânını Yenile</span>
+                <span className="ai-mini-sub">AI ile Seramiği Deneyimle</span>
+              </div>
+              <div className="ai-mini-cta-arrow">
+                <ArrowRight size={13} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. CANLI FIRSAT RADARI (Vitrin Alanının Hemen Altı) */}
       <LiveDealsTicker />
 
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
@@ -4162,177 +4380,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Top Header Navigation */}
-      <header className="main-header glass-panel">
-        <div className="header-brand" onClick={() => setActiveTab('search')} style={{ cursor: 'pointer' }}>
-          <div className="logo-icon">SB</div>
-          <span className="logo-text">SeramikBak</span>
-        </div>
-        
-        {/* Navigation tabs */}
-        <nav className="header-nav">
-          {isKioskMode ? (
-            <span className="kiosk-status-text">
-              ✦ SERAMİKBAK BAYİ TEŞHİR KİOSK EKRANI ✦
-            </span>
-          ) : (
-            <>
-              <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <SearchIcon size={16} />
-                <span>{t('products')}</span>
-              </button>
-              <button 
-                className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
-                onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              >
-                <Palette size={16} />
-                <span>{t('studio3d')}</span>
-              </button>
-              <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                <MapPin size={16} />
-                <span>{t('dealers')}</span>
-              </button>
-            </>
-          )}
-        </nav>
 
-        {/* Right Buttons */}
-        <div className="header-right-buttons">
-          <div className="desktop-header-actions">
-            {isKioskMode ? (
-              <button 
-                onClick={() => setIsKioskMode(false)} 
-                className="header-btn kiosk-btn active exit-kiosk-btn"
-                title="Kiosk Modunu Kapat"
-              >
-                <span>Kiosk Kapat</span>
-              </button>
-            ) : (
-              <>
-                <button 
-                  className="header-btn quote-cart-btn" 
-                  onClick={() => setShowQuoteCartDrawer(true)}
-                  title={t('quoteDrawerTitle')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    position: 'relative',
-                    borderColor: quoteCartItems.length > 0 ? 'var(--accent-gold)' : undefined
-                  }}
-                >
-                  <ShoppingBag size={14} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
-                  <span>{t('cart')}</span>
-                  {quoteCartItems.length > 0 && (
-                    <span 
-                      style={{
-                        background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                        color: '#ffffff',
-                        fontSize: '0.64rem',
-                        fontWeight: '800',
-                        borderRadius: '10px',
-                        padding: '1px 5px',
-                        marginLeft: '1px'
-                      }}
-                    >
-                      {quoteCartItems.length}
-                    </span>
-                  )}
-                </button>
-                <button 
-                  className="header-btn favorites-btn" 
-                  onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
-                  title={t('favorites')}
-                >
-                  <HeartIcon size={14} className="heart-icon-gold" />
-                  <span>{t('favorites')}</span>
-                  {userFavorites.length > 0 && <span className="fav-count-badge">{userFavorites.length}</span>}
-                </button>
-                {currentUser ? (
-                  <div className="user-menu-wrapper">
-                    <button className="header-btn account-btn logged-in" onClick={() => setShowUserMenu(!showUserMenu)}>
-                      <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
-                      <span>{currentUser.name.split(' ')[0]}</span>
-                      <ChevronDown size={11} />
-                    </button>
-                    {showUserMenu && (
-                      <div className="user-dropdown-menu glass-panel">
-                        <div className="user-dropdown-header">
-                          <div className="user-dropdown-avatar">{currentUser.name.charAt(0).toUpperCase()}</div>
-                          <div>
-                            <div className="user-dropdown-name">{currentUser.name}</div>
-                            <div className="user-dropdown-email">{currentUser.email}</div>
-                          </div>
-                        </div>
-                        <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=overview'; setShowUserMenu(false); }}>
-                          <Activity size={14} /> Panelim
-                        </button>
-                        <button className="user-dropdown-item" onClick={() => { setActiveTab('studio'); setShowUserMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                          <Palette size={14} /> 3D Sanal Stüdyo
-                        </button>
-                        <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
-                          <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
-                        </button>
-                        <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=settings'; setShowUserMenu(false); }}>
-                          <Settings size={14} /> Hesap Ayarları
-                        </button>
-                        <div className="user-dropdown-divider" />
-                        <button className="user-dropdown-item logout-item" onClick={handleLogout}>
-                          <ArrowRight size={14} /> Çıkış Yap
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <button className="header-btn account-btn" onClick={() => window.location.href = '/uyelik'}>
-                    <UserIcon size={14} />
-                    <span>{t('login')}</span>
-                  </button>
-                )}
-              </>
-            )}
-            <HeaderLocationPicker 
-              userLocationName={userLocationName}
-              userCoords={userCoords}
-              onLocationChange={handleLocationChange}
-              onDetectLocation={detectUserLocation}
-              isLocating={isLocating}
-            />
-            <LanguageSelector />
-          </div>
-          <div className="mobile-header-actions">
-            <HeaderLocationPicker 
-              userLocationName={userLocationName}
-              userCoords={userCoords}
-              onLocationChange={handleLocationChange}
-              onDetectLocation={detectUserLocation}
-              isLocating={isLocating}
-            />
-            <button 
-              type="button"
-              className="mobile-header-action-btn"
-              onClick={() => setShowQuoteCartDrawer(true)}
-              aria-label="Teklif Sepeti"
-              title="Teklif & Numune Sepeti"
-            >
-              <ShoppingBag size={17} style={{ color: quoteCartItems.length > 0 ? 'var(--accent-gold)' : 'currentColor' }} />
-              {quoteCartItems.length > 0 && <span className="mobile-header-badge" style={{ background: 'var(--accent-gold)' }}>{quoteCartItems.length}</span>}
-            </button>
-            <button 
-              type="button"
-              className="mobile-header-action-btn" 
-              onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
-              aria-label="Favorilerim"
-            >
-              <HeartIcon size={17} fill={userFavorites.length > 0 ? 'var(--accent-gold)' : 'none'} stroke={userFavorites.length > 0 ? 'var(--accent-gold)' : 'currentColor'} />
-              {userFavorites.length > 0 && <span className="mobile-header-badge">{userFavorites.length}</span>}
-            </button>
-            <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
-              <MenuIcon size={20} />
-            </button>
-          </div>
-        </div>
-      </header>
 
       {/* Mobile Navigation Drawer */}
       {showMobileMenu && (
@@ -10310,6 +10358,475 @@ export default function Home() {
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
         /* ==========================================================================
+           LUXURY OBSIDIAN TOP HEADER (MATCHING IMAGE 1)
+           ========================================================================== */
+        :global(.luxury-dark-header) {
+          background: #0f172a;
+          border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+          border-radius: 0 0 24px 24px;
+          padding: 10px 24px;
+          color: #ffffff;
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        :global(.luxury-header-inner) {
+          max-width: 1440px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+        }
+
+        :global(.luxury-header-brand) {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          user-select: none;
+          flex-shrink: 0;
+        }
+
+        :global(.luxury-logo-badge) {
+          width: 44px;
+          height: 44px;
+          background: linear-gradient(135deg, #1e293b 0%, #0b1120 100%);
+          border: 2px solid #d4af37;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          font-size: 1.2rem;
+          color: #fef08a;
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        :global(.luxury-logo-text-col) {
+          display: flex;
+          flex-direction: column;
+        }
+
+        :global(.luxury-logo-title) {
+          font-size: 1.45rem;
+          font-weight: 900;
+          letter-spacing: -0.02em;
+          color: #ffffff;
+          line-height: 1.1;
+        }
+
+        :global(.luxury-logo-subtitle) {
+          font-size: 0.70rem;
+          color: #cbd5e1;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+        }
+
+        :global(.luxury-header-nav) {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: nowrap;
+        }
+
+        :global(.luxury-nav-pill) {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(212, 175, 55, 0.22);
+          border: 1.5px solid rgba(212, 175, 55, 0.5);
+          color: #fef08a;
+          padding: 7px 16px;
+          border-radius: 9999px;
+          font-weight: 700;
+          font-size: 0.84rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+        }
+
+        :global(.luxury-nav-link) {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: transparent;
+          border: none;
+          color: #f1f5f9;
+          padding: 7px 12px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.84rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+
+        :global(.luxury-nav-link:hover) {
+          color: #d4af37;
+          background: rgba(255, 255, 255, 0.06);
+        }
+
+        :global(.luxury-header-actions) {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+
+        :global(.luxury-teklif-cta-btn) {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          background: linear-gradient(135deg, #d4af37 0%, #b48520 100%);
+          color: #ffffff;
+          border: none;
+          padding: 8px 20px;
+          border-radius: 9999px;
+          font-weight: 800;
+          font-size: 0.86rem;
+          cursor: pointer;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        :global(.luxury-teklif-cta-btn:hover) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(212, 175, 55, 0.5);
+        }
+
+        :global(.luxury-icon-circle-btn) {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          position: relative;
+          transition: all 0.2s ease;
+        }
+
+        :global(.luxury-icon-circle-btn:hover) {
+          background: rgba(255, 255, 255, 0.18);
+          border-color: #d4af37;
+          color: #d4af37;
+        }
+
+        :global(.luxury-badge-count) {
+          position: absolute;
+          top: -3px;
+          right: -3px;
+          background: #d4af37;
+          color: #0f172a;
+          font-size: 0.62rem;
+          font-weight: 900;
+          border-radius: 9999px;
+          padding: 1px 5px;
+        }
+
+        :global(.luxury-hamburger-btn) {
+          display: none;
+          background: transparent;
+          border: none;
+          color: #ffffff;
+          cursor: pointer;
+          padding: 4px;
+        }
+
+        /* ==========================================================================
+           SHOWCASE LUXURY CAROUSEL (MATCHING IMAGE 1)
+           ========================================================================== */
+        :global(.showcase-luxury-hero-zone) {
+          width: 100%;
+          max-width: 1440px;
+          margin: 16px auto 14px auto;
+          padding: 0 16px;
+          box-sizing: border-box;
+        }
+
+        :global(.showcase-carousel-wrapper) {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+        }
+
+        :global(.showcase-arrow-btn) {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          color: #0f172a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+          z-index: 5;
+          flex-shrink: 0;
+          transition: all 0.2s ease;
+        }
+
+        :global(.showcase-arrow-btn:hover) {
+          background: #0f172a;
+          color: #ffffff;
+          border-color: #0f172a;
+          transform: scale(1.08);
+        }
+
+        :global(.showcase-cards-grid) {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 14px;
+          width: 100%;
+        }
+
+        :global(.showcase-luxury-card) {
+          height: 195px;
+          border-radius: 20px;
+          background-size: cover;
+          background-position: center;
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 16px 14px;
+          box-sizing: border-box;
+          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+        }
+
+        :global(.showcase-luxury-card:hover) {
+          transform: translateY(-4px);
+          box-shadow: 0 16px 32px rgba(0, 0, 0, 0.13);
+        }
+
+        :global(.showcase-card-overlay) {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.74) 48%, rgba(255, 255, 255, 0.15) 100%);
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        :global(.showcase-card-content) {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        :global(.showcase-card-badge) {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(180, 130, 40, 0.92);
+          backdrop-filter: blur(4px);
+          color: #ffffff;
+          font-size: 0.70rem;
+          font-weight: 800;
+          padding: 4px 10px;
+          border-radius: 9999px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+          align-self: flex-start;
+        }
+
+        :global(.showcase-card-text-block) {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        :global(.showcase-card-brand) {
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.2;
+        }
+
+        :global(.showcase-card-model) {
+          font-size: 0.84rem;
+          font-weight: 700;
+          color: #334155;
+          line-height: 1.25;
+        }
+
+        :global(.showcase-card-action-btn) {
+          position: absolute;
+          bottom: 12px;
+          right: 12px;
+          z-index: 2;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: none;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #0f172a;
+          cursor: pointer;
+          transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        :global(.showcase-luxury-card:hover .showcase-card-action-btn) {
+          transform: scale(1.1);
+          background: #0f172a;
+          color: #ffffff;
+        }
+
+        :global(.showcase-carousel-dots) {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin: 12px 0 16px 0;
+        }
+
+        :global(.showcase-dot) {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          border: none;
+          background: #cbd5e1;
+          padding: 0;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+
+        :global(.showcase-dot.active) {
+          width: 28px;
+          height: 8px;
+          border-radius: 4px;
+          background: #c58f27;
+        }
+
+        /* ==========================================================================
+           TRUST GUARANTEES & AI MEKANINI YENILE ISLAND (MATCHING IMAGE 1)
+           ========================================================================== */
+        :global(.showcase-trust-ai-island) {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          width: 100%;
+          margin-bottom: 14px;
+        }
+
+        :global(.showcase-trust-items-pill) {
+          flex: 1;
+          background: #ffffff;
+          border: 1px solid #eef2f6;
+          border-radius: 9999px;
+          padding: 11px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          box-shadow: 0 3px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        :global(.trust-island-item) {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.84rem;
+          color: #334155;
+          white-space: nowrap;
+        }
+
+        :global(.trust-island-item strong) {
+          color: #0f172a;
+          font-weight: 800;
+        }
+
+        :global(.trust-island-divider) {
+          width: 1px;
+          height: 24px;
+          background: #e2e8f0;
+        }
+
+        :global(.showcase-ai-mini-banner) {
+          background: #ffffff;
+          border: 1px solid #eef2f6;
+          border-radius: 9999px;
+          padding: 4px 6px 4px 6px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          user-select: none;
+          flex-shrink: 0;
+        }
+
+        :global(.showcase-ai-mini-banner:hover) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(197, 143, 39, 0.22);
+        }
+
+        :global(.ai-mini-thumb img) {
+          width: 64px;
+          height: 40px;
+          border-radius: 9999px;
+          object-fit: cover;
+          display: block;
+        }
+
+        :global(.ai-mini-cta-pill) {
+          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%);
+          border-radius: 9999px;
+          padding: 6px 16px 6px 18px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #ffffff;
+        }
+
+        :global(.ai-mini-cta-text) {
+          display: flex;
+          flex-direction: column;
+        }
+
+        :global(.ai-mini-title) {
+          font-size: 0.86rem;
+          font-weight: 800;
+          line-height: 1.1;
+        }
+
+        :global(.ai-mini-sub) {
+          font-size: 0.66rem;
+          opacity: 0.92;
+          font-weight: 500;
+        }
+
+        :global(.ai-mini-cta-arrow) {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        /* ==========================================================================
            CLEAN MODERN HERO BANNER (MATCHING IMAGE 1)
            ========================================================================== */
         :global(.clean-hero-card) {
@@ -10795,6 +11312,89 @@ export default function Home() {
           }
           :global(.clean-nav-card-title) {
             font-size: 0.72rem;
+          }
+
+          /* Luxury Dark Header Mobile */
+          :global(.luxury-dark-header) {
+            padding: 8px 14px;
+            border-radius: 0 0 18px 18px;
+          }
+          :global(.luxury-header-nav) {
+            display: none !important;
+          }
+          :global(.luxury-teklif-cta-btn span) {
+            display: none;
+          }
+          :global(.luxury-teklif-cta-btn) {
+            padding: 7px 10px;
+          }
+          :global(.luxury-logo-subtitle) {
+            display: none;
+          }
+          :global(.luxury-hamburger-btn) {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+          }
+          :global(.sun-toggle-btn) {
+            display: none !important;
+          }
+
+          /* Showcase Carousel Mobile */
+          :global(.showcase-cards-grid) {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+          }
+          :global(.showcase-luxury-card:nth-child(n+3)) {
+            display: none;
+          }
+          :global(.showcase-arrow-btn) {
+            display: none !important;
+          }
+          :global(.showcase-luxury-card) {
+            height: 155px;
+            border-radius: 16px;
+            padding: 10px;
+          }
+          :global(.showcase-card-brand) {
+            font-size: 0.82rem;
+          }
+          :global(.showcase-card-model) {
+            font-size: 0.72rem;
+          }
+          :global(.showcase-card-badge) {
+            font-size: 0.62rem;
+            padding: 2px 7px;
+          }
+          :global(.showcase-card-action-btn) {
+            width: 28px;
+            height: 28px;
+            bottom: 8px;
+            right: 8px;
+          }
+
+          /* Trust Island Mobile */
+          :global(.showcase-trust-ai-island) {
+            flex-direction: column !important;
+            gap: 10px !important;
+          }
+          :global(.showcase-trust-items-pill) {
+            border-radius: 18px !important;
+            padding: 12px 14px !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+          }
+          :global(.trust-island-divider) {
+            display: none !important;
+          }
+          :global(.trust-island-item) {
+            font-size: 0.74rem !important;
+          }
+          :global(.showcase-ai-mini-banner) {
+            width: 100% !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
           }
         }
         /* ==========================================================================
