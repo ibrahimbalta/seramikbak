@@ -575,20 +575,13 @@
                     isProtected = true;
                 }
 
-                // 3. Universal Wood Furniture / Vanity Drawer Protection
-                // Detects oak, walnut, timber warm color signature across all rooms
-                const isWoodFurniture = (r > 48 && r > g && g > b && (r - b) >= 18 && lum >= 28 && lum <= 210);
-                if (isWoodFurniture && y >= Math.round(h * 0.25)) {
+                // 3. Plant / Foliage protection (pure green leaves)
+                if ((g > r + 20 && g > b + 20) || (2 * g - r - b > 35 && g > 50)) {
                     isProtected = true;
                 }
 
-                // 4. Matte black metal fixtures (faucets, shower heads, towel racks, paper holders)
-                if (lum < 32 && chroma < 18 && y >= Math.round(h * 0.10) && y <= Math.round(h * 0.95)) {
-                    isProtected = true;
-                }
-
-                // 5. White porcelain ceramic sanitary fixtures (toilet bowls, vessel sinks, bathtubs)
-                if (conf.isBathroom && lum >= 135 && chroma <= 32 && y >= Math.round(h * 0.40) && y <= Math.round(h * 0.92)) {
+                // 4. Small black metal fixtures (faucets, small shower heads)
+                if (lum < 20 && chroma < 12 && y >= Math.round(h * 0.15) && y <= Math.round(h * 0.60)) {
                     isProtected = true;
                 }
 
@@ -606,8 +599,8 @@
                     else if (x >= Math.round(w * 0.27) && x <= Math.round(w * 0.38) && y >= Math.round(h * 0.62) && y <= Math.round(h * 0.88)) {
                         isProtected = true;
                     }
-                    // Wall niche above toilet with decorative items & plants
-                    else if (x >= Math.round(w * 0.03) && x <= Math.round(w * 0.38) && y >= Math.round(h * 0.30) && y <= Math.round(h * 0.45)) {
+                    // Shelf decorative items & perfume bottles inside niche
+                    else if (x >= Math.round(w * 0.08) && x <= Math.round(w * 0.35) && y >= Math.round(h * 0.35) && y <= Math.round(h * 0.44)) {
                         isProtected = true;
                     }
                     // Upper beige cabinets
