@@ -136,11 +136,11 @@
         },
         'easy_bathroom': {
             floorY: 0.72,
-            ceilingY: 0.18,
+            ceilingY: 0.02,
             horizonY: 0.48,
             vanishingX: 0.50,
             vanishingY: 0.48,
-            fgUrl: '/hero/easy_bathroom_fg.png',
+            fgUrl: null,
             isBathroom: true,
             layout: 'easy'
         },
@@ -636,22 +636,31 @@
                         isProtected = true;
                     }
                 } else if (isEasyBathroom) {
-                    // Right shower cabin glass partition
-                    if (x > Math.round(w * 0.68) && y < floorY) {
+                    // 1. Far left wood door casing / trim
+                    if (x <= Math.round(w * 0.08)) {
                         isProtected = true;
                     }
-                    // Mirror above vanity
-                    else if (x >= Math.round(w * 0.38) && x <= Math.round(w * 0.62) && y >= Math.round(h * 0.22) && y <= Math.round(h * 0.50)) {
+                    // 2. Suspended Toilet Bowl (klozet gövdesi)
+                    else if (x >= Math.round(w * 0.11) && x <= Math.round(w * 0.32) && y >= Math.round(h * 0.56) && y <= Math.round(h * 0.94)) {
                         isProtected = true;
                     }
-                    // Vessel sink & faucet
-                    else if (x >= Math.round(w * 0.42) && x <= Math.round(w * 0.58) && y >= Math.round(h * 0.48) && y <= Math.round(h * 0.58)) {
+                    // 3. Toilet actuator flush plate (gömme rezervuar kumanda paneli)
+                    else if (x >= Math.round(w * 0.18) && x <= Math.round(w * 0.26) && y >= Math.round(h * 0.45) && y <= Math.round(h * 0.54)) {
                         isProtected = true;
                     }
-                    // Vanity countertop & drawers
-                    else if (x >= Math.round(w * 0.30) && x <= Math.round(w * 0.70) && y >= Math.round(h * 0.54) && y <= Math.round(h * 0.73)) {
+                    // 4. Mirror above vanity (ayna)
+                    else if (x >= Math.round(w * 0.39) && x <= Math.round(w * 0.62) && y >= Math.round(h * 0.20) && y <= Math.round(h * 0.49)) {
                         isProtected = true;
                     }
+                    // 5. Vessel sink & faucet (lavabo haznesi ve batarya)
+                    else if (x >= Math.round(w * 0.41) && x <= Math.round(w * 0.60) && y >= Math.round(h * 0.47) && y <= Math.round(h * 0.56)) {
+                        isProtected = true;
+                    }
+                    // 6. Vanity countertop & wooden drawers (banyo dolabı ahşap gövdesi ve çekmeceleri)
+                    else if (x >= Math.round(w * 0.31) && x <= Math.round(w * 0.70) && y >= Math.round(h * 0.55) && y <= Math.round(h * 0.74)) {
+                        isProtected = true;
+                    }
+                    // Shower cabin wall and floor are explicitly NOT protected so tiles flow seamlessly behind glass!
                 }
 
                 if (isProtected) {
