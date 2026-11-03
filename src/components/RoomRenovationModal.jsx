@@ -47,7 +47,7 @@ export default function RoomRenovationModal({
   const textureUrl = resolveSafeTextureUrl(rawTexture);
 
   // Visualizer URL with params (explicit index.html ensures direct static serving without router rewrite issues)
-  const visualizerUrl = `/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}&finish=${encodeURIComponent(finish)}&scale=1.0&surface=floor&embed=1&v=5.0.2`;
+  const visualizerUrl = `/tile-engine/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&width=${tileWidth}&height=${tileHeight}&finish=${encodeURIComponent(finish)}&scale=1.0&surface=floor&embed=1&v=5.1.0`;
 
   // Lock body scroll when modal is open
   useEffect(() => {

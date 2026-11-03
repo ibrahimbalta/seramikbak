@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Seramik Mekân Görselleştirici</title>
-    <link rel="stylesheet" href="style.css?v=5.0.2" />
+    <link rel="stylesheet" href="style.css?v=5.1.0" />
 </head>
 <body>
     <div class="engine-layout">
@@ -251,6 +251,26 @@
 
                     <!-- Right Controls for Masking -->
                     <div class="masking-controls-col">
+                        <!-- Brush Mode: Paint vs Erase / Protect -->
+                        <div class="brush-mode-toggle">
+                            <button type="button" class="btn-brush-mode active" id="mode-brush-btn" title="Döşenecek alanı boyayarak genişlet">
+                                <span>🖌️</span> <span>Seramik Ekle</span>
+                            </button>
+                            <button type="button" class="btn-brush-mode" id="mode-eraser-btn" title="Klozet, dolap, lavabo ve aynayı seramikten koru (Silgi)">
+                                <span>🧹</span> <span>Nesne Koru / Sil</span>
+                            </button>
+                        </div>
+
+                        <!-- Quick Surface Actions -->
+                        <div class="quick-mask-actions">
+                            <button type="button" class="btn-quick-mask" id="btn-quick-protect-fixtures" title="Yapay zekâ ile klozet, dolap ve aynayı otomatik koru">
+                                <span>🪄</span> <span>Otomatik Nesne Koru</span>
+                            </button>
+                            <button type="button" class="btn-quick-mask" id="btn-quick-select-all" title="Tüm duvar ve zemini seç">
+                                <span>📐</span> <span>Tüm Alanı Seç</span>
+                            </button>
+                        </div>
+
                         <div class="sliders-grid">
                             <!-- Brush Size -->
                             <div class="mask-control-group">
@@ -360,6 +380,6 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
-    <script src="script.js?v=5.0.2"></script>
+    <script src="script.js?v=5.1.0"></script>
 </body>
 </html>
