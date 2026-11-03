@@ -9,7 +9,7 @@
 
     // DOM Elements
     const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => document.querySelectorAll(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
     // Sidebar
     const surfFloorBtn    = $('#surf-floor-btn');
@@ -26,8 +26,8 @@
     const finishSelect    = $('#finish-select');
     const groutColorInput = $('#grout-color-input');
     const groutColorVal   = $('#grout-color-val');
-    const groutSwatches   = $('.grout-swatch');
-    const sizeChips       = $('.size-chip');
+    const groutSwatches   = $$('.grout-swatch');
+    const sizeChips       = $$('.size-chip');
     const deviceSelect    = $('#device-select');
     const resetSettingsBtn = $('#reset-settings-btn');
     const applySettingsBtn = $('#apply-settings-btn');
@@ -247,7 +247,7 @@
         if (tileCardTag) {
             tileCardTag.textContent = `${w}×${h} cm`;
         }
-        sizeChips.forEach((chip) => {
+        Array.isArray(sizeChips) && sizeChips.forEach((chip) => {
             const cw = parseInt(chip.dataset.w, 10);
             const ch = parseInt(chip.dataset.h, 10);
             chip.classList.toggle('active', cw === w && ch === h);
@@ -270,7 +270,7 @@
     });
 
     // Grout Color Swatches handler
-    groutSwatches.forEach((swatch) => {
+    Array.isArray(groutSwatches) && groutSwatches.forEach((swatch) => {
         swatch.addEventListener('click', () => {
             groutSwatches.forEach((s) => s.classList.remove('active'));
             swatch.classList.add('active');

@@ -132,7 +132,8 @@ function enrichProductData(p, userCity = 'İstanbul') {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
   const brandName = p.brand?.name || 'Seramik';
   
-  const cleanCity = userCity ? userCity.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() : 'İstanbul';
+  const safeCity = (typeof userCity === 'string' && userCity.trim()) ? userCity : 'İstanbul';
+  const cleanCity = safeCity.replace(' Merkez', '').replace(' Showroom', '').replace(' (Varsayılan)', '').replace(' (GPS)', '').trim() || 'İstanbul';
 
   const dealerOffers = [
     { dealerName: `${cleanCity} ${brandName} Yetkili Showroom`, price: Math.round(basePrice * 0.95), stock: 'Hemen Teslim' },
