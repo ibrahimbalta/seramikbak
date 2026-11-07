@@ -126,6 +126,10 @@ export async function GET() {
       },
       activities: formattedActivities,
       timestamp: new Date().toISOString()
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
+      },
     });
   } catch (error) {
     console.error('Error fetching live real stats:', error);

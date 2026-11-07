@@ -3,14 +3,12 @@ import "./globals.css";
 
 const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-outfit",
   display: "swap",
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-plus-jakarta",
   display: "swap",
 });
@@ -268,6 +266,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="tr" className={`${outfit.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://bienseramik.b-cdn.net" />
+        <link rel="dns-prefetch" href="https://img-salsify.mncdn.com" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
         <link rel="apple-touch-icon" href="/icon-192.png" />

@@ -142,10 +142,16 @@ export default function TileVisualPreview({ style, color, finish, width, height,
   const effectiveUrl = useFallbackTexture ? fallbackTexture : (imageUrl || fallbackTexture);
 
   if (effectiveUrl && !imageError) {
+    let optimizedUrl = effectiveUrl;
+    // Auto-optimize Cloudinary assets to auto webp/avif, auto quality and mobile card dimension
+    if (optimizedUrl && typeof optimizedUrl === 'string' && optimizedUrl.includes('res.cloudinary.com') && !optimizedUrl.includes('f_auto')) {
+      optimizedUrl = optimizedUrl.replace('/upload/', '/upload/f_auto,q_auto,w_400,c_limit/');
+    }
+
     // Use direct URL for maximum CDN speed; only route through proxy if direct load failed
-    const displaySrc = (!useFallbackTexture && useProxyFallback && (effectiveUrl.startsWith('http://') || effectiveUrl.startsWith('https://')))
-      ? `/api/proxy?url=${encodeURIComponent(effectiveUrl)}`
-      : effectiveUrl;
+    const displaySrc = (!useFallbackTexture && useProxyFallback && (optimizedUrl.startsWith('http://') || optimizedUrl.startsWith('https://')))
+      ? `/api/proxy?url=${encodeURIComponent(optimizedUrl)}`
+      : optimizedUrl;
 
     return (
       <div className="tile-preview-container" style={{ backgroundColor: bgColor }} title={seoAltString} aria-label={seoAltString}>

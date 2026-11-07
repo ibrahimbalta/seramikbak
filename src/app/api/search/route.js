@@ -459,10 +459,18 @@ export async function GET(request) {
           }
         }
       }
-      return NextResponse.json(diversified);
+      return NextResponse.json(diversified, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      });
     }
 
-    return NextResponse.json(sortedProducts);
+    return NextResponse.json(sortedProducts, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('Search API Error:', error);
     return NextResponse.json(

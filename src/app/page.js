@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
 import HeaderLocationPicker from '@/components/HeaderLocationPicker';
-import QuoteCartDrawer from '@/components/QuoteCartDrawer';
 import { findNearestCity, TURKEY_CITIES } from '@/lib/turkeyCities';
 import { useLanguage } from '@/lib/languageContext';
 
@@ -78,6 +77,8 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
+const QuoteCartDrawer = dynamic(() => import('@/components/QuoteCartDrawer'), { ssr: false });
+const BathroomMockupPreview = dynamic(() => import('@/components/BathroomMockupPreview'), { ssr: false });
 const GlobalExportHub = dynamic(() => import('@/components/GlobalExportHub'), { ssr: false });
 const HowItWorksModal = dynamic(() => import('@/components/HowItWorksModal'), { ssr: false });
 const BimSpecDownloadModal = dynamic(() => import('@/components/BimSpecDownloadModal'), { ssr: false });
@@ -121,7 +122,6 @@ const ModelViewerAR = dynamic(() => import('@/components/ModelViewerAR'), {
 });
 
 import TileVisualPreview from '@/components/TileVisualPreview';
-import BathroomMockupPreview from '@/components/BathroomMockupPreview';
 import ProductCard from '@/components/ProductCard';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
