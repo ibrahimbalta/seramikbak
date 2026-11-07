@@ -4049,7 +4049,7 @@ export default function Home() {
               <span>İlham</span>
             </Link>
 
-            {/* Kurumsal Dropdown (Nasıl Çalışır, Hakkımızda, Dijital Katalog, Global) */}
+            {/* Kurumsal Dropdown (Nasıl Çalışır, Hakkımızda, Global) */}
             <div 
               className="utility-dropdown-wrapper luxury-dropdown-wrapper"
               onMouseEnter={() => handleUtilityDropdownOpen('kurumsal')}
@@ -4097,18 +4097,6 @@ export default function Home() {
                         <span className="dropdown-item-title">Hakkımızda</span>
                       </div>
                       <span className="dropdown-item-desc">SeramikBak vizyonu ve kurumsal bilgiler</span>
-                    </div>
-                  </Link>
-
-                  <Link href="/katalog-prototip" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
-                    <div className="dropdown-item-icon blue-icon">
-                      <FileText size={14} />
-                    </div>
-                    <div className="dropdown-item-content">
-                      <div className="dropdown-title-row">
-                        <span className="dropdown-item-title">Dijital Katalog</span>
-                      </div>
-                      <span className="dropdown-item-desc">Tüm marka ve koleksiyon PDF katalogları</span>
                     </div>
                   </Link>
 
