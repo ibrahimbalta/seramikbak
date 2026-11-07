@@ -4208,7 +4208,7 @@ export default function Home() {
             onClick={() => setVitrinIndex(prev => (prev === 0 ? Math.max(0, displayVitrinItems.length - 1) : prev - 1))}
             aria-label="Önceki Vitrin Ürünü"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={16} />
           </button>
 
           {/* 5 Cards Row */}
@@ -4244,7 +4244,7 @@ export default function Home() {
                   </div>
                 </div>
                 <button type="button" className="showcase-card-action-btn" aria-label="İncele">
-                  <ArrowRight size={14} />
+                  <ArrowRight size={12} />
                 </button>
               </div>
             ))}
@@ -4257,7 +4257,7 @@ export default function Home() {
             onClick={() => setVitrinIndex(prev => (prev + 1) % displayVitrinItems.length)}
             aria-label="Sonraki Vitrin Ürünü"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={16} />
           </button>
         </div>
 
@@ -10548,7 +10548,7 @@ export default function Home() {
         :global(.showcase-luxury-hero-zone) {
           width: 100%;
           max-width: 1440px;
-          margin: 16px auto 14px auto;
+          margin: 10px auto 8px auto;
           padding: 0 16px;
           box-sizing: border-box;
         }
@@ -10557,13 +10557,13 @@ export default function Home() {
           position: relative;
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           width: 100%;
         }
 
         :global(.showcase-arrow-btn) {
-          width: 44px;
-          height: 44px;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
           background: #ffffff;
           border: 1px solid #e2e8f0;
@@ -10588,31 +10588,31 @@ export default function Home() {
         :global(.showcase-cards-grid) {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: 14px;
+          gap: 10px;
           width: 100%;
         }
 
         :global(.showcase-luxury-card) {
-          height: 195px;
-          border-radius: 20px;
+          height: 135px;
+          border-radius: 14px;
           background-size: cover;
           background-position: center;
           position: relative;
           overflow: hidden;
           cursor: pointer;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
-          border: 1px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.85);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 16px 14px;
+          padding: 10px 12px;
           box-sizing: border-box;
           transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
         }
 
         :global(.showcase-luxury-card:hover) {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 32px rgba(0, 0, 0, 0.13);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
         }
 
         :global(.showcase-card-overlay) {
@@ -10628,25 +10628,25 @@ export default function Home() {
           z-index: 2;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 4px;
         }
 
         :global(.showcase-card-badge) {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
+          gap: 4px;
           background: rgba(15, 23, 42, 0.82);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           color: #ffffff;
-          font-size: 0.63rem;
+          font-size: 0.58rem;
           font-weight: 750;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.03em;
           text-transform: uppercase;
-          padding: 3px 9px 3px 7px;
+          padding: 2px 7px 2px 6px;
           border-radius: 9999px;
           border: 1px solid rgba(212, 175, 55, 0.4);
-          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10);
           align-self: flex-start;
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           user-select: none;
@@ -10693,30 +10693,30 @@ export default function Home() {
         }
 
         :global(.showcase-card-brand) {
-          font-size: 0.95rem;
+          font-size: 0.82rem;
           font-weight: 800;
           color: #0f172a;
-          line-height: 1.2;
+          line-height: 1.15;
         }
 
         :global(.showcase-card-model) {
-          font-size: 0.84rem;
-          font-weight: 700;
+          font-size: 0.74rem;
+          font-weight: 600;
           color: #334155;
-          line-height: 1.25;
+          line-height: 1.2;
         }
 
         :global(.showcase-card-action-btn) {
           position: absolute;
-          bottom: 12px;
-          right: 12px;
+          bottom: 8px;
+          right: 8px;
           z-index: 2;
-          width: 34px;
-          height: 34px;
+          width: 26px;
+          height: 26px;
           border-radius: 50%;
           background: #ffffff;
           border: none;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -10735,8 +10735,8 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          margin: 12px 0 16px 0;
+          gap: 5px;
+          margin: 6px 0 10px 0;
         }
 
         :global(.showcase-dot) {
@@ -11136,6 +11136,7 @@ export default function Home() {
 
         :global(.clean-search-text-input) {
           flex: 1;
+          min-width: 0;
           border: none;
           outline: none;
           font-size: 0.98rem;
@@ -11361,35 +11362,64 @@ export default function Home() {
           :global(.clean-3d-badge-text) {
             font-size: 0.95rem;
           }
+          :global(.clean-search-container) {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
           :global(.clean-search-pill-box) {
-            height: 52px;
-            padding: 4px 6px 4px 8px;
-            gap: 6px;
+            height: 48px !important;
+            padding: 3px 6px 3px 8px !important;
+            gap: 5px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
           }
           :global(.modern-search-icon-circle) {
-            width: 34px;
-            height: 34px;
+            width: 30px !important;
+            height: 30px !important;
+            flex-shrink: 0 !important;
+          }
+          :global(.modern-search-icon-circle svg) {
+            width: 15px !important;
+            height: 15px !important;
           }
           :global(.clean-search-text-input) {
-            font-size: 0.82rem;
-            padding: 4px;
+            font-size: 0.78rem !important;
+            padding: 2px 4px !important;
+            min-width: 0 !important;
+            flex: 1 1 0% !important;
+            width: 0 !important;
           }
           :global(.clean-search-text-input::placeholder) {
-            font-size: 0.76rem;
+            font-size: 0.72rem !important;
           }
           :global(.clean-search-v-divider) {
-            display: none;
+            display: none !important;
           }
           :global(.modern-camera-pill-btn) {
-            padding: 7px 10px;
-            gap: 4px;
+            padding: 6px 8px !important;
+            gap: 0 !important;
+            flex-shrink: 0 !important;
+          }
+          :global(.modern-camera-pill-btn svg) {
+            width: 16px !important;
+            height: 16px !important;
           }
           :global(.modern-camera-text) {
-            display: none;
+            display: none !important;
           }
           :global(.modern-search-submit-btn) {
-            padding: 8px 14px;
-            font-size: 0.80rem;
+            padding: 7px 11px !important;
+            font-size: 0.76rem !important;
+            gap: 4px !important;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+          }
+          :global(.modern-search-submit-btn svg) {
+            width: 13px !important;
+            height: 13px !important;
           }
           :global(.clean-quick-nav-cards) {
             gap: 8px;
@@ -11525,25 +11555,25 @@ export default function Home() {
             display: none !important;
           }
           :global(.showcase-luxury-card) {
-            height: 155px !important;
-            border-radius: 16px !important;
-            padding: 10px !important;
+            height: 105px !important;
+            border-radius: 12px !important;
+            padding: 8px !important;
           }
           :global(.showcase-card-brand) {
-            font-size: 0.82rem !important;
+            font-size: 0.76rem !important;
           }
           :global(.showcase-card-model) {
-            font-size: 0.72rem !important;
+            font-size: 0.68rem !important;
           }
           :global(.showcase-card-badge) {
-            font-size: 0.58rem !important;
-            padding: 2px 6px !important;
+            font-size: 0.54rem !important;
+            padding: 1px 5px !important;
           }
           :global(.showcase-card-action-btn) {
-            width: 28px !important;
-            height: 28px !important;
-            bottom: 8px !important;
-            right: 8px !important;
+            width: 22px !important;
+            height: 22px !important;
+            bottom: 6px !important;
+            right: 6px !important;
           }
 
           /* Trust Island Mobile - Symmetrical 2x2 Grid No Overflow */
