@@ -3,13 +3,13 @@
 /* Fonts are loaded via next/font/google in layout.js for optimal performance */
 
 :root {
-  /* Color Palette (Clean Light Mode - Whites & Greys) */
-  --bg-dark: #f8f9fc;
-  --bg-card: rgba(255, 255, 255, 0.85);
-  --bg-card-solid: #ffffff;
-  --bg-input: #f1f3f7;
-  --border-color: rgba(0, 0, 0, 0.07);
-  --border-hover: rgba(0, 0, 0, 0.14);
+  /* Color Palette (Warm Stone Light Mode - Soft & Low-Glare) */
+  --bg-dark: #f2efea;
+  --bg-card: rgba(255, 253, 249, 0.92);
+  --bg-card-solid: #fcfbf8;
+  --bg-input: #ebe7e0;
+  --border-color: rgba(15, 23, 42, 0.09);
+  --border-hover: rgba(15, 23, 42, 0.18);
   --border-gold: rgba(197, 160, 89, 0.4);
   
   --accent-gold: #b38e47;

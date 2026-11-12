@@ -11000,8 +11000,8 @@ export default function Home() {
           align-items: center;
           justify-content: space-between;
           overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.85);
-          box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03);
+          border: 1px solid rgba(197, 143, 39, 0.25);
+          box-shadow: 0 22px 50px -12px rgba(15, 23, 42, 0.28), 0 4px 12px rgba(0, 0, 0, 0.08);
           margin-bottom: 14px;
           box-sizing: border-box;
         }
@@ -11009,7 +11009,7 @@ export default function Home() {
         :global(.clean-hero-overlay) {
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.94) 34%, rgba(255, 255, 255, 0.52) 62%, rgba(255, 255, 255, 0.12) 100%);
+          background: linear-gradient(90deg, #0f172a 0%, rgba(15, 23, 42, 0.94) 38%, rgba(15, 23, 42, 0.65) 68%, rgba(15, 23, 42, 0.25) 100%);
           z-index: 1;
           pointer-events: none;
         }
@@ -11028,11 +11028,11 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(197, 143, 39, 0.10);
-          border: 1px solid rgba(197, 143, 39, 0.35);
+          background: rgba(197, 143, 39, 0.18);
+          border: 1px solid rgba(212, 175, 55, 0.45);
           padding: 4px 12px;
           border-radius: 9999px;
-          color: #996515;
+          color: #f3d285;
           font-size: 0.68rem;
           font-weight: 800;
           letter-spacing: 0.06em;
@@ -11040,20 +11040,20 @@ export default function Home() {
         }
 
         :global(.hero-eyebrow-icon) {
-          color: #c58f27;
+          color: #f3d285;
         }
 
         :global(.clean-hero-heading) {
           font-size: 2.35rem;
           font-weight: 850;
-          color: #0f172a;
+          color: #f8fafc;
           line-height: 1.14;
           margin: 0;
           letter-spacing: -0.03em;
         }
 
         :global(.clean-hero-highlight) {
-          background: linear-gradient(135deg, #b8860b 0%, #c58f27 45%, #8f6515 100%);
+          background: linear-gradient(135deg, #f3d285 0%, #d4af37 50%, #c58f27 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-weight: 850;
@@ -11062,7 +11062,7 @@ export default function Home() {
 
         :global(.clean-hero-sub) {
           font-size: 0.92rem;
-          color: #475569;
+          color: #cbd5e1;
           line-height: 1.5;
           margin: 2px 0 6px 0;
           max-width: 440px;
@@ -11102,11 +11102,11 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: rgba(255, 255, 255, 0.85);
+          background: rgba(255, 255, 255, 0.10);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          border: 1.5px solid #cbd5e1;
-          color: #0f172a;
+          border: 1.5px solid rgba(255, 255, 255, 0.28);
+          color: #f8fafc;
           padding: 10px 20px;
           border-radius: 9999px;
           font-size: 0.88rem;
@@ -11117,11 +11117,11 @@ export default function Home() {
         }
 
         :global(.luxury-hero-secondary-btn:hover) {
-          background: #ffffff;
-          border-color: #c58f27;
-          color: #996515;
+          background: rgba(255, 255, 255, 0.18);
+          border-color: #d4af37;
+          color: #f3d285;
           transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
         }
 
         :global(.ai-badge-chip) {
@@ -11146,7 +11146,7 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          color: #64748b;
+          color: #cbd5e1;
           font-size: 0.76rem;
           font-weight: 600;
         }
@@ -11168,7 +11168,7 @@ export default function Home() {
           height: 8px;
           border-radius: 50%;
           border: none;
-          background: #cbd5e1;
+          background: rgba(255, 255, 255, 0.30);
           padding: 0;
           cursor: pointer;
           transition: all 0.25s ease;
@@ -11194,11 +11194,11 @@ export default function Home() {
           position: relative;
           z-index: 2;
           width: 230px;
-          background: rgba(255, 255, 255, 0.72);
+          background: rgba(15, 23, 42, 0.78);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          border: 1.5px solid rgba(255, 255, 255, 0.95);
-          box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+          border: 1.5px solid rgba(255, 255, 255, 0.16);
+          box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.12);
           border-radius: 20px;
           padding: 18px 20px;
           box-sizing: border-box;
@@ -11213,17 +11213,17 @@ export default function Home() {
 
         :global(.luxury-hero-3d-showcase-card:hover) {
           transform: translateY(-4px) scale(1.02);
-          box-shadow: 0 26px 50px -10px rgba(197, 143, 39, 0.20), inset 0 1px 1px rgba(255, 255, 255, 1);
-          border-color: rgba(197, 143, 39, 0.45);
+          box-shadow: 0 26px 50px -10px rgba(197, 143, 39, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+          border-color: rgba(212, 175, 55, 0.55);
         }
 
         :global(.showcase-card-live-tag) {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(16, 185, 129, 0.12);
-          border: 1px solid rgba(16, 185, 129, 0.3);
-          color: #047857;
+          background: rgba(16, 185, 129, 0.16);
+          border: 1px solid rgba(52, 211, 153, 0.35);
+          color: #6ee7b7;
           font-size: 0.65rem;
           font-weight: 800;
           padding: 3px 8px;
@@ -11286,13 +11286,13 @@ export default function Home() {
         :global(.showcase-meta-title) {
           font-size: 0.88rem;
           font-weight: 800;
-          color: #0f172a;
+          color: #f8fafc;
           line-height: 1.2;
         }
 
         :global(.showcase-meta-subtitle) {
           font-size: 0.72rem;
-          color: #64748b;
+          color: #cbd5e1;
           line-height: 1.3;
         }
 
@@ -11301,8 +11301,8 @@ export default function Home() {
           align-items: center;
           justify-content: space-between;
           padding-top: 8px;
-          border-top: 1px solid rgba(226, 232, 240, 0.8);
-          color: #996515;
+          border-top: 1px solid rgba(255, 255, 255, 0.14);
+          color: #f3d285;
           font-size: 0.74rem;
           font-weight: 750;
         }
@@ -11607,7 +11607,7 @@ export default function Home() {
             margin-bottom: 12px;
           }
           :global(.clean-hero-overlay) {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(255, 255, 255, 0.92) 55%, rgba(255, 255, 255, 0.72) 100%);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(15, 23, 42, 0.92) 55%, rgba(15, 23, 42, 0.78) 100%);
           }
           :global(.luxury-hero-eyebrow) {
             font-size: 0.68rem;
