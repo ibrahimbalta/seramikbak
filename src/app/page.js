@@ -7466,7 +7466,7 @@ export default function Home() {
                       }}
                       className="detail-action-btn btn-action-cart"
                       style={{
-                        background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#ecfdf5' : '#ffffff',
+                        background: quoteCartItems.some(c => c.id === detailProduct.id) ? '#ecfdf5' : '#f5f6f8',
                         borderColor: quoteCartItems.some(c => c.id === detailProduct.id) ? '#059669' : '#cbd5e1'
                       }}
                     >
@@ -17137,8 +17137,8 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 16px;
-          background: #ffffff !important;
-          border: 1px solid rgba(179, 142, 71, 0.25) !important;
+          background: #e6e8ec !important;
+          border: 1.5px solid rgba(179, 142, 71, 0.4) !important;
           border-radius: var(--border-radius-md) !important;
           box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.25) !important;
         }
@@ -17655,8 +17655,8 @@ export default function Home() {
           max-height: 94vh;
           padding: 20px 24px;
           border-radius: 20px;
-          background: #f8fafc;
-          border: 1px solid rgba(179, 142, 71, 0.28);
+          background: #e6e8ec;
+          border: 1.5px solid rgba(179, 142, 71, 0.4);
           backdrop-filter: blur(30px);
           -webkit-backdrop-filter: blur(30px);
           box-shadow: 0 25px 60px rgba(15, 23, 42, 0.28), 
@@ -17792,8 +17792,8 @@ export default function Home() {
         }
 
         .spec-item-box {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          background: #f5f6f8;
+          border: 1px solid #cbd5e1;
           padding: 8px 10px;
           border-radius: 10px;
           display: flex;
@@ -17803,7 +17803,7 @@ export default function Home() {
         }
 
         .spec-item-box:hover {
-          background: #ffffff;
+          background: #f8f9fb;
           border-color: rgba(179, 142, 71, 0.4);
           transform: translateY(-2px);
           box-shadow: 0 8px 18px rgba(179, 142, 71, 0.12);
@@ -17987,8 +17987,8 @@ export default function Home() {
           min-height: 52px !important;
           height: 52px !important;
           border-radius: 12px !important;
-          background: #ffffff !important;
-          border: 1px solid #e2e8f0 !important;
+          background: #f5f6f8 !important;
+          border: 1px solid #cbd5e1 !important;
           cursor: pointer !important;
           display: flex !important;
           align-items: center !important;
@@ -18009,9 +18009,9 @@ export default function Home() {
         .btn-action-sample:hover,
         :global(.btn-action-standalone-sym:hover) {
           transform: translateY(-2px) !important;
-          border-color: rgba(179, 142, 71, 0.45) !important;
+          border-color: rgba(179, 142, 71, 0.55) !important;
           box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08) !important;
-          background: #ffffff !important;
+          background: #f8f9fb !important;
         }
 
         .btn-action-cart:active,
@@ -18186,8 +18186,8 @@ export default function Home() {
         }
 
         .detail-modal-content-premium .close-modal-btn {
-          background: #f1f5f9;
-          border: 1px solid #e2e8f0;
+          background: #dfe3ea;
+          border: 1px solid #cbd5e1;
           color: #64748b;
           width: 34px;
           height: 34px;
@@ -18212,8 +18212,8 @@ export default function Home() {
         }
 
         .detail-modal-content-premium .channel-box {
-          border: 1px solid #e2e8f0;
-          background: #f8fafc;
+          border: 1px solid #cbd5e1;
+          background: #f5f6f8;
           border-radius: 12px;
           padding: 14px 16px;
           display: flex;
@@ -18224,8 +18224,8 @@ export default function Home() {
         }
 
         .detail-modal-content-premium .channel-box:hover {
-          border-color: rgba(179, 142, 71, 0.35);
-          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.45);
+          background: #f8f9fb;
           box-shadow: 0 6px 18px rgba(179, 142, 71, 0.1);
         }
 
@@ -18283,7 +18283,7 @@ export default function Home() {
 
         .detail-modal-content-premium .calc-input, 
         .detail-modal-content-premium .calc-select {
-          background: #ffffff;
+          background: #f8f9fb;
           border: 1px solid #cbd5e1;
           border-radius: 8px;
           padding: 10px 12px;
@@ -18316,8 +18316,8 @@ export default function Home() {
         }
 
         .calc-res-item {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: #f8f9fb;
+          border: 1px solid #cbd5e1;
           padding: 10px 12px;
           border-radius: 8px;
           display: flex;
