@@ -34,6 +34,12 @@ function maskEmail(email) {
 export async function GET(request) {
   try {
     const auth = await verifyAuth(request);
+    if (!auth) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim. Lütfen giriş yapınız.' },
+        { status: 401 }
+      );
+    }
     const { searchParams } = new URL(request.url);
     const queryDealerId = searchParams.get('dealerId');
     const queryBrandId = searchParams.get('brandId');
@@ -43,16 +49,11 @@ export async function GET(request) {
     let dealerId = null;
     let brandId = null;
 
-    if (auth) {
-      if (auth.role === 'dealer') {
-        dealerId = auth.id;
-      } else if (auth.role === 'brand') {
-        brandId = auth.id;
-      } else if (auth.role === 'admin') {
-        dealerId = queryDealerId;
-        brandId = queryBrandId;
-      }
-    } else {
+    if (auth.role === 'dealer') {
+      dealerId = auth.id;
+    } else if (auth.role === 'brand') {
+      brandId = auth.id;
+    } else if (auth.role === 'admin') {
       dealerId = queryDealerId;
       brandId = queryBrandId;
     }
@@ -65,8 +66,15 @@ export async function GET(request) {
     }
 
     if (email) {
+      const normalizedEmail = email.trim().toLowerCase();
+      if (auth.role !== 'admin' && auth.email?.toLowerCase() !== normalizedEmail) {
+        return NextResponse.json(
+          { error: 'Ba?ka bir kullan?c?n?n proje taleplerine eri?emezsiniz.' },
+          { status: 403 }
+        );
+      }
       const userProjects = await prisma.projectRequest.findMany({
-        where: { contactEmail: email },
+        where: { contactEmail: normalizedEmail },
         orderBy: { createdAt: 'desc' }
       });
       return NextResponse.json({

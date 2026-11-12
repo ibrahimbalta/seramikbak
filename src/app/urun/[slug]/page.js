@@ -283,19 +283,19 @@ export default async function ProductDetailPage({ params }) {
       {productSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema).replace(/</g, '\\u003c') }}
         />
       )}
       {breadcrumbSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema).replace(/</g, '\\u003c') }}
         />
       )}
       {imageSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema).replace(/</g, '\\u003c') }}
         />
       )}
       <ProductDetailClient

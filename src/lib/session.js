@@ -50,7 +50,8 @@ export function decryptSession(token) {
       if (!ivHex || !tagHex || !encryptedHex) return null;
       const iv = Buffer.from(ivHex, 'hex');
       const tag = Buffer.from(tagHex, 'hex');
-      const decipher = crypto.createDecipheriv(GCM_ALGORITHM, KEY, iv);
+      if (iv.length !== 16 || tag.length !== 16) return null;
+      const decipher = crypto.createDecipheriv(GCM_ALGORITHM, KEY, iv, { authTagLength: 16 });
       decipher.setAuthTag(tag);
       let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
       decrypted += decipher.final('utf8');

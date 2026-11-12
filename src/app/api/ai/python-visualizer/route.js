@@ -24,7 +24,12 @@ async function resolveImageBuffer(imgInput) {
 
   // Case 2: Local public path (e.g. /textures/calacatta_gold.jpg or /hero/easy_bathroom.jpg)
   if (imgInput.startsWith('/')) {
-    const localPath = path.join(process.cwd(), 'public', imgInput);
+    const publicRoot = path.resolve(process.cwd(), 'public');
+    const safeRel = imgInput.replace(/^\/+/, '');
+    const localPath = path.resolve(publicRoot, safeRel);
+    if (!localPath.startsWith(publicRoot + path.sep)) {
+      throw new Error('Geçersiz dosya yolu.');
+    }
     if (fs.existsSync(localPath)) {
       const buffer = fs.readFileSync(localPath);
       const ext = path.extname(localPath).toLowerCase();
@@ -33,10 +38,26 @@ async function resolveImageBuffer(imgInput) {
     }
   }
 
-  // Case 3: HTTP/HTTPS remote URL
+  // Case 3: HTTP/HTTPS remote URL (with SSRF protection)
   if (imgInput.startsWith('http://') || imgInput.startsWith('https://')) {
-    const res = await fetch(imgInput, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) throw new Error(`Görsel indirilemedi: ${imgInput} (${res.status})`);
+    const parsed = new URL(imgInput);
+    const host = parsed.hostname.toLowerCase();
+    const isPrivate =
+      host === 'localhost' ||
+      host.endsWith('.localhost') ||
+      host === '127.0.0.1' ||
+      host === '::1' ||
+      host === '0.0.0.0' ||
+      host.startsWith('169.254.') ||
+      host.startsWith('10.') ||
+      host.startsWith('192.168.') ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host) ||
+      /^100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\./.test(host);
+    if (isPrivate) {
+      throw new Error('Yasaklı hedef adres.');
+    }
+    const res = await fetch(parsed.toString(), { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error(`Görsel indirilemedi (${res.status})`);
     const arrayBuffer = await res.arrayBuffer();
     const mimeType = res.headers.get('content-type') || 'image/jpeg';
     return { buffer: Buffer.from(arrayBuffer), mimeType };

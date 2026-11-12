@@ -19,5 +19,9 @@ COPY . .
 ENV PORT=8000
 EXPOSE 8000
 
+# Create non-root user
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Run FastAPI app with Uvicorn
 CMD exec uvicorn main:app --host 0.0.0.0 --port $PORT

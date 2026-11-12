@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim. Lütfen giriş yapınız.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const requestedUserId = searchParams.get('userId');
+    const userId = session.role === 'admin' && requestedUserId ? requestedUserId : session.id;
 
     if (!userId) {
       return NextResponse.json(
@@ -45,7 +55,7 @@ export async function GET(request) {
   } catch (error) {
     console.error('List Favorites API Error:', error);
     return NextResponse.json(
-      { error: 'Favoriler listelenirken hata oluştu.', details: error.message },
+      { error: 'Favoriler listelenirken hata oluştu.' },
       { status: 500 }
     );
   }

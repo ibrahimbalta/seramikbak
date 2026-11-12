@@ -47,4 +47,11 @@ test('Session Library - AES-256-GCM Token Encryption & Decryption', async (t) =>
     const decrypted = decryptSession(expiredToken);
     assert.equal(decrypted, null, 'Expired token should return null');
   });
+
+  await t.test('should reject truncated GCM auth tags (authTagLength enforcement)', () => {
+    const validToken = encryptSession({ id: 'usr-tag', role: 'admin' });
+    const [ivHex, tagHex, ciphertext] = validToken.split(':');
+    const truncatedTagToken = `${ivHex}:${tagHex.slice(0, 8)}:${ciphertext}`;
+    assert.equal(decryptSession(truncatedTagToken), null, 'Truncated GCM auth tag must be rejected');
+  });
 });

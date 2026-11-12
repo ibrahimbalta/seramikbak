@@ -18,11 +18,11 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Eksik parametreler: base64Data ve filename zorunludur.' }, { status: 400 });
     }
 
-    // 1. Extension Validation (Safe images only)
+    // 1. Extension Validation (Safe raster images only - No SVG, HTML, or executables)
     const fileExt = path.extname(filename).toLowerCase();
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.svg'];
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
     if (!allowedExtensions.includes(fileExt)) {
-      return NextResponse.json({ success: false, error: 'Yalnızca JPEG, PNG, WebP ve SVG görsel formatlarına izin verilir.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Yalnızca JPEG, PNG ve WebP görsel formatlarına izin verilir.' }, { status: 400 });
     }
 
     // 2. Base64 Size Limit (Max 12MB binary ~16MB base64 string)

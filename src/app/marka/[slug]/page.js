@@ -198,11 +198,11 @@ export default async function BrandShowcasePage({ params }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema).replace(/</g, '\\u003c') }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema).replace(/</g, '\\u003c') }}
       />
       <BrandShowcaseClient
         brand={brand}

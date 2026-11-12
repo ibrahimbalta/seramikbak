@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim. Lütfen giriş yapınız.' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
-    const { userId, productId } = body;
+    const { userId: requestedUserId, productId } = body;
+    const userId = session.role === 'admin' && requestedUserId ? requestedUserId : session.id;
 
     if (!userId || !productId) {
       return NextResponse.json(
@@ -66,7 +76,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Toggle Favorite API Error:', error);
     return NextResponse.json(
-      { error: 'Favori işlemi başarısız oldu.', details: error.message },
+      { error: 'Favori işlemi başarısız oldu.' },
       { status: 500 }
     );
   }

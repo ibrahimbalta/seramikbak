@@ -5,7 +5,14 @@ import path from 'path';
 export async function GET(req, { params }) {
   const { id } = await params;
   try {
-    const roomDir = path.join(process.cwd(), 'public', 'static', 'panorama', 'rooms', id);
+    if (!id || !/^[a-zA-Z0-9_-]+$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid room id' }, { status: 400 });
+    }
+    const baseDir = path.resolve(process.cwd(), 'public', 'static', 'panorama', 'rooms');
+    const roomDir = path.resolve(baseDir, id);
+    if (!roomDir.startsWith(baseDir + path.sep)) {
+      return NextResponse.json({ error: 'Invalid room path' }, { status: 400 });
+    }
     if (!fs.existsSync(roomDir)) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }

@@ -72,9 +72,9 @@ export async function POST(request) {
       }
     });
 
-    // Send verification email
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://seramikbak.com';
-    const verificationLink = `${origin}/api/auth/verify-email?token=${verificationToken}`;
+    // Send verification email (use configured app URL, never untrusted Origin header)
+    const appBaseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.seramikbak.com').replace(/\/+$/, '');
+    const verificationLink = `${appBaseUrl}/api/auth/verify-email?token=${verificationToken}`;
     await sendVerificationEmail({ toEmail: normalizedEmail, userName: name, verificationLink });
 
     return NextResponse.json({

@@ -183,7 +183,7 @@ export default async function Page({ params }) {
       {localBusinessSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema).replace(/</g, '\\u003c') }}
         />
       )}
       <DealerProfileClient dealer={dealer} products={products} />

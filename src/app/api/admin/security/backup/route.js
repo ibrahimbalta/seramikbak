@@ -4,9 +4,9 @@ import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
-    const auth = await verifyAuth(request, 'admin');
+    const auth = await verifyAuth(request, 'admin', 'SUPER_ADMIN');
     if (!auth) {
-      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+      return NextResponse.json({ error: 'Yetkisiz erişim. Bu alana yalnızca Süper Admin erişebilir.' }, { status: 403 });
     }
 
     // Export all critical database collections for backup

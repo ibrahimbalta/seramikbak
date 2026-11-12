@@ -125,7 +125,7 @@ export default function ProductSchemaJsonLd({ product, currency = 'TRY', lang = 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData).replace(/</g, '\\u003c') }}
     />
   );
 }

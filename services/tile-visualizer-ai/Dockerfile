@@ -19,7 +19,10 @@ COPY . .
 
 EXPOSE 8000
 
-ENV HF_HOME=/root/.cache/huggingface
+ENV HF_HOME=/tmp/huggingface
 ENV PYTHONUNBUFFERED=1
+
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser:appuser /app
+USER appuser
 
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,23 +1,75 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { encryptSession } from '@/lib/session';
+import { hashPassword } from '@/lib/auth';
 
-// Helper function to decode JWT payload without external library
-function parseJwtPayload(token) {
+let cachedCerts = null;
+let cachedCertsExpiresAt = 0;
+
+async function getGoogleJwks() {
+  if (cachedCerts && Date.now() < cachedCertsExpiresAt) {
+    return cachedCerts;
+  }
+  const res = await fetch('https://www.googleapis.com/oauth2/v3/certs', {
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) {
+    throw new Error('Google JWKS anahtarları alınamadı.');
+  }
+  const data = await res.json();
+  const cacheControl = res.headers.get('cache-control') || '';
+  const maxAgeMatch = cacheControl.match(/max-age=(\d+)/i);
+  const maxAgeSec = maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : 3600;
+  cachedCerts = Array.isArray(data.keys) ? data.keys : [];
+  cachedCertsExpiresAt = Date.now() + maxAgeSec * 1000;
+  return cachedCerts;
+}
+
+function decodeBase64UrlJson(segment) {
+  const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+  return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+}
+
+async function verifyGoogleIdToken(token) {
+  if (typeof token !== 'string') return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+
+  const [headerB64, payloadB64, signatureB64] = parts;
+  let header, payload;
   try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
+    header = decodeBase64UrlJson(headerB64);
+    payload = decodeBase64UrlJson(payloadB64);
+  } catch {
     return null;
   }
+
+  if (header.alg !== 'RS256' || !header.kid) {
+    return null;
+  }
+
+  const keys = await getGoogleJwks();
+  let jwk = keys.find((k) => k.kid === header.kid);
+  if (!jwk) {
+    cachedCertsExpiresAt = 0;
+    const freshKeys = await getGoogleJwks();
+    jwk = freshKeys.find((k) => k.kid === header.kid);
+  }
+  if (!jwk) return null;
+
+  const publicKey = crypto.createPublicKey({ key: jwk, format: 'jwk' });
+  const signingInput = Buffer.from(`${headerB64}.${payloadB64}`, 'utf8');
+  const sigBase64 = signatureB64.replace(/-/g, '+').replace(/_/g, '/');
+  const sigPadded = sigBase64 + '='.repeat((4 - (sigBase64.length % 4)) % 4);
+  const signature = Buffer.from(sigPadded, 'base64');
+
+  const isValid = crypto.verify('RSA-SHA256', signingInput, publicKey, signature);
+  if (!isValid) return null;
+
+  return payload;
 }
 
 export async function POST(request) {
@@ -33,11 +85,11 @@ export async function POST(request) {
       );
     }
 
-    const payload = parseJwtPayload(credential);
-    if (!payload || !payload.email) {
+    const payload = await verifyGoogleIdToken(credential);
+    if (!payload || !payload.email || payload.email_verified !== true) {
       return NextResponse.json(
-        { error: 'Google kimlik belirteci çözümlenemedi.' },
-        { status: 400 }
+        { error: 'Google kimlik belirteci doğrulanamadı.' },
+        { status: 401 }
       );
     }
 
@@ -51,7 +103,7 @@ export async function POST(request) {
     }
 
     // Verify Token Expiration
-    if (payload.exp && Date.now() >= payload.exp * 1000) {
+    if (!payload.exp || Date.now() >= payload.exp * 1000) {
       return NextResponse.json(
         { error: 'Google oturum süresi dolmuş. Lütfen tekrar giriş yapınız.' },
         { status: 401 }
@@ -60,7 +112,7 @@ export async function POST(request) {
 
     // Verify Audience if GOOGLE_CLIENT_ID is configured
     const configuredClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (configuredClientId && payload.aud && payload.aud !== configuredClientId) {
+    if (configuredClientId && payload.aud !== configuredClientId) {
       return NextResponse.json(
         { error: 'Google istemci kimliği eşleşmedi.' },
         { status: 401 }
@@ -83,7 +135,8 @@ export async function POST(request) {
         data: {
           email: cleanEmail,
           name: userName || cleanEmail.split('@')[0],
-          password: `google_auth_${Date.now()}_${Math.random().toString(36).slice(2)}`
+          emailVerified: true,
+          password: hashPassword(crypto.randomBytes(32).toString('hex'))
         }
       });
     }

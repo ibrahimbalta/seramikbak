@@ -59,11 +59,11 @@ async def upload_image(request: Request, file: UploadFile = File(...)):
                 "crops": crops
             }
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Error during upload/detection")
         return templates.TemplateResponse(
             "index.html",
-            {"request": request, "error": f"Processing error: {e}"}
+            {"request": request, "error": "Processing error occurred."}
         )
 
 
@@ -71,10 +71,11 @@ async def upload_image(request: Request, file: UploadFile = File(...)):
 @app.post("/select_tile", response_class=HTMLResponse)
 async def select_tile(request: Request, tile: str = Form(...)):
     try:
-        tile_name = tile
-        tile_path = os.path.join(CROP_DIR, tile_name)
+        tile_name = os.path.basename(tile)
+        crop_root = os.path.realpath(CROP_DIR)
+        tile_path = os.path.realpath(os.path.join(crop_root, tile_name))
 
-        if not os.path.exists(tile_path):
+        if not tile_path.startswith(crop_root + os.sep) or not os.path.exists(tile_path):
             return templates.TemplateResponse(
                 "index.html",
                 {"request": request, "error": "Crop file not found. Please upload again."}
@@ -92,11 +93,11 @@ async def select_tile(request: Request, tile: str = Form(...)):
                 "matches": results
             }
         )
-    except Exception as e:
+    except Exception:
         logger.exception("Error during tile selection")
         return templates.TemplateResponse(
             "index.html",
-            {"request": request, "error": f"Processing error: {e}"}
+            {"request": request, "error": "Processing error occurred."}
         )
 
 

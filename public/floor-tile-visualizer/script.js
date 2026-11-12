@@ -1868,11 +1868,14 @@ async function initFromParams() {
 }
 
 window.addEventListener("message", async (e) => {
-    if (!e.data) return;
+    if (!e.data || typeof e.data !== "object") return;
     if (e.data.type === "LOAD_PRODUCT") {
-        if (e.data.tile) await loadTileFromUrl(e.data.tile, e.data.product);
-        if (e.data.surface) {
-            const btn = document.querySelector('.surface-btn[data-surface="' + e.data.surface + '"]');
+        if (typeof e.data.tile === "string" && (e.data.tile.startsWith("/") || e.data.tile.startsWith("https://"))) {
+            await loadTileFromUrl(e.data.tile, e.data.product);
+        }
+        const allowedSurfaces = ["floor", "wall", "ceiling"];
+        if (typeof e.data.surface === "string" && allowedSurfaces.includes(e.data.surface)) {
+            const btn = document.querySelector(`.surface-btn[data-surface="${e.data.surface}"]`);
             if (btn) btn.click();
         }
     }
