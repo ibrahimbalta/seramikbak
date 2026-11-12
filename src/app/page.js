@@ -5173,8 +5173,9 @@ export default function Home() {
                           width: '230px',
                           borderRadius: 'var(--border-radius-md)',
                           overflow: 'hidden',
-                          background: '#f7f8fa',
-                          border: '1px solid rgba(15, 23, 42, 0.08)',
+                          background: '#f8f9fb',
+                          border: '1.5px solid #cfd7e3',
+                          boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
                           display: 'flex',
                           flexDirection: 'column',
                           padding: '12px',
@@ -10238,7 +10239,7 @@ export default function Home() {
            LUXURY LIGHT TWO-TONE TOP NAVBAR & DROPDOWNS
            ========================================================================== */
         :global(.luxury-dark-header) {
-          background: rgba(255, 255, 255, 0.97);
+          background: rgba(244, 246, 249, 0.94);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-bottom: 2px solid rgba(212, 175, 55, 0.45);
@@ -11373,11 +11374,11 @@ export default function Home() {
         :global(.clean-search-pill-box) {
           display: flex;
           align-items: center;
-          background: #f5f6f8;
+          background: #f8f9fb;
           border-radius: 9999px;
-          border: 1.5px solid rgba(197, 143, 39, 0.28);
+          border: 1.5px solid rgba(179, 142, 71, 0.45);
           padding: 6px 8px 6px 14px;
-          box-shadow: 0 16px 40px -6px rgba(15, 23, 42, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 14px 36px -6px rgba(15, 23, 42, 0.1), 0 2px 10px rgba(0, 0, 0, 0.04);
           gap: 10px;
           height: 64px;
           box-sizing: border-box;
