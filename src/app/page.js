@@ -11328,7 +11328,7 @@ export default function Home() {
           gap: 5px;
           font-size: 0.76rem;
           font-weight: 750;
-          color: #64748b;
+          color: #cbd5e1;
           white-space: nowrap;
           flex-shrink: 0;
         }
@@ -11340,23 +11340,23 @@ export default function Home() {
         }
 
         :global(.trend-chip-btn) {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: #131a26;
+          border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 999px;
           padding: 5px 12px;
           font-size: 0.75rem;
           font-weight: 600;
-          color: #334155;
+          color: #e2e8f0;
           cursor: pointer;
           white-space: nowrap;
           transition: all 0.2s ease;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         :global(.trend-chip-btn:hover) {
-          background: #f8fafc;
-          border-color: #c58f27;
-          color: #996515;
+          background: #1e293b;
+          border-color: #c5a059;
+          color: #f3d285;
           transform: translateY(-1px);
         }
 
@@ -11372,11 +11372,11 @@ export default function Home() {
         :global(.clean-search-pill-box) {
           display: flex;
           align-items: center;
-          background: #ffffff;
+          background: #131a26;
           border-radius: 9999px;
-          border: 1.5px solid rgba(197, 143, 39, 0.28);
+          border: 1.5px solid rgba(197, 160, 89, 0.38);
           padding: 6px 8px 6px 14px;
-          box-shadow: 0 16px 40px -6px rgba(15, 23, 42, 0.08), 0 2px 10px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.45), 0 2px 10px rgba(0, 0, 0, 0.25);
           gap: 10px;
           height: 64px;
           box-sizing: border-box;
@@ -11414,7 +11414,7 @@ export default function Home() {
           outline: none;
           font-size: 0.98rem;
           font-weight: 500;
-          color: #0f172a;
+          color: #f8fafc;
           background: transparent;
           padding: 6px 8px;
           font-family: inherit;
@@ -11480,7 +11480,7 @@ export default function Home() {
         :global(.clean-search-v-divider) {
           width: 1px;
           height: 32px;
-          background: #e2e8f0;
+          background: rgba(255, 255, 255, 0.12);
           margin: 0 4px;
           flex-shrink: 0;
         }
@@ -11491,9 +11491,9 @@ export default function Home() {
           gap: 7px;
           padding: 9px 18px;
           border-radius: 9999px;
-          background: #f8fafc;
-          border: 1.5px solid #e2e8f0;
-          color: #1e293b;
+          background: #1a2233;
+          border: 1.5px solid rgba(255, 255, 255, 0.14);
+          color: #f1f5f9;
           font-weight: 700;
           font-size: 0.85rem;
           cursor: pointer;
@@ -11504,11 +11504,11 @@ export default function Home() {
         }
 
         :global(.modern-camera-pill-btn:hover) {
-          background: #f1f5f9;
-          border-color: #cbd5e1;
-          color: #0f172a;
+          background: #232d42;
+          border-color: #c5a059;
+          color: #f3d285;
           transform: translateY(-1px);
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
         }
 
         :global(.modern-camera-icon) {
@@ -11562,8 +11562,8 @@ export default function Home() {
         }
 
         :global(.clean-nav-card-item) {
-          background: #ffffff;
-          border: 1px solid #eef2f6;
+          background: #131a26;
+          border: 1px solid rgba(255, 255, 255, 0.09);
           border-radius: 18px;
           padding: 16px 8px;
           display: flex;
@@ -11573,19 +11573,19 @@ export default function Home() {
           text-align: center;
           gap: 8px;
           cursor: pointer;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
           transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
           user-select: none;
         }
 
         :global(.clean-nav-card-item:hover) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
-          border-color: #cbd5e1;
+          box-shadow: 0 8px 20px rgba(197, 160, 89, 0.15);
+          border-color: rgba(197, 160, 89, 0.45);
         }
 
         :global(.clean-nav-card-icon) {
-          color: #111e38;
+          color: #d4af37;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -11594,7 +11594,7 @@ export default function Home() {
         :global(.clean-nav-card-title) {
           font-size: 0.85rem;
           font-weight: 700;
-          color: #111e38;
+          color: #f1f5f9;
           line-height: 1.25;
         }
 

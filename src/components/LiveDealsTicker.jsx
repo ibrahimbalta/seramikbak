@@ -136,15 +136,15 @@ export default function LiveDealsTicker() {
         .live-ticker-bar {
           width: 100%;
           max-width: 100%;
-          background: #ffffff;
-          border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid #e2e8f0;
+          background: #131a26;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
           padding: 8px 24px;
           display: flex;
           align-items: center;
           gap: 16px;
           position: relative;
-          box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -236,25 +236,25 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: #f8fafc !important;
+          background: #1a2233 !important;
           backdrop-filter: blur(8px) !important;
           padding: 6px 14px !important;
           border-radius: 12px !important;
-          border: 1px solid #e2e8f0 !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
           font-size: 0.80rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
-          color: #1e293b !important;
-          box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+          color: #e2e8f0 !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
           flex-shrink: 0 !important;
         }
 
         :global(a.ticker-event-card:hover) {
-          background: #ffffff !important;
-          border-color: #b38e47 !important;
+          background: #232d42 !important;
+          border-color: #c5a059 !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.15) !important;
+          box-shadow: 0 4px 14px rgba(197, 160, 89, 0.2) !important;
         }
 
         .event-badge-tag {
