@@ -5113,7 +5113,7 @@ export default function Home() {
                 gap: '16px', 
                 marginBottom: '32px',
                 padding: '24px',
-                background: '#ffffff'
+                background: '#eef0f4'
               }}>
                 <div className="weekly-products-header" style={{ 
                   display: 'flex', 
@@ -5173,7 +5173,8 @@ export default function Home() {
                           width: '230px',
                           borderRadius: 'var(--border-radius-md)',
                           overflow: 'hidden',
-                          background: '#ffffff',
+                          background: '#f7f8fa',
+                          border: '1px solid rgba(15, 23, 42, 0.08)',
                           display: 'flex',
                           flexDirection: 'column',
                           padding: '12px',
@@ -11340,7 +11341,7 @@ export default function Home() {
         }
 
         :global(.trend-chip-btn) {
-          background: #ffffff;
+          background: #f5f6f8;
           border: 1px solid #e2e8f0;
           border-radius: 999px;
           padding: 5px 12px;
@@ -11372,7 +11373,7 @@ export default function Home() {
         :global(.clean-search-pill-box) {
           display: flex;
           align-items: center;
-          background: #ffffff;
+          background: #f5f6f8;
           border-radius: 9999px;
           border: 1.5px solid rgba(197, 143, 39, 0.28);
           padding: 6px 8px 6px 14px;
@@ -11562,7 +11563,7 @@ export default function Home() {
         }
 
         :global(.clean-nav-card-item) {
-          background: #ffffff;
+          background: #f5f6f8;
           border: 1px solid #eef2f6;
           border-radius: 18px;
           padding: 16px 8px;

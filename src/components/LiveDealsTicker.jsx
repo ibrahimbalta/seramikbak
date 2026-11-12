@@ -136,7 +136,7 @@ export default function LiveDealsTicker() {
         .live-ticker-bar {
           width: 100%;
           max-width: 100%;
-          background: #ffffff;
+          background: #eef0f4;
           border-top: 1px solid #e2e8f0;
           border-bottom: 1px solid #e2e8f0;
           padding: 8px 24px;
@@ -236,7 +236,7 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: #f8fafc !important;
+          background: #f5f6f8 !important;
           backdrop-filter: blur(8px) !important;
           padding: 6px 14px !important;
           border-radius: 12px !important;

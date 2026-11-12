@@ -4,10 +4,10 @@
 
 :root {
   /* Color Palette (Warm Stone Light Mode - Soft & Low-Glare) */
-  --bg-dark: #f2efea;
-  --bg-card: rgba(255, 253, 249, 0.92);
-  --bg-card-solid: #fcfbf8;
-  --bg-input: #ebe7e0;
+  --bg-dark: #e6e8ec;
+  --bg-card: rgba(242, 243, 246, 0.92);
+  --bg-card-solid: #f2f3f6;
+  --bg-input: #e0e3e8;
   --border-color: rgba(15, 23, 42, 0.09);
   --border-hover: rgba(15, 23, 42, 0.18);
   --border-gold: rgba(197, 160, 89, 0.4);
@@ -87,7 +87,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glassmorphism Class Utilities (Light theme) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(241, 243, 246, 0.92);
   backdrop-filter: blur(16px) saturate(120%);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -102,7 +102,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-panel-gold {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(241, 243, 246, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(179, 142, 71, 0.25);
@@ -201,7 +201,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .brand-marquee-section {
-  background: #ffffff;
+  background: #eef0f4;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   padding: 20px 0;
