@@ -11342,24 +11342,25 @@ export default function Home() {
         }
 
         :global(.trend-chip-btn) {
-          background: #f5f6f8;
-          border: 1px solid #e2e8f0;
+          background: #eef1f6;
+          border: 1px solid #cbd5e1;
           border-radius: 999px;
-          padding: 5px 12px;
+          padding: 5px 13px;
           font-size: 0.75rem;
           font-weight: 600;
-          color: #334155;
+          color: #1e293b;
           cursor: pointer;
           white-space: nowrap;
           transition: all 0.2s ease;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
         }
 
         :global(.trend-chip-btn:hover) {
-          background: #f8fafc;
-          border-color: #c58f27;
-          color: #996515;
+          background: #0f172a;
+          border-color: #d4af37;
+          color: #fde68a;
           transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
         }
 
         /* ==========================================================================
@@ -11378,7 +11379,7 @@ export default function Home() {
           border-radius: 9999px;
           border: 1.5px solid rgba(179, 142, 71, 0.45);
           padding: 6px 8px 6px 14px;
-          box-shadow: 0 14px 36px -6px rgba(15, 23, 42, 0.1), 0 2px 10px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 18px 44px -8px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.65) inset;
           gap: 10px;
           height: 64px;
           box-sizing: border-box;
@@ -11493,9 +11494,9 @@ export default function Home() {
           gap: 7px;
           padding: 9px 18px;
           border-radius: 9999px;
-          background: #f8fafc;
-          border: 1.5px solid #e2e8f0;
-          color: #1e293b;
+          background: #eef1f6;
+          border: 1.5px solid #cbd5e1;
+          color: #0f172a;
           font-weight: 700;
           font-size: 0.85rem;
           cursor: pointer;
@@ -11506,11 +11507,11 @@ export default function Home() {
         }
 
         :global(.modern-camera-pill-btn:hover) {
-          background: #f1f5f9;
-          border-color: #cbd5e1;
+          background: #fdfaf3;
+          border-color: #b38e47;
           color: #0f172a;
           transform: translateY(-1px);
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.16);
         }
 
         :global(.modern-camera-icon) {
@@ -11531,23 +11532,26 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 7px;
-          padding: 11px 24px;
+          padding: 11px 26px;
           border-radius: 9999px;
-          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%);
-          color: #ffffff;
-          border: none;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #2a374f 100%);
+          color: #fde68a;
+          border: 1.5px solid #d4af37;
           font-weight: 700;
           font-size: 0.92rem;
           cursor: pointer;
-          box-shadow: 0 4px 16px rgba(197, 143, 39, 0.35);
-          transition: all 0.2s ease;
+          box-shadow: 0 6px 20px rgba(15, 23, 42, 0.24);
+          transition: all 0.22s ease;
           white-space: nowrap;
           flex-shrink: 0;
         }
 
         :global(.modern-search-submit-btn:hover) {
           transform: translateY(-1px);
-          box-shadow: 0 6px 22px rgba(197, 143, 39, 0.45);
+          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%);
+          border-color: #fde68a;
+          color: #ffffff;
+          box-shadow: 0 8px 24px rgba(197, 143, 39, 0.42);
         }
 
         :global(.modern-search-submit-btn:active) {
@@ -11564,7 +11568,9 @@ export default function Home() {
         }
 
         :global(.clean-nav-card-item) {
-          background: #f2f4f8;
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(180deg, #f4f6fa 0%, #eceff5 100%);
           border: 1.5px solid #cbd5e1;
           border-radius: 18px;
           padding: 16px 10px;
