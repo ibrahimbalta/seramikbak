@@ -10946,8 +10946,8 @@ export default function Home() {
           background-size: cover;
           background-position: center right;
           background-repeat: no-repeat;
-          padding: 42px 48px;
-          min-height: 400px;
+          padding: 58px 52px;
+          min-height: 480px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -11570,8 +11570,8 @@ export default function Home() {
         /* MOBILE ADAPTATION (< 768px) */
         @media (max-width: 768px) {
           :global(.clean-hero-card) {
-            padding: 22px 18px;
-            min-height: 220px;
+            padding: 28px 18px;
+            min-height: 260px;
             border-radius: 20px;
             margin-bottom: 12px;
           }
