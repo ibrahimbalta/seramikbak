@@ -4274,56 +4274,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 3. WHITE TRUST ISLAND + AI MEKANINI YENILE MINI BANNER (MATCHING IMAGE 1) */}
-        <div className="showcase-trust-ai-island">
-          <div className="showcase-trust-items-pill">
-            <div className="trust-island-item">
-              <Sparkles size={15} className="trust-icon-gold" style={{ color: '#d4af37', flexShrink: 0 }} />
-              <span><strong>17 Lider Marka</strong> <span className="trust-desk-text">Tek Çatı Altında</span></span>
-            </div>
-            <div className="trust-island-divider" />
-            <div className="trust-island-item">
-              <Store size={15} className="trust-icon-amber" style={{ color: '#d97706', flexShrink: 0 }} />
-              <span><strong>81 İlde</strong> <span className="trust-desk-text">Yetkili</span> Bayi Ağı</span>
-            </div>
-            <div className="trust-island-divider" />
-            <div className="trust-island-item">
-              <ShieldCheck size={15} className="trust-icon-green" style={{ color: '#10b981', flexShrink: 0 }} />
-              <span><strong>%100 Ücretsiz</strong> <span className="trust-desk-text">Fiyat</span> Teklifi</span>
-            </div>
-            <div className="trust-island-divider" />
-            <div className="trust-island-item">
-              <Box size={15} className="trust-icon-blue" style={{ color: '#3b82f6', flexShrink: 0 }} />
-              <span><strong>3D Stüdyo</strong> &amp; AR</span>
-            </div>
-          </div>
-
-          {/* Mekânını Yenile AI Mini Banner - Ultra Sleek Symmetric Luxury Pill */}
-          <div 
-            className="showcase-ai-mini-banner"
-            onClick={() => {
-              setActiveTab('studio');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            role="button"
-            tabIndex={0}
-            title="3D Sanal Mekân & AI Görselleştirici"
-          >
-            <div className="ai-mini-thumb">
-              <img src="/hero/modern_living.png" alt="Mekânını Yenile" />
-              <div className="ai-mini-thumb-sparkle" aria-hidden="true">
-                <Sparkles size={9} />
-              </div>
-            </div>
-            <div className="ai-mini-cta-text">
-              <span className="ai-mini-title">Mekânını Yenile</span>
-              <span className="ai-mini-sub">AI ile Seramiği Deneyimle</span>
-            </div>
-            <div className="ai-mini-cta-arrow">
-              <ArrowRight size={14} strokeWidth={2.4} />
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* 4. CANLI FIRSAT RADARI (Vitrin Alanının Hemen Altı) */}
