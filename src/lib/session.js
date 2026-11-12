@@ -1,15 +1,15 @@
 import crypto from 'crypto';
 
-if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
-  throw new Error('CRITICAL SECURITY: SESSION_SECRET ortam değişkeni üretim ortamında tanımlanmalıdır.');
-}
-
-const SECRET = process.env.SESSION_SECRET || 'seramikbak_dev_session_key_do_not_use_in_prod';
 const GCM_ALGORITHM = 'aes-256-gcm';
 const CBC_ALGORITHM = 'aes-256-cbc';
 
-// Generate 32-byte key deterministically from secret using SHA-256
-const KEY = crypto.createHash('sha256').update(SECRET).digest();
+function getSessionKey() {
+  if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+    throw new Error('CRITICAL SECURITY: SESSION_SECRET ortam değişkeni üretim ortamında tanımlanmalıdır.');
+  }
+  const secret = process.env.SESSION_SECRET || 'seramikbak_dev_session_key_do_not_use_in_prod';
+  return crypto.createHash('sha256').update(secret).digest();
+}
 
 /**
  * Encrypts a JSON payload into a secure hex token using AES-256-GCM (AEAD).
@@ -24,7 +24,7 @@ export function encryptSession(data, durationMs = 7 * 24 * 60 * 60 * 1000) { // 
     expiresAt: Date.now() + durationMs,
   };
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(GCM_ALGORITHM, KEY, iv);
+  const cipher = crypto.createCipheriv(GCM_ALGORITHM, getSessionKey(), iv);
   let encrypted = cipher.update(JSON.stringify(payload), 'utf8', 'hex');
   encrypted += cipher.final('hex');
   const tag = cipher.getAuthTag();
@@ -51,7 +51,7 @@ export function decryptSession(token) {
       const iv = Buffer.from(ivHex, 'hex');
       const tag = Buffer.from(tagHex, 'hex');
       if (iv.length !== 16 || tag.length !== 16) return null;
-      const decipher = crypto.createDecipheriv(GCM_ALGORITHM, KEY, iv, { authTagLength: 16 });
+      const decipher = crypto.createDecipheriv(GCM_ALGORITHM, getSessionKey(), iv, { authTagLength: 16 });
       decipher.setAuthTag(tag);
       let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
@@ -61,7 +61,7 @@ export function decryptSession(token) {
       const [ivHex, encryptedHex] = parts;
       if (!ivHex || !encryptedHex) return null;
       const iv = Buffer.from(ivHex, 'hex');
-      const decipher = crypto.createDecipheriv(CBC_ALGORITHM, KEY, iv);
+      const decipher = crypto.createDecipheriv(CBC_ALGORITHM, getSessionKey(), iv);
       let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       payload = JSON.parse(decrypted);
