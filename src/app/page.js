@@ -5353,12 +5353,12 @@ export default function Home() {
                   boxSizing: 'border-box',
                   overflow: 'hidden'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', boxSizing: 'border-box' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
                       <MapPin size={14} style={{ color: '#b38e47', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap' }}>Teslimat Şehri</span>
+                      <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap' }}>Teslimat Şehri</span>
                     </div>
-                    <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{userLocationName || 'İstanbul'}</span>
+                    <span style={{ fontSize: '0.65rem', color: '#926f2b', fontWeight: '700', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', minWidth: 0, textAlign: 'right' }}>{userLocationName || 'İstanbul'}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '6px', width: '100%', boxSizing: 'border-box', alignItems: 'stretch' }}>
                     <select
@@ -5428,10 +5428,10 @@ export default function Home() {
                   borderRadius: '12px', 
                   background: selectedIsPremium === 'true' 
                     ? 'linear-gradient(135deg, rgba(179,142,71,0.15) 0%, rgba(140,107,48,0.06) 100%)' 
-                    : 'linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.005) 100%)', 
+                    : '#e2e6ed', 
                   border: selectedIsPremium === 'true' 
                     ? '1px solid rgba(179,142,71,0.35)' 
-                    : '1px solid rgba(0,0,0,0.05)', 
+                    : '1px solid #cbd5e1', 
                   marginBottom: '8px', 
                   transition: 'all 0.3s ease',
                   boxShadow: selectedIsPremium === 'true' ? '0 4px 12px rgba(179,142,71,0.08)' : 'none'
@@ -9213,12 +9213,12 @@ export default function Home() {
             boxSizing: 'border-box',
             overflow: 'hidden'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
                 <MapPin size={14} style={{ color: '#b38e47', flexShrink: 0 }} />
-                <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap' }}>Teslimat Şehri</span>
+                <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap' }}>Teslimat Şehri</span>
               </div>
-              <span style={{ fontSize: '0.65rem', color: '#b38e47', fontWeight: '700', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{userLocationName || 'İstanbul'}</span>
+              <span style={{ fontSize: '0.65rem', color: '#926f2b', fontWeight: '700', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', minWidth: 0, textAlign: 'right' }}>{userLocationName || 'İstanbul'}</span>
             </div>
             <div style={{ display: 'flex', gap: '6px', width: '100%', boxSizing: 'border-box', alignItems: 'stretch' }}>
               <select
@@ -10837,14 +10837,14 @@ export default function Home() {
 
         :global(.showcase-trust-items-pill) {
           flex: 1;
-          background: #ffffff;
-          border: 1px solid #eef2f6;
+          background: linear-gradient(135deg, #162033 0%, #1e293b 100%);
+          border: 1px solid rgba(212, 175, 55, 0.28);
           border-radius: 9999px;
           padding: 11px 24px;
           display: flex;
           align-items: center;
           justify-content: space-around;
-          box-shadow: 0 3px 16px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 6px 20px rgba(15, 23, 42, 0.14);
         }
 
         :global(.trust-island-item) {
@@ -10852,19 +10852,19 @@ export default function Home() {
           align-items: center;
           gap: 8px;
           font-size: 0.84rem;
-          color: #334155;
+          color: #cbd5e1;
           white-space: nowrap;
         }
 
         :global(.trust-island-item strong) {
-          color: #0f172a;
+          color: #f8fafc;
           font-weight: 800;
         }
 
         :global(.trust-island-divider) {
           width: 1px;
           height: 24px;
-          background: #e2e8f0;
+          background: rgba(255, 255, 255, 0.14);
         }
 
         :global(.showcase-ai-mini-banner) {
@@ -11563,33 +11563,44 @@ export default function Home() {
         }
 
         :global(.clean-nav-card-item) {
-          background: #f5f6f8;
-          border: 1px solid #eef2f6;
+          background: #f2f4f8;
+          border: 1.5px solid #cbd5e1;
           border-radius: 18px;
-          padding: 16px 8px;
+          padding: 16px 10px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
-          gap: 8px;
+          gap: 10px;
           cursor: pointer;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-          transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+          transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
           user-select: none;
         }
 
         :global(.clean-nav-card-item:hover) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
-          border-color: #cbd5e1;
+          transform: translateY(-3px);
+          background: #f8fafc;
+          box-shadow: 0 8px 22px rgba(179, 142, 71, 0.15);
+          border-color: #b38e47;
         }
 
         :global(.clean-nav-card-icon) {
-          color: #111e38;
+          width: 46px;
+          height: 46px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #182235 0%, #0f172a 100%);
+          color: #e5c158;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: transform 0.18s ease;
+        }
+
+        :global(.clean-nav-card-item:hover .clean-nav-card-icon) {
+          transform: scale(1.06);
         }
 
         :global(.clean-nav-card-title) {
@@ -13975,19 +13986,19 @@ export default function Home() {
           width: 50px;
           height: 50px;
           border-radius: 50%;
-          border: 1px solid var(--border-color);
+          border: 2px solid #cbd5e1;
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #ffffff;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+          background-color: #f4f6f9;
+          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
           transition: all 0.3s ease;
         }
 
         .category-circle-btn span {
           font-size: 0.75rem;
-          color: var(--text-secondary);
-          font-weight: 500;
+          color: #334155;
+          font-weight: 600;
           font-family: var(--font-body);
         }
 
@@ -14217,9 +14228,9 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.05);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+          background: #eceff4;
+          border: 1px solid #cbd5e1;
+          box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
           border-radius: var(--border-radius-lg);
           transition: all 0.3s ease;
         }
@@ -21257,13 +21268,13 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           padding: 8px 10px;
-          background: #ffffff;
-          border: 1px solid rgba(15, 23, 42, 0.09);
+          background: #f8f9fb;
+          border: 1px solid #cbd5e1;
           border-radius: 8px; /* Sleek modern rounded rectangle */
           font-size: 0.76rem;
           font-family: var(--font-body);
           font-weight: 600;
-          color: #334155;
+          color: #1e293b;
           cursor: pointer;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           text-align: center;
