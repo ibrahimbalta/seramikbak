@@ -3947,19 +3947,17 @@ Yetkili Satış & Showroom Departmanı`;
                             key={prod.id} 
                             className={`showroom-qr-card tag-theme-${qrTagStyle} ${isSelected ? 'is-selected-for-print' : 'not-selected-for-print'}`}
                             style={{
-                              background: qrTagStyle === 'luxury-gold' 
-                                ? 'linear-gradient(135deg, #111827 0%, #090d16 100%)' 
-                                : qrTagStyle === 'minimal-dark' 
+                              background: qrTagStyle === 'minimal-dark' 
                                 ? '#0b0f19' 
                                 : '#ffffff',
-                              color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
+                              color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
                               border: isSelected
                                 ? '2.5px solid #d4af37'
                                 : (qrTagStyle === 'luxury-gold' 
-                                    ? '2px solid rgba(212, 175, 55, 0.5)' 
+                                    ? '2px solid #d4af37' 
                                     : qrTagStyle === 'minimal-dark' 
                                     ? '2px solid rgba(255, 255, 255, 0.15)' 
-                                    : '2px solid #e2e8f0'),
+                                    : '2px solid #cbd5e1'),
                               borderRadius: '16px',
                               padding: '20px',
                               display: 'flex',
@@ -4043,9 +4041,9 @@ Yetkili Satış & Showroom Departmanı`;
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                               <div>
                                 <div className="print-brand-badge" style={{
-                                  fontSize: '0.65rem',
+                                  fontSize: '0.68rem',
                                   fontWeight: '900',
-                                  color: '#d4af37',
+                                  color: '#b38e47',
                                   letterSpacing: '0.08em',
                                   textTransform: 'uppercase',
                                   display: 'flex',
@@ -4053,14 +4051,14 @@ Yetkili Satış & Showroom Departmanı`;
                                   gap: '4px'
                                 }}>
                                   <span>✦</span>
-                                  <span>SERAMİKBAK 3D SHOWROOM</span>
+                                  <span>{(dealerInfo?.name || dealerName || 'SHOWROOM').toUpperCase()} • 3D SHOWROOM</span>
                                 </div>
                                 <h3 className="print-prod-title" style={{
                                   margin: '4px 0 2px 0',
-                                  fontSize: '1.05rem',
+                                  fontSize: '1.15rem',
                                   fontWeight: '900',
-                                  color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
-                                  lineHeight: '1.2'
+                                  color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                  lineHeight: '1.25'
                                 }}>
                                   {prod.name}
                                 </h3>
@@ -4116,14 +4114,14 @@ Yetkili Satış & Showroom Departmanı`;
                                 <div className="print-qr-title" style={{
                                   fontSize: '0.85rem',
                                   fontWeight: '900',
-                                  color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
+                                  color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
                                   lineHeight: '1.25'
                                 }}>
                                   📱 Kameranla Tara, Banyonda Canlı Gör!
                                 </div>
                                 <div className="print-qr-desc" style={{
                                   fontSize: '0.72rem',
-                                  color: qrTagStyle === 'clean-white' ? '#64748b' : '#94a3b8',
+                                  color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#475569',
                                   lineHeight: '1.3'
                                 }}>
                                   Telefonunuzun kamerasıyla QR kodu okutarak bu seramiğin 3D sanal odadaki döşenmiş halini inceleyin.
@@ -4155,7 +4153,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 <span className="print-dealer-sub" style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                                   SHOWROOM TEŞHİR NOKTASI
                                 </span>
-                                <span className="print-dealer-title" style={{ fontSize: '0.82rem', fontWeight: '800', color: qrTagStyle === 'clean-white' ? '#0f172a' : '#d4af37' }}>
+                                <span className="print-dealer-title" style={{ fontSize: '0.82rem', fontWeight: '800', color: qrTagStyle === 'minimal-dark' ? '#d4af37' : '#0f172a' }}>
                                   {dealerName}
                                 </span>
                                 <span className="print-dealer-contact" style={{ fontSize: '0.68rem', color: '#64748b' }}>
@@ -8533,11 +8531,12 @@ Yetkili Satış & Showroom Departmanı`;
 
         /* Showroom QR card custom theme font colors */
         .showroom-qr-card.tag-theme-luxury-gold h3,
+        .showroom-qr-card.tag-theme-clean-white h3,
+        .showroom-qr-card .print-prod-title {
+          color: #0f172a !important;
+        }
         .showroom-qr-card.tag-theme-minimal-dark h3 {
           color: #ffffff !important;
-        }
-        .showroom-qr-card.tag-theme-clean-white h3 {
-          color: #0f172a !important;
         }
 
         .dealer-main-content label {
@@ -9263,12 +9262,18 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-prod-title,
-          .showroom-qr-card h3 {
+          .showroom-qr-card h3,
+          .showroom-qr-card.tag-theme-luxury-gold h3,
+          .showroom-qr-card.tag-theme-clean-white h3,
+          .showroom-qr-card.tag-theme-minimal-dark h3 {
             color: #0f172a !important;
             font-size: 1.15rem !important;
             font-weight: 900 !important;
             margin: 4px 0 2px 0 !important;
             line-height: 1.2 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
           }
 
           .print-prod-sub {
