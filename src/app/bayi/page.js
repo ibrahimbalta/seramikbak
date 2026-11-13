@@ -2994,9 +2994,9 @@ Yetkili Satış & Showroom Departmanı`;
                   <button
                     onClick={() => setActivePortalTab('dashboard')}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#cbd5e1',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      background: '#f1f5f9',
+                      color: '#334155',
+                      border: '1.5px solid #cbd5e1',
                       borderRadius: '10px',
                       padding: '12px 20px',
                       fontSize: '0.85rem',
@@ -3605,11 +3605,11 @@ Yetkili Satış & Showroom Departmanı`;
               {/* Header & Control Bar */}
               <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
-                    <QrCode size={24} style={{ color: '#d4af37' }} />
+                  <h2 style={{ fontSize: '1.3rem', fontWeight: '900', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
+                    <QrCode size={24} style={{ color: '#b38e47' }} />
                     Showroom Akıllı QR Etiket Üretici
                   </h2>
-                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+                  <p style={{ fontSize: '0.84rem', color: '#475569', margin: 0, fontWeight: '500' }}>
                     Mağazanızdaki seramik stantları ve kayar panolar için müşterilerinizi anında 3D Sanal Stüdyoya bağlayan lüks QR etiketler oluşturun ve yazdırın.
                   </p>
                 </div>
@@ -3648,34 +3648,37 @@ Yetkili Satış & Showroom Departmanı`;
 
               {/* Instructions Banner */}
               <div className="no-print" style={{
-                background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(15,23,42,0.6) 100%)',
-                border: '1px solid rgba(212, 175, 55, 0.35)',
-                borderRadius: '14px',
+                background: '#ffffff',
+                border: '1.5px solid #d4af37',
+                borderRadius: '16px',
                 padding: '16px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '16px',
-                flexWrap: isMobile ? 'wrap' : 'nowrap'
+                flexWrap: isMobile ? 'wrap' : 'nowrap',
+                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
               }}>
                 <div style={{
                   width: '42px',
                   height: '42px',
-                  borderRadius: '10px',
-                  background: 'rgba(212,175,55,0.2)',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                  border: '1px solid #d4af37',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#d4af37',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)'
                 }}>
-                  <Sparkles size={22} />
+                  <Sparkles size={20} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#fff', marginBottom: '2px' }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', marginBottom: '3px' }}>
                     Mağazanızdaki Müşterilere 3D Deneyim Yaşatın
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
-                    1. Teşhirinizdeki modelleri aşağıdan seçin. &bull; 2. İsterseniz mağaza liste fiyatınızı girin. &bull; 3. <strong>"Yazdır"</strong> butonuna basıp A4 etiket çıktısı alın ve panolara yapıştırın. Müşteri telefon kamerasını tuttuğu an odayı 3D görür!
+                  <div style={{ fontSize: '0.8rem', color: '#475569', lineHeight: '1.5' }}>
+                    1. Teşhirinizdeki modelleri aşağıdan seçin. &bull; 2. İsterseniz mağaza liste fiyatınızı girin. &bull; 3. <strong style={{ color: '#0f172a' }}>"Yazdır"</strong> butonuna basıp A4 etiket çıktısı alın ve panolara yapıştırın. Müşteri telefon kamerasını tuttuğu an odayı 3D görür!
                   </div>
                 </div>
               </div>
@@ -3695,7 +3698,7 @@ Yetkili Satış & Showroom Departmanı`;
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8' }}>Tema:</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Tema:</span>
                     <div style={{ display: 'flex', gap: '4px' }}>
                       {[
                         { id: 'luxury-gold', label: '🏆 Lüks Altın' },
@@ -3706,14 +3709,15 @@ Yetkili Satış & Showroom Departmanı`;
                           key={t.id}
                           onClick={() => setQrTagStyle(t.id)}
                           style={{
-                            background: qrTagStyle === t.id ? '#d4af37' : 'rgba(255,255,255,0.05)',
-                            color: qrTagStyle === t.id ? '#090d16' : '#cbd5e1',
-                            border: 'none',
-                            padding: '5px 10px',
-                            borderRadius: '6px',
-                            fontSize: '0.72rem',
-                            fontWeight: '700',
-                            cursor: 'pointer'
+                            background: qrTagStyle === t.id ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : '#f1f5f9',
+                            color: qrTagStyle === t.id ? '#fde68a' : '#475569',
+                            border: qrTagStyle === t.id ? '1.5px solid #d4af37' : '1px solid #cbd5e1',
+                            padding: '6px 12px',
+                            borderRadius: '8px',
+                            fontSize: '0.74rem',
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           {t.label}
@@ -3723,7 +3727,7 @@ Yetkili Satış & Showroom Departmanı`;
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8' }}>Düzen:</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Düzen:</span>
                     <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                       {[
                         { id: 'grid-4', label: "A4 4'lü Stand (2x2)" },
@@ -3735,14 +3739,15 @@ Yetkili Satış & Showroom Departmanı`;
                           key={l.id}
                           onClick={() => setQrTagLayout(l.id)}
                           style={{
-                            background: qrTagLayout === l.id ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.05)',
-                            color: qrTagLayout === l.id ? '#d4af37' : '#cbd5e1',
-                            border: qrTagLayout === l.id ? '1px solid rgba(212,175,55,0.5)' : '1px solid transparent',
-                            padding: '5px 10px',
-                            borderRadius: '6px',
+                            background: qrTagLayout === l.id ? '#fef3c7' : '#f1f5f9',
+                            color: qrTagLayout === l.id ? '#854d0e' : '#475569',
+                            border: qrTagLayout === l.id ? '1.5px solid #d4af37' : '1px solid #cbd5e1',
+                            padding: '6px 10px',
+                            borderRadius: '8px',
                             fontSize: '0.72rem',
-                            fontWeight: '700',
-                            cursor: 'pointer'
+                            fontWeight: '800',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
                           }}
                         >
                           {l.label}
@@ -3751,7 +3756,7 @@ Yetkili Satış & Showroom Departmanı`;
                     </div>
                   </div>
 
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#cbd5e1', cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#0f172a', fontWeight: '700', cursor: 'pointer' }}>
                     <input 
                       type="checkbox" 
                       checked={qrIncludePrice} 
@@ -3763,16 +3768,16 @@ Yetkili Satış & Showroom Departmanı`;
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   {/* Selection Filter Tabs */}
-                  <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '3px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', gap: '4px', background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '3px', borderRadius: '8px' }}>
                     <button
                       onClick={() => setQrFilterMode('all')}
                       style={{
                         background: qrFilterMode === 'all' ? '#d4af37' : 'transparent',
-                        color: qrFilterMode === 'all' ? '#090d16' : '#cbd5e1',
+                        color: qrFilterMode === 'all' ? '#090d16' : '#475569',
                         border: 'none',
-                        padding: '5px 10px',
+                        padding: '5px 12px',
                         borderRadius: '6px',
-                        fontSize: '0.72rem',
+                        fontSize: '0.74rem',
                         fontWeight: '800',
                         cursor: 'pointer'
                       }}
@@ -3783,11 +3788,11 @@ Yetkili Satış & Showroom Departmanı`;
                       onClick={() => setQrFilterMode('selected')}
                       style={{
                         background: qrFilterMode === 'selected' ? '#d4af37' : 'transparent',
-                        color: qrFilterMode === 'selected' ? '#090d16' : '#cbd5e1',
+                        color: qrFilterMode === 'selected' ? '#090d16' : '#475569',
                         border: 'none',
-                        padding: '5px 10px',
+                        padding: '5px 12px',
                         borderRadius: '6px',
-                        fontSize: '0.72rem',
+                        fontSize: '0.74rem',
                         fontWeight: '800',
                         cursor: 'pointer'
                       }}
@@ -3802,12 +3807,13 @@ Yetkili Satış & Showroom Departmanı`;
                     value={qrSearchQuery}
                     onChange={e => setQrSearchQuery(e.target.value)}
                     style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      background: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
                       padding: '8px 12px',
                       borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '0.78rem',
+                      color: '#0f172a',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
                       outline: 'none',
                       width: '180px'
                     }}
@@ -3823,13 +3829,13 @@ Yetkili Satış & Showroom Departmanı`;
                       }
                     }}
                     style={{
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      color: '#cbd5e1',
+                      background: '#f1f5f9',
+                      border: '1.5px solid #cbd5e1',
+                      color: '#0f172a',
                       padding: '8px 12px',
                       borderRadius: '8px',
                       fontSize: '0.75rem',
-                      fontWeight: '700',
+                      fontWeight: '800',
                       cursor: 'pointer'
                     }}
                   >
@@ -3859,7 +3865,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <div className={`printable-showroom-qr-area print-layout-${qrTagLayout} ${qrSelectedProductIds.length > 0 ? 'has-selection' : 'print-all'}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#94a3b8' }}>
+                        <span style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a' }}>
                           {qrFilterMode === 'selected' 
                             ? `Baskı İçin Seçilen Modeller (${displayList.length} Model)`
                             : `Showroom Seramik Modelleri (${displayList.length} Model Listeleniyor)`}
@@ -3901,8 +3907,8 @@ Yetkili Satış & Showroom Departmanı`;
 
                     {displayList.length === 0 ? (
                       <div className="no-print" style={{
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1.5px dashed rgba(212,175,55,0.3)',
+                        background: '#ffffff',
+                        border: '1.5px dashed #d4af37',
                         borderRadius: '16px',
                         padding: '48px 24px',
                         textAlign: 'center',
@@ -3911,25 +3917,26 @@ Yetkili Satış & Showroom Departmanı`;
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '14px',
-                        margin: '10px 0'
+                        margin: '10px 0',
+                        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
                       }}>
                         <div style={{
                           width: '56px',
                           height: '56px',
                           borderRadius: '50%',
-                          background: 'rgba(212,175,55,0.12)',
+                          background: 'rgba(212,175,55,0.15)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#d4af37'
+                          color: '#b38e47'
                         }}>
                           <QrCode size={28} />
                         </div>
                         <div>
-                          <h4 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '800', color: '#f8fafc' }}>
+                          <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#0f172a' }}>
                             {qrFilterMode === 'selected' ? 'Baskı İçin Henüz Ürün Seçilmedi' : (brandProductsLoading ? 'Modeller Yükleniyor...' : 'Model Bulunamadı')}
                           </h4>
-                          <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8', maxWidth: '440px', lineHeight: 1.5 }}>
+                          <p style={{ margin: 0, fontSize: '0.84rem', color: '#475569', maxWidth: '440px', lineHeight: 1.5, fontWeight: '500' }}>
                             {qrFilterMode === 'selected'
                               ? 'Showroomunuz için seramik etiketlerini seçmek için yukarıdaki "Tüm Modeller" butonuna tıklayabilir veya aşağıdaki butondan tüm modelleri listeleyebilirsiniz.'
                               : (brandProductsLoading ? 'Bayisi olduğunuz markanın ürünleri sunucudan alınıyor, lütfen bekleyin...' : 'Bayisi olduğunuz markanın seramik modellerini yüklemek için aşağıdaki butona tıklayın.')}
@@ -4010,8 +4017,8 @@ Yetkili Satış & Showroom Departmanı`;
                             }}
                           >
                             {/* Card Control Bar (Hidden in Print) */}
-                            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
-                              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', cursor: 'pointer', userSelect: 'none' }}>
+                            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #e2e8f0', paddingBottom: '10px' }}>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.76rem', cursor: 'pointer', userSelect: 'none' }}>
                                 <input 
                                   type="checkbox"
                                   checked={isSelected}
@@ -4022,7 +4029,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   }}
                                   style={{ width: '16px', height: '16px', accentColor: '#d4af37', cursor: 'pointer' }}
                                 />
-                                <span style={{ fontWeight: '800', color: isSelected ? '#d4af37' : '#94a3b8' }}>
+                                <span style={{ fontWeight: '800', color: isSelected ? '#b45309' : '#475569' }}>
                                   {isSelected ? '✓ Baskıya Eklendi' : 'Baskı İçin Seç'}
                                 </span>
                               </label>
@@ -4037,12 +4044,13 @@ Yetkili Satış & Showroom Departmanı`;
                                   }}
                                   title="3D Showroom Linkini Kopyala"
                                   style={{
-                                    background: 'rgba(255,255,255,0.06)',
-                                    border: '1px solid rgba(255,255,255,0.12)',
-                                    color: '#cbd5e1',
-                                    padding: '4px 8px',
+                                    background: '#f1f5f9',
+                                    border: '1.5px solid #cbd5e1',
+                                    color: '#334155',
+                                    padding: '5px 10px',
                                     borderRadius: '6px',
-                                    fontSize: '0.7rem',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -4058,17 +4066,17 @@ Yetkili Satış & Showroom Departmanı`;
                                   rel="noopener noreferrer"
                                   title="3D Stüdyoda Müşteri Gibi Aç"
                                   style={{
-                                    background: 'rgba(212,175,55,0.15)',
-                                    border: '1px solid rgba(212,175,55,0.3)',
-                                    color: '#d4af37',
-                                    padding: '4px 8px',
+                                    background: '#fef3c7',
+                                    border: '1.5px solid #fde68a',
+                                    color: '#854d0e',
+                                    padding: '5px 10px',
                                     borderRadius: '6px',
-                                    fontSize: '0.7rem',
+                                    fontSize: '0.72rem',
                                     textDecoration: 'none',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '4px',
-                                    fontWeight: '700'
+                                    fontWeight: '800'
                                   }}
                                 >
                                   <ExternalLink size={12} />
@@ -4102,7 +4110,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 }}>
                                   {prod.name}
                                 </h3>
-                                <div className="print-prod-sub" style={{ fontSize: '0.75rem', color: qrTagStyle === 'clean-white' ? '#475569' : '#94a3b8', fontWeight: '600' }}>
+                                <div className="print-prod-sub" style={{ fontSize: '0.76rem', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#475569', fontWeight: '600' }}>
                                   {(typeof prod.brand === 'object' ? prod.brand?.name : prod.brand) || dealerInfo?.brandName || 'Seramik'} &bull; {prod.dimensions || '60x120 cm'} &bull; {prod.finish || 'Porselen Karo'}
                                 </div>
                               </div>
@@ -4186,33 +4194,33 @@ Yetkili Satış & Showroom Departmanı`;
                               display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                              borderTop: qrTagStyle === 'clean-white' ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.08)',
+                              borderTop: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.12)' : '1.5px solid #e2e8f0',
                               paddingTop: '10px'
                             }}>
                               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span className="print-dealer-sub" style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                <span className="print-dealer-sub" style={{ fontSize: '0.65rem', color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                                   SHOWROOM TEŞHİR NOKTASI
                                 </span>
-                                <span className="print-dealer-title" style={{ fontSize: '0.82rem', fontWeight: '800', color: qrTagStyle === 'minimal-dark' ? '#d4af37' : '#0f172a' }}>
+                                <span className="print-dealer-title" style={{ fontSize: '0.84rem', fontWeight: '800', color: qrTagStyle === 'minimal-dark' ? '#d4af37' : '#0f172a' }}>
                                   {dealerName}
                                 </span>
-                                <span className="print-dealer-contact" style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                                <span className="print-dealer-contact" style={{ fontSize: '0.7rem', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155', fontWeight: '500' }}>
                                   {dealerCity} &bull; {dealerInfo?.phone || ''}
                                 </span>
                               </div>
 
                               {qrIncludePrice && (
                                 <div style={{ textAlign: 'right' }}>
-                                  <span className="print-price-label" style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase' }}>
+                                  <span className="print-price-label" style={{ fontSize: '0.62rem', color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>
                                     LİSTE / KAMPANYA
                                   </span>
                                   <div className="print-price-val" style={{
                                     fontSize: '1.1rem',
                                     fontWeight: '900',
-                                    color: '#10b981'
+                                    color: '#059669'
                                   }}>
                                     ₺{customPrice || prod.price || '650'}
-                                    <span style={{ fontSize: '0.7rem', fontWeight: '600', color: '#64748b' }}> / m²</span>
+                                    <span style={{ fontSize: '0.7rem', fontWeight: '600', color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#64748b' }}> / m²</span>
                                   </div>
                                 </div>
                               )}
@@ -4220,7 +4228,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                             {/* Price Input in Card (No Print) */}
                             <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
-                              <label style={{ fontSize: '0.68rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>Özel Fiyat Gir (₺):</label>
+                              <label style={{ fontSize: '0.72rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Özel Fiyat Gir (₺):</label>
                               <input 
                                 type="number" 
                                 placeholder={prod.price || '650'}
@@ -4231,12 +4239,13 @@ Yetkili Satış & Showroom Departmanı`;
                                 }}
                                 style={{
                                   width: '90px',
-                                  background: 'rgba(255,255,255,0.06)',
-                                  border: '1px solid rgba(255,255,255,0.15)',
+                                  background: '#f8fafc',
+                                  border: '1.5px solid #cbd5e1',
                                   borderRadius: '6px',
-                                  padding: '3px 8px',
-                                  fontSize: '0.72rem',
-                                  color: '#fff',
+                                  padding: '4px 8px',
+                                  fontSize: '0.76rem',
+                                  fontWeight: '700',
+                                  color: '#0f172a',
                                   outline: 'none'
                                 }}
                               />
@@ -4272,7 +4281,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fff' }}>
                             {qrSelectedProductIds.length} Model Baskı İçin Seçildi
                           </span>
-                          <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                          <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '500' }}>
                             (A4 kağıdına {qrTagLayout === 'grid-4' ? "4'lü (2x2)" : qrTagLayout === 'grid-6' ? "6'lı (2x3)" : "2'li"} yerleşecek)
                           </span>
                         </div>
