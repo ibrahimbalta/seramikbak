@@ -3988,51 +3988,101 @@ Yetkili Satış & Showroom Departmanı`;
                         const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(targetUrl)}&margin=8`;
                         const customPrice = qrCustomPrices[prod.id];
                         const isSelected = qrSelectedProductIds.includes(prod.id);
+                        const brandName = (typeof prod.brand === 'object' ? prod.brand?.name : prod.brand) || dealerInfo?.brandName || 'Seramik';
+                        const displayDealerName = (dealerInfo?.name || dealerName || 'Showroom Teşhir').trim();
 
                         return (
                           <div 
                             key={prod.id} 
                             className={`showroom-qr-card tag-theme-${qrTagStyle} ${isSelected ? 'is-selected-for-print' : 'not-selected-for-print'}`}
                             style={{
-                              background: qrTagStyle === 'minimal-dark' 
-                                ? '#0b0f19' 
-                                : '#ffffff',
+                              background: qrTagStyle === 'minimal-dark' ? '#0b0f19' : '#ffffff',
                               color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
                               border: isSelected
-                                ? '2.5px solid #d4af37'
+                                ? '2px solid #b38e47'
                                 : (qrTagStyle === 'luxury-gold' 
-                                    ? '2px solid #d4af37' 
+                                    ? '1.5px solid #d4af37' 
                                     : qrTagStyle === 'minimal-dark' 
-                                    ? '2px solid rgba(255, 255, 255, 0.15)' 
-                                    : '2px solid #cbd5e1'),
-                              borderRadius: '16px',
-                              padding: '20px',
+                                    ? '1.5px solid rgba(255, 255, 255, 0.15)' 
+                                    : '1.5px solid #cbd5e1'),
+                              borderRadius: '20px',
+                              overflow: 'hidden',
                               display: 'flex',
                               flexDirection: 'column',
-                              gap: '14px',
                               position: 'relative',
-                              boxShadow: isSelected ? '0 0 20px rgba(212, 175, 55, 0.35)' : '0 8px 24px rgba(0,0,0,0.2)',
+                              boxShadow: isSelected 
+                                ? '0 16px 36px rgba(212, 175, 55, 0.22), 0 4px 12px rgba(15, 23, 42, 0.08)' 
+                                : '0 8px 24px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(15, 23, 42, 0.03)',
                               pageBreakInside: 'avoid',
-                              transition: 'all 0.2s ease'
+                              transition: 'all 0.25s ease'
                             }}
                           >
-                            {/* Card Control Bar (Hidden in Print) */}
-                            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #e2e8f0', paddingBottom: '10px' }}>
-                              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.76rem', cursor: 'pointer', userSelect: 'none' }}>
-                                <input 
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={() => {
-                                    setQrSelectedProductIds(prev => 
-                                      prev.includes(prod.id) ? prev.filter(x => x !== prod.id) : [...prev, prod.id]
-                                    );
-                                  }}
-                                  style={{ width: '16px', height: '16px', accentColor: '#d4af37', cursor: 'pointer' }}
-                                />
-                                <span style={{ fontWeight: '800', color: isSelected ? '#b45309' : '#475569' }}>
-                                  {isSelected ? '✓ Baskıya Eklendi' : 'Baskı İçin Seç'}
-                                </span>
-                              </label>
+                            {/* Top Luxury Accent Strip */}
+                            <div 
+                              style={{ 
+                                height: '5px', 
+                                width: '100%', 
+                                background: qrTagStyle === 'minimal-dark' 
+                                  ? 'linear-gradient(90deg, #b38e47 0%, #fef08a 50%, #b38e47 100%)' 
+                                  : (isSelected 
+                                      ? 'linear-gradient(90deg, #b38e47 0%, #fde68a 50%, #d4af37 100%)' 
+                                      : 'linear-gradient(90deg, #d4af37 0%, #fde68a 50%, #d4af37 100%)')
+                              }} 
+                            />
+
+                            {/* Dealer Control Strip (Hidden in Print) */}
+                            <div 
+                              className="no-print" 
+                              style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center', 
+                                background: qrTagStyle === 'minimal-dark' ? '#111827' : '#f8fafc',
+                                borderBottom: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', 
+                                padding: '10px 16px',
+                                gap: '8px',
+                                flexWrap: 'wrap'
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setQrSelectedProductIds(prev => 
+                                    prev.includes(prod.id) ? prev.filter(x => x !== prod.id) : [...prev, prod.id]
+                                  );
+                                }}
+                                style={{
+                                  background: isSelected 
+                                    ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' 
+                                    : (qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.08)' : '#ffffff'),
+                                  color: isSelected ? '#854d0e' : (qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155'),
+                                  border: isSelected 
+                                    ? '1.5px solid #d4af37' 
+                                    : (qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1'),
+                                  padding: '5px 12px',
+                                  borderRadius: '8px',
+                                  fontSize: '0.74rem',
+                                  fontWeight: '800',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  cursor: 'pointer',
+                                  boxShadow: isSelected ? '0 2px 8px rgba(212,175,55,0.25)' : 'none',
+                                  transition: 'all 0.15s ease'
+                                }}
+                              >
+                                {isSelected ? (
+                                  <>
+                                    <span style={{ color: '#b45309', fontWeight: '900' }}>✓</span>
+                                    <span>Baskıya Eklendi</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span style={{ opacity: 0.6 }}>+</span>
+                                    <span>Baskı İçin Seç</span>
+                                  </>
+                                )}
+                              </button>
 
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <button
@@ -4044,211 +4094,364 @@ Yetkili Satış & Showroom Departmanı`;
                                   }}
                                   title="3D Showroom Linkini Kopyala"
                                   style={{
-                                    background: '#f1f5f9',
-                                    border: '1.5px solid #cbd5e1',
-                                    color: '#334155',
+                                    background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                                    border: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1',
+                                    color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155',
                                     padding: '5px 10px',
-                                    borderRadius: '6px',
+                                    borderRadius: '8px',
                                     fontSize: '0.72rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '4px'
+                                    gap: '5px',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
                                   }}
                                 >
-                                  {qrCopiedId === prod.id ? <CheckCheck size={12} style={{ color: '#10b981' }} /> : <Copy size={12} />}
+                                  {qrCopiedId === prod.id ? <CheckCheck size={13} style={{ color: '#10b981' }} /> : <Copy size={13} />}
                                   <span>{qrCopiedId === prod.id ? 'Kopyalandı' : 'Linki Al'}</span>
                                 </button>
                                 <a 
                                   href={targetUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="3D Stüdyoda Müşteri Gibi Aç"
+                                  title="3D Stüdyoda Müşteri Gibi Canlı Aç"
                                   style={{
-                                    background: '#fef3c7',
-                                    border: '1.5px solid #fde68a',
+                                    background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                                    border: '1px solid #d4af37',
                                     color: '#854d0e',
-                                    padding: '5px 10px',
-                                    borderRadius: '6px',
+                                    padding: '5px 12px',
+                                    borderRadius: '8px',
                                     fontSize: '0.72rem',
                                     textDecoration: 'none',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '4px',
-                                    fontWeight: '800'
+                                    gap: '5px',
+                                    fontWeight: '800',
+                                    boxShadow: '0 2px 6px rgba(212,175,55,0.2)'
                                   }}
                                 >
-                                  <ExternalLink size={12} />
-                                  <span>Test Et</span>
+                                  <ExternalLink size={13} />
+                                  <span>3D Test Et</span>
                                 </a>
                               </div>
                             </div>
 
-                            {/* Tag Header (Print Visible) */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                              <div>
-                                <div className="print-brand-badge" style={{
-                                  fontSize: '0.68rem',
-                                  fontWeight: '900',
-                                  color: '#b38e47',
-                                  letterSpacing: '0.08em',
-                                  textTransform: 'uppercase',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}>
-                                  <span>✦</span>
-                                  <span>{(dealerInfo?.name || dealerName || 'SHOWROOM').toUpperCase()} • 3D SHOWROOM</span>
-                                </div>
-                                <h3 className="print-prod-title" style={{
-                                  margin: '4px 0 2px 0',
-                                  fontSize: '1.15rem',
-                                  fontWeight: '900',
-                                  color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
-                                  lineHeight: '1.25'
-                                }}>
-                                  {prod.name}
-                                </h3>
-                                <div className="print-prod-sub" style={{ fontSize: '0.76rem', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#475569', fontWeight: '600' }}>
-                                  {(typeof prod.brand === 'object' ? prod.brand?.name : prod.brand) || dealerInfo?.brandName || 'Seramik'} &bull; {prod.dimensions || '60x120 cm'} &bull; {prod.finish || 'Porselen Karo'}
-                                </div>
-                              </div>
-
-                              <div className="print-prod-code" style={{
-                                padding: '4px 8px',
-                                borderRadius: '6px',
-                                background: 'rgba(212,175,55,0.15)',
-                                border: '1px solid rgba(212,175,55,0.35)',
-                                color: '#d4af37',
-                                fontSize: '0.65rem',
-                                fontWeight: '800'
-                              }}>
-                                KOD: {prod.code || 'SB-KARO'}
-                              </div>
-                            </div>
-
-                            {/* Central QR Code & Scan Prompt */}
-                            <div className="print-qr-container" style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              gap: '16px',
-                              background: qrTagStyle === 'clean-white' ? '#f8fafc' : 'rgba(255,255,255,0.03)',
-                              padding: '14px',
-                              borderRadius: '12px',
-                              border: qrTagStyle === 'clean-white' ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.06)'
-                            }}>
-                              <div className="print-qr-img-box" style={{
-                                width: '110px',
-                                height: '110px',
-                                background: '#ffffff',
-                                padding: '6px',
-                                borderRadius: '10px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                              }}>
-                                <img 
-                                  src={qrImgUrl} 
-                                  alt={`${prod.name} 3D QR Kod`} 
-                                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
-                              </div>
-
-                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                <div className="print-qr-title" style={{
-                                  fontSize: '0.85rem',
-                                  fontWeight: '900',
-                                  color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
-                                  lineHeight: '1.25'
-                                }}>
-                                  📱 Kameranla Tara, Banyonda Canlı Gör!
-                                </div>
-                                <div className="print-qr-desc" style={{
-                                  fontSize: '0.72rem',
-                                  color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#475569',
-                                  lineHeight: '1.3'
-                                }}>
-                                  Telefonunuzun kamerasıyla QR kodu okutarak bu seramiğin 3D sanal odadaki döşenmiş halini inceleyin.
-                                </div>
-                                <div className="print-qr-badge" style={{
-                                  fontSize: '0.68rem',
-                                  fontWeight: '800',
-                                  color: '#059669',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                  marginTop: '2px'
-                                }}>
-                                  <span>✓</span>
-                                  <span>Uygulama İndirmek Gerekmez</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Tag Footer & Showroom Information */}
-                            <div className="print-card-footer" style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              borderTop: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.12)' : '1.5px solid #e2e8f0',
-                              paddingTop: '10px'
-                            }}>
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span className="print-dealer-sub" style={{ fontSize: '0.65rem', color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                                  SHOWROOM TEŞHİR NOKTASI
-                                </span>
-                                <span className="print-dealer-title" style={{ fontSize: '0.84rem', fontWeight: '800', color: qrTagStyle === 'minimal-dark' ? '#d4af37' : '#0f172a' }}>
-                                  {dealerName}
-                                </span>
-                                <span className="print-dealer-contact" style={{ fontSize: '0.7rem', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155', fontWeight: '500' }}>
-                                  {dealerCity} &bull; {dealerInfo?.phone || ''}
-                                </span>
-                              </div>
-
-                              {qrIncludePrice && (
-                                <div style={{ textAlign: 'right' }}>
-                                  <span className="print-price-label" style={{ fontSize: '0.62rem', color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>
-                                    LİSTE / KAMPANYA
-                                  </span>
-                                  <div className="print-price-val" style={{
-                                    fontSize: '1.1rem',
+                            {/* Main Showroom Display Label Body */}
+                            <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+                              
+                              {/* Tag Header: Prestige Crest & Specimen Code */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                                <div>
+                                  <div className="print-brand-badge" style={{
+                                    fontSize: '0.66rem',
                                     fontWeight: '900',
-                                    color: '#059669'
+                                    color: '#b38e47',
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px'
                                   }}>
-                                    ₺{customPrice || prod.price || '650'}
-                                    <span style={{ fontSize: '0.7rem', fontWeight: '600', color: qrTagStyle === 'minimal-dark' ? '#94a3b8' : '#64748b' }}> / m²</span>
+                                    <span>✦</span>
+                                    <span>{displayDealerName.toUpperCase()} • 3D SHOWROOM</span>
+                                  </div>
+                                  <h3 className="print-prod-title" style={{
+                                    margin: '5px 0 6px 0',
+                                    fontSize: '1.22rem',
+                                    fontWeight: '900',
+                                    color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                    lineHeight: '1.25',
+                                    letterSpacing: '-0.02em',
+                                    fontFamily: 'var(--font-title, "Outfit", sans-serif)'
+                                  }}>
+                                    {prod.name}
+                                  </h3>
+                                  
+                                  {/* Specification Tag Pills */}
+                                  <div className="print-prod-sub" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
+                                    <span style={{
+                                      background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.08)' : '#f1f5f9',
+                                      color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155',
+                                      padding: '2px 8px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: '700'
+                                    }}>
+                                      {brandName}
+                                    </span>
+                                    <span style={{
+                                      background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.08)' : '#f1f5f9',
+                                      color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155',
+                                      padding: '2px 8px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: '700'
+                                    }}>
+                                      {prod.dimensions || '60x120 cm'}
+                                    </span>
+                                    <span style={{
+                                      background: qrTagStyle === 'minimal-dark' ? 'rgba(212,175,55,0.15)' : '#fef3c7',
+                                      color: qrTagStyle === 'minimal-dark' ? '#fde68a' : '#854d0e',
+                                      border: qrTagStyle === 'minimal-dark' ? '1px solid rgba(212,175,55,0.3)' : '1px solid #fde68a',
+                                      padding: '2px 8px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: '800'
+                                    }}>
+                                      {prod.finish || 'Porselen Karo'}
+                                    </span>
                                   </div>
                                 </div>
-                              )}
+
+                                <div className="print-prod-code" style={{
+                                  padding: '4px 10px',
+                                  borderRadius: '8px',
+                                  background: qrTagStyle === 'minimal-dark' ? 'rgba(212,175,55,0.15)' : '#fef3c7',
+                                  border: '1.5px solid #d4af37',
+                                  color: qrTagStyle === 'minimal-dark' ? '#fde68a' : '#854d0e',
+                                  fontSize: '0.68rem',
+                                  fontWeight: '800',
+                                  letterSpacing: '0.04em',
+                                  fontFamily: 'monospace, sans-serif',
+                                  whiteSpace: 'nowrap',
+                                  flexShrink: 0
+                                }}>
+                                  KOD: {prod.code || 'SB-KARO'}
+                                </div>
+                              </div>
+
+                              {/* Central Architectural AR/3D Viewfinder Chamber */}
+                              <div className="print-qr-container" style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '16px',
+                                background: qrTagStyle === 'minimal-dark' 
+                                  ? 'linear-gradient(135deg, #111827 0%, #1e293b 100%)' 
+                                  : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                                padding: '16px',
+                                borderRadius: '16px',
+                                border: qrTagStyle === 'minimal-dark' 
+                                  ? '1px solid rgba(212,175,55,0.35)' 
+                                  : '1.5px solid #e2e8f0',
+                                position: 'relative',
+                                boxShadow: '0 4px 12px rgba(15,23,42,0.03)'
+                              }}>
+                                {/* QR Code Frame with Viewfinder Corner Brackets */}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                  <div className="print-qr-img-box" style={{
+                                    width: '116px',
+                                    height: '116px',
+                                    background: '#ffffff',
+                                    padding: '8px',
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    position: 'relative',
+                                    boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
+                                    border: '2px solid #d4af37'
+                                  }}>
+                                    {/* Architectural Viewfinder Corner Accents */}
+                                    <div style={{ position: 'absolute', top: '-4px', left: '-4px', width: '10px', height: '10px', borderTop: '3px solid #b38e47', borderLeft: '3px solid #b38e47', borderTopLeftRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '10px', height: '10px', borderTop: '3px solid #b38e47', borderRight: '3px solid #b38e47', borderTopRightRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', bottom: '-4px', left: '-4px', width: '10px', height: '10px', borderBottom: '3px solid #b38e47', borderLeft: '3px solid #b38e47', borderBottomLeftRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', width: '10px', height: '10px', borderBottom: '3px solid #b38e47', borderRight: '3px solid #b38e47', borderBottomRightRadius: '3px' }} />
+
+                                    <img 
+                                      src={qrImgUrl} 
+                                      alt={`${prod.name} 3D QR Kod`} 
+                                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    />
+                                  </div>
+                                  <span style={{ 
+                                    fontSize: '0.62rem', 
+                                    fontWeight: '900', 
+                                    color: '#b38e47', 
+                                    letterSpacing: '0.08em',
+                                    textTransform: 'uppercase'
+                                  }}>
+                                    📷 Kameranla Okut
+                                  </span>
+                                </div>
+
+                                {/* Viewfinder Experience Pitch */}
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', alignSelf: 'flex-start', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fde68a', padding: '3px 8px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: '800', border: '1px solid #d4af37' }}>
+                                    <Sparkles size={11} style={{ color: '#d4af37' }} />
+                                    <span>3D SANAL ODA STÜDYOSU</span>
+                                  </div>
+                                  
+                                  <div className="print-qr-title" style={{
+                                    fontSize: '0.94rem',
+                                    fontWeight: '900',
+                                    color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                    lineHeight: '1.25',
+                                    margin: '2px 0 0 0'
+                                  }}>
+                                    Banyonuzda Canlı Deneyimleyin
+                                  </div>
+                                  
+                                  <div className="print-qr-desc" style={{
+                                    fontSize: '0.72rem',
+                                    color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#475569',
+                                    lineHeight: '1.38',
+                                    fontWeight: '500'
+                                  }}>
+                                    Telefon kameranızı koda tutarak bu seramiğin 3D sanal odadaki gerçek döşenmiş halini 360° inceleyin.
+                                  </div>
+
+                                  <div className="print-qr-badge" style={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: '800',
+                                    color: '#059669',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    marginTop: '3px'
+                                  }}>
+                                    <span style={{ fontSize: '0.8rem' }}>✓</span>
+                                    <span>Hızlı Açılır &bull; Uygulama Gerektirmez</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Ornamental Geometric Divider */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '2px 0' }}>
+                                <div style={{ flex: 1, height: '1px', background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0' }} />
+                                <span style={{ color: '#d4af37', fontSize: '0.72rem' }}>❖</span>
+                                <div style={{ flex: 1, height: '1px', background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0' }} />
+                              </div>
+
+                              {/* Tag Footer & Showroom Information */}
+                              <div className="print-card-footer" style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: '10px'
+                              }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span className="print-dealer-sub" style={{ 
+                                    fontSize: '0.62rem', 
+                                    color: '#b38e47', 
+                                    fontWeight: '800', 
+                                    textTransform: 'uppercase', 
+                                    letterSpacing: '0.1em' 
+                                  }}>
+                                    YETKİLİ TEŞHİR NOKTASI
+                                  </span>
+                                  <span className="print-dealer-title" style={{ 
+                                    fontSize: '0.92rem', 
+                                    fontWeight: '900', 
+                                    color: qrTagStyle === 'minimal-dark' ? '#fde68a' : '#0f172a' 
+                                  }}>
+                                    {displayDealerName}
+                                  </span>
+                                  <span className="print-dealer-contact" style={{ 
+                                    fontSize: '0.7rem', 
+                                    color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#64748b', 
+                                    fontWeight: '600' 
+                                  }}>
+                                    📍 {dealerCity} {dealerInfo?.phone ? `• 📞 ${dealerInfo.phone}` : ''}
+                                  </span>
+                                </div>
+
+                                {qrIncludePrice && (
+                                  <div style={{ textAlign: 'right' }}>
+                                    <span className="print-price-label" style={{ 
+                                      fontSize: '0.62rem', 
+                                      color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#64748b', 
+                                      fontWeight: '800', 
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.06em'
+                                    }}>
+                                      LİSTE SATIŞ FİYATI
+                                    </span>
+                                    <div className="print-price-val" style={{
+                                      fontSize: '1.25rem',
+                                      fontWeight: '900',
+                                      color: '#059669',
+                                      lineHeight: '1.1',
+                                      letterSpacing: '-0.02em'
+                                    }}>
+                                      ₺{customPrice || prod.price || '650'}
+                                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#64748b' }}> / m²</span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
-                            {/* Price Input in Card (No Print) */}
-                            <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
-                              <label style={{ fontSize: '0.72rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Özel Fiyat Gir (₺):</label>
-                              <input 
-                                type="number" 
-                                placeholder={prod.price || '650'}
-                                value={customPrice || ''}
-                                onChange={e => {
-                                  const val = e.target.value;
-                                  setQrCustomPrices(prev => ({ ...prev, [prod.id]: val }));
-                                }}
-                                style={{
-                                  width: '90px',
-                                  background: '#f8fafc',
-                                  border: '1.5px solid #cbd5e1',
-                                  borderRadius: '6px',
-                                  padding: '4px 8px',
-                                  fontSize: '0.76rem',
-                                  fontWeight: '700',
-                                  color: '#0f172a',
-                                  outline: 'none'
-                                }}
-                              />
+                            {/* Luxury Quick Price Editor Toolbar (Hidden in Print) */}
+                            <div 
+                              className="no-print" 
+                              style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'space-between',
+                                background: qrTagStyle === 'minimal-dark' ? '#111827' : '#f8fafc',
+                                borderTop: qrTagStyle === 'minimal-dark' ? '1px dashed rgba(255,255,255,0.15)' : '1px dashed #cbd5e1',
+                                padding: '10px 18px',
+                                gap: '8px'
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '0.85rem' }}>🏷️</span>
+                                <label style={{ fontSize: '0.74rem', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155', fontWeight: '700', whiteSpace: 'nowrap' }}>
+                                  Özel Mağaza Fiyatı:
+                                </label>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                  <span style={{ position: 'absolute', left: '8px', fontSize: '0.76rem', fontWeight: '800', color: '#b38e47' }}>₺</span>
+                                  <input 
+                                    type="number" 
+                                    placeholder={prod.price || '650'}
+                                    value={customPrice || ''}
+                                    onChange={e => {
+                                      const val = e.target.value;
+                                      setQrCustomPrices(prev => ({ ...prev, [prod.id]: val }));
+                                    }}
+                                    style={{
+                                      width: '94px',
+                                      background: qrTagStyle === 'minimal-dark' ? '#0b0f19' : '#ffffff',
+                                      border: customPrice ? '1.5px solid #10b981' : '1.5px solid #cbd5e1',
+                                      borderRadius: '8px',
+                                      padding: '5px 8px 5px 22px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '800',
+                                      color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                      outline: 'none',
+                                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+                                    }}
+                                  />
+                                </div>
+                                <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>/ m²</span>
+                                {customPrice && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setQrCustomPrices(prev => {
+                                        const next = { ...prev };
+                                        delete next[prod.id];
+                                        return next;
+                                      });
+                                    }}
+                                    title="Varsayılan Fiyata Sıfırla"
+                                    style={{
+                                      background: 'transparent',
+                                      border: 'none',
+                                      color: '#ef4444',
+                                      fontSize: '0.68rem',
+                                      fontWeight: '700',
+                                      cursor: 'pointer',
+                                      padding: '2px 4px'
+                                    }}
+                                  >
+                                    Sıfırla
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
