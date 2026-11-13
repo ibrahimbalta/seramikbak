@@ -57,6 +57,7 @@ import { calculateQuote, formatQuoteWhatsAppText, getWhatsAppUrl } from '@/lib/q
 import NotificationBell from '@/components/NotificationBell';
 
 export default function DealerPortalPage() {
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -591,25 +592,27 @@ Yetkili Satış & Showroom Departmanı`;
     }
   };
 
-  // Inactivity / Auto-Logout states (15 min inactivity limit)
-  const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000;
-  const WARNING_BUFFER_MS = 60 * 1000;
+  // Inactivity / Auto-Logout states (7 days showroom session matching server cookie)
+  const INACTIVITY_TIMEOUT_MS = 7 * 24 * 60 * 60 * 1000;
+  const WARNING_BUFFER_MS = 5 * 60 * 1000;
   const [showInactivityWarning, setShowInactivityWarning] = useState(false);
   const [inactivityCountdown, setInactivityCountdown] = useState(60);
   const [inactivityLogoutReason, setInactivityLogoutReason] = useState('');
 
   // Restore session from localStorage on mount with inactivity check
   useEffect(() => {
-    const savedSession = localStorage.getItem('sb_dealer_session');
-    const lastActivity = Number(localStorage.getItem('sb_dealer_last_activity') || 0);
+    try {
+      const savedSession = localStorage.getItem('sb_dealer_session');
+      const lastActivity = Number(localStorage.getItem('sb_dealer_last_activity') || Date.now());
 
-    if (savedSession) {
-      if (lastActivity > 0 && (Date.now() - lastActivity > INACTIVITY_TIMEOUT_MS)) {
-        localStorage.removeItem('sb_dealer_session');
-        localStorage.removeItem('sb_dealer_last_activity');
-        setInactivityLogoutReason('Son oturumunuz 15 dakikalık hareketsizlik nedeniyle otomatik kapatılmıştır. Lütfen tekrar giriş yapın.');
-      } else {
-        try {
+      if (savedSession) {
+        if (lastActivity > 0 && (Date.now() - lastActivity > INACTIVITY_TIMEOUT_MS)) {
+          localStorage.removeItem('sb_dealer_session');
+          localStorage.removeItem('sb_dealer_last_activity');
+          setInactivityLogoutReason('Güvenliğiniz için oturum süreniz dolmuştur. Lütfen tekrar giriş yapın.');
+          setIsLoggedIn(false);
+          setIsCheckingAuth(false);
+        } else {
           const session = JSON.parse(savedSession);
           setDealerInfo(session);
           setIsLoggedIn(true);
@@ -645,10 +648,14 @@ Yetkili Satış & Showroom Departmanı`;
           setProfileSocialLinkedin(session.socialLinkedin || '');
           setProfileSocialYoutube(session.socialYoutube || '');
           setProfileSocialWebsite(session.socialWebsite || '');
-        } catch (err) {
-          console.error('Session restore failed:', err);
+          setIsCheckingAuth(false);
         }
+      } else {
+        setIsCheckingAuth(false);
       }
+    } catch (err) {
+      console.error('Session restore failed:', err);
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -1695,6 +1702,39 @@ Yetkili Satış & Showroom Departmanı`;
       setIsSavingProfile(false);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <main style={{
+        minHeight: '100vh',
+        backgroundColor: '#e6e8ec',
+        backgroundImage: 'radial-gradient(ellipse 85% 40% at 50% -6%, rgba(197, 160, 89, 0.12), transparent 70%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
+      }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '46px',
+            height: '46px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+            border: '1.5px solid #d4af37',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            fontWeight: '900',
+            fontSize: '1.2rem',
+            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)'
+          }}>SB</div>
+          <Loader2 className="animate-spin" size={24} style={{ color: '#b38e47' }} />
+          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Bayi Portalı Yükleniyor...</span>
+        </div>
+      </main>
+    );
+  }
 
   if (!isLoggedIn) {
     return (
