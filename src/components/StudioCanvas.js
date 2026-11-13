@@ -90,6 +90,9 @@ export default function StudioCanvas({
   const directionalLightRef = useRef(null);
   const pointLightRef = useRef(null);
   const imageCacheRef = useRef(new Map());
+  const bumpCacheRef = useRef(new Map());
+  const requestRenderRef = useRef(() => {});
+  const backgroundColorRef = useRef(backgroundColor);
 
   // Tracks loading state and type
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
@@ -98,6 +101,7 @@ export default function StudioCanvas({
   const activeGlass = showerGlass || 'clear';
 
   useEffect(() => {
+    backgroundColorRef.current = backgroundColor;
     if (sceneRef.current && backgroundColor) {
       try {
         sceneRef.current.background = new THREE.Color(backgroundColor);
@@ -231,53 +235,59 @@ export default function StudioCanvas({
     return canvas;
   };
 
-  // Helper to generate a CanvasTexture dynamically injecting grout border overlays, tile patterns (Herringbone, Staggered) and rotation
+  // Helper to generate a CanvasTexture dynamically injecting grout border overlays, tile patterns and rotation
   const generateGroutOverlay = (sourceCanvasOrImage, product, gWidth, gColor, rotation, pattern) => {
+    const isMobile = typeof window !== 'undefined' && (
+      window.innerWidth <= 768 ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
+    const cSize = isMobile ? 256 : 512;
     const cleanSource = cropWhiteBorders(sourceCanvasOrImage);
 
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = cSize;
+    canvas.height = cSize;
     const ctx = canvas.getContext('2d');
 
     const groutMm = parseFloat(gWidth) || 2;
-    const borderPx = groutMm > 0 ? Math.max(1, Math.min(3, Math.round(groutMm * 0.6))) : 0;
+    const borderPx = groutMm > 0 ? Math.max(1, Math.min(isMobile ? 2 : 3, Math.round(groutMm * (isMobile ? 0.35 : 0.6)))) : 0;
 
     // Fill entire canvas with grout color first
     ctx.fillStyle = gColor || '#888888';
-    ctx.fillRect(0, 0, 512, 512);
+    ctx.fillRect(0, 0, cSize, cSize);
+    const s = cSize / 512;
 
     if (pattern === 'herringbone') {
-      const pw = 250 - borderPx;
-      const ph = 120 - borderPx;
+      const pw = Math.round((250 - borderPx) * s);
+      const ph = Math.round((120 - borderPx) * s);
 
-      ctx.drawImage(cleanSource, 10, 10, pw, ph);
-      ctx.drawImage(cleanSource, 260, 10, pw, ph);
+      ctx.drawImage(cleanSource, 10 * s, 10 * s, pw, ph);
+      ctx.drawImage(cleanSource, 260 * s, 10 * s, pw, ph);
       
       ctx.save();
-      ctx.translate(135, 380);
+      ctx.translate(135 * s, 380 * s);
       ctx.rotate(Math.PI / 2);
-      ctx.drawImage(cleanSource, -ph/2, -pw/2, ph, pw);
+      ctx.drawImage(cleanSource, -ph / 2, -pw / 2, ph, pw);
       ctx.restore();
 
       ctx.save();
-      ctx.translate(385, 380);
+      ctx.translate(385 * s, 380 * s);
       ctx.rotate(Math.PI / 2);
-      ctx.drawImage(cleanSource, -ph/2, -pw/2, ph, pw);
+      ctx.drawImage(cleanSource, -ph / 2, -pw / 2, ph, pw);
       ctx.restore();
     } 
     else if (pattern === 'staggered_50' || pattern === 'staggered_33') {
-      const rowH = 256 - borderPx;
+      const rowH = Math.round((256 - borderPx) * s);
       const offsetRatio = pattern === 'staggered_50' ? 0.5 : 0.33;
 
-      ctx.drawImage(cleanSource, 0, 0, 512 - borderPx, rowH);
-      const offsetPx = 512 * offsetRatio;
-      ctx.drawImage(cleanSource, offsetPx, 256, 512 - borderPx, rowH);
-      ctx.drawImage(cleanSource, offsetPx - 512, 256, 512 - borderPx, rowH);
+      ctx.drawImage(cleanSource, 0, 0, cSize - borderPx, rowH);
+      const offsetPx = cSize * offsetRatio;
+      ctx.drawImage(cleanSource, offsetPx, cSize / 2, cSize - borderPx, rowH);
+      ctx.drawImage(cleanSource, offsetPx - cSize, cSize / 2, cSize - borderPx, rowH);
     } 
     else {
-      const tileW = 512 - borderPx;
-      const tileH = 512 - borderPx;
+      const tileW = cSize - borderPx;
+      const tileH = cSize - borderPx;
       ctx.drawImage(cleanSource, 0, 0, tileW, tileH);
     }
 
@@ -301,37 +311,48 @@ export default function StudioCanvas({
     return texture;
   };
 
-  // Helper to generate a 3D BumpMap providing realistic depth to grout canals and bevel tile edges
+  // Helper to generate a 3D BumpMap providing realistic depth with memory-pooling cache
   const generateGroutBumpMap = (gWidth, rotation, pattern) => {
+    const isMobile = typeof window !== 'undefined' && (
+      window.innerWidth <= 768 ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
+    const cacheKey = `${gWidth}_${rotation}_${pattern}_${isMobile ? 'm' : 'd'}`;
+    if (bumpCacheRef.current.has(cacheKey)) {
+      return bumpCacheRef.current.get(cacheKey);
+    }
+
+    const cSize = isMobile ? 256 : 512;
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = cSize;
+    canvas.height = cSize;
     const ctx = canvas.getContext('2d');
 
     // Recessed grout base is dark
     ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, 512, 512);
+    ctx.fillRect(0, 0, cSize, cSize);
 
     const groutMm = parseFloat(gWidth) || 2;
-    const borderPx = groutMm > 0 ? Math.max(1, Math.min(4, Math.round(groutMm * 0.7))) : 0;
+    const borderPx = groutMm > 0 ? Math.max(1, Math.min(isMobile ? 3 : 4, Math.round(groutMm * (isMobile ? 0.35 : 0.7)))) : 0;
+    const s = cSize / 512;
 
     if (pattern === 'herringbone') {
-      const pw = 250 - borderPx;
-      const ph = 120 - borderPx;
+      const pw = Math.round((250 - borderPx) * s);
+      const ph = Math.round((120 - borderPx) * s);
       const drawBevelBlock = (x, y, w, h) => {
         ctx.fillStyle = '#b0b0b0';
         ctx.fillRect(x, y, w, h);
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
       };
-      drawBevelBlock(10, 10, pw, ph);
-      drawBevelBlock(260, 10, pw, ph);
-      drawBevelBlock(10, 260, pw, ph);
-      drawBevelBlock(260, 260, pw, ph);
+      drawBevelBlock(10 * s, 10 * s, pw, ph);
+      drawBevelBlock(260 * s, 10 * s, pw, ph);
+      drawBevelBlock(10 * s, 260 * s, pw, ph);
+      drawBevelBlock(260 * s, 260 * s, pw, ph);
     } else if (pattern === 'staggered_50' || pattern === 'staggered_33') {
-      const rowH = 256 - borderPx;
+      const rowH = Math.round((256 - borderPx) * s);
       const offsetRatio = pattern === 'staggered_50' ? 0.5 : 0.33;
-      const offsetPx = 512 * offsetRatio;
+      const offsetPx = cSize * offsetRatio;
 
       const drawBevelRow = (x, y, w, h) => {
         ctx.fillStyle = '#b0b0b0';
@@ -339,18 +360,18 @@ export default function StudioCanvas({
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
       };
-      drawBevelRow(0, 0, 512 - borderPx, rowH);
-      drawBevelRow(offsetPx, 256, 512 - borderPx, rowH);
-      drawBevelRow(offsetPx - 512, 256, 512 - borderPx, rowH);
+      drawBevelRow(0, 0, cSize - borderPx, rowH);
+      drawBevelRow(offsetPx, cSize / 2, cSize - borderPx, rowH);
+      drawBevelRow(offsetPx - cSize, cSize / 2, cSize - borderPx, rowH);
     } else {
-      const tileW = 512 - borderPx;
-      const tileH = 512 - borderPx;
+      const tileW = cSize - borderPx;
+      const tileH = cSize - borderPx;
       // Bevel rim (mid-grey catches glancing specular)
       ctx.fillStyle = '#b4b4b4';
       ctx.fillRect(0, 0, tileW, tileH);
       // Flat elevated surface
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(3, 3, Math.max(1, tileW - 6), Math.max(1, tileH - 6));
+      ctx.fillRect(2, 2, Math.max(1, tileW - 4), Math.max(1, tileH - 4));
     }
 
     const bumpTexture = new THREE.CanvasTexture(canvas);
@@ -364,6 +385,8 @@ export default function StudioCanvas({
       bumpTexture.rotation = totalRotationRad;
       bumpTexture.center.set(0.5, 0.5);
     }
+
+    bumpCacheRef.current.set(cacheKey, bumpTexture);
     return bumpTexture;
   };
 
@@ -373,7 +396,7 @@ export default function StudioCanvas({
 
     // 1. Scene
     const scene = new THREE.Scene();
-    const initialBg = backgroundColor || '#1c202a';
+    const initialBg = backgroundColorRef.current || '#1c202a';
     scene.background = new THREE.Color(initialBg); 
     scene.fog = new THREE.FogExp2(initialBg, 0.032);
     sceneRef.current = scene;
@@ -383,19 +406,27 @@ export default function StudioCanvas({
     camera.position.set(4, 3.2, 5); 
     cameraRef.current = camera;
 
-    const isMobileDevice = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const isMobileDevice = typeof window !== 'undefined' && (
+      window.innerWidth <= 768 ||
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
 
     // 3. Renderer with high performance & mobile optimizations
     const renderer = new THREE.WebGLRenderer({ 
       antialias: !isMobileDevice, 
       alpha: false, 
       preserveDrawingBuffer: true,
-      powerPreference: "high-performance"
+      powerPreference: "high-performance",
+      precision: isMobileDevice ? "mediump" : "highp"
     });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobileDevice ? 1.5 : 2.0));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(isMobileDevice ? Math.min(window.devicePixelRatio || 1, 1.0) : Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.shadowMap.enabled = !isMobileDevice;
+    if (!isMobileDevice) {
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.needsUpdate = true;
+    }
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
     
@@ -429,14 +460,16 @@ export default function StudioCanvas({
 
     const directionalLight = new THREE.DirectionalLight('#fffaf0', 0.88);
     directionalLight.position.set(4, 5.2, 3.2);
-    directionalLight.castShadow = true;
-    const shadowMapRes = isMobileDevice ? 1024 : 2048;
-    directionalLight.shadow.mapSize.width = shadowMapRes;
-    directionalLight.shadow.mapSize.height = shadowMapRes;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 16;
-    directionalLight.shadow.bias = -0.0005;
-    directionalLight.shadow.normalBias = 0.02;
+    directionalLight.castShadow = !isMobileDevice;
+    if (!isMobileDevice) {
+      const shadowMapRes = 1024;
+      directionalLight.shadow.mapSize.width = shadowMapRes;
+      directionalLight.shadow.mapSize.height = shadowMapRes;
+      directionalLight.shadow.camera.near = 0.5;
+      directionalLight.shadow.camera.far = 16;
+      directionalLight.shadow.bias = -0.0005;
+      directionalLight.shadow.normalBias = 0.02;
+    }
     scene.add(directionalLight);
     directionalLightRef.current = directionalLight;
 
@@ -446,42 +479,47 @@ export default function StudioCanvas({
     pointLightRef.current = pointLight;
 
     // 4 Architectural Recessed Ceiling Downlights with Soft Natural Falloff (penumbra: 0.95)
-    // 1. Vanity / Sink Spotlight
-    const vanityDownlight = new THREE.SpotLight('#fff5e2', 0.82, 7.0, Math.PI / 3.6, 0.95, 1.2);
-    vanityDownlight.position.set(-ROOM_WIDTH / 2 + 0.65, ROOM_HEIGHT - 0.05, 0);
-    vanityDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6, 0);
-    scene.add(vanityDownlight);
-    scene.add(vanityDownlight.target);
+    // Secondary task lights only loaded on desktop to preserve 60fps on mobile GPUs
+    if (!isMobileDevice) {
+      // 1. Vanity / Sink Spotlight
+      const vanityDownlight = new THREE.SpotLight('#fff5e2', 0.82, 7.0, Math.PI / 3.6, 0.95, 1.2);
+      vanityDownlight.position.set(-ROOM_WIDTH / 2 + 0.65, ROOM_HEIGHT - 0.05, 0);
+      vanityDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6, 0);
+      scene.add(vanityDownlight);
+      scene.add(vanityDownlight.target);
 
-    // 2. Shower Spotlight
-    const showerDownlight = new THREE.SpotLight('#f2f7ff', 0.78, 7.0, Math.PI / 3.6, 0.95, 1.2);
-    showerDownlight.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.58);
-    showerDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.58, 0, -ROOM_DEPTH / 2 + 0.58);
-    scene.add(showerDownlight);
-    scene.add(showerDownlight.target);
+      // 2. Shower Spotlight
+      const showerDownlight = new THREE.SpotLight('#f2f7ff', 0.78, 7.0, Math.PI / 3.6, 0.95, 1.2);
+      showerDownlight.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.58);
+      showerDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.58, 0, -ROOM_DEPTH / 2 + 0.58);
+      scene.add(showerDownlight);
+      scene.add(showerDownlight.target);
 
-    // 3. Toilet Area Spotlight
-    const toiletDownlight = new THREE.SpotLight('#fff3df', 0.68, 6.5, Math.PI / 3.6, 0.95, 1.2);
-    toiletDownlight.position.set(0.9, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.3);
-    toiletDownlight.target.position.set(0.9, 0, -ROOM_DEPTH / 2 + 0.3);
-    scene.add(toiletDownlight);
-    scene.add(toiletDownlight.target);
+      // 3. Toilet Area Spotlight
+      const toiletDownlight = new THREE.SpotLight('#fff3df', 0.68, 6.5, Math.PI / 3.6, 0.95, 1.2);
+      toiletDownlight.position.set(0.9, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.3);
+      toiletDownlight.target.position.set(0.9, 0, -ROOM_DEPTH / 2 + 0.3);
+      scene.add(toiletDownlight);
+      scene.add(toiletDownlight.target);
+    }
 
-    // 4. Center / Floor Specular Accent Spotlight
+    // 4. Center / Floor Specular Accent Spotlight (active on all devices)
     const floorDownlight = new THREE.SpotLight('#fff9ee', 0.75, 7.5, Math.PI / 3.2, 0.95, 1.2);
     floorDownlight.position.set(0.5, ROOM_HEIGHT - 0.05, 0.5);
     floorDownlight.target.position.set(0, 0, 0);
     scene.add(floorDownlight);
     scene.add(floorDownlight.target);
 
-    // Soft Studio Shadow Floor beneath floating room
-    const studioFloorGeo = new THREE.PlaneGeometry(16, 16);
-    const studioFloorMat = new THREE.ShadowMaterial({ opacity: 0.32 });
-    const studioFloor = new THREE.Mesh(studioFloorGeo, studioFloorMat);
-    studioFloor.rotation.x = -Math.PI / 2;
-    studioFloor.position.y = -0.005;
-    studioFloor.receiveShadow = true;
-    scene.add(studioFloor);
+    // Soft Studio Shadow Floor beneath floating room (desktop only)
+    if (!isMobileDevice) {
+      const studioFloorGeo = new THREE.PlaneGeometry(16, 16);
+      const studioFloorMat = new THREE.ShadowMaterial({ opacity: 0.32 });
+      const studioFloor = new THREE.Mesh(studioFloorGeo, studioFloorMat);
+      studioFloor.rotation.x = -Math.PI / 2;
+      studioFloor.position.y = -0.005;
+      studioFloor.receiveShadow = true;
+      scene.add(studioFloor);
+    }
 
     // 5. Room geometry setup
     // Floor
@@ -617,7 +655,7 @@ export default function StudioCanvas({
     scene.add(furnishingsGroup);
     furnishingsGroupRef.current = furnishingsGroup;
 
-    // Simple custom orbit drag controls using mouse events
+    // Custom orbit drag controls and demand-driven render engine
     let isDragging = false;
     let startX = 0;
     let startY = 0;
@@ -626,11 +664,19 @@ export default function StudioCanvas({
     let phi = Math.PI / 3;   
     let radius = 6.8;        
 
+    // Demand-driven rendering: renders on active movement or updates, sleeps when idle (saving battery/GPU on mobile)
+    let renderFramesRemaining = 60;
+    const requestRender = (frames = 15) => {
+      renderFramesRemaining = Math.max(renderFramesRemaining, frames);
+    };
+    requestRenderRef.current = requestRender;
+
     const updateCameraPosition = () => {
       camera.position.x = radius * Math.sin(phi) * Math.sin(theta);
       camera.position.y = radius * Math.cos(phi) + 0.8;
       camera.position.z = radius * Math.sin(phi) * Math.cos(theta);
       camera.lookAt(0, ROOM_HEIGHT / 3, 0);
+      requestRender(2);
     };
     updateCameraPosition();
 
@@ -646,6 +692,7 @@ export default function StudioCanvas({
 
       mat.emissive = new THREE.Color('#d4af37'); // Warm gold highlight pulse
       mat.emissiveIntensity = 0.48;
+      requestRender(35);
 
       const start = performance.now();
       const duration = 500;
@@ -653,11 +700,13 @@ export default function StudioCanvas({
         const elapsed = performance.now() - start;
         const progress = Math.min(1, elapsed / duration);
         mat.emissiveIntensity = 0.48 * (1 - progress);
+        requestRender(2);
         if (progress < 1) {
           requestAnimationFrame(animatePulse);
         } else {
           mat.emissive = prevColor;
           mat.emissiveIntensity = prevIntensity;
+          requestRender(2);
         }
       };
       requestAnimationFrame(animatePulse);
@@ -668,6 +717,7 @@ export default function StudioCanvas({
       if (isAttractModeRef.current && onExitAttractModeRef.current) {
         onExitAttractModeRef.current();
       }
+      requestRender(15);
 
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -718,6 +768,7 @@ export default function StudioCanvas({
       startX = e.clientX;
       startY = e.clientY;
       previousMousePosition = { x: e.clientX, y: e.clientY };
+      requestRender(5);
     };
 
     const onMouseMove = (e) => {
@@ -733,6 +784,7 @@ export default function StudioCanvas({
 
         previousMousePosition = { x: e.clientX, y: e.clientY };
         updateCameraPosition();
+        requestRender(2);
         return;
       }
 
@@ -763,11 +815,13 @@ export default function StudioCanvas({
       if (dragDistance < 5) {
         onContainerClick(e);
       }
+      requestRender(10);
     };
 
     const onWheel = (e) => {
       radius = Math.max(3.2, Math.min(12, radius + e.deltaY * 0.004));
       updateCameraPosition();
+      requestRender(10);
     };
 
     // Mobile touch interaction listeners (pinch zoom, orbit rotate, tap target)
@@ -787,15 +841,18 @@ export default function StudioCanvas({
         startX = touch.clientX;
         startY = touch.clientY;
         previousMousePosition = { x: touch.clientX, y: touch.clientY };
+        requestRender(5);
       } else if (e.touches.length === 2) {
         isDragging = false;
         initialPinchDistance = getTouchDistance(e.touches[0], e.touches[1]);
         initialPinchRadius = radius;
+        requestRender(5);
       }
     };
 
     const onTouchMove = (e) => {
       if (e.touches.length === 1 && isDragging) {
+        if (e.cancelable) e.preventDefault();
         const touch = e.touches[0];
         const deltaX = touch.clientX - previousMousePosition.x;
         const deltaY = touch.clientY - previousMousePosition.y;
@@ -805,11 +862,14 @@ export default function StudioCanvas({
 
         previousMousePosition = { x: touch.clientX, y: touch.clientY };
         updateCameraPosition();
+        requestRender(2);
       } else if (e.touches.length === 2 && initialPinchDistance) {
+        if (e.cancelable) e.preventDefault();
         const currentDist = getTouchDistance(e.touches[0], e.touches[1]);
         const scale = initialPinchDistance / Math.max(currentDist, 1);
         radius = Math.max(3.2, Math.min(12, initialPinchRadius * scale));
         updateCameraPosition();
+        requestRender(2);
       }
     };
 
@@ -829,6 +889,7 @@ export default function StudioCanvas({
       if (e.touches.length < 2) {
         initialPinchDistance = null;
       }
+      requestRender(10);
     };
 
     const container = containerRef.current;
@@ -838,20 +899,27 @@ export default function StudioCanvas({
     window.addEventListener('mouseup', onMouseUp);
     container.addEventListener('wheel', onWheel);
 
-    // Touch event listeners
+    // Touch event listeners with smooth gesture handling
     container.addEventListener('touchstart', onTouchStart, { passive: true });
-    container.addEventListener('touchmove', onTouchMove, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
     container.addEventListener('touchend', onTouchEnd);
 
-    // Render loop
+    // Render loop - Demand-driven rendering when idle to prevent GPU throttling and mobile freeze
     let animationFrameId;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       if (isAttractModeRef.current) {
         theta -= 0.0016;
         updateCameraPosition();
+        renderFramesRemaining = Math.max(renderFramesRemaining, 2);
       }
-      renderer.render(scene, camera);
+      if (renderFramesRemaining > 0) {
+        renderFramesRemaining--;
+        if (renderer.shadowMap.enabled && !renderer.shadowMap.autoUpdate) {
+          renderer.shadowMap.needsUpdate = true;
+        }
+        renderer.render(scene, camera);
+      }
     };
     animate();
 
@@ -866,6 +934,7 @@ export default function StudioCanvas({
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
+        requestRender(10);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -1858,6 +1927,7 @@ export default function StudioCanvas({
       group.add(doorTrim);
     }
 
+    if (requestRenderRef.current) requestRenderRef.current(35);
   }, [roomType, isSceneReady, cabinetColor, faucetColor, activeGlass]);
 
   // Update lighting configurations reactively when controls change
@@ -1932,6 +2002,7 @@ export default function StudioCanvas({
       });
     }
 
+    if (requestRenderRef.current) requestRenderRef.current(35);
   }, [lightTemp, lightIntensity, timeOfDay, isSceneReady]);
 
   // Regenerate tile textures and repeat maps reactively with instant 0-ms visual tiling & RAM caching
@@ -2390,6 +2461,7 @@ export default function StudioCanvas({
       showerFloorMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
+    if (requestRenderRef.current) requestRenderRef.current(45);
   }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, comparisonProduct, comparisonMode, walkthroughMode, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, roomType, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
 
   // Walkthrough Mode Camera Adjustments
@@ -2402,6 +2474,7 @@ export default function StudioCanvas({
       cameraRef.current.position.set(4, 3.2, 5);
       cameraRef.current.lookAt(0, ROOM_HEIGHT / 3, 0);
     }
+    if (requestRenderRef.current) requestRenderRef.current(35);
   }, [walkthroughMode, isSceneReady]);
 
   // Camera preset positions
@@ -2422,6 +2495,7 @@ export default function StudioCanvas({
       cam.position.set(0.01, 6.2, 0.01);
       cam.lookAt(0, 0, 0);
     }
+    if (requestRenderRef.current) requestRenderRef.current(35);
   };
 
   const downloadSnapshot = () => {
@@ -2495,6 +2569,7 @@ export default function StudioCanvas({
           setTimeout(() => {
             mat.emissive = prevColor;
             mat.emissiveIntensity = 0;
+            if (requestRenderRef.current) requestRenderRef.current(5);
           }, 450);
         }
 
@@ -2510,6 +2585,7 @@ export default function StudioCanvas({
         if (onDropProductOnTargetRef.current) {
           onDropProductOnTargetRef.current(targetName, droppedProduct);
         }
+        if (requestRenderRef.current) requestRenderRef.current(45);
       }
     } catch (err) {
       console.warn('Canvas drop parse warning:', err);

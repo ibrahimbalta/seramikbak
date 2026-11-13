@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { 
@@ -234,7 +234,11 @@ const getTextureFallback = (prod) => {
 
 export default function ShowroomKioskPage() {
   const canvasContainerRef = useRef(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   // Ürün ve Marka Eyaletleri
   const [products, setProducts] = useState(BRAND_CATALOG);
@@ -264,7 +268,19 @@ export default function ShowroomKioskPage() {
   const [stripeWallProduct, setStripeWallProduct] = useState(null);
   const [comparisonProduct, setComparisonProduct] = useState(null);
 
-  const [isOffline, setIsOffline] = useState(false);
+  const isOffline = useSyncExternalStore(
+    (callback) => {
+      if (typeof window === 'undefined') return () => {};
+      window.addEventListener('online', callback);
+      window.addEventListener('offline', callback);
+      return () => {
+        window.removeEventListener('online', callback);
+        window.removeEventListener('offline', callback);
+      };
+    },
+    () => (typeof navigator !== 'undefined' ? !navigator.onLine : false),
+    () => false
+  );
 
   // Yüzey Uygulama Açık/Kapalı
   const [applyFloor, setApplyFloor] = useState(true);
@@ -354,158 +370,155 @@ export default function ShowroomKioskPage() {
   const [isEmbed, setIsEmbed] = useState(false);
   const [embedThemeColor, setEmbedThemeColor] = useState('#d4af37');
 
-  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula + Online/Offline Dinleyici
+  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula
   useEffect(() => {
-    setMounted(true);
     if (typeof window === 'undefined') return;
 
-    setIsOffline(!navigator.onLine);
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    const timer = setTimeout(() => {
+      let targetProduct = null;
 
-    let targetProduct = null;
+      // 0. Bayi Oturumu Kontrolü (Giriş yapan bayinin bilgilerini yükle)
+      try {
+        const savedDealer = localStorage.getItem('sb_dealer_session');
+        if (savedDealer) {
+          const parsedDealer = JSON.parse(savedDealer);
+          if (parsedDealer && (parsedDealer.id || parsedDealer.name)) {
+            setSelectedDealer(parsedDealer);
+            if (parsedDealer.brandId) {
+              setSelectedBrandId(parsedDealer.brandId);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Kiosk dealer session read error:', e);
+      }
 
-    // 0. Bayi Oturumu Kontrolü (Giriş yapan bayinin bilgilerini yükle)
-    try {
-      const savedDealer = localStorage.getItem('sb_dealer_session');
-      if (savedDealer) {
-        const parsedDealer = JSON.parse(savedDealer);
-        if (parsedDealer && (parsedDealer.id || parsedDealer.name)) {
-          setSelectedDealer(parsedDealer);
-          if (parsedDealer.brandId) {
-            setSelectedBrandId(parsedDealer.brandId);
+      // 1. Session / Local Storage kontrolü (İlham, Showroom ve Mimar portalından tıklanınca anında aktarılan ürün)
+      try {
+        const stored = sessionStorage.getItem('kiosk_selected_product') || localStorage.getItem('kiosk_selected_product');
+        if (stored) {
+          targetProduct = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error('Kiosk storage read error:', e);
+      }
+
+      // 2. URL searchParams kontrolü (?productId=... &code=... &room=... &style=... &q=... &embed=true &theme=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
+      const paramCode = urlParams.get('code');
+      const paramRoom = urlParams.get('room') || urlParams.get('scene');
+      const paramStyle = urlParams.get('style');
+      const paramSearch = urlParams.get('search') || urlParams.get('q');
+      const paramEmbed = urlParams.get('embed') === 'true' || urlParams.get('embed') === '1' || urlParams.get('mode') === 'embed';
+      const paramTheme = urlParams.get('theme') || urlParams.get('color') || urlParams.get('primary');
+      const paramBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
+
+      if (paramEmbed) {
+        setIsEmbed(true);
+      }
+      if (paramTheme) {
+        setEmbedThemeColor(paramTheme.startsWith('#') ? paramTheme : `#${paramTheme}`);
+      }
+      if (paramBrand) {
+        setSelectedBrandId(paramBrand);
+        if (!targetProduct) {
+          const bLower = paramBrand.toLowerCase();
+          const brandMatch = BRAND_CATALOG.find(p => 
+            p.brand?.id?.toLowerCase() === bLower ||
+            p.brand?.id?.toLowerCase().includes(bLower) ||
+            p.brand?.name?.toLowerCase().includes(bLower) ||
+            bLower.includes(p.brand?.id?.toLowerCase())
+          );
+          if (brandMatch) {
+            targetProduct = brandMatch;
           }
         }
       }
-    } catch (e) {
-      console.warn('Kiosk dealer session read error:', e);
-    }
 
-    // 1. Session / Local Storage kontrolü (İlham, Showroom ve Mimar portalından tıklanınca anında aktarılan ürün)
-    try {
-      const stored = sessionStorage.getItem('kiosk_selected_product') || localStorage.getItem('kiosk_selected_product');
-      if (stored) {
-        targetProduct = JSON.parse(stored);
+      if (paramSearch) {
+        setSearchTerm(paramSearch);
       }
-    } catch (e) {
-      console.error('Kiosk storage read error:', e);
-    }
-
-    // 2. URL searchParams kontrolü (?productId=... &code=... &room=... &style=... &q=... &embed=true &theme=...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
-    const paramCode = urlParams.get('code');
-    const paramRoom = urlParams.get('room') || urlParams.get('scene');
-    const paramStyle = urlParams.get('style');
-    const paramSearch = urlParams.get('search') || urlParams.get('q');
-    const paramEmbed = urlParams.get('embed') === 'true' || urlParams.get('embed') === '1' || urlParams.get('mode') === 'embed';
-    const paramTheme = urlParams.get('theme') || urlParams.get('color') || urlParams.get('primary');
-    const paramBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
-
-    if (paramEmbed) {
-      setIsEmbed(true);
-    }
-    if (paramTheme) {
-      setEmbedThemeColor(paramTheme.startsWith('#') ? paramTheme : `#${paramTheme}`);
-    }
-    if (paramBrand) {
-      setSelectedBrandId(paramBrand);
-      if (!targetProduct) {
-        const bLower = paramBrand.toLowerCase();
-        const brandMatch = BRAND_CATALOG.find(p => 
-          p.brand?.id?.toLowerCase() === bLower ||
-          p.brand?.id?.toLowerCase().includes(bLower) ||
-          p.brand?.name?.toLowerCase().includes(bLower) ||
-          bLower.includes(p.brand?.id?.toLowerCase())
-        );
-        if (brandMatch) {
-          targetProduct = brandMatch;
+      if (paramStyle) {
+        setSelectedStyle(paramStyle.toLowerCase());
+      }
+      if (paramRoom) {
+        const r = paramRoom.toLowerCase();
+        if (r === 'kitchen' || r === 'mutfak') {
+          setRoomType('kitchen');
+          setApplyWalls(false);
+          setApplyShower(false);
+          setApplyShowerFloor(false);
+          setApplyToiletWall(false);
+          setApplyAccent(false);
+          setApplyStripeWall(true);
+          setActiveTargetSurface('stripe');
+        } else if (r === 'livingroom' || r === 'salon') {
+          setRoomType('livingroom');
+          setApplyWalls(false);
+          setApplyShower(false);
+          setApplyShowerFloor(false);
+          setApplyToiletWall(false);
+          setApplyStripeWall(false);
+          setApplyAccent(false);
+        } else if (r === 'terrace' || r === 'teras') {
+          setRoomType('terrace');
+          setApplyWalls(false);
+          setApplyShower(false);
+          setApplyShowerFloor(false);
+          setApplyToiletWall(false);
+          setApplyStripeWall(false);
+          setApplyAccent(false);
+        } else {
+          setRoomType('bathroom');
+          setApplyWalls(true);
         }
       }
-    }
 
-    if (paramSearch) {
-      setSearchTerm(paramSearch);
-    }
-    if (paramStyle) {
-      setSelectedStyle(paramStyle.toLowerCase());
-    }
-    if (paramRoom) {
-      const r = paramRoom.toLowerCase();
-      if (r === 'kitchen' || r === 'mutfak') {
-        setRoomType('kitchen');
-        setApplyWalls(false);
-        setApplyShower(false);
-        setApplyShowerFloor(false);
-        setApplyToiletWall(false);
-        setApplyAccent(false);
-        setApplyStripeWall(true);
-        setActiveTargetSurface('stripe');
-      } else if (r === 'livingroom' || r === 'salon') {
-        setRoomType('livingroom');
-        setApplyWalls(false);
-        setApplyShower(false);
-        setApplyShowerFloor(false);
-        setApplyToiletWall(false);
-        setApplyStripeWall(false);
-        setApplyAccent(false);
-      } else if (r === 'terrace' || r === 'teras') {
-        setRoomType('terrace');
-        setApplyWalls(false);
-        setApplyShower(false);
-        setApplyShowerFloor(false);
-        setApplyToiletWall(false);
-        setApplyStripeWall(false);
-        setApplyAccent(false);
-      } else {
-        setRoomType('bathroom');
+      if (paramProductId && targetProduct && String(targetProduct.id) !== String(paramProductId)) {
+        const match = BRAND_CATALOG.find(p => String(p.id) === String(paramProductId));
+        if (match) targetProduct = match;
+      }
+
+      if (!targetProduct && (paramProductId || paramCode || paramSearch)) {
+        targetProduct = BRAND_CATALOG.find(p =>
+          (paramProductId && String(p.id) === String(paramProductId)) ||
+          (paramCode && (p.code === paramCode || p.name?.toLowerCase().includes(paramCode.toLowerCase()))) ||
+          (paramSearch && (p.name?.toLowerCase().includes(paramSearch.toLowerCase()) || p.style?.toLowerCase().includes(paramSearch.toLowerCase())))
+        );
+      }
+
+      if (targetProduct) {
+        let tex = targetProduct.textureUrl || targetProduct.imageUrl;
+        let img = targetProduct.imageUrl || tex;
+        if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+          tex = getTextureFallback(targetProduct);
+        }
+
+        const finalProd = {
+          ...targetProduct,
+          imageUrl: img || tex,
+          textureUrl: tex || img,
+          unitPrice: targetProduct.unitPrice || 480
+        };
+
+        setSelectedProduct(finalProd);
+        setFloorProduct(finalProd);
+        setWallProduct(finalProd);
+        setApplyFloor(true);
         setApplyWalls(true);
+        if (finalProd.unitPrice) {
+          setUnitPriceM2(finalProd.unitPrice);
+        }
+
+        setProducts(prev => {
+          const withoutTarget = prev.filter(p => p.id !== finalProd.id && p.code !== finalProd.code);
+          return [finalProd, ...withoutTarget];
+        });
       }
-    }
+    }, 0);
 
-    if (paramProductId && targetProduct && String(targetProduct.id) !== String(paramProductId)) {
-      const match = BRAND_CATALOG.find(p => String(p.id) === String(paramProductId));
-      if (match) targetProduct = match;
-    }
-
-    if (!targetProduct && (paramProductId || paramCode || paramSearch)) {
-      targetProduct = BRAND_CATALOG.find(p =>
-        (paramProductId && String(p.id) === String(paramProductId)) ||
-        (paramCode && (p.code === paramCode || p.name?.toLowerCase().includes(paramCode.toLowerCase()))) ||
-        (paramSearch && (p.name?.toLowerCase().includes(paramSearch.toLowerCase()) || p.style?.toLowerCase().includes(paramSearch.toLowerCase())))
-      );
-    }
-
-    if (targetProduct) {
-      let tex = targetProduct.textureUrl || targetProduct.imageUrl;
-      let img = targetProduct.imageUrl || tex;
-      if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
-        tex = getTextureFallback(targetProduct);
-      }
-
-      const finalProd = {
-        ...targetProduct,
-        imageUrl: img || tex,
-        textureUrl: tex || img,
-        unitPrice: targetProduct.unitPrice || 480
-      };
-
-      setSelectedProduct(finalProd);
-      setFloorProduct(finalProd);
-      setWallProduct(finalProd);
-      setApplyFloor(true);
-      setApplyWalls(true);
-      if (finalProd.unitPrice) {
-        setUnitPriceM2(finalProd.unitPrice);
-      }
-
-      setProducts(prev => {
-        const withoutTarget = prev.filter(p => p.id !== finalProd.id && p.code !== finalProd.code);
-        return [finalProd, ...withoutTarget];
-      });
-    }
+    return () => clearTimeout(timer);
   }, []);
 
   // Veritabanından Markaları, Bayiyi ve Kiosk Abonelik Yetkisini Kontrol Et
