@@ -4678,7 +4678,7 @@ Yetkili Satış & Showroom Departmanı`;
                               <div>Firma: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.companyName}</strong></div>
                               <div>Yetkili: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactName}</strong></div>
                               <div>Telefon: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactPhone}</strong></div>
-                              <div style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginTop: '4px' }}>
+                              <div style={{ fontSize: '0.74rem', color: '#b45309', fontWeight: '800', marginTop: '4px' }}>
                                 ⚠️ İletişim bilgilerini görmek için PREMIUM pakete geçin.
                               </div>
                             </div>
@@ -5133,8 +5133,8 @@ Yetkili Satış & Showroom Departmanı`;
                   {/* Banner Background Image Group */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Sayfa Hero Banner Arka Plan Görseli</label>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Showroom başlık kartı arka plan fotoğrafı</span>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Sayfa Hero Banner Arka Plan Görseli</label>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '500' }}>Showroom başlık kartı arka plan fotoğrafı</span>
                     </div>
                     <div className="settings-upload-row">
                       {profileBannerUrl && (
@@ -5181,8 +5181,8 @@ Yetkili Satış & Showroom Departmanı`;
                   {/* PDF Catalog Group */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>İndirilebilir Ürün Kataloğu & Broşür Linki (PDF)</label>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Müşterilerinizin indirebileceği PDF kataloğunuzun internet adresi</span>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>İndirilebilir Ürün Kataloğu & Broşür Linki (PDF)</label>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '500' }}>Müşterilerinizin indirebileceği PDF kataloğunuzun internet adresi</span>
                     </div>
 
                     <div className="catalog-inputs-grid" style={{ display: 'grid', gap: '10px', alignItems: 'center' }}>
@@ -5624,11 +5624,11 @@ Yetkili Satış & Showroom Departmanı`;
                     <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
                     Showroom Başlık İstatistikleri (Hero Kartı)
                   </h3>
-                  <p style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '2px 0 12px 0' }}>Canlı bayi profilinizdeki üst kartta görünen 3 ana istatistiği özelleştirin.</p>
+                  <p style={{ fontSize: '0.74rem', color: '#475569', margin: '2px 0 12px 0', fontWeight: '500' }}>Canlı bayi profilinizdeki üst kartta görünen 3 ana istatistiği özelleştirin.</p>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Deneyim İstatistiği</label>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Deneyim İstatistiği</label>
                       <input 
                         type="text" 
                         value={profileDealerStats.experience || ''} 
@@ -5639,7 +5639,7 @@ Yetkili Satış & Showroom Departmanı`;
                       />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Mutlu Müşteri İstatistiği</label>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Mutlu Müşteri İstatistiği</label>
                       <input 
                         type="text" 
                         value={profileDealerStats.happyClients || ''} 
@@ -5650,7 +5650,7 @@ Yetkili Satış & Showroom Departmanı`;
                       />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Showroom Alanı</label>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Showroom Alanı</label>
                       <input 
                         type="text" 
                         value={profileDealerStats.showroomArea || ''} 
@@ -6753,22 +6753,22 @@ Yetkili Satış & Showroom Departmanı`;
 
             {/* Feature Comparison Table */}
             <div style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: '#ffffff',
+              border: '1.5px solid #cbd5e1',
               borderRadius: '20px',
               padding: '32px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+              boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
             }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', color: '#ffffff' }}>Paket Karşılaştırma Tablosu</h3>
-              <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: '0 0 20px 0' }}>Tüm paketlerin detaylı özellik karşılaştırması</p>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a' }}>Paket Karşılaştırma Tablosu</h3>
+              <p style={{ fontSize: '0.84rem', color: '#475569', margin: '0 0 20px 0', fontWeight: '500' }}>Tüm paketlerin detaylı özellik karşılaştırması</p>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#cbd5e1' }}>Özellik</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#cbd5e1', textAlign: 'center' }}>LITE</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#f59e0b', textAlign: 'center', background: 'rgba(245, 158, 11, 0.08)', borderRadius: '8px 8px 0 0' }}>STANDART</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#ffffff', textAlign: 'center' }}>PREMIUM</th>
+                    <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', background: '#f8fafc' }}>
+                      <th style={{ padding: '12px 16px', fontWeight: '800', color: '#334155', borderRadius: '8px 0 0 8px' }}>Özellik</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '800', color: '#475569', textAlign: 'center' }}>LITE</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '800', color: '#b45309', textAlign: 'center', background: '#fef3c7' }}>STANDART</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '800', color: '#0f172a', textAlign: 'center', borderRadius: '0 8px 8px 0' }}>PREMIUM</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -6784,13 +6784,13 @@ Yetkili Satış & Showroom Departmanı`;
                       { feature: 'WhatsApp Hızlı Teklif Motoru', lite: false, standart: false, premium: true },
                       { feature: 'Destek Kanalı', lite: 'E-posta', standart: 'Telefon + E-posta', premium: '7/24 VIP Destek' },
                     ].map((row, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                        <td style={{ padding: '13px 16px', fontWeight: '600', color: '#ffffff' }}>{row.feature}</td>
+                      <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                        <td style={{ padding: '13px 16px', fontWeight: '700', color: '#0f172a' }}>{row.feature}</td>
                         {[row.lite, row.standart, row.premium].map((val, ci) => (
-                          <td key={ci} style={{ padding: '13px 16px', textAlign: 'center', background: ci === 1 ? 'rgba(245, 158, 11, 0.03)' : 'transparent' }}>
-                            {val === true ? <Check size={16} style={{ color: '#10b981', margin: '0 auto' }} /> 
-                              : val === false ? <X size={16} style={{ color: 'rgba(255, 255, 255, 0.15)', margin: '0 auto' }} /> 
-                              : <span style={{ fontWeight: '600', color: ci === 2 ? '#a78bfa' : '#cbd5e1' }}>{val}</span>}
+                          <td key={ci} style={{ padding: '13px 16px', textAlign: 'center', background: ci === 1 ? '#fffbeb' : 'transparent' }}>
+                            {val === true ? <Check size={16} style={{ color: '#059669', margin: '0 auto', strokeWidth: 3 }} /> 
+                              : val === false ? <X size={16} style={{ color: '#94a3b8', margin: '0 auto' }} /> 
+                              : <span style={{ fontWeight: '700', color: ci === 2 ? '#b45309' : '#334155' }}>{val}</span>}
                           </td>
                         ))}
                       </tr>
@@ -6802,23 +6802,23 @@ Yetkili Satış & Showroom Departmanı`;
 
             {/* FAQ Section */}
             <div style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: '#ffffff',
+              border: '1.5px solid #cbd5e1',
               borderRadius: '20px',
               padding: '32px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+              boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
             }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#ffffff' }}>Sık Sorulan Sorular</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 20px 0', color: '#0f172a' }}>Sık Sorulan Sorular</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {[
                   { q: 'Abonelik süresi dolunca ne olur?', a: 'Aboneliğiniz sona erdiğinde gelen müşteri talepleri görünmeye devam eder ancak müşteri iletişim bilgileri maskelenir. Yenileme yaparak erişiminizi geri kazanabilirsiniz.' },
                   { q: 'Paket yükseltme yapabilir miyim?', a: 'Evet, dilediğiniz zaman daha üst bir pakete geçiş yapabilirsiniz. Mevcut sürenize kalan gün sayısı kadar indirim uygulanır.' },
                   { q: 'Ödeme nasıl yapılır?', a: 'Kredi kartı, banka havalesi/EFT ve sanal POS ile güvenli ödeme yapabilirsiniz. Fatura otomatik olarak e-posta adresinize gönderilir.' },
                   { q: 'İptal/iade politikası nedir?', a: 'İlk 14 gün içinde koşulsuz iade garantisi sunulmaktadır. 14 gün sonrası için kalan süre üzerinden orantılı iade yapılır.' },
                 ].map((faq, i) => (
-                  <div key={i} style={{ padding: '16px 20px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px' }}>
-                    <h4 style={{ fontSize: '0.88rem', fontWeight: '700', margin: '0 0 6px 0', color: '#ffffff' }}>{faq.q}</h4>
-                    <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>{faq.a}</p>
+                  <div key={i} style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a' }}>{faq.q}</h4>
+                    <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>{faq.a}</p>
                   </div>
                 ))}
               </div>
@@ -8407,29 +8407,29 @@ Yetkili Satış & Showroom Departmanı`;
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 255, 255, 0.03)', padding: '10px', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                         {lead.product?.imageUrl && (
                           <img 
                             src={lead.product.imageUrl} 
                             alt={lead.product.name} 
-                            style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} 
+                            style={{ width: '44px', height: '44px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #cbd5e1' }} 
                           />
                         )}
                         <div>
-                          <strong style={{ fontSize: '0.8rem', color: '#ffffff', display: 'block' }}>{lead.product?.name}</strong>
-                          <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>SKU: {lead.product?.code}</span>
+                          <strong style={{ fontSize: '0.86rem', color: '#0f172a', display: 'block', fontWeight: '800' }}>{lead.product?.name}</strong>
+                          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>SKU: {lead.product?.code}</span>
                         </div>
                       </div>
 
                       {lead.notes && (
-                        <div style={{ fontSize: '0.78rem', color: '#cbd5e1', background: 'rgba(255, 255, 255, 0.02)', padding: '8px 12px', borderRadius: '8px' }}>
+                        <div style={{ fontSize: '0.8rem', color: '#334155', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', lineHeight: '1.4' }}>
                           {lead.notes}
                         </div>
                       )}
 
                       {lead.projectDimensions && (
-                        <div style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.03)', padding: '6px 10px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#cbd5e1' }}>
-                          <strong>Ölçüler:</strong> {lead.projectDimensions}
+                        <div style={{ fontSize: '0.78rem', background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', color: '#0f172a' }}>
+                          <strong style={{ color: '#334155' }}>Ölçüler:</strong> <span style={{ fontWeight: '700' }}>{lead.projectDimensions}</span>
                         </div>
                       )}
 
@@ -8446,7 +8446,7 @@ Yetkili Satış & Showroom Departmanı`;
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '10px', marginTop: '4px', fontSize: '0.72rem', color: '#94a3b8' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '10px', marginTop: '4px', fontSize: '0.74rem', color: '#64748b', fontWeight: '600' }}>
                         <span>{new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                         <button 
                           onClick={() => handleDeleteLead(lead.id)}
@@ -8467,25 +8467,25 @@ Yetkili Satış & Showroom Departmanı`;
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                     <thead>
-                      <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.12)', textAlign: 'left', color: '#cbd5e1', fontWeight: '700' }}>
-                        <th style={{ padding: '12px 16px' }}>Müşteri Bilgileri</th>
+                      <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', color: '#334155', fontWeight: '800', background: '#f8fafc' }}>
+                        <th style={{ padding: '12px 16px', borderRadius: '8px 0 0 8px' }}>Müşteri Bilgileri</th>
                         <th style={{ padding: '12px 16px' }}>Ürün Detayı</th>
                         <th style={{ padding: '12px 16px' }}>Müşteri Notu</th>
                         <th style={{ padding: '12px 16px' }}>Tarih</th>
                         <th style={{ padding: '12px 16px' }}>Durum</th>
-                        <th style={{ padding: '12px 16px' }}>İşlem</th>
+                        <th style={{ padding: '12px 16px', borderRadius: '0 8px 8px 0' }}>İşlem</th>
                       </tr>
                     </thead>
                     <tbody>
                       {leads.map(lead => (
-                        <tr key={lead.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', transition: 'background 0.2s' }}>
+                        <tr key={lead.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }}>
                           <td style={{ padding: '16px' }}>
-                            <strong style={{ display: 'block', color: '#ffffff' }}>{lead.clientName}</strong>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#cbd5e1', marginTop: '2px' }}>
-                              <Phone size={10} /> {lead.clientPhone}
+                            <strong style={{ display: 'block', color: '#0f172a', fontWeight: '800' }}>{lead.clientName}</strong>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#b45309', fontWeight: '700', marginTop: '3px' }}>
+                              <Phone size={11} /> {lead.clientPhone}
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#cbd5e1', marginTop: '2px' }}>
-                              <Mail size={10} /> {lead.clientEmail}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem', color: '#475569', fontWeight: '500', marginTop: '2px' }}>
+                              <Mail size={11} /> {lead.clientEmail}
                             </div>
                             
                             {/* Badges for requested services */}
@@ -8512,17 +8512,17 @@ Yetkili Satış & Showroom Departmanı`;
                                 />
                               )}
                               <div>
-                                <strong style={{ color: '#ffffff' }}>{lead.product?.name}</strong>
-                                <span style={{ display: 'block', fontSize: '0.7rem', color: '#cbd5e1' }}>SKU: {lead.product?.code}</span>
+                                <strong style={{ color: '#0f172a', fontWeight: '800' }}>{lead.product?.name}</strong>
+                                <span style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>SKU: {lead.product?.code}</span>
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: '16px', maxWidth: '240px', color: '#cbd5e1', lineHeight: '1.4' }}>
+                          <td style={{ padding: '16px', maxWidth: '240px', color: '#334155', lineHeight: '1.5', fontWeight: '500' }}>
                             {lead.notes || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Not bırakılmadı</span>}
                             
                             {lead.projectDimensions && (
-                              <div style={{ marginTop: '6px', fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.03)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#cbd5e1' }}>
-                                <strong>Ölçüler:</strong> {lead.projectDimensions}
+                              <div style={{ marginTop: '6px', fontSize: '0.75rem', background: '#f8fafc', padding: '5px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', color: '#0f172a' }}>
+                                <strong style={{ color: '#334155' }}>Ölçüler:</strong> <span style={{ fontWeight: '700' }}>{lead.projectDimensions}</span>
                               </div>
                             )}
                             
@@ -8539,9 +8539,9 @@ Yetkili Satış & Showroom Departmanı`;
                               </div>
                             )}
                           </td>
-                          <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.75rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Calendar size={12} />
+                          <td style={{ padding: '16px', color: '#475569', fontSize: '0.78rem', fontWeight: '600' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <Calendar size={13} style={{ color: '#b38e47' }} />
                               {new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                             </div>
                           </td>
@@ -8605,7 +8605,7 @@ Yetkili Satış & Showroom Departmanı`;
                       ))}
                       {leads.length === 0 && (
                         <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#cbd5e1' }}>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#64748b', fontWeight: '600' }}>
                             Henüz size yönlendirilmiş bir müşteri teklif talebi bulunmamaktadır.
                           </td>
                         </tr>
