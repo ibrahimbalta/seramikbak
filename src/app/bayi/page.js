@@ -1669,7 +1669,8 @@ Yetkili Satış & Showroom Departmanı`;
       <>
         <main className="login-layout" style={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+          backgroundColor: '#e6e8ec',
+          backgroundImage: 'radial-gradient(ellipse 85% 40% at 50% -6%, rgba(197, 160, 89, 0.12), transparent 70%), radial-gradient(circle at 12% 28%, rgba(15, 23, 42, 0.035), transparent 45%), radial-gradient(circle at 88% 42%, rgba(197, 160, 89, 0.045), transparent 45%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1692,13 +1693,14 @@ Yetkili Satış & Showroom Departmanı`;
           <div className="login-card glass-panel" style={{
             position: 'relative',
             zIndex: 2,
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            background: '#f8f9fb',
+            border: '1.5px solid #cbd5e1',
             borderRadius: isMobile ? '20px' : '24px',
-            padding: isMobile ? '28px 18px' : '40px',
+            padding: isMobile ? '24px 16px' : '40px',
             width: '100%',
             maxWidth: registerTab === 'login' ? '460px' : '720px',
-            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05)',
+            boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.10), 0 0 0 1px rgba(255, 255, 255, 0.6) inset',
+            overflow: 'hidden',
             transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             boxSizing: 'border-box'
           }}>
@@ -1753,18 +1755,18 @@ Yetkili Satış & Showroom Departmanı`;
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            background: '#f1f5f9',
+            background: '#e2e6ed',
             padding: '4px',
             borderRadius: '12px',
             marginBottom: '24px',
-            border: '1px solid #e2e8f0'
+            border: '1px solid #cbd5e1'
           }}>
             <button
               type="button"
               onClick={() => { setRegisterTab('login'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: registerTab === 'login' ? '#ffffff' : 'transparent',
-                border: registerTab === 'login' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
+                background: registerTab === 'login' ? '#f8f9fb' : 'transparent',
+                border: registerTab === 'login' ? '1px solid #cbd5e1' : '1px solid transparent',
                 padding: '10px',
                 fontSize: '0.84rem',
                 fontWeight: '700',
@@ -1781,8 +1783,8 @@ Yetkili Satış & Showroom Departmanı`;
               type="button"
               onClick={() => { setRegisterTab('register'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: registerTab === 'register' ? '#ffffff' : 'transparent',
-                border: registerTab === 'register' ? '1px solid rgba(226, 232, 240, 0.9)' : '1px solid transparent',
+                background: registerTab === 'register' ? '#f8f9fb' : 'transparent',
+                border: registerTab === 'register' ? '1px solid #cbd5e1' : '1px solid transparent',
                 padding: '10px',
                 fontSize: '0.84rem',
                 fontWeight: '700',
@@ -1895,15 +1897,16 @@ Yetkili Satış & Showroom Departmanı`;
                   type="submit"
                   disabled={isLoading}
                   style={{
-                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                    color: '#ffffff',
-                    border: 'none',
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #2a374f 100%)',
+                    color: '#fde68a',
+                    border: '1.5px solid #d4af37',
                     borderRadius: '10px',
                     padding: '13px',
                     fontWeight: '800',
                     fontSize: '0.92rem',
+                    minHeight: '44px',
                     cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(179, 142, 71, 0.25)',
+                    boxShadow: '0 6px 20px rgba(15, 23, 42, 0.24)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2298,13 +2301,23 @@ Yetkili Satış & Showroom Departmanı`;
 
       {/* Local styles for login/registration */}
       <style jsx>{`
+        .login-input {
+          background: #f1f4f8 !important;
+          border: 1.5px solid #cbd5e1 !important;
+          color: #0f172a !important;
+          font-weight: 600 !important;
+        }
         .login-input:focus {
-          border-color: #b38e47 !important;
-          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15) !important;
+          background: #f8f9fb !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
         }
         .login-btn:hover {
-          filter: brightness(1.05);
+          background: linear-gradient(135deg, #c58f27 0%, #a8731d 100%) !important;
+          border-color: #fde68a !important;
+          color: #ffffff !important;
           transform: translateY(-1px);
+          box-shadow: 0 8px 24px rgba(197, 143, 39, 0.42) !important;
         }
         .hover-gold-text:hover {
           color: #b38e47 !important;
@@ -2312,12 +2325,14 @@ Yetkili Satış & Showroom Departmanı`;
         }
         @media (max-width: 768px) {
           .login-card {
-            padding: 24px 16px !important;
+            padding: 22px 14px !important;
             border-radius: 18px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           .campaign-inputs-grid {
             grid-template-columns: 1fr !important;
-            gap: 14px !important;
+            gap: 12px !important;
           }
         }
       `}</style>
@@ -2327,7 +2342,8 @@ Yetkili Satış & Showroom Departmanı`;
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
+      backgroundColor: '#090e17',
+      backgroundImage: 'radial-gradient(ellipse 90% 45% at 50% 0%, rgba(197, 160, 89, 0.10), transparent 70%), radial-gradient(circle at 10% 30%, rgba(30, 41, 59, 0.2), transparent 50%)',
       color: '#ffffff',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
       display: 'flex',
@@ -2722,7 +2738,7 @@ Yetkili Satış & Showroom Departmanı`;
                       title="Showroom Sayfasını Aç"
                     >
                       <ExternalLink size={11} />
-                      <span>Showroom</span>
+                      <span className="dealer-header-showroom-txt">Showroom</span>
                     </a>
                   )}
                   {saasInfo && (
@@ -6712,18 +6728,19 @@ Yetkili Satış & Showroom Departmanı`;
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
                     {inventoryList.map(item => (
                       <div key={item.id} style={{
-                        background: '#fff',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '12px',
-                        padding: '16px',
+                        background: 'rgba(20, 29, 46, 0.85)',
+                        border: '1px solid rgba(212, 175, 55, 0.22)',
+                        borderRadius: '14px',
+                        padding: '14px',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '12px'
+                        gap: '12px',
+                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', background: '#f8fafc' }} />
+                          <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', background: 'rgba(255, 255, 255, 0.05)' }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <span style={{ fontWeight: '700', color: '#0f172a', display: 'block', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</span>
+                            <span style={{ fontWeight: '700', color: '#ffffff', display: 'block', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</span>
                             <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {item.product?.code}</span>
                           </div>
                           <button 
@@ -8108,13 +8125,25 @@ Yetkili Satış & Showroom Departmanı`;
           scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
         }
 
-        /* ===== PORTAL GLASSMORPHIC DARK THEME ===== */
+        /* ===== PORTAL ARCHITECTURAL LUXURY THEME ===== */
         .glass-panel {
-          background: rgba(17, 24, 39, 0.7) !important;
-          backdrop-filter: blur(16px) !important;
-          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          background: rgba(20, 29, 46, 0.85) !important;
+          backdrop-filter: blur(20px) !important;
+          border: 1px solid rgba(212, 175, 55, 0.22) !important;
           color: #ffffff !important;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45) !important;
+        }
+
+        .project-card {
+          background: rgba(20, 29, 46, 0.85) !important;
+          border: 1px solid rgba(212, 175, 55, 0.22) !important;
+          color: #f8fafc !important;
+        }
+        .project-card h4 {
+          color: #ffffff !important;
+        }
+        .project-card strong {
+          color: #fde68a !important;
         }
 
         .dealer-main-content h1, 
@@ -8210,11 +8239,11 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .settings-card {
-          background: #ffffff !important;
-          border: 1px solid #e2e8f0 !important;
+          background: #f8f9fb !important;
+          border: 1.5px solid #cbd5e1 !important;
           border-radius: 24px;
-          padding: 40px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+          padding: 36px 28px;
+          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22) !important;
           transition: all 0.3s ease;
         }
 
@@ -8240,14 +8269,14 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .settings-section {
-          background: #ffffff !important;
+          background: #f1f4f8 !important;
           border: 1px solid #cbd5e1 !important;
           border-radius: 16px;
-          padding: 24px;
+          padding: 22px 18px;
           display: flex;
           flex-direction: column;
           gap: 20px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
         }
 
         .analytics-white-card {
@@ -8259,10 +8288,12 @@ Yetkili Satış & Showroom Departmanı`;
           color: #0f172a !important;
         }
 
-        /* ===== QUOTE FORM CARD — White card dark text overrides ===== */
+        /* ===== QUOTE FORM CARD — Soft Architectural Pearl Card ===== */
         .quote-form-card {
-          background: #ffffff !important;
+          background: #f8f9fb !important;
+          border: 1.5px solid #cbd5e1 !important;
           color: #1e293b !important;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
         }
 
         .quote-form-card h3,
@@ -8282,21 +8313,22 @@ Yetkili Satış & Showroom Departmanı`;
         .quote-form-card input,
         .quote-form-card select,
         .quote-form-card textarea {
-          background-color: #ffffff !important;
-          border: 1.5px solid #94a3b8 !important;
+          background-color: #f1f4f8 !important;
+          border: 1.5px solid #cbd5e1 !important;
           color: #0f172a !important;
           font-weight: 600 !important;
           font-size: 0.85rem !important;
           opacity: 1 !important;
           caret-color: #0f172a !important;
+          border-radius: 8px !important;
         }
 
         .quote-form-card input:focus,
         .quote-form-card select:focus,
         .quote-form-card textarea:focus {
-          background-color: #ffffff !important;
+          background-color: #f8f9fb !important;
           border-color: #d4af37 !important;
-          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
           color: #0f172a !important;
         }
 
@@ -8313,10 +8345,12 @@ Yetkili Satış & Showroom Departmanı`;
           gap: 16px;
         }
 
-        /* ===== QUOTE CALC PREVIEW CARD — White card dark text ===== */
+        /* ===== QUOTE CALC PREVIEW CARD ===== */
         .quote-calc-card {
-          background: #ffffff !important;
-          color: #475569 !important;
+          background: #f8f9fb !important;
+          border: 1.5px solid rgba(212, 175, 55, 0.45) !important;
+          color: #334155 !important;
+          box-shadow: 0 10px 30px rgba(212, 175, 55, 0.12) !important;
         }
 
         .quote-calc-card span {
@@ -8327,10 +8361,12 @@ Yetkili Satış & Showroom Departmanı`;
           color: #0f172a !important;
         }
 
-        /* ===== PAYMENT MODAL CARD — White card dark text ===== */
+        /* ===== PAYMENT MODAL CARD ===== */
         .payment-modal-card {
-          background: #ffffff !important;
+          background: #f8f9fb !important;
+          border: 1.5px solid #cbd5e1 !important;
           color: #0f172a !important;
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35) !important;
         }
 
         .payment-modal-card h3,
@@ -8412,9 +8448,9 @@ Yetkili Satış & Showroom Departmanı`;
         .portal-input,
         .dealer-card-input,
         .dealer-card-textarea {
-          background-color: #ffffff !important;
-          border: 1.5px solid #94a3b8 !important;
-          color: #000000 !important;
+          background-color: #f1f4f8 !important;
+          border: 1.5px solid #cbd5e1 !important;
+          color: #0f172a !important;
           font-weight: 700 !important;
           font-size: 0.88rem !important;
           opacity: 1 !important;
@@ -8429,10 +8465,10 @@ Yetkili Satış & Showroom Departmanı`;
         .portal-input:focus,
         .dealer-card-input:focus,
         .dealer-card-textarea:focus {
-          background-color: #ffffff !important;
+          background-color: #f8f9fb !important;
           border-color: #d4af37 !important;
-          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
-          color: #000000 !important;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
+          color: #0f172a !important;
         }
 
         .settings-card input::placeholder,
@@ -8527,8 +8563,23 @@ Yetkili Satış & Showroom Departmanı`;
 
         /* ===== MOBILE (max-width: 768px) ===== */
         @media (max-width: 768px) {
+          .dealer-main-content {
+            padding: 12px 10px 84px 10px !important;
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+          }
+          .dealer-header {
+            padding: 0 10px !important;
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+          }
+          .dealer-header-showroom-txt {
+            display: inline-block;
+          }
           .dealer-header-container {
-            padding: 10px 12px !important;
+            padding: 10px 10px !important;
           }
           .dealer-header-actions {
             flex-direction: column !important;
@@ -8547,12 +8598,11 @@ Yetkili Satış & Showroom Departmanı`;
           .dealer-tabs-nav button span {
             display: none !important;
           }
-          .dealer-main-content {
-            padding: 14px 10px !important;
-          }
           .login-card {
-            padding: 24px 18px !important;
-            border-radius: 16px !important;
+            padding: 22px 14px !important;
+            border-radius: 18px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           .dealer-project-details-split,
           .dealer-pricing-grid,
@@ -8564,19 +8614,59 @@ Yetkili Satış & Showroom Departmanı`;
           .settings-grid-address {
             grid-template-columns: 1fr !important;
             gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           .dealer-stats-grid {
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 8px !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 6px !important;
             margin-bottom: 14px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .dealer-stats-grid > div {
+            padding: 10px 4px !important;
+            min-width: 0 !important;
+            border-radius: 12px !important;
+          }
+          .dealer-stats-grid h4 {
+            font-size: 0.62rem !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          .dealer-stats-grid span {
+            font-size: clamp(0.95rem, 4vw, 1.25rem) !important;
           }
           .settings-card {
-            padding: 16px !important;
+            padding: 16px 12px !important;
             border-radius: 16px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           .settings-section {
-            padding: 14px !important;
-            gap: 14px !important;
+            padding: 14px 10px !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .payment-modal-card,
+          [style*="maxWidth: '560px'"],
+          [style*="maxWidth: '520px'"],
+          [style*="maxWidth: '480px'"] {
+            max-width: min(520px, calc(100vw - 20px)) !important;
+            width: 100% !important;
+            padding: 18px 14px !important;
+            box-sizing: border-box !important;
+          }
+          button, a.dealer-action-btn, .portal-submit-btn, .login-btn {
+            touch-action: manipulation;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .dealer-header-showroom-txt {
+            display: none !important;
           }
         }
 

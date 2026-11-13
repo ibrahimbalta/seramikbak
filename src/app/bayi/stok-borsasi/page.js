@@ -1284,6 +1284,19 @@ export default function DealerStockExchangePage() {
             grid-template-columns: 1fr !important;
             gap: 14px !important;
           }
+          .stok-borsasi-toolbar {
+            padding: 12px 14px !important;
+            border-radius: 16px !important;
+          }
+          button, a {
+            touch-action: manipulation;
+          }
+          [style*="maxWidth: '520px'"],
+          [style*="maxWidth: '560px'"] {
+            max-width: min(520px, calc(100vw - 24px)) !important;
+            padding: 20px 16px !important;
+            box-sizing: border-box !important;
+          }
         }
       `}</style>
     </div>
