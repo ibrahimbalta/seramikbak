@@ -9,7 +9,7 @@ export async function GET(request) {
     const style = searchParams.get('style') || '';
     const finish = searchParams.get('finish') || '';
     const rawLimit = parseInt(searchParams.get('limit') || '24', 10);
-    const limit = Math.max(1, Math.min(isNaN(rawLimit) ? 24 : rawLimit, 500)); // Clamp between 1 and 500 for full brand showrooms
+    const limit = Math.max(1, Math.min(isNaN(rawLimit) ? 24 : rawLimit, 3000)); // Clamp between 1 and 3000 for full brand showrooms and dealer catalogs
     const rawPage = parseInt(searchParams.get('page') || '1', 10);
     const page = Math.max(1, isNaN(rawPage) ? 1 : rawPage);
     const skip = (page - 1) * limit;

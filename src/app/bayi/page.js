@@ -367,20 +367,50 @@ Yetkili Satış & Showroom Departmanı`;
   const [profileSocialYoutube, setProfileSocialYoutube] = useState('');
   const [profileSocialWebsite, setProfileSocialWebsite] = useState('');
 
-  const loadBrandProducts = async () => {
+  const [brandProductsLoading, setBrandProductsLoading] = useState(false);
+  const loadBrandProducts = async (customDealer = null) => {
     try {
-      const url = dealerInfo?.brandId 
-        ? `/api/admin/products?brandId=${dealerInfo.brandId}&limit=5000`
-        : `/api/admin/products?limit=5000`;
+      setBrandProductsLoading(true);
+      const activeDealer = customDealer || dealerInfo;
+      const brandTarget = activeDealer?.brandId || activeDealer?.brandName || activeDealer?.brand?.id || activeDealer?.brand?.name || '';
+      const url = brandTarget 
+        ? `/api/products?brandId=${encodeURIComponent(brandTarget)}&limit=3000`
+        : `/api/products?limit=3000`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        if (data.success) {
-          setBrandProducts(data.products || []);
+        if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+          setBrandProducts(data.products);
+          setBrandProductsLoading(false);
+          return;
+        }
+      }
+      // Fallback: If brandTarget was an ID or name and returned 0 products, try brandName
+      if (activeDealer?.brandName && activeDealer.brandName !== brandTarget) {
+        const fallbackRes = await fetch(`/api/products?brandId=${encodeURIComponent(activeDealer.brandName)}&limit=3000`);
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.success && Array.isArray(fallbackData.products) && fallbackData.products.length > 0) {
+            setBrandProducts(fallbackData.products);
+            setBrandProductsLoading(false);
+            return;
+          }
+        }
+      }
+      // Safety net fallback
+      if (!brandTarget) {
+        const genRes = await fetch('/api/products?limit=500');
+        if (genRes.ok) {
+          const genData = await genRes.json();
+          if (genData.success && Array.isArray(genData.products)) {
+            setBrandProducts(genData.products);
+          }
         }
       }
     } catch (err) {
       console.error('Failed to load brand products:', err);
+    } finally {
+      setBrandProductsLoading(false);
     }
   };
   const [profileDealerCampaigns, setProfileDealerCampaigns] = useState([]);
@@ -583,6 +613,7 @@ Yetkili Satış & Showroom Departmanı`;
           const session = JSON.parse(savedSession);
           setDealerInfo(session);
           setIsLoggedIn(true);
+          loadBrandProducts(session);
           localStorage.setItem('sb_dealer_last_activity', String(Date.now()));
           // Initialize profile form
           setProfilePhone(session.phone || '');
@@ -1212,6 +1243,7 @@ Yetkili Satış & Showroom Departmanı`;
         localStorage.setItem('sb_dealer_session', JSON.stringify(data.dealer));
         localStorage.setItem('sb_dealer_last_activity', String(Date.now()));
         setIsLoggedIn(true);
+        loadBrandProducts(data.dealer);
 
         // Initialize profile form fields
         setProfilePhone(data.dealer.phone || '');
@@ -3812,6 +3844,78 @@ Yetkili Satış & Showroom Departmanı`;
                       )}
                     </div>
 
+                    {displayList.length === 0 ? (
+                      <div className="no-print" style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1.5px dashed rgba(212,175,55,0.3)',
+                        borderRadius: '16px',
+                        padding: '48px 24px',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '14px',
+                        margin: '10px 0'
+                      }}>
+                        <div style={{
+                          width: '56px',
+                          height: '56px',
+                          borderRadius: '50%',
+                          background: 'rgba(212,175,55,0.12)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#d4af37'
+                        }}>
+                          <QrCode size={28} />
+                        </div>
+                        <div>
+                          <h4 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '800', color: '#f8fafc' }}>
+                            {qrFilterMode === 'selected' ? 'Baskı İçin Henüz Ürün Seçilmedi' : (brandProductsLoading ? 'Modeller Yükleniyor...' : 'Model Bulunamadı')}
+                          </h4>
+                          <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8', maxWidth: '440px', lineHeight: 1.5 }}>
+                            {qrFilterMode === 'selected'
+                              ? 'Showroomunuz için seramik etiketlerini seçmek için yukarıdaki "Tüm Modeller" butonuna tıklayabilir veya aşağıdaki butondan tüm modelleri listeleyebilirsiniz.'
+                              : (brandProductsLoading ? 'Bayisi olduğunuz markanın ürünleri sunucudan alınıyor, lütfen bekleyin...' : 'Bayisi olduğunuz markanın seramik modellerini yüklemek için aşağıdaki butona tıklayın.')}
+                          </p>
+                        </div>
+                        {qrFilterMode === 'selected' ? (
+                          <button
+                            onClick={() => setQrFilterMode('all')}
+                            style={{
+                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              color: '#090d16',
+                              border: 'none',
+                              padding: '10px 22px',
+                              borderRadius: '8px',
+                              fontWeight: '800',
+                              fontSize: '0.82rem',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Tüm Marka Modellerini Göster
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => loadBrandProducts()}
+                            disabled={brandProductsLoading}
+                            style={{
+                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              color: '#090d16',
+                              border: 'none',
+                              padding: '10px 22px',
+                              borderRadius: '8px',
+                              fontWeight: '800',
+                              fontSize: '0.82rem',
+                              cursor: brandProductsLoading ? 'wait' : 'pointer'
+                            }}
+                          >
+                            {brandProductsLoading ? 'Yükleniyor...' : 'Modelleri Yeniden Yükle'}
+                          </button>
+                        )}
+                      </div>
+                    ) : (
                     <div className="qr-grid-container" style={{
                       display: 'grid',
                       gridTemplateColumns: isMobile ? '1fr' : (qrTagLayout === 'single-large' ? '1fr 1fr' : 'repeat(auto-fill, minmax(320px, 1fr))'),
@@ -4088,6 +4192,7 @@ Yetkili Satış & Showroom Departmanı`;
                         );
                       })}
                     </div>
+                    )}
 
                     {/* Sticky Floating Print Action Bar when items are selected */}
                     {qrSelectedProductIds.length > 0 && (
