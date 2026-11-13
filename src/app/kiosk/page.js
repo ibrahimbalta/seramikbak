@@ -308,6 +308,36 @@ export default function ShowroomKioskPage() {
   const [isPresentationMode, setIsPresentationMode] = useState(false); // Tam Ekran Müşteri Sunum Modu (Zen)
   const [bottomTab, setBottomTab] = useState('design'); // 'design' | 'atmosphere' | 'quote' | 'presets'
   const [isBottomDockCollapsed, setIsBottomDockCollapsed] = useState(false); // Alttaki menüyü gizle / 3D tam görünüm modu
+  const [isAttractMode, setIsAttractMode] = useState(false); // Kiosk Dinlenme / Showroom Screensaver Modu
+
+  // 90 saniye işlem yapılmadığında Kiosk Showroom Screensaver Modunu Başlat
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let timer = null;
+
+    const resetInactivity = () => {
+      setIsAttractMode(false);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        setIsAttractMode(true);
+      }, 90000); // 90 saniye
+    };
+
+    window.addEventListener('pointerdown', resetInactivity, { passive: true });
+    window.addEventListener('keydown', resetInactivity, { passive: true });
+    window.addEventListener('touchstart', resetInactivity, { passive: true });
+
+    timer = setTimeout(() => {
+      setIsAttractMode(true);
+    }, 90000);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('pointerdown', resetInactivity);
+      window.removeEventListener('keydown', resetInactivity);
+      window.removeEventListener('touchstart', resetInactivity);
+    };
+  }, []);
 
   // Filtreler & Modallar
   const [searchTerm, setSearchTerm] = useState('');
@@ -917,81 +947,121 @@ export default function ShowroomKioskPage() {
     }, 2200);
   };
 
-  // 3D Sahneden veya Mobil Çiplerden Bir Yüzeye Dokunulduğunda Seramiği Ekle / Çıkar
+  // 3D Sahneden veya Dokunmatik Ekranda Bir Yüzeye Dokunulduğunda Yüzeyi Seç & Seramiği Uygula
   const handleToggleTargetFromCanvas = (target) => {
     const prod = selectedProduct || BRAND_CATALOG[0];
     const prodShortName = prod?.name ? prod.name.split(' ')[0] : 'Seramik';
 
     if (target === 'floor') {
-      if (applyFloor && activeTargetSurface === 'floor') {
-        setApplyFloor(false);
-        showTouchFeedback('Zemin seramik kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('floor');
+      setApplyFloor(true);
+      if (selectedProduct) {
+        setFloorProduct(selectedProduct);
+        showTouchFeedback(`✓ Zemin Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setFloorProduct(prod);
-        setApplyFloor(true);
-        setActiveTargetSurface('floor');
-        showTouchFeedback(`✓ Zemin: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Zemin Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
     } else if (target === 'walls') {
-      if (applyWalls && activeTargetSurface === 'walls') {
-        setApplyWalls(false);
-        showTouchFeedback('Ana Duvar kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('walls');
+      setApplyWalls(true);
+      if (selectedProduct) {
+        setWallProduct(selectedProduct);
+        showTouchFeedback(`✓ Ana Duvar Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setWallProduct(prod);
-        setApplyWalls(true);
-        setActiveTargetSurface('walls');
-        showTouchFeedback(`✓ Ana Duvar: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Ana Duvar Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
     } else if (target === 'shower') {
-      if (applyShower && activeTargetSurface === 'shower') {
-        setApplyShower(false);
-        showTouchFeedback('Duş Duvarı kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('shower');
+      setApplyShower(true);
+      if (selectedProduct) {
+        setShowerProduct(selectedProduct);
+        showTouchFeedback(`✓ Duş Alanı Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setShowerProduct(prod);
-        setApplyShower(true);
-        setActiveTargetSurface('shower');
-        showTouchFeedback(`✓ Duş Duvarı: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Duş Alanı Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
     } else if (target === 'showerFloor') {
-      if (applyShowerFloor && activeTargetSurface === 'showerFloor') {
-        setApplyShowerFloor(false);
-        showTouchFeedback('Duş Zemini kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('showerFloor');
+      setApplyShowerFloor(true);
+      if (selectedProduct) {
+        setShowerFloorProduct(selectedProduct);
+        showTouchFeedback(`✓ Duş Tabanı Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setShowerFloorProduct(prod);
-        setApplyShowerFloor(true);
-        setActiveTargetSurface('showerFloor');
-        showTouchFeedback(`✓ Duş Zemini: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Duş Tabanı Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
     } else if (target === 'toilet') {
-      if (applyToiletWall && activeTargetSurface === 'toilet') {
-        setApplyToiletWall(false);
-        showTouchFeedback('Klozet Arkası kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('toilet');
+      setApplyToiletWall(true);
+      if (selectedProduct) {
+        setToiletWallProduct(selectedProduct);
+        showTouchFeedback(`✓ Klozet Arkası Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setToiletWallProduct(prod);
-        setApplyToiletWall(true);
-        setActiveTargetSurface('toilet');
-        showTouchFeedback(`✓ Klozet Arkası: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Klozet Arkası Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
     } else if (target === 'accent') {
-      if (applyAccent && activeTargetSurface === 'accent') {
-        setApplyAccent(false);
-        showTouchFeedback('Lavabo Arkası kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('accent');
+      setApplyAccent(true);
+      if (selectedProduct) {
+        setAccentProduct(selectedProduct);
+        showTouchFeedback(`✓ Lavabo Arkası Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setAccentProduct(prod);
-        setApplyAccent(true);
-        setActiveTargetSurface('accent');
-        showTouchFeedback(`✓ Lavabo Arkası: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Lavabo Arkası Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
     } else if (target === 'stripe') {
-      if (applyStripeWall && activeTargetSurface === 'stripe') {
-        setApplyStripeWall(false);
-        showTouchFeedback('Yatay Bordür kaplaması kaldırıldı ✕');
+      setActiveTargetSurface('stripe');
+      setApplyStripeWall(true);
+      if (selectedProduct) {
+        setStripeWallProduct(selectedProduct);
+        showTouchFeedback(`✓ Bordür / Tezgah Seçildi: ${prodShortName} kaplandı`);
       } else {
-        setStripeWallProduct(prod);
-        setApplyStripeWall(true);
-        setActiveTargetSurface('stripe');
-        showTouchFeedback(`✓ Yatay Bordür: ${prodShortName} kaplaması eklendi`);
+        showTouchFeedback('✓ Bordür / Tezgah Seçildi • Sol katalogdan seramik seçebilirsiniz');
       }
+    }
+  };
+
+  // Sürükle & Bırak (Drag & Drop) ile 3D Yüzey Üzerine Doğrudan Karo Bırakma
+  const handleDropProductOnTarget = (target, prod) => {
+    if (!prod) return;
+    setSelectedProduct(prod);
+    if (prod.unitPrice) {
+      setUnitPriceM2(prod.unitPrice);
+    }
+    const prodShortName = prod.name ? prod.name.split(' ')[0] : 'Seramik';
+
+    if (target === 'floor') {
+      setFloorProduct(prod);
+      setApplyFloor(true);
+      setActiveTargetSurface('floor');
+      showTouchFeedback(`🎯 Zemin: ${prodShortName} kaplandı`);
+    } else if (target === 'walls') {
+      setWallProduct(prod);
+      setApplyWalls(true);
+      setActiveTargetSurface('walls');
+      showTouchFeedback(`🎯 Ana Duvar: ${prodShortName} kaplandı`);
+    } else if (target === 'shower') {
+      setShowerProduct(prod);
+      setApplyShower(true);
+      setActiveTargetSurface('shower');
+      showTouchFeedback(`🎯 Duş Alanı: ${prodShortName} kaplandı`);
+    } else if (target === 'showerFloor') {
+      setShowerFloorProduct(prod);
+      setApplyShowerFloor(true);
+      setActiveTargetSurface('showerFloor');
+      showTouchFeedback(`🎯 Duş Tabanı: ${prodShortName} kaplandı`);
+    } else if (target === 'toilet') {
+      setToiletWallProduct(prod);
+      setApplyToiletWall(true);
+      setActiveTargetSurface('toilet');
+      showTouchFeedback(`🎯 Klozet Arkası: ${prodShortName} kaplandı`);
+    } else if (target === 'accent') {
+      setAccentProduct(prod);
+      setApplyAccent(true);
+      setActiveTargetSurface('accent');
+      showTouchFeedback(`🎯 Lavabo Arkası: ${prodShortName} kaplandı`);
+    } else if (target === 'stripe') {
+      setStripeWallProduct(prod);
+      setApplyStripeWall(true);
+      setActiveTargetSurface('stripe');
+      showTouchFeedback(`🎯 Bordür / Tezgah: ${prodShortName} kaplandı`);
     }
   };
 
@@ -1850,8 +1920,18 @@ export default function ShowroomKioskPage() {
                   return (
                     <div
                       key={product.id}
+                      draggable="true"
+                      onDragStart={(e) => {
+                        try {
+                          e.dataTransfer.setData('application/json', JSON.stringify(product));
+                          e.dataTransfer.effectAllowed = 'copy';
+                        } catch (err) {
+                          // fallback
+                        }
+                      }}
                       onClick={() => handleSelectProductForTarget(product)}
                       className={`product-touch-card ${isCurrentTarget ? 'active' : ''}`}
+                      title={`${product.name} (Tıklayabilir veya 3D odaya sürükleyip bırakabilirsiniz)`}
                     >
                       <div className="card-thumb-wrapper">
                         <img
@@ -1934,6 +2014,9 @@ export default function ShowroomKioskPage() {
               comparisonMode={comparisonMode}
               walkthroughMode={walkthroughMode}
               onToggleTarget={handleToggleTargetFromCanvas}
+              onDropProductOnTarget={handleDropProductOnTarget}
+              isAttractMode={isAttractMode}
+              onExitAttractMode={() => setIsAttractMode(false)}
               roomType={roomType}
               groutColor={groutColor}
               groutWidth={groutWidth}
@@ -1970,13 +2053,37 @@ export default function ShowroomKioskPage() {
                         {activeTargetSurface === 'stripe' && (applyStripeWall ? 'Bordür' : 'Bordür: Pasif')}
                       </span>
                       {(activeTargetSurface === 'floor' && applyFloor) && (
-                        <button onClick={() => handleToggleTargetFromCanvas('floor')} className="pill-remove-btn" title="Zemin kaplamasını kaldır" type="button">✕</button>
+                        <button onClick={() => setApplyFloor(false)} className="pill-remove-btn" title="Zemin kaplamasını kaldır" type="button">✕</button>
                       )}
                       {(activeTargetSurface === 'walls' && applyWalls) && (
-                        <button onClick={() => handleToggleTargetFromCanvas('walls')} className="pill-remove-btn" title="Duvar kaplamasını kaldır" type="button">✕</button>
+                        <button onClick={() => setApplyWalls(false)} className="pill-remove-btn" title="Duvar kaplamasını kaldır" type="button">✕</button>
                       )}
                     </div>
                   )}
+
+                  {/* Hızlı Derz (Fuga) Renk Seçimi Kartelası */}
+                  <div className="canvas-grout-quick-bar" title="Derz (Fuga) Rengini Değiştir">
+                    <span className="grout-quick-lbl">Derz:</span>
+                    {[
+                      { color: '#ffffff', label: 'Beyaz' },
+                      { color: '#cccccc', label: 'Açık Gri' },
+                      { color: '#2a2a2a', label: 'Antrasit' },
+                      { color: '#d8cbb8', label: 'Bej' },
+                      { color: '#d4af37', label: 'Altın' }
+                    ].map(g => (
+                      <button
+                        key={g.color}
+                        onClick={() => {
+                          setGroutColor(g.color);
+                          showTouchFeedback(`✓ Derz Rengi: ${g.label} seçildi`);
+                        }}
+                        style={{ background: g.color }}
+                        className={`quick-grout-dot ${groutColor === g.color ? 'active' : ''}`}
+                        title={`Derz Rengi: ${g.label}`}
+                        type="button"
+                      />
+                    ))}
+                  </div>
                 </div>
               }
               extraTopRight={
@@ -2664,7 +2771,7 @@ export default function ShowroomKioskPage() {
             </div>
             <h3 className="modal-title">Müşteriye WhatsApp Teklifi Gönder</h3>
             <p className="modal-desc">
-              Showroom'da hazırladığınız 3D tasarım ve fiyat teklifini müşterinizin cep telefonuna WhatsApp mesajı olarak iletin.
+              Showroom&apos;da hazırladığınız 3D tasarım ve fiyat teklifini müşterinizin cep telefonuna WhatsApp mesajı olarak iletin.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', margin: '14px 0', textAlign: 'left' }}>
               <div>
@@ -3502,6 +3609,47 @@ export default function ShowroomKioskPage() {
         .pill-remove-btn:hover {
           background: #ef4444;
           color: #ffffff;
+        }
+
+        .canvas-grout-quick-bar {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(15, 23, 42, 0.90);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          height: 28px;
+          padding: 0 8px;
+          border-radius: 7px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+          flex-shrink: 0;
+        }
+
+        .grout-quick-lbl {
+          font-size: 0.64rem;
+          font-weight: 700;
+          color: #94a3b8;
+          text-transform: uppercase;
+          margin-right: 2px;
+        }
+
+        .quick-grout-dot {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          border: 1.5px solid rgba(255, 255, 255, 0.25);
+          cursor: pointer;
+          transition: transform 0.15s ease, border-color 0.15s ease;
+          padding: 0;
+        }
+
+        .quick-grout-dot:hover {
+          transform: scale(1.2);
+        }
+
+        .quick-grout-dot.active {
+          border-color: #f59e0b;
+          transform: scale(1.25);
+          box-shadow: 0 0 6px #f59e0b;
         }
 
         .canvas-focus-toggle-btn {

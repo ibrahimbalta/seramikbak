@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 export default function StudioCanvas({ 
@@ -25,6 +26,9 @@ export default function StudioCanvas({
   comparisonSplit = 50,
   walkthroughMode = false,
   onToggleTarget,
+  onDropProductOnTarget,
+  isAttractMode = false,
+  onExitAttractMode,
   roomType = 'bathroom',
   groutWidth = '2',
   groutColor = '#888888',
@@ -62,10 +66,25 @@ export default function StudioCanvas({
   const leftWallMeshRef = useRef(null);
   const furnishingsGroupRef = useRef(null);
   const onToggleTargetRef = useRef(onToggleTarget);
+  const onDropProductOnTargetRef = useRef(onDropProductOnTarget);
+  const isAttractModeRef = useRef(isAttractMode);
+  const onExitAttractModeRef = useRef(onExitAttractMode);
 
   useEffect(() => {
     onToggleTargetRef.current = onToggleTarget;
   }, [onToggleTarget]);
+
+  useEffect(() => {
+    onDropProductOnTargetRef.current = onDropProductOnTarget;
+  }, [onDropProductOnTarget]);
+
+  useEffect(() => {
+    isAttractModeRef.current = isAttractMode;
+  }, [isAttractMode]);
+
+  useEffect(() => {
+    onExitAttractModeRef.current = onExitAttractMode;
+  }, [onExitAttractMode]);
 
   const ambientLightRef = useRef(null);
   const directionalLightRef = useRef(null);
@@ -76,11 +95,7 @@ export default function StudioCanvas({
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [activeCameraPreset, setActiveCameraPreset] = useState('perspective');
-  const [activeGlass, setActiveGlass] = useState(showerGlass || 'clear');
-
-  useEffect(() => {
-    if (showerGlass) setActiveGlass(showerGlass);
-  }, [showerGlass]);
+  const activeGlass = showerGlass || 'clear';
 
   useEffect(() => {
     if (sceneRef.current && backgroundColor) {
@@ -286,6 +301,72 @@ export default function StudioCanvas({
     return texture;
   };
 
+  // Helper to generate a 3D BumpMap providing realistic depth to grout canals and bevel tile edges
+  const generateGroutBumpMap = (gWidth, rotation, pattern) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    // Recessed grout base is dark
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, 512, 512);
+
+    const groutMm = parseFloat(gWidth) || 2;
+    const borderPx = groutMm > 0 ? Math.max(1, Math.min(4, Math.round(groutMm * 0.7))) : 0;
+
+    if (pattern === 'herringbone') {
+      const pw = 250 - borderPx;
+      const ph = 120 - borderPx;
+      const drawBevelBlock = (x, y, w, h) => {
+        ctx.fillStyle = '#b0b0b0';
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
+      };
+      drawBevelBlock(10, 10, pw, ph);
+      drawBevelBlock(260, 10, pw, ph);
+      drawBevelBlock(10, 260, pw, ph);
+      drawBevelBlock(260, 260, pw, ph);
+    } else if (pattern === 'staggered_50' || pattern === 'staggered_33') {
+      const rowH = 256 - borderPx;
+      const offsetRatio = pattern === 'staggered_50' ? 0.5 : 0.33;
+      const offsetPx = 512 * offsetRatio;
+
+      const drawBevelRow = (x, y, w, h) => {
+        ctx.fillStyle = '#b0b0b0';
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
+      };
+      drawBevelRow(0, 0, 512 - borderPx, rowH);
+      drawBevelRow(offsetPx, 256, 512 - borderPx, rowH);
+      drawBevelRow(offsetPx - 512, 256, 512 - borderPx, rowH);
+    } else {
+      const tileW = 512 - borderPx;
+      const tileH = 512 - borderPx;
+      // Bevel rim (mid-grey catches glancing specular)
+      ctx.fillStyle = '#b4b4b4';
+      ctx.fillRect(0, 0, tileW, tileH);
+      // Flat elevated surface
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(3, 3, Math.max(1, tileW - 6), Math.max(1, tileH - 6));
+    }
+
+    const bumpTexture = new THREE.CanvasTexture(canvas);
+    bumpTexture.wrapS = THREE.RepeatWrapping;
+    bumpTexture.wrapT = THREE.RepeatWrapping;
+
+    let totalRotationRad = 0;
+    if (pattern === 'diagonal') totalRotationRad += Math.PI / 4;
+    if (rotation === 90) totalRotationRad += Math.PI / 2;
+    if (totalRotationRad !== 0) {
+      bumpTexture.rotation = totalRotationRad;
+      bumpTexture.center.set(0.5, 0.5);
+    }
+    return bumpTexture;
+  };
+
   // Setup Three.js scene
   useEffect(() => {
     if (!containerRef.current) return;
@@ -316,24 +397,37 @@ export default function StudioCanvas({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.08;
     
     // Clear container and append canvas
     containerRef.current.innerHTML = '';
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
+    // High-End Studio HDRI Environment Reflections via RoomEnvironment & PMREM
+    let pmremGenerator = null;
+    let roomEnvTexture = null;
+    try {
+      pmremGenerator = new THREE.PMREMGenerator(renderer);
+      pmremGenerator.compileEquirectangularShader();
+      const roomEnv = new RoomEnvironment(renderer);
+      roomEnvTexture = pmremGenerator.fromScene(roomEnv, 0.04).texture;
+      scene.environment = roomEnvTexture;
+    } catch (e) {
+      console.warn('RoomEnvironment initialization notice:', e);
+    }
+
     // 4. Lights
-    const ambientLight = new THREE.AmbientLight('#ffffff', 0.48);
+    const ambientLight = new THREE.AmbientLight('#ffffff', 0.42);
     scene.add(ambientLight);
     ambientLightRef.current = ambientLight;
 
     // Ceiling & floor bounce light for natural architectural GI look
-    const hemiLight = new THREE.HemisphereLight(0xfff6ea, 0x1f2430, 0.65);
+    const hemiLight = new THREE.HemisphereLight(0xfff6ea, 0x1a202c, 0.55);
     hemiLight.position.set(0, ROOM_HEIGHT, 0);
     scene.add(hemiLight);
 
-    const directionalLight = new THREE.DirectionalLight('#fffaf0', 0.95);
+    const directionalLight = new THREE.DirectionalLight('#fffaf0', 0.88);
     directionalLight.position.set(4, 5.2, 3.2);
     directionalLight.castShadow = true;
     const shadowMapRes = isMobileDevice ? 1024 : 2048;
@@ -346,39 +440,48 @@ export default function StudioCanvas({
     scene.add(directionalLight);
     directionalLightRef.current = directionalLight;
 
-    const pointLight = new THREE.PointLight('#ffdf9e', 0.35, 10);
+    const pointLight = new THREE.PointLight('#ffdf9e', 0.28, 10);
     pointLight.position.set(0, 2.2, 0); 
     scene.add(pointLight);
     pointLightRef.current = pointLight;
 
-    // 4 Architectural Recessed Ceiling Downlights (Spotlights)
+    // 4 Architectural Recessed Ceiling Downlights with Soft Natural Falloff (penumbra: 0.95)
     // 1. Vanity / Sink Spotlight
-    const vanityDownlight = new THREE.SpotLight('#fff4e0', 1.25, 6.5, Math.PI / 4, 0.6, 1);
+    const vanityDownlight = new THREE.SpotLight('#fff5e2', 0.82, 7.0, Math.PI / 3.6, 0.95, 1.2);
     vanityDownlight.position.set(-ROOM_WIDTH / 2 + 0.65, ROOM_HEIGHT - 0.05, 0);
     vanityDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6, 0);
     scene.add(vanityDownlight);
     scene.add(vanityDownlight.target);
 
     // 2. Shower Spotlight
-    const showerDownlight = new THREE.SpotLight('#f2f7ff', 1.15, 6.5, Math.PI / 4, 0.6, 1);
+    const showerDownlight = new THREE.SpotLight('#f2f7ff', 0.78, 7.0, Math.PI / 3.6, 0.95, 1.2);
     showerDownlight.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.58);
     showerDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.58, 0, -ROOM_DEPTH / 2 + 0.58);
     scene.add(showerDownlight);
     scene.add(showerDownlight.target);
 
     // 3. Toilet Area Spotlight
-    const toiletDownlight = new THREE.SpotLight('#fff3df', 0.95, 6.0, Math.PI / 4, 0.6, 1);
+    const toiletDownlight = new THREE.SpotLight('#fff3df', 0.68, 6.5, Math.PI / 3.6, 0.95, 1.2);
     toiletDownlight.position.set(0.9, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.3);
     toiletDownlight.target.position.set(0.9, 0, -ROOM_DEPTH / 2 + 0.3);
     scene.add(toiletDownlight);
     scene.add(toiletDownlight.target);
 
     // 4. Center / Floor Specular Accent Spotlight
-    const floorDownlight = new THREE.SpotLight('#fff9ee', 1.05, 7.0, Math.PI / 3.5, 0.75, 1);
+    const floorDownlight = new THREE.SpotLight('#fff9ee', 0.75, 7.5, Math.PI / 3.2, 0.95, 1.2);
     floorDownlight.position.set(0.5, ROOM_HEIGHT - 0.05, 0.5);
     floorDownlight.target.position.set(0, 0, 0);
     scene.add(floorDownlight);
     scene.add(floorDownlight.target);
+
+    // Soft Studio Shadow Floor beneath floating room
+    const studioFloorGeo = new THREE.PlaneGeometry(16, 16);
+    const studioFloorMat = new THREE.ShadowMaterial({ opacity: 0.32 });
+    const studioFloor = new THREE.Mesh(studioFloorGeo, studioFloorMat);
+    studioFloor.rotation.x = -Math.PI / 2;
+    studioFloor.position.y = -0.005;
+    studioFloor.receiveShadow = true;
+    scene.add(studioFloor);
 
     // 5. Room geometry setup
     // Floor
@@ -535,8 +638,37 @@ export default function StudioCanvas({
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
+    const triggerPulse = (mesh) => {
+      if (!mesh || !mesh.material) return;
+      const mat = mesh.material;
+      const prevColor = mat.emissive ? mat.emissive.clone() : new THREE.Color(0x000000);
+      const prevIntensity = mat.emissiveIntensity || 0;
+
+      mat.emissive = new THREE.Color('#d4af37'); // Warm gold highlight pulse
+      mat.emissiveIntensity = 0.48;
+
+      const start = performance.now();
+      const duration = 500;
+      const animatePulse = () => {
+        const elapsed = performance.now() - start;
+        const progress = Math.min(1, elapsed / duration);
+        mat.emissiveIntensity = 0.48 * (1 - progress);
+        if (progress < 1) {
+          requestAnimationFrame(animatePulse);
+        } else {
+          mat.emissive = prevColor;
+          mat.emissiveIntensity = prevIntensity;
+        }
+      };
+      requestAnimationFrame(animatePulse);
+    };
+
     const onContainerClick = (e) => {
       if (!containerRef.current) return;
+      if (isAttractModeRef.current && onExitAttractModeRef.current) {
+        onExitAttractModeRef.current();
+      }
+
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -559,6 +691,8 @@ export default function StudioCanvas({
       const intersects = raycaster.intersectObjects(targets);
       if (intersects.length > 0) {
         const hit = intersects[0].object;
+        triggerPulse(hit);
+
         if (hit === showerFloorMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('showerFloor');
         } else if (hit === floorMeshRef.current) {
@@ -713,6 +847,10 @@ export default function StudioCanvas({
     let animationFrameId;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (isAttractModeRef.current) {
+        theta -= 0.0016;
+        updateCameraPosition();
+      }
       renderer.render(scene, camera);
     };
     animate();
@@ -1804,14 +1942,44 @@ export default function StudioCanvas({
 
     // Helper for realistic architectural PBR reflections responding to scene spotlights & cove lights
     const getPBRProps = (prod) => {
-      const finish = (prod?.finish || '').toLowerCase();
-      const isParlak = finish.includes('parlak');
+      const finish = (prod?.finish || prod?.surfaceType || prod?.style || prod?.name || '').toLowerCase();
+      const isParlak = finish.includes('parlak') || finish.includes('lappato') || finish.includes('glaze') || finish.includes('glossy') || finish.includes('polish');
       const isLappato = finish.includes('lapatto') || finish.includes('lappato') || finish.includes('yarı');
+      const isMat = finish.includes('mat') || finish.includes('matte') || finish.includes('saten') || finish.includes('rustic') || finish.includes('ahşap') || finish.includes('beton');
+
+      if (isParlak && !isLappato) {
+        return {
+          roughness: 0.06,
+          metalness: 0.02,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.03,
+          reflectivity: 0.95
+        };
+      } else if (isLappato) {
+        return {
+          roughness: 0.20,
+          metalness: 0.02,
+          clearcoat: 0.70,
+          clearcoatRoughness: 0.10,
+          reflectivity: 0.85
+        };
+      } else if (isMat) {
+        return {
+          roughness: 0.78,
+          metalness: 0.0,
+          clearcoat: 0.04,
+          clearcoatRoughness: 0.35,
+          reflectivity: 0.45
+        };
+      }
+
+      // Default high quality glazed ceramic
       return {
-        roughness: isParlak ? 0.09 : (isLappato ? 0.28 : 0.82),
-        metalness: isParlak ? 0.08 : (isLappato ? 0.04 : 0.0),
-        clearcoat: isParlak ? 1.0 : (isLappato ? 0.55 : 0.0),
-        clearcoatRoughness: isParlak ? 0.03 : 0.16
+        roughness: 0.25,
+        metalness: 0.01,
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.08,
+        reflectivity: 0.75
       };
     };
 
@@ -1863,18 +2031,25 @@ export default function StudioCanvas({
         texture.repeat.set(repeatX, repeatY);
         texture.colorSpace = THREE.SRGBColorSpace;
 
+        const bumpTexture = generateGroutBumpMap(groutWidth, tileRotation, layPattern);
+        bumpTexture.repeat.set(repeatX, repeatY);
+
         const pbr = getPBRProps(floorProduct);
 
         const newMaterial = new THREE.MeshPhysicalMaterial({
           map: texture,
+          bumpMap: bumpTexture,
+          bumpScale: 0.02,
           roughness: pbr.roughness,
           metalness: pbr.metalness,
           clearcoat: pbr.clearcoat,
-          clearcoatRoughness: pbr.clearcoatRoughness
+          clearcoatRoughness: pbr.clearcoatRoughness,
+          reflectivity: pbr.reflectivity
         });
 
         if (floorMeshRef.current) {
           if (floorMeshRef.current.material.map) floorMeshRef.current.material.map.dispose();
+          if (floorMeshRef.current.material.bumpMap) floorMeshRef.current.material.bumpMap.dispose();
           floorMeshRef.current.material.dispose();
           floorMeshRef.current.material = newMaterial;
         }
@@ -1906,15 +2081,23 @@ export default function StudioCanvas({
         // Back Wall
         const backTexture = texture.clone();
         backTexture.repeat.set(repeatX, wallRepeatY);
+
+        const bumpTexture = generateGroutBumpMap(groutWidth, tileRotation, layPattern);
+        bumpTexture.repeat.set(repeatX, wallRepeatY);
+
         const backWallMat = new THREE.MeshPhysicalMaterial({
           map: backTexture,
+          bumpMap: bumpTexture,
+          bumpScale: 0.018,
           roughness: pbr.roughness,
           metalness: pbr.metalness,
           clearcoat: pbr.clearcoat,
-          clearcoatRoughness: pbr.clearcoatRoughness
+          clearcoatRoughness: pbr.clearcoatRoughness,
+          reflectivity: pbr.reflectivity
         });
         if (backWallMeshRef.current) {
           if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
+          if (backWallMeshRef.current.material.bumpMap) backWallMeshRef.current.material.bumpMap.dispose();
           backWallMeshRef.current.material.dispose();
           backWallMeshRef.current.material = backWallMat;
         }
@@ -1929,17 +2112,24 @@ export default function StudioCanvas({
           compTex.repeat.set(ROOM_DEPTH / compW_m, ROOM_HEIGHT / compH_m);
           compTex.colorSpace = THREE.SRGBColorSpace;
 
+          const compBumpTex = generateGroutBumpMap(groutWidth, tileRotation, layPattern);
+          compBumpTex.repeat.set(ROOM_DEPTH / compW_m, ROOM_HEIGHT / compH_m);
+
           const pbrComp = getPBRProps(compTargetProduct);
 
           const leftWallMat = new THREE.MeshPhysicalMaterial({
             map: compTex,
+            bumpMap: compBumpTex,
+            bumpScale: 0.018,
             roughness: pbrComp.roughness,
             metalness: pbrComp.metalness,
             clearcoat: pbrComp.clearcoat,
-            clearcoatRoughness: pbrComp.clearcoatRoughness
+            clearcoatRoughness: pbrComp.clearcoatRoughness,
+            reflectivity: pbrComp.reflectivity
           });
           if (leftWallMeshRef.current) {
             if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
+            if (leftWallMeshRef.current.material.bumpMap) leftWallMeshRef.current.material.bumpMap.dispose();
             leftWallMeshRef.current.material.dispose();
             leftWallMeshRef.current.material = leftWallMat;
           }
@@ -2200,7 +2390,7 @@ export default function StudioCanvas({
       showerFloorMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
-  }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, comparisonProduct, comparisonMode, walkthroughMode, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+  }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, comparisonProduct, comparisonMode, walkthroughMode, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, roomType, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
 
   // Walkthrough Mode Camera Adjustments
   useEffect(() => {
@@ -2264,6 +2454,68 @@ export default function StudioCanvas({
     link.click();
   };
 
+  const handleCanvasDrop = (e) => {
+    e.preventDefault();
+    if (isAttractModeRef.current && onExitAttractModeRef.current) {
+      onExitAttractModeRef.current();
+    }
+    const rawData = e.dataTransfer ? e.dataTransfer.getData('application/json') : null;
+    if (!rawData) return;
+    try {
+      const droppedProduct = JSON.parse(rawData);
+      if (!rendererRef.current || !cameraRef.current) return;
+      const rect = rendererRef.current.domElement.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(new THREE.Vector2(x, y), cameraRef.current);
+
+      const targets = [];
+      if (showerFloorMeshRef.current) targets.push(showerFloorMeshRef.current);
+      if (floorMeshRef.current) targets.push(floorMeshRef.current);
+      if (showerBackWallMeshRef.current) targets.push(showerBackWallMeshRef.current);
+      if (showerSideWallMeshRef.current) targets.push(showerSideWallMeshRef.current);
+      if (toiletWallMeshRef.current) targets.push(toiletWallMeshRef.current);
+      if (accentWallMeshRef.current) targets.push(accentWallMeshRef.current);
+      if (leftWallAccentMeshRef.current) targets.push(leftWallAccentMeshRef.current);
+      if (stripeWallMeshRef.current) targets.push(stripeWallMeshRef.current);
+      if (leftStripeWallMeshRef.current) targets.push(leftStripeWallMeshRef.current);
+      if (backWallMeshRef.current) targets.push(backWallMeshRef.current);
+      if (leftWallMeshRef.current) targets.push(leftWallMeshRef.current);
+
+      const intersects = raycaster.intersectObjects(targets);
+      if (intersects.length > 0) {
+        const hit = intersects[0].object;
+        if (hit && hit.material) {
+          const mat = hit.material;
+          const prevColor = mat.emissive ? mat.emissive.clone() : new THREE.Color(0x000000);
+          mat.emissive = new THREE.Color('#d4af37');
+          mat.emissiveIntensity = 0.5;
+          setTimeout(() => {
+            mat.emissive = prevColor;
+            mat.emissiveIntensity = 0;
+          }, 450);
+        }
+
+        let targetName = 'walls';
+        if (hit === floorMeshRef.current) targetName = 'floor';
+        else if (hit === showerFloorMeshRef.current) targetName = 'showerFloor';
+        else if (hit === showerBackWallMeshRef.current || hit === showerSideWallMeshRef.current) targetName = 'shower';
+        else if (hit === toiletWallMeshRef.current) targetName = 'toilet';
+        else if (hit === accentWallMeshRef.current) targetName = 'accent';
+        else if (hit === leftWallAccentMeshRef.current) targetName = 'leftWallAccent';
+        else if (hit === stripeWallMeshRef.current || hit === leftStripeWallMeshRef.current) targetName = 'stripe';
+
+        if (onDropProductOnTargetRef.current) {
+          onDropProductOnTargetRef.current(targetName, droppedProduct);
+        }
+      }
+    } catch (err) {
+      console.warn('Canvas drop parse warning:', err);
+    }
+  };
+
   return (
     <div 
       className="studio-canvas-root" 
@@ -2285,11 +2537,11 @@ export default function StudioCanvas({
           top: typeof topOffset === 'number' ? `${topOffset}px` : topOffset 
         } : undefined}
       >
-        {/* SOL: Mekân Bilgi Rozetleri & Aktif Yüzey Seçimi */}
+        {/* SOL: Mekân Bilgi Rozeti & Hızlı Yüzey/Derz Kontrolleri */}
         <div className="header-bar-left">
           <div className="desktop-badges-group">
             <div className="overlay-badge" title="Mekân Türü">
-              <span className="badge-lbl">Oda Türü:</span>
+              <span className="badge-lbl">Oda:</span>
               <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
                 {roomType === 'bathroom' ? 'Lüks Banyo' : 
                  roomType === 'livingroom' ? 'Modern Salon' : 
@@ -2299,33 +2551,7 @@ export default function StudioCanvas({
               </strong>
             </div>
 
-            <div className="overlay-badge" title="Yüzey Kaplama Kapsamı">
-              <span className="badge-lbl">Kaplama:</span>
-              <strong style={{ textTransform: 'capitalize', color: '#38bdf8' }}>
-                {applyAccent ? 'Zemin & Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Zemin' : 'Döşenmemiş'}
-              </strong>
-            </div>
-
-            <div className="overlay-badge" title="Yüksek Çözünürlüklü Doku Durumu">
-              <span className="badge-lbl">Doku:</span>
-              <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
-                {textureStatus}
-              </strong>
-            </div>
-
-            {roomType === 'bathroom' && (
-              <div className="overlay-badge" style={{ borderColor: 'rgba(56, 189, 248, 0.4)' }} title="Duşakabin Cam Kaplama">
-                <span className="badge-lbl">Cam:</span>
-                <strong style={{ color: '#38bdf8' }}>
-                  {activeGlass === 'clear' ? 'Şeffaf Kristal' :
-                   activeGlass === 'smoke' ? 'Füme Duman' :
-                   activeGlass === 'bronze' ? 'Lüks Bronz' :
-                   activeGlass === 'frosted' ? 'Buzlu Opak' : 'Siyah Grid'}
-                </strong>
-              </div>
-            )}
-
-            {layPattern !== 'flat' && (
+            {layPattern && layPattern !== 'flat' && (
               <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }} title="Döşeme Deseni">
                 <span className="badge-lbl">Desen:</span>
                 <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
@@ -2391,6 +2617,11 @@ export default function StudioCanvas({
       {/* 3D WebGL Sahnesi (Header Bar'ın Altında Tertemiz Yerleşir, Tasarımın Üstüne Binmez!) */}
       <div 
         className="canvas-viewport-stage" 
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+        }}
+        onDrop={handleCanvasDrop}
         style={{ 
           position: 'relative', 
           flex: 1, 
@@ -2403,6 +2634,43 @@ export default function StudioCanvas({
           ref={containerRef} 
           style={{ width: '100%', height: '100%', cursor: walkthroughMode ? 'crosshair' : 'grab' }} 
         />
+
+        {/* Showroom Kiosk Attract Mode / Screensaver Overlay */}
+        {isAttractMode && (
+          <div 
+            className="kiosk-attract-overlay"
+            onClick={() => {
+              if (onExitAttractModeRef.current) onExitAttractModeRef.current();
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="attract-card">
+              <div className="attract-badge">
+                <span className="attract-sparkle">✨</span>
+                <span>SHOWROOM 3D TASARIM STÜDYOSU</span>
+              </div>
+              <h2 className="attract-headline">Mekânınızı Tasarlamaya Başlayın</h2>
+              <p className="attract-subline">
+                Yüzlerce lüks seramik modelini 360° deneyin • Canlı metraj ve bayi teklifi alın
+              </p>
+
+              <div className="attract-pulse-touch">
+                <div className="pulse-ring" />
+                <div className="pulse-button">
+                  <span className="touch-emoji">👆</span>
+                  <span className="pulse-txt">BAŞLAMAK İÇİN EKRANA DOKUNUN</span>
+                </div>
+              </div>
+
+              <div className="attract-chips">
+                <span className="attract-chip">🔄 360° Döndürme & İnceleme</span>
+                <span className="attract-chip">🎯 Sürükle & Bırak Karo Kaplama</span>
+                <span className="attract-chip">📐 Metraj & Kutu Hesabı</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 3D Split-Screen Comparison Slider Line */}
         {comparisonMode && (
@@ -2463,9 +2731,9 @@ export default function StudioCanvas({
           height: 48px;
           background: rgba(9, 13, 22, 0.96);
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
+          display: flex;
           align-items: center;
+          justify-content: space-between;
           padding: 0 14px;
           gap: 12px;
           z-index: 25;
@@ -2488,22 +2756,17 @@ export default function StudioCanvas({
         .header-bar-left {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
           min-width: 0;
-          overflow-x: auto;
-          scrollbar-width: none;
-          justify-self: start;
+          flex-shrink: 0;
           pointer-events: auto;
-        }
-        .header-bar-left::-webkit-scrollbar {
-          display: none;
         }
 
         .desktop-badges-group {
           display: flex;
           align-items: center;
           gap: 6px;
-          flex-wrap: nowrap;
+          flex-shrink: 0;
           white-space: nowrap;
         }
 
@@ -2511,8 +2774,8 @@ export default function StudioCanvas({
           display: flex;
           align-items: center;
           justify-content: center;
-          justify-self: center;
           flex-shrink: 0;
+          margin: 0 auto;
           pointer-events: auto;
         }
 
@@ -2520,7 +2783,7 @@ export default function StudioCanvas({
           display: flex;
           align-items: center;
           gap: 8px;
-          justify-self: end;
+          justify-content: flex-end;
           flex-shrink: 0;
           pointer-events: auto;
         }
@@ -2694,6 +2957,135 @@ export default function StudioCanvas({
           .header-bar-left, .header-bar-center, .header-bar-right {
             flex-shrink: 0;
           }
+        }
+
+        /* Kiosk Attract Mode / Showroom Screensaver Overlay */
+        .kiosk-attract-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: 80;
+          background: radial-gradient(circle at center, rgba(15, 23, 42, 0.76) 0%, rgba(9, 13, 22, 0.90) 100%);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          user-select: none;
+          animation: attractFadeIn 0.4s ease;
+          padding: 20px;
+        }
+
+        @keyframes attractFadeIn {
+          from { opacity: 0; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        .attract-card {
+          text-align: center;
+          padding: 34px 44px;
+          max-width: 540px;
+          background: rgba(17, 24, 39, 0.92);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 35px rgba(212, 175, 55, 0.16);
+          border-radius: 24px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .attract-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 14px;
+          border-radius: 999px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.32);
+          color: #fbbf24;
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+        }
+
+        .attract-headline {
+          color: #ffffff;
+          font-size: 1.85rem;
+          font-weight: 800;
+          margin: 0;
+          line-height: 1.25;
+        }
+
+        .attract-subline {
+          color: #94a3b8;
+          font-size: 0.95rem;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .attract-pulse-touch {
+          position: relative;
+          margin: 10px 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .pulse-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 999px;
+          border: 2px solid #fbbf24;
+          animation: pulseRippleAnim 2s infinite ease-out;
+          pointer-events: none;
+        }
+
+        @keyframes pulseRippleAnim {
+          0% { transform: scale(0.95); opacity: 0.85; }
+          100% { transform: scale(1.45); opacity: 0; }
+        }
+
+        .pulse-button {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 30px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          font-size: 0.96rem;
+          font-weight: 800;
+          letter-spacing: 0.02em;
+          box-shadow: 0 4px 22px rgba(245, 158, 11, 0.45);
+        }
+
+        .touch-emoji {
+          font-size: 1.35rem;
+          animation: bounceHand 1.6s infinite ease-in-out;
+        }
+
+        @keyframes bounceHand {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+
+        .attract-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          justify-content: center;
+        }
+
+        .attract-chip {
+          padding: 6px 12px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 8px;
+          color: #cbd5e1;
+          font-size: 0.75rem;
+          font-weight: 500;
         }
 
         @media (max-width: 640px) {
