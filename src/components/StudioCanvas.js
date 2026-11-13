@@ -90,7 +90,6 @@ export default function StudioCanvas({
   const directionalLightRef = useRef(null);
   const pointLightRef = useRef(null);
   const imageCacheRef = useRef(new Map());
-  const bumpCacheRef = useRef(new Map());
   const requestRenderRef = useRef(() => {});
   const backgroundColorRef = useRef(backgroundColor);
 
@@ -311,85 +310,6 @@ export default function StudioCanvas({
     return texture;
   };
 
-  // Helper to generate a 3D BumpMap providing realistic depth with memory-pooling cache
-  const generateGroutBumpMap = (gWidth, rotation, pattern) => {
-    const isMobile = typeof window !== 'undefined' && (
-      window.innerWidth <= 768 ||
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    );
-    const cacheKey = `${gWidth}_${rotation}_${pattern}_${isMobile ? 'm' : 'd'}`;
-    if (bumpCacheRef.current.has(cacheKey)) {
-      return bumpCacheRef.current.get(cacheKey);
-    }
-
-    const cSize = isMobile ? 256 : 512;
-    const canvas = document.createElement('canvas');
-    canvas.width = cSize;
-    canvas.height = cSize;
-    const ctx = canvas.getContext('2d');
-
-    // Recessed grout base is dark
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, cSize, cSize);
-
-    const groutMm = parseFloat(gWidth) || 2;
-    const borderPx = groutMm > 0 ? Math.max(1, Math.min(isMobile ? 3 : 4, Math.round(groutMm * (isMobile ? 0.35 : 0.7)))) : 0;
-    const s = cSize / 512;
-
-    if (pattern === 'herringbone') {
-      const pw = Math.round((250 - borderPx) * s);
-      const ph = Math.round((120 - borderPx) * s);
-      const drawBevelBlock = (x, y, w, h) => {
-        ctx.fillStyle = '#b0b0b0';
-        ctx.fillRect(x, y, w, h);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
-      };
-      drawBevelBlock(10 * s, 10 * s, pw, ph);
-      drawBevelBlock(260 * s, 10 * s, pw, ph);
-      drawBevelBlock(10 * s, 260 * s, pw, ph);
-      drawBevelBlock(260 * s, 260 * s, pw, ph);
-    } else if (pattern === 'staggered_50' || pattern === 'staggered_33') {
-      const rowH = Math.round((256 - borderPx) * s);
-      const offsetRatio = pattern === 'staggered_50' ? 0.5 : 0.33;
-      const offsetPx = cSize * offsetRatio;
-
-      const drawBevelRow = (x, y, w, h) => {
-        ctx.fillStyle = '#b0b0b0';
-        ctx.fillRect(x, y, w, h);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
-      };
-      drawBevelRow(0, 0, cSize - borderPx, rowH);
-      drawBevelRow(offsetPx, cSize / 2, cSize - borderPx, rowH);
-      drawBevelRow(offsetPx - cSize, cSize / 2, cSize - borderPx, rowH);
-    } else {
-      const tileW = cSize - borderPx;
-      const tileH = cSize - borderPx;
-      // Bevel rim (mid-grey catches glancing specular)
-      ctx.fillStyle = '#b4b4b4';
-      ctx.fillRect(0, 0, tileW, tileH);
-      // Flat elevated surface
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(2, 2, Math.max(1, tileW - 4), Math.max(1, tileH - 4));
-    }
-
-    const bumpTexture = new THREE.CanvasTexture(canvas);
-    bumpTexture.wrapS = THREE.RepeatWrapping;
-    bumpTexture.wrapT = THREE.RepeatWrapping;
-
-    let totalRotationRad = 0;
-    if (pattern === 'diagonal') totalRotationRad += Math.PI / 4;
-    if (rotation === 90) totalRotationRad += Math.PI / 2;
-    if (totalRotationRad !== 0) {
-      bumpTexture.rotation = totalRotationRad;
-      bumpTexture.center.set(0.5, 0.5);
-    }
-
-    bumpCacheRef.current.set(cacheKey, bumpTexture);
-    return bumpTexture;
-  };
-
   // Setup Three.js scene
   useEffect(() => {
     if (!containerRef.current) return;
@@ -416,9 +336,9 @@ export default function StudioCanvas({
       antialias: !isMobileDevice, 
       alpha: false, 
       preserveDrawingBuffer: true,
-      powerPreference: "high-performance",
-      precision: isMobileDevice ? "mediump" : "highp"
+      powerPreference: "high-performance"
     });
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     renderer.setPixelRatio(isMobileDevice ? Math.min(window.devicePixelRatio || 1, 1.0) : Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.shadowMap.enabled = !isMobileDevice;
@@ -428,7 +348,7 @@ export default function StudioCanvas({
       renderer.shadowMap.needsUpdate = true;
     }
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.15;
     
     // Clear container and append canvas
     containerRef.current.innerHTML = '';
@@ -467,7 +387,7 @@ export default function StudioCanvas({
       directionalLight.shadow.mapSize.height = shadowMapRes;
       directionalLight.shadow.camera.near = 0.5;
       directionalLight.shadow.camera.far = 16;
-      directionalLight.shadow.bias = -0.0005;
+      directionalLight.shadow.bias = 0.0001;
       directionalLight.shadow.normalBias = 0.02;
     }
     scene.add(directionalLight);
@@ -478,37 +398,37 @@ export default function StudioCanvas({
     scene.add(pointLight);
     pointLightRef.current = pointLight;
 
-    // 4 Architectural Recessed Ceiling Downlights with Soft Natural Falloff (penumbra: 0.95)
-    // Secondary task lights only loaded on desktop to preserve 60fps on mobile GPUs
+    // 4 Architectural Recessed Ceiling Downlights with Soft Natural Falloff
+    // Secondary task lights only loaded on desktop with physically correct decay to eliminate burn spots
     if (!isMobileDevice) {
-      // 1. Vanity / Sink Spotlight
-      const vanityDownlight = new THREE.SpotLight('#fff5e2', 0.82, 7.0, Math.PI / 3.6, 0.95, 1.2);
+      // 1. Vanity / Sink Downlight
+      const vanityDownlight = new THREE.SpotLight('#fff5e2', 0.35, 6.0, Math.PI / 3.6, 0.85, 2.0);
       vanityDownlight.position.set(-ROOM_WIDTH / 2 + 0.65, ROOM_HEIGHT - 0.05, 0);
       vanityDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6, 0);
       scene.add(vanityDownlight);
       scene.add(vanityDownlight.target);
 
-      // 2. Shower Spotlight
-      const showerDownlight = new THREE.SpotLight('#f2f7ff', 0.78, 7.0, Math.PI / 3.6, 0.95, 1.2);
+      // 2. Shower Downlight
+      const showerDownlight = new THREE.SpotLight('#f2f7ff', 0.30, 6.0, Math.PI / 3.6, 0.85, 2.0);
       showerDownlight.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.58);
       showerDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.58, 0, -ROOM_DEPTH / 2 + 0.58);
       scene.add(showerDownlight);
       scene.add(showerDownlight.target);
 
-      // 3. Toilet Area Spotlight
-      const toiletDownlight = new THREE.SpotLight('#fff3df', 0.68, 6.5, Math.PI / 3.6, 0.95, 1.2);
+      // 3. Toilet Area Downlight
+      const toiletDownlight = new THREE.SpotLight('#fff3df', 0.30, 6.0, Math.PI / 3.6, 0.85, 2.0);
       toiletDownlight.position.set(0.9, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.3);
       toiletDownlight.target.position.set(0.9, 0, -ROOM_DEPTH / 2 + 0.3);
       scene.add(toiletDownlight);
       scene.add(toiletDownlight.target);
-    }
 
-    // 4. Center / Floor Specular Accent Spotlight (active on all devices)
-    const floorDownlight = new THREE.SpotLight('#fff9ee', 0.75, 7.5, Math.PI / 3.2, 0.95, 1.2);
-    floorDownlight.position.set(0.5, ROOM_HEIGHT - 0.05, 0.5);
-    floorDownlight.target.position.set(0, 0, 0);
-    scene.add(floorDownlight);
-    scene.add(floorDownlight.target);
+      // 4. Center / Floor Specular Accent Downlight
+      const floorDownlight = new THREE.SpotLight('#fff9ee', 0.35, 6.5, Math.PI / 3.2, 0.85, 2.0);
+      floorDownlight.position.set(0.5, ROOM_HEIGHT - 0.05, 0.5);
+      floorDownlight.target.position.set(0, 0, 0);
+      scene.add(floorDownlight);
+      scene.add(floorDownlight.target);
+    }
 
     // Soft Studio Shadow Floor beneath floating room (desktop only)
     if (!isMobileDevice) {
@@ -2020,37 +1940,37 @@ export default function StudioCanvas({
 
       if (isParlak && !isLappato) {
         return {
-          roughness: 0.06,
+          roughness: 0.12,
           metalness: 0.02,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.03,
-          reflectivity: 0.95
+          clearcoat: 0.5,
+          clearcoatRoughness: 0.08,
+          reflectivity: 0.85
         };
       } else if (isLappato) {
         return {
-          roughness: 0.20,
+          roughness: 0.22,
           metalness: 0.02,
-          clearcoat: 0.70,
-          clearcoatRoughness: 0.10,
-          reflectivity: 0.85
+          clearcoat: 0.35,
+          clearcoatRoughness: 0.12,
+          reflectivity: 0.75
         };
       } else if (isMat) {
         return {
-          roughness: 0.78,
+          roughness: 0.82,
           metalness: 0.0,
-          clearcoat: 0.04,
-          clearcoatRoughness: 0.35,
-          reflectivity: 0.45
+          clearcoat: 0.0,
+          clearcoatRoughness: 0.4,
+          reflectivity: 0.35
         };
       }
 
       // Default high quality glazed ceramic
       return {
-        roughness: 0.25,
+        roughness: 0.28,
         metalness: 0.01,
-        clearcoat: 0.6,
-        clearcoatRoughness: 0.08,
-        reflectivity: 0.75
+        clearcoat: 0.4,
+        clearcoatRoughness: 0.12,
+        reflectivity: 0.65
       };
     };
 
@@ -2102,15 +2022,10 @@ export default function StudioCanvas({
         texture.repeat.set(repeatX, repeatY);
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        const bumpTexture = generateGroutBumpMap(groutWidth, tileRotation, layPattern);
-        bumpTexture.repeat.set(repeatX, repeatY);
-
         const pbr = getPBRProps(floorProduct);
 
         const newMaterial = new THREE.MeshPhysicalMaterial({
           map: texture,
-          bumpMap: bumpTexture,
-          bumpScale: 0.02,
           roughness: pbr.roughness,
           metalness: pbr.metalness,
           clearcoat: pbr.clearcoat,
@@ -2120,7 +2035,6 @@ export default function StudioCanvas({
 
         if (floorMeshRef.current) {
           if (floorMeshRef.current.material.map) floorMeshRef.current.material.map.dispose();
-          if (floorMeshRef.current.material.bumpMap) floorMeshRef.current.material.bumpMap.dispose();
           floorMeshRef.current.material.dispose();
           floorMeshRef.current.material = newMaterial;
         }
@@ -2153,13 +2067,8 @@ export default function StudioCanvas({
         const backTexture = texture.clone();
         backTexture.repeat.set(repeatX, wallRepeatY);
 
-        const bumpTexture = generateGroutBumpMap(groutWidth, tileRotation, layPattern);
-        bumpTexture.repeat.set(repeatX, wallRepeatY);
-
         const backWallMat = new THREE.MeshPhysicalMaterial({
           map: backTexture,
-          bumpMap: bumpTexture,
-          bumpScale: 0.018,
           roughness: pbr.roughness,
           metalness: pbr.metalness,
           clearcoat: pbr.clearcoat,
@@ -2168,7 +2077,6 @@ export default function StudioCanvas({
         });
         if (backWallMeshRef.current) {
           if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
-          if (backWallMeshRef.current.material.bumpMap) backWallMeshRef.current.material.bumpMap.dispose();
           backWallMeshRef.current.material.dispose();
           backWallMeshRef.current.material = backWallMat;
         }
@@ -2183,15 +2091,10 @@ export default function StudioCanvas({
           compTex.repeat.set(ROOM_DEPTH / compW_m, ROOM_HEIGHT / compH_m);
           compTex.colorSpace = THREE.SRGBColorSpace;
 
-          const compBumpTex = generateGroutBumpMap(groutWidth, tileRotation, layPattern);
-          compBumpTex.repeat.set(ROOM_DEPTH / compW_m, ROOM_HEIGHT / compH_m);
-
           const pbrComp = getPBRProps(compTargetProduct);
 
           const leftWallMat = new THREE.MeshPhysicalMaterial({
             map: compTex,
-            bumpMap: compBumpTex,
-            bumpScale: 0.018,
             roughness: pbrComp.roughness,
             metalness: pbrComp.metalness,
             clearcoat: pbrComp.clearcoat,
@@ -2200,7 +2103,6 @@ export default function StudioCanvas({
           });
           if (leftWallMeshRef.current) {
             if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
-            if (leftWallMeshRef.current.material.bumpMap) leftWallMeshRef.current.material.bumpMap.dispose();
             leftWallMeshRef.current.material.dispose();
             leftWallMeshRef.current.material = leftWallMat;
           }
