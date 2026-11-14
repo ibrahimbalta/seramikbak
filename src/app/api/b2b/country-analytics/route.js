@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // Master country configuration with region mapping
 const countryMasterList = [
@@ -19,8 +20,17 @@ const countryMasterList = [
 
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'brand' && auth.role !== 'admin')) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const brandId = searchParams.get('brandId');
+    // Anti-IDOR: Brands can only query their own analytics
+    const brandId = auth.role === 'brand' ? auth.id : searchParams.get('brandId');
     const period = searchParams.get('period') || '30d'; // 30d, 90d, 1y, all
 
     if (!brandId) {

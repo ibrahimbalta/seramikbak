@@ -46,6 +46,8 @@ export async function GET(request) {
       prisma.sampleOrder.findMany()
     ]);
 
+    const stripSecrets = (rows) => rows.map(({ password, resetToken, resetTokenExpires, ...safe }) => safe);
+
     const backupData = {
       meta: {
         appName: 'SeramikBak',
@@ -67,9 +69,9 @@ export async function GET(request) {
         }
       },
       data: {
-        brands,
+        brands: stripSecrets(brands),
         products,
-        dealers,
+        dealers: stripSecrets(dealers),
         dealerSaas,
         leads,
         campaigns,
@@ -79,8 +81,8 @@ export async function GET(request) {
         dealerInventories,
         outletListings,
         installers,
-        architects,
-        users,
+        architects: stripSecrets(architects),
+        users: stripSecrets(users),
         catalogs,
         sampleOrders
       }

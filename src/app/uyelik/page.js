@@ -251,6 +251,8 @@ export default function UyelikPage() {
   const [googleReady, setGoogleReady] = useState(false);
   const googleLoginBtnRef = useRef(null);
   const googleRegisterBtnRef = useRef(null);
+  const googleInitializedRef = useRef(false);
+  const googleAuthHandlerRef = useRef(null);
 
   const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '994830104230-v19gj9ts8ed2ngslcsfm0k8obpuulqb6.apps.googleusercontent.com';
 
@@ -291,21 +293,29 @@ export default function UyelikPage() {
     }
   };
 
+  // Keep latest Google auth handler in ref so GSI callback never goes stale
+  googleAuthHandlerRef.current = handleGoogleAuthSubmit;
+
   // Render official Google Identity Services buttons
   const renderGoogleButtons = useCallback(() => {
     if (typeof window === 'undefined' || !window.google?.accounts?.id) return;
 
     try {
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (response) => {
-          if (response.credential) {
-            handleGoogleAuthSubmit({ credential: response.credential });
-          }
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
+      if (!googleInitializedRef.current) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          ux_mode: 'popup',
+          itp_support: true,
+          callback: (response) => {
+            if (response.credential && googleAuthHandlerRef.current) {
+              googleAuthHandlerRef.current({ credential: response.credential });
+            }
+          },
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+        googleInitializedRef.current = true;
+      }
 
       // Render official login button
       if (googleLoginBtnRef.current) {

@@ -3,9 +3,21 @@ import prisma from '@/lib/prisma';
 import { hashPassword, verifyPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { encryptSession } from '@/lib/session';
+import { verifyAuth } from '@/lib/auth-check';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`architect_auth_${clientIp}`, 15, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      const waitMinutes = Math.ceil(rateCheck.resetInMs / 60000);
+      return NextResponse.json(
+        { error: `\u00c7ok fazla deneme yap\u0131ld\u0131. L\u00fctfen ${waitMinutes} dakika sonra tekrar deneyin.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { action, email, password, officeName, name, phone, city, title, chamberNo, isDemo } = body;
 
@@ -229,8 +241,13 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'architect' && auth.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz eri\u015fim. L\u00fctfen giri\u015f yap\u0131n\u0131z.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const architectId = searchParams.get('id');
+    const architectId = auth.role === 'architect' ? auth.id : (searchParams.get('id') || auth.id);
 
     if (!architectId) {
       return NextResponse.json({ error: 'architectId gerekli.' }, { status: 400 });

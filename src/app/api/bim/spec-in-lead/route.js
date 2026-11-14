@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // 1. POST: Register new BIM/CAD Spec-In Download Lead
 export async function POST(request) {
@@ -96,8 +97,14 @@ export async function POST(request) {
 // 2. GET: List Spec-In Leads for a brand with analytics summary
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'brand' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const brandId = searchParams.get('brandId');
+    // Anti-IDOR: Regular brands can only access their own Spec-In leads
+    const brandId = auth.role === 'brand' ? auth.id : searchParams.get('brandId');
     const statusFilter = searchParams.get('status');
 
     if (!brandId) {
@@ -174,11 +181,28 @@ export async function GET(request) {
 // 3. PATCH: Update lead status or notes by brand sales team
 export async function PATCH(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'brand' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { leadId, status, notes } = body;
 
     if (!leadId) {
       return NextResponse.json({ success: false, error: 'leadId parametresi zorunludur.' }, { status: 400 });
+    }
+
+    // Anti-IDOR: Verify lead belongs to the authenticated brand
+    const existingLead = await prisma.specInLead.findUnique({
+      where: { id: leadId },
+      select: { id: true, brandId: true }
+    });
+    if (!existingLead) {
+      return NextResponse.json({ success: false, error: 'Kayıt bulunamadı.' }, { status: 404 });
+    }
+    if (auth.role === 'brand' && existingLead.brandId !== auth.id) {
+      return NextResponse.json({ success: false, error: 'Bu talebi güncelleme yetkiniz bulunmamaktadır.' }, { status: 403 });
     }
 
     const updateData = {};

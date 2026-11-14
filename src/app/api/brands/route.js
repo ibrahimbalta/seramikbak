@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
+import { verifyAuth } from '@/lib/auth-check';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const customOrder = [
   "Çanakkale Seramik",
@@ -53,6 +56,12 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`brand_apply_${clientIp}`, 10, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({ error: '\u00c7ok fazla ba\u015fvuru denemesi. L\u00fctfen daha sonra tekrar deneyin.' }, { status: 429 });
+    }
+
     const payload = await request.json();
     const brandName = payload.name || payload.brandName || payload.brandId;
     const contactPerson = payload.contactPerson || payload.paymentSender || 'Yetkili';
@@ -75,13 +84,23 @@ export async function POST(request) {
       }
     });
 
-    if (!brand) {
+    if (brand) {
+      const auth = await verifyAuth(request);
+      const isOwnerOrAdmin = auth && (auth.role === 'admin' || (auth.role === 'brand' && auth.id === brand.id));
+      if (!isOwnerOrAdmin) {
+        return NextResponse.json(
+          { error: 'Bu marka ad\u0131 sistemde zaten kay\u0131tl\u0131. Mevcut marka hesab\u0131n\u0131zla giri\u015f yaparak i\u015flem yapabilirsiniz.' },
+          { status: 409 }
+        );
+      }
+    } else {
       const cleanUsername = brandName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
+      const rawPassword = 'marka' + Math.floor(1000 + Math.random() * 9000);
       brand = await prisma.brand.create({
         data: {
           name: brandName,
           username: cleanUsername,
-          password: 'marka' + Math.floor(1000 + Math.random() * 9000)
+          password: hashPassword(rawPassword)
         }
       });
     }

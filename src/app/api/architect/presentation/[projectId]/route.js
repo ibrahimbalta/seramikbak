@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { matchCSBPoz } from '@/lib/csbPozMatcher';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 // GET: Fetch client presentation data for a specific project (White-label)
 export async function GET(request, { params }) {
@@ -80,12 +81,18 @@ export async function GET(request, { params }) {
 // POST: Client approves a tile selection or submits revision feedback
 export async function POST(request, { params }) {
   try {
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`pres_feedback_${clientIp}`, 20, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({ error: 'Çok fazla işlem yapıldı. Lütfen daha sonra tekrar deneyin.' }, { status: 429 });
+    }
+
     const { projectId } = await params;
     const body = await request.json();
     const { itemId, action, clientName, clientNote } = body;
 
-    if (!itemId || !action) {
-      return NextResponse.json({ error: 'itemId ve action (approve | revision) zorunludur.' }, { status: 400 });
+    if (!itemId || (action !== 'approve' && action !== 'revision')) {
+      return NextResponse.json({ error: 'Geçerli bir itemId ve action (approve | revision) zorunludur.' }, { status: 400 });
     }
 
     const item = await prisma.architectProjectItem.findUnique({
@@ -97,13 +104,14 @@ export async function POST(request, { params }) {
     }
 
     const timestamp = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    const author = clientName?.trim() || 'İşveren';
+    const author = (typeof clientName === 'string' && clientName.trim()) ? clientName.trim().slice(0, 80) : 'İşveren';
+    const safeNote = (typeof clientNote === 'string' && clientNote.trim()) ? clientNote.trim().slice(0, 500) : '';
 
     let formattedNote = '';
     if (action === 'approve') {
-      formattedNote = `[ONAYLANDI - ${author} • ${timestamp}] ${clientNote?.trim() ? `Not: ${clientNote.trim()}` : 'Malzeme seçimi işveren tarafından onaylandı.'}`;
+      formattedNote = `[ONAYLANDI - ${author} • ${timestamp}] ${safeNote ? `Not: ${safeNote}` : 'Malzeme seçimi işveren tarafından onaylandı.'}`;
     } else {
-      formattedNote = `[REVİZYON TALEBİ - ${author} • ${timestamp}] ${clientNote?.trim() || 'Farklı doku/renk alternatifi talep edildi.'}`;
+      formattedNote = `[REVİZYON TALEBİ - ${author} • ${timestamp}] ${safeNote || 'Farklı doku/renk alternatifi talep edildi.'}`;
     }
 
     const updatedItem = await prisma.architectProjectItem.update({

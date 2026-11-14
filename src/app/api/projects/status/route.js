@@ -25,6 +25,12 @@ export async function GET(request) {
     }
 
     const trimmed = query.trim();
+    if (trimmed.length < 6) {
+      return NextResponse.json(
+        { error: 'Lütfen geçerli bir proje takip kodu (en az 6 karakter), e-posta veya tam telefon numarası girin.' },
+        { status: 400 }
+      );
+    }
 
     // 1. Direct ID match
     let project = await prisma.projectRequest.findUnique({
@@ -39,18 +45,22 @@ export async function GET(request) {
       });
     }
 
-    // 3. Search by phone number or ID prefix
+    // 3. Search by full phone number (10+ digits) or long ID prefix (8+ chars) to prevent enumeration
     if (!project) {
       const cleanPhone = trimmed.replace(/\D/g, '');
-      project = await prisma.projectRequest.findFirst({
-        where: {
-          OR: [
-            ...(cleanPhone.length >= 7 ? [{ contactPhone: { contains: cleanPhone } }] : []),
-            { id: { startsWith: trimmed } }
-          ]
-        },
-        orderBy: { createdAt: 'desc' }
-      });
+      const orClauses = [];
+      if (cleanPhone.length >= 10) {
+        orClauses.push({ contactPhone: { contains: cleanPhone.slice(-10) } });
+      }
+      if (trimmed.length >= 8) {
+        orClauses.push({ id: { startsWith: trimmed } });
+      }
+      if (orClauses.length > 0) {
+        project = await prisma.projectRequest.findFirst({
+          where: { OR: orClauses },
+          orderBy: { createdAt: 'desc' }
+        });
+      }
     }
 
     if (!project) {
@@ -60,13 +70,18 @@ export async function GET(request) {
       );
     }
 
+    const maskText = (val) => {
+      if (!val || typeof val !== 'string') return '***';
+      return val.split(' ').map(w => w.length <= 2 ? w[0] + '*' : w.slice(0, 2) + '***').join(' ');
+    };
+
     return NextResponse.json({
       success: true,
       project: {
         id: project.id,
         projectName: project.projectName,
-        companyName: project.companyName,
-        contactName: project.contactName,
+        companyName: maskText(project.companyName),
+        contactName: maskText(project.contactName),
         city: project.city,
         district: project.district,
         projectType: project.projectType,

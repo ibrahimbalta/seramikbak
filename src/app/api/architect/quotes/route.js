@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // POST: Architect submits a large project B2B wholesale / factory price request
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'architect' && auth.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz eri\u015fim. L\u00fctfen mimar giri\u015fi yap\u0131n\u0131z.' }, { status: 401 });
+    }
+
     const body = await request.json();
+    const architectId = auth.role === 'architect' ? auth.id : (body.architectId || auth.id);
     const { 
-      architectId, 
       projectId, 
       projectName, 
       projectType, 

@@ -23,9 +23,16 @@ export function hashPassword(password) {
 export function verifyPassword(password, storedPassword) {
   if (!password || !storedPassword) return false;
   
-  // Backward compatibility fallback for legacy plaintext passwords
+  const safeEqual = (a, b) => {
+    const bufA = Buffer.from(String(a), 'utf8');
+    const bufB = Buffer.from(String(b), 'utf8');
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+  };
+
+  // Backward compatibility fallback for legacy plaintext passwords (constant-time)
   if (!storedPassword.includes(':')) {
-    return password === storedPassword;
+    return safeEqual(password, storedPassword);
   }
   
   const [salt, originalHash] = storedPassword.split(':');
@@ -33,9 +40,9 @@ export function verifyPassword(password, storedPassword) {
   
   // Try modern 100,000 iterations first
   const modernHash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
-  if (modernHash === originalHash) return true;
+  if (safeEqual(modernHash, originalHash)) return true;
 
   // Fallback to legacy 1000 iterations
   const legacyHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-  return legacyHash === originalHash;
+  return safeEqual(legacyHash, originalHash);
 }

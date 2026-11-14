@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import dns from 'node:dns';
+import net from 'node:net';
 
 function isPrivateOrLocalHost(hostname) {
   if (!hostname) return true;
@@ -56,21 +58,75 @@ export async function GET(request) {
   }
 
   // 2. Block private/internal network addresses (SSRF Protection)
-  if (isPrivateOrLocalHost(parsedUrl.hostname)) {
-    return new NextResponse('Forbidden target host', { status: 403 });
+  async function assertSafeTarget(targetUrlObj) {
+    if (targetUrlObj.protocol !== 'http:' && targetUrlObj.protocol !== 'https:') {
+      return { ok: false, status: 400, msg: 'Unsupported protocol' };
+    }
+    if (isPrivateOrLocalHost(targetUrlObj.hostname)) {
+      return { ok: false, status: 403, msg: 'Forbidden target host' };
+    }
+    // Resolve DNS to block DNS rebinding / wildcard DNS pointing to private/loopback IPs
+    if (!net.isIP(targetUrlObj.hostname)) {
+      try {
+        const records = await dns.promises.lookup(targetUrlObj.hostname, { all: true });
+        if (!records || records.length === 0) {
+          return { ok: false, status: 403, msg: 'Unresolvable target host' };
+        }
+        for (const rec of records) {
+          if (isPrivateOrLocalHost(rec.address)) {
+            return { ok: false, status: 403, msg: 'Forbidden target host (private IP resolution)' };
+          }
+        }
+      } catch {
+        return { ok: false, status: 403, msg: 'Target host DNS lookup failed' };
+      }
+    }
+    return { ok: true };
+  }
+
+  const initialCheck = await assertSafeTarget(parsedUrl);
+  if (!initialCheck.ok) {
+    return new NextResponse(initialCheck.msg, { status: initialCheck.status });
   }
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
-    const res = await fetch(parsedUrl.toString(), {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+    let currentUrl = parsedUrl;
+    let res = null;
+    const maxRedirects = 2;
+    for (let hop = 0; hop <= maxRedirects; hop++) {
+      res = await fetch(currentUrl.toString(), {
+        signal: controller.signal,
+        redirect: 'manual',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+        }
+      });
+
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get('location');
+        if (!loc || hop === maxRedirects) {
+          clearTimeout(timeoutId);
+          return new NextResponse('Too many or invalid redirects', { status: 403 });
+        }
+        try {
+          currentUrl = new URL(loc, currentUrl.toString());
+        } catch {
+          clearTimeout(timeoutId);
+          return new NextResponse('Invalid redirect URL', { status: 400 });
+        }
+        const hopCheck = await assertSafeTarget(currentUrl);
+        if (!hopCheck.ok) {
+          clearTimeout(timeoutId);
+          return new NextResponse(hopCheck.msg, { status: hopCheck.status });
+        }
+        continue;
       }
-    });
+      break;
+    }
     clearTimeout(timeoutId);
 
     if (!res.ok) {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 const allCitiesList = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
@@ -14,8 +15,17 @@ const allCitiesList = [
 
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'brand' && auth.role !== 'admin')) {
+      return NextResponse.json(
+        { error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const brandId = searchParams.get('brandId');
+    // Anti-IDOR: Brands can only query using their own brandId
+    const brandId = auth.role === 'brand' ? auth.id : searchParams.get('brandId');
 
     if (!brandId) {
       return NextResponse.json(
@@ -51,6 +61,8 @@ export async function GET(request) {
       where: {
         createdAt: { gte: thirtyDaysAgo }
       },
+      take: 5000,
+      orderBy: { createdAt: 'desc' },
       include: {
         product: {
           select: {

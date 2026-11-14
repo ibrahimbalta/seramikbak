@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendPushNotification } from '@/lib/pushServer';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET: List sample orders requested by the architect
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'architect' && auth.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz eri\u015fim. L\u00fctfen mimar giri\u015fi yap\u0131n\u0131z.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const architectId = searchParams.get('architectId');
+    const architectId = auth.role === 'architect' ? auth.id : (searchParams.get('architectId') || auth.id);
 
     if (!architectId) {
       return NextResponse.json({ error: 'architectId gerekli.' }, { status: 400 });
@@ -34,8 +40,14 @@ export async function GET(request) {
 // POST: Request new sample box for selected product(s)
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'architect' && auth.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz eri\u015fim. L\u00fctfen mimar giri\u015fi yap\u0131n\u0131z.' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { architectId, productIds, officeAddress, city, notes, projectName, neededM2 } = body;
+    const architectId = auth.role === 'architect' ? auth.id : (body.architectId || auth.id);
+    const { productIds, officeAddress, city, notes, projectName, neededM2 } = body;
 
     if (!architectId || !productIds || !Array.isArray(productIds) || productIds.length === 0) {
       return NextResponse.json({ error: 'Mimar ID ve en az bir ürün seçilmelidir.' }, { status: 400 });

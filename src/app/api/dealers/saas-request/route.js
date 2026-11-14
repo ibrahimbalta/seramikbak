@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen bayi girişi yapınız.' }, { status: 401 });
+    }
+
     const payload = await request.json();
-    const { dealerId, plan, paymentSender, paymentDate, paymentNote } = payload;
+    const { plan, paymentSender, paymentDate, paymentNote } = payload;
+    // Anti-IDOR: Regular dealers can only submit SaaS requests for their own account
+    const dealerId = auth.role === 'dealer' ? auth.id : (payload.dealerId || auth.id);
 
     if (!dealerId || !plan) {
       return NextResponse.json({ error: 'Missing dealerId or plan' }, { status: 400 });
