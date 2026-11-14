@@ -19,7 +19,7 @@ function MekanimdaGorContent() {
   useEffect(() => {
     let url = '/tile-engine/index.html';
     const params = new URLSearchParams();
-    params.set('v', '4.0.0');
+    params.set('v', '6.0.0');
 
     if (tileParam) {
       params.set('tile', tileParam);
@@ -44,7 +44,7 @@ function MekanimdaGorContent() {
           setLoading(false);
         })
         .catch(() => {
-          setVisualizerSrc('/tile-engine/index.html?v=4.0.0');
+          setVisualizerSrc('/tile-engine/index.html?v=6.0.0');
           setLoading(false);
         });
       return;

@@ -465,7 +465,7 @@
             activeTileName = name;
             tileImgPreview.src = url;
             tileFileName.textContent = name;
-            tileDetailsNote.textContent = `Tile details: ${name}`;
+            tileDetailsNote.textContent = name;
 
             tileImageEl = await loadImage(url);
             tileDims.textContent = `${tileImageEl.naturalWidth}×${tileImageEl.naturalHeight}px`;
@@ -1255,7 +1255,7 @@
 
     // Execute Full Visualization Pipeline
     async function executeVisualization(silent = false) {
-        if (!silent) showLoading('Tile Detection & Visualization Engine çalışıyor…');
+        if (!silent) showLoading('Seramik mekâna döşeniyor…');
 
         try {
             const blob = await renderTilesPerspective();
@@ -1274,7 +1274,8 @@
                 showToast('Seramik mekâna başarıyla döşendi!', 'success');
             }
 
-            setSliderSplit(50);
+            setSliderSplit(0);
+            window.dispatchEvent(new CustomEvent('tileengine:rendered', { detail: { url: resultBlobUrl } }));
         } catch (err) {
             console.error(err);
             if (!silent) showToast('Hata: ' + err.message, 'error');
@@ -1383,7 +1384,7 @@
 
     // URL Parameters Initialization
     async function initFromUrlParams() {
-        showLoading('Tile Detection & Visualization Engine başlatılıyor…');
+        showLoading('Mekân hazırlanıyor…');
         const params = new URLSearchParams(window.location.search);
         const tileParam = params.get('tile');
         const productParam = params.get('product');
@@ -1433,6 +1434,25 @@
         await executeVisualization(true);
         hideLoading();
     }
+
+    // Public API for the Roomvo-style UI layer (roomvo-ui.js)
+    window.TileEngine = {
+        loadTile,
+        loadRoom,
+        execute: executeVisualization,
+        switchSurface,
+        showToast,
+        showLoading,
+        hideLoading,
+        getState: () => ({
+            surface: activeSurface,
+            tileUrl: activeTileUrl,
+            tileName: activeTileName,
+            roomUrl: activeRoomUrl,
+            roomName: activeRoomName,
+            resultUrl: resultBlobUrl
+        })
+    };
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initFromUrlParams);
