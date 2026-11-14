@@ -88,71 +88,187 @@
     let activeSurface = 'floor'; // 'floor' | 'wall'
     let activeTileUrl = '/textures/calacatta_gold.jpg';
     let activeTileName = 'Calacatta Gold 60×120';
-    let activeRoomUrl = '/hero/easy_bathroom.jpg';
-    let activeRoomName = 'Modern Banyo';
+    let activeRoomUrl = '/hero/wide_living.jpg';
+    let activeRoomName = 'Modern Salon';
 
     let tileImageEl = null;
     let roomImageEl = null;
     let roomFgImageEl = null;
+    let surfaceTypeMap = null; // Uint8Array: 0=none, 1=floor, 2=back_wall, 3=left_wall, 4=right_wall
+    let floorRefLum = 0.55;
+    let wallRefLum = 0.65;
+    const aiSegmentCache = new Map();
 
-    // Calibrated Room Geometries & Foreground Presets
+    // Calibrated Room Geometries & Exact Surface Polygons (0-100% coordinates)
     const ROOM_PRESETS = {
-        'modern_living': {
-            floorY: 0.52,
-            ceilingY: 0.10,
-            horizonY: 0.46,
-            vanishingX: 0.50,
-            vanishingY: 0.46,
-            fgUrl: '/hero/modern_living_fg.png',
-            isBathroom: false
-        },
-        'luxury_bathroom': {
-            floorY: 0.835,
-            ceilingY: 0.04,
-            horizonY: 0.48,
-            vanishingX: 0.50,
-            vanishingY: 0.48,
+        'wide_living': {
+            floorY: 0.618,
+            ceilingY: 0.08,
+            horizonY: 0.56,
+            vanishingX: 0.45,
+            vanishingY: 0.56,
             fgUrl: null,
-            isBathroom: true,
-            layout: 'luxury'
+            isBathroom: false,
+            defaultSurface: 'floor',
+            floor: {
+                polygon: [[0, 74.5], [9.0, 69.5], [24.8, 61.8], [83.4, 61.8], [87.5, 63.0], [95.2, 65.0], [100, 66.5], [100, 100], [0, 100]],
+                exclude: [
+                    [[26.5, 56.5], [29.8, 56.5], [29.8, 63.5], [26.5, 63.5]],
+                    [[25.0, 71.0], [28.2, 67.5], [28.2, 53.0], [65.5, 53.0], [65.5, 62.5], [75.8, 55.0], [77.8, 71.0]],
+                    [[95.0, 50.0], [100, 50.0], [100, 67.5], [95.0, 65.5]]
+                ]
+            },
+            walls: [
+                {
+                    name: 'right_pillar',
+                    type: 'back_wall',
+                    polygon: [[83.4, 25.5], [87.5, 25.5], [87.5, 63.0], [83.4, 61.8]],
+                    exclude: []
+                }
+            ]
         },
-        'easy_kitchen': {
-            floorY: 0.57,
-            ceilingY: 0.15,
-            horizonY: 0.46,
-            vanishingX: 0.50,
-            vanishingY: 0.46,
-            fgUrl: '/hero/scandinavian_kitchen_fg.png',
-            isBathroom: false
+        'wide_kitchen': {
+            floorY: 0.63,
+            ceilingY: 0.12,
+            horizonY: 0.52,
+            vanishingX: 0.48,
+            vanishingY: 0.52,
+            fgUrl: null,
+            isBathroom: false,
+            defaultSurface: 'floor',
+            floor: {
+                polygon: [[0, 75.2], [20.0, 64.0], [21.8, 63.0], [66.5, 63.0], [71.5, 60.5], [74.2, 60.5], [79.5, 62.8], [84.5, 66.0], [100, 76.5], [100, 100], [0, 100]],
+                exclude: [
+                    [[21.8, 48.0], [66.5, 48.0], [66.5, 73.2], [21.8, 73.2]]
+                ]
+            },
+            walls: [
+                {
+                    name: 'backsplash',
+                    type: 'back_wall',
+                    polygon: [[35.0, 31.3], [58.8, 31.3], [58.8, 45.8], [35.0, 45.8]],
+                    exclude: [
+                        [[36.0, 36.8], [41.5, 36.8], [41.5, 45.8], [36.0, 45.8]],
+                        [[44.8, 40.5], [49.8, 40.5], [49.8, 45.8], [44.8, 45.8]],
+                        [[53.8, 34.5], [58.8, 34.5], [58.8, 45.8], [53.8, 45.8]]
+                    ]
+                }
+            ]
         },
-        'scandinavian_kitchen': {
-            floorY: 0.57,
-            ceilingY: 0.15,
-            horizonY: 0.46,
+        'wide_terrace': {
+            floorY: 0.582,
+            ceilingY: 0.18,
+            horizonY: 0.52,
             vanishingX: 0.50,
-            vanishingY: 0.46,
-            fgUrl: '/hero/scandinavian_kitchen_fg.png',
-            isBathroom: false
+            vanishingY: 0.52,
+            fgUrl: null,
+            isBathroom: false,
+            defaultSurface: 'floor',
+            floor: {
+                polygon: [[0, 68.5], [12.0, 64.5], [27.5, 58.2], [72.5, 58.2], [85.5, 62.5], [100, 69.0], [100, 100], [0, 100]],
+                exclude: [
+                    [[11.8, 60.5], [16.0, 60.5], [16.0, 66.5], [11.8, 66.5]],
+                    [[14.8, 51.5], [26.6, 51.5], [26.6, 66.2], [17.0, 66.2], [14.8, 61.5]],
+                    [[25.8, 55.5], [32.2, 55.5], [32.2, 61.5], [25.8, 61.5]],
+                    [[29.6, 50.5], [35.5, 50.5], [35.5, 59.5], [29.6, 59.5]],
+                    [[36.3, 25.0], [37.6, 25.0], [37.6, 61.0], [36.3, 61.0]],
+                    [[62.8, 25.0], [64.1, 25.0], [64.1, 61.0], [62.8, 61.0]],
+                    [[66.8, 50.5], [71.8, 50.5], [71.8, 59.8], [66.8, 59.8]],
+                    [[69.5, 56.0], [76.5, 56.0], [76.5, 62.5], [69.5, 62.5]],
+                    [[75.5, 51.2], [88.2, 51.2], [88.2, 63.5], [75.5, 62.0]],
+                    [[85.5, 58.5], [91.5, 58.5], [91.5, 67.2], [85.5, 67.2]]
+                ]
+            },
+            walls: [
+                {
+                    name: 'right_wall',
+                    type: 'right_wall',
+                    polygon: [[91.5, 21.5], [100, 18.0], [100, 69.0], [91.5, 64.5]],
+                    exclude: []
+                }
+            ]
         },
         'easy_bathroom': {
-            floorY: 0.72,
-            ceilingY: 0.02,
-            horizonY: 0.48,
+            floorY: 0.71,
+            ceilingY: 0.198,
+            horizonY: 0.50,
             vanishingX: 0.50,
-            vanishingY: 0.48,
+            vanishingY: 0.50,
             fgUrl: null,
             isBathroom: true,
-            layout: 'easy'
+            defaultSurface: 'both',
+            floor: {
+                polygon: [[0, 85.2], [13.8, 75.5], [19.8, 71.0], [69.8, 71.0], [76.5, 74.5], [91.0, 74.5], [100, 74.5], [100, 100], [0, 100]],
+                exclude: []
+            },
+            walls: [
+                {
+                    name: 'back_wall_main',
+                    type: 'back_wall',
+                    polygon: [[31.5, 19.8], [69.8, 19.8], [69.8, 71.0], [31.5, 71.0]],
+                    exclude: [
+                        [[40.2, 25.0], [59.8, 25.0], [59.8, 49.8], [40.2, 49.8]],
+                        [[48.2, 50.2], [51.8, 50.2], [51.8, 54.6], [48.2, 54.6]],
+                        [[30.5, 54.5], [69.5, 54.5], [69.5, 68.2], [30.5, 68.2]],
+                        [[36.0, 32.0], [38.0, 32.0], [38.0, 44.0], [36.0, 44.0]],
+                        [[62.0, 32.0], [64.0, 32.0], [64.0, 44.0], [62.0, 44.0]]
+                    ]
+                },
+                {
+                    name: 'shower_back_wall',
+                    type: 'back_wall',
+                    polygon: [[69.8, 19.8], [91.0, 19.8], [91.0, 74.5], [69.8, 74.5]],
+                    exclude: [
+                        [[79.8, 24.0], [87.5, 24.0], [87.5, 29.0], [79.8, 29.0]]
+                    ]
+                },
+                {
+                    name: 'shower_right_wall',
+                    type: 'right_wall',
+                    polygon: [[91.0, 19.8], [100, 11.0], [100, 74.5], [91.0, 74.5]],
+                    exclude: []
+                }
+            ]
         },
-        'antrasit_gri_banyo': {
-            floorY: 0.856,
-            ceilingY: 0.176,
-            horizonY: 0.48,
-            vanishingX: 0.50,
-            vanishingY: 0.48,
+        'luxury_bathroom': {
+            floorY: 0.72,
+            ceilingY: 0.04,
+            horizonY: 0.56,
+            vanishingX: 0.48,
+            vanishingY: 0.56,
             fgUrl: null,
             isBathroom: true,
-            layout: 'antrasit'
+            defaultSurface: 'both',
+            floor: {
+                polygon: [[0, 88.5], [18.5, 81.5], [48.0, 72.5], [83.8, 69.0], [100, 69.0], [100, 100], [0, 100]],
+                exclude: [
+                    [[15.8, 63.0], [49.8, 63.0], [49.8, 92.0], [35.0, 96.5], [21.0, 96.5], [15.8, 86.0]],
+                    [[4.5, 71.0], [28.5, 71.0], [28.5, 100], [4.5, 100]],
+                    [[51.5, 80.0], [80.0, 80.0], [94.5, 100], [50.8, 100]]
+                ]
+            },
+            walls: [
+                {
+                    name: 'left_wall',
+                    type: 'left_wall',
+                    polygon: [[0, 0], [23.0, 0], [23.0, 81.5], [0, 88.5]],
+                    exclude: [
+                        [[0, 1.0], [18.0, 8.5], [18.0, 68.5], [0, 69.5]],
+                        [[0, 56.0], [7.0, 56.0], [7.0, 85.0], [0, 85.0]]
+                    ]
+                },
+                {
+                    name: 'back_wall',
+                    type: 'back_wall',
+                    polygon: [[23.0, 0], [100, 14.0], [100, 69.0], [23.0, 74.5]],
+                    exclude: [
+                        [[33.2, 20.0], [71.5, 25.0], [71.5, 48.8], [33.2, 48.8]],
+                        [[45.2, 50.0], [83.8, 52.0], [83.8, 70.0], [45.2, 74.0]],
+                        [[15.8, 63.0], [49.8, 63.0], [49.8, 92.0], [15.8, 88.0]],
+                        [[89.5, 50.0], [97.0, 50.0], [97.0, 63.0], [89.5, 63.0]]
+                    ]
+                }
+            ]
         }
     };
 
@@ -499,6 +615,9 @@
             }
 
             setupMaskCanvas(roomImageEl.naturalWidth, roomImageEl.naturalHeight);
+            if (!conf.floor && !aiSegmentCache.has(url)) {
+                await segmentRoomWithAI(roomImageEl, url);
+            }
             generateAutoMask();
         } catch (err) {
             console.error('Room load failed:', err);
@@ -513,7 +632,100 @@
         historyIndex = -1;
     }
 
-    // Intelligent Mask Generation (Unified perspective plane, protecting furniture & fixtures without artificial holes)
+    // Rasterize 0-100% polygons + exclusions to an anti-aliased alpha mask using 2D Canvas
+    function rasterizePolygonLayer(w, h, items) {
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, w, h);
+
+        for (const item of items) {
+            if (!item || !Array.isArray(item.polygon) || item.polygon.length < 3) continue;
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            item.polygon.forEach(([px, py], idx) => {
+                const x = (px / 100) * w;
+                const y = (py / 100) * h;
+                if (idx === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fill();
+
+            if (Array.isArray(item.exclude) && item.exclude.length > 0) {
+                ctx.globalCompositeOperation = 'destination-out';
+                for (const exPoly of item.exclude) {
+                    if (!Array.isArray(exPoly) || exPoly.length < 3) continue;
+                    ctx.beginPath();
+                    exPoly.forEach(([px, py], idx) => {
+                        const x = (px / 100) * w;
+                        const y = (py / 100) * h;
+                        if (idx === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            ctx.restore();
+        }
+
+        const data = ctx.getImageData(0, 0, w, h).data;
+        const alpha = new Uint8ClampedArray(w * h);
+        for (let i = 0; i < w * h; i++) {
+            alpha[i] = data[i * 4 + 3];
+        }
+        return alpha;
+    }
+
+    // Call /api/ai/segment for user-uploaded photos
+    async function segmentRoomWithAI(imgEl, cacheKey) {
+        try {
+            const maxDim = 1024;
+            let sw = imgEl.naturalWidth || imgEl.width;
+            let sh = imgEl.naturalHeight || imgEl.height;
+            if (sw > maxDim || sh > maxDim) {
+                const r = maxDim / Math.max(sw, sh);
+                sw = Math.round(sw * r);
+                sh = Math.round(sh * r);
+            }
+            const sc = document.createElement('canvas');
+            sc.width = sw;
+            sc.height = sh;
+            sc.getContext('2d').drawImage(imgEl, 0, 0, sw, sh);
+            const dataUrl = sc.toDataURL('image/jpeg', 0.85);
+
+            const res = await fetch('/api/ai/segment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: dataUrl, target: 'both' })
+            });
+            if (!res.ok) return null;
+            const json = await res.json();
+            if (json && json.success && json.floor) {
+                aiSegmentCache.set(cacheKey, json);
+                return json;
+            }
+        } catch (err) {
+            console.warn('AI segmentation unavailable, using fallback geometry:', err);
+        }
+        return null;
+    }
+
+    function inferWallType(wall) {
+        if (wall.type === 'left_wall') return 3;
+        if (wall.type === 'right_wall') return 4;
+        if (wall.type === 'back_wall') return 2;
+        const n = (wall.name || '').toLowerCase();
+        if (n.includes('left') || n.includes('sol')) return 3;
+        if (n.includes('right') || n.includes('sag') || n.includes('sağ')) return 4;
+        return 2;
+    }
+
+    // Intelligent Mask Generation (Exact calibrated/AI polygons + surface-median luminance)
     function generateAutoMask() {
         if (!roomImageEl) return;
         const w = maskCanvas.width;
@@ -529,10 +741,7 @@
         const rgbData = tCtx.getImageData(0, 0, w, h).data;
 
         const conf = getRoomConfig(activeRoomUrl, w, h, activeRoomName);
-        const floorY = Math.round(h * conf.floorY);
-        const ceilingY = Math.round(h * conf.ceilingY);
-        const isLuxuryBathroom = (activeRoomUrl || '').includes('luxury_bathroom') || (activeRoomName || '').toLowerCase().includes('lüks');
-        const isEasyBathroom = (activeRoomUrl || '').includes('easy_bathroom') || (activeRoomName || '').toLowerCase().includes('modern');
+        const segSource = conf.floor ? conf : aiSegmentCache.get(activeRoomUrl);
 
         // Independent Mask Buffers (Zero Overlap Disjoint Partition)
         const activeImgData  = maskCtx.createImageData(w, h);
@@ -546,6 +755,110 @@
         const fPx  = floorImgData.data;
         const prPx = protImgData.data;
         const ovPx = overlayImgData.data;
+
+        surfaceTypeMap = new Uint8Array(w * h);
+
+        if (segSource && segSource.floor && Array.isArray(segSource.floor.polygon)) {
+            const floorAlpha = rasterizePolygonLayer(w, h, [segSource.floor]);
+            const wallAlpha = new Uint8ClampedArray(w * h);
+            const wallTypes = new Uint8Array(w * h);
+
+            if (Array.isArray(segSource.walls)) {
+                for (const wall of segSource.walls) {
+                    const wa = rasterizePolygonLayer(w, h, [wall]);
+                    const wt = inferWallType(wall);
+                    for (let i = 0; i < w * h; i++) {
+                        if (wa[i] > wallAlpha[i]) {
+                            wallAlpha[i] = wa[i];
+                            wallTypes[i] = wt;
+                        }
+                    }
+                }
+            }
+
+            const floorHist = new Uint32Array(64);
+            const wallHist = new Uint32Array(64);
+            let floorCount = 0;
+            let wallCount = 0;
+
+            for (let i = 0; i < w * h; i++) {
+                const idx = i * 4;
+                const r = rgbData[idx];
+                const g = rgbData[idx + 1];
+                const b = rgbData[idx + 2];
+                const fA = floorAlpha[i];
+                const wA = fA > 128 ? 0 : wallAlpha[i];
+
+                if (fA > 10) {
+                    surfaceTypeMap[i] = 1;
+                    fPx[idx] = 255; fPx[idx + 1] = 255; fPx[idx + 2] = 255; fPx[idx + 3] = fA;
+                    ovPx[idx] = Math.min(255, Math.round(r * 0.45 + 16 * 0.55));
+                    ovPx[idx + 1] = Math.min(255, Math.round(g * 0.45 + 185 * 0.55));
+                    ovPx[idx + 2] = Math.min(255, Math.round(b * 0.45 + 129 * 0.55));
+                    ovPx[idx + 3] = 255;
+
+                    if (fA > 200) {
+                        const lum = r * 0.299 + g * 0.587 + b * 0.114;
+                        floorHist[Math.min(63, Math.floor(lum / 4))]++;
+                        floorCount++;
+                    }
+                } else if (wA > 10) {
+                    surfaceTypeMap[i] = wallTypes[i] || 2;
+                    wPx[idx] = 255; wPx[idx + 1] = 255; wPx[idx + 2] = 255; wPx[idx + 3] = wA;
+                    ovPx[idx] = Math.min(255, Math.round(r * 0.45 + 99 * 0.55));
+                    ovPx[idx + 1] = Math.min(255, Math.round(g * 0.45 + 102 * 0.55));
+                    ovPx[idx + 2] = Math.min(255, Math.round(b * 0.45 + 241 * 0.55));
+                    ovPx[idx + 3] = 255;
+
+                    if (wA > 200) {
+                        const lum = r * 0.299 + g * 0.587 + b * 0.114;
+                        wallHist[Math.min(63, Math.floor(lum / 4))]++;
+                        wallCount++;
+                    }
+                } else {
+                    prPx[idx] = 255; prPx[idx + 1] = 68; prPx[idx + 2] = 68; prPx[idx + 3] = 255;
+                    ovPx[idx] = Math.min(255, Math.round(r * 0.45 + 239 * 0.55));
+                    ovPx[idx + 1] = Math.min(255, Math.round(g * 0.45 + 68 * 0.55));
+                    ovPx[idx + 2] = Math.min(255, Math.round(b * 0.45 + 68 * 0.55));
+                    ovPx[idx + 3] = 255;
+                }
+
+                const targetAlpha = activeSurface === 'floor' ? fA :
+                                    activeSurface === 'wall' ? wA :
+                                    Math.max(fA, wA);
+                if (targetAlpha > 10) {
+                    mPx[idx] = 179; mPx[idx + 1] = 142; mPx[idx + 2] = 71; mPx[idx + 3] = targetAlpha;
+                }
+            }
+
+            const getPercentileLum = (hist, count, pct) => {
+                if (count === 0) return 0.58;
+                const target = Math.floor(count * pct);
+                let acc = 0;
+                for (let b = 0; b < 64; b++) {
+                    acc += hist[b];
+                    if (acc >= target) return Math.max(0.18, Math.min(0.88, (b * 4 + 2) / 255.0));
+                }
+                return 0.58;
+            };
+            floorRefLum = getPercentileLum(floorHist, floorCount, 0.58);
+            wallRefLum  = getPercentileLum(wallHist, wallCount, 0.58);
+
+            cachedMasks.active    = activeImgData;
+            cachedMasks.wall      = wallImgData;
+            cachedMasks.floor     = floorImgData;
+            cachedMasks.protected = protImgData;
+            cachedMasks.overlay   = overlayImgData;
+
+            renderCurrentLayerToCanvas();
+            saveMaskState();
+            return;
+        }
+
+        const floorY = Math.round(h * conf.floorY);
+        const ceilingY = Math.round(h * conf.ceilingY);
+        const isLuxuryBathroom = (activeRoomUrl || '').includes('luxury_bathroom') || (activeRoomName || '').toLowerCase().includes('lüks');
+        const isEasyBathroom = (activeRoomUrl || '').includes('easy_bathroom') || (activeRoomName || '').toLowerCase().includes('modern');
 
         for (let y = 0; y < h; y++) {
             const rowOffset = y * w * 4;
@@ -1031,11 +1344,15 @@
         const vx = Math.round(w * conf.vanishingX);
         const vy = Math.round(h * conf.horizonY);
 
-        // Camera and Metric focal scaling for Floor
-        // In realistic interior room photography, bottom width represents ~260cm of floor width
+        // Camera and Metric focal scaling for Floor & Side Walls
+        // In realistic interior room photography, bottom width represents ~340cm on wide 16:9 or ~260cm on square
+        const roomSpanCm = (w / h) > 1.35 ? 360.0 : 260.0;
         const camHeightCm = 145.0; // Human standing eye-level
         const focalMetricY = (h - vy) * 1.85;
-        const focalMetricX = (w / 260.0) * focalMetricY;
+        const focalMetricX = (w / roomSpanCm) * focalMetricY;
+        const backWallScale = roomSpanCm / w;
+        const sideWallK = focalMetricX * 145.0; // depth constant along side wall
+        const sideWallHScale = 145.0;           // height scale matching camHeightCm at horizon
 
         // Grout & Bevel physical dimensions in centimeters
         const gHalfCm = Math.max(0.06, gw / 20.0); // e.g. 2mm -> 0.1cm half-width
@@ -1044,29 +1361,19 @@
         const outImgData = rCtx.createImageData(w, h);
         const outBuf = new Uint32Array(outImgData.data.buffer);
         const roomBuf = new Uint32Array(roomPx.buffer);
+        const wallH = Math.max(1, floorHorizonY - ceilingY);
 
         for (let y = 0; y < h; y++) {
             const rowOffset = y * w;
             const rowByteOffset = rowOffset * 4;
             const dy = y - vy;
-            const isFloorPlane = y >= floorHorizonY;
 
-            // Pre-calculate per-row perspective depths
-            let zFloorCm = 0;
-            let uFloorScale = 0;
-            let vCoordBase = 0;
-            let yWallCm = 0;
-
-            if (isFloorPlane) {
-                const absDy = Math.max(1.0, dy);
-                zFloorCm = (focalMetricY * camHeightCm) / absDy;
-                uFloorScale = zFloorCm / focalMetricX;
-                vCoordBase = zFloorCm;
-            } else {
-                // Wall plane starts at floor joint (floorHorizonY) and stacks upward!
-                const wallH = Math.max(1, floorHorizonY - ceilingY);
-                yWallCm = (floorHorizonY - y) * (240.0 / wallH);
-            }
+            // Pre-calculate per-row perspective depths for floor and back wall
+            const absDyFloor = Math.max(1.0, dy);
+            const zFloorCm = (focalMetricY * camHeightCm) / absDyFloor;
+            const uFloorScale = zFloorCm / focalMetricX;
+            const vCoordBase = zFloorCm;
+            const yWallCm = (floorHorizonY - y) * (250.0 / wallH);
 
             for (let x = 0; x < w; x++) {
                 const pxIdx = rowOffset + x;
@@ -1078,15 +1385,28 @@
                     continue;
                 }
 
+                const sType = surfaceTypeMap ? surfaceTypeMap[pxIdx] : (y >= floorHorizonY ? 1 : 2);
+                const isFloorPlane = (sType === 1) || (sType === 0 && y >= floorHorizonY);
+
                 let uMetric = 0;
                 let vMetric = 0;
 
                 if (isFloorPlane) {
                     uMetric = (x - vx) * uFloorScale;
                     vMetric = vCoordBase;
+                } else if (sType === 3) {
+                    // Left Wall receding toward vanishing point (vx, vy)
+                    const dx = Math.max(8.0, vx - x);
+                    uMetric = sideWallK / dx;
+                    vMetric = ((vy - y) / dx) * sideWallHScale + 145.0;
+                } else if (sType === 4) {
+                    // Right Wall receding toward vanishing point (vx, vy)
+                    const dx = Math.max(8.0, x - vx);
+                    uMetric = sideWallK / dx;
+                    vMetric = ((vy - y) / dx) * sideWallHScale + 145.0;
                 } else {
-                    // Wall metric coordinates: aligned from floor baseline
-                    uMetric = (x - vx) * (260.0 / w);
+                    // Fronto-parallel Back Wall
+                    uMetric = (x - vx) * backWallScale;
                     vMetric = yWallCm;
                 }
 
@@ -1199,13 +1519,15 @@
                 let depthFactor = 1.0;
                 if (isFloorPlane) {
                     const depthDist = Math.max(0, 1.0 - (dy / Math.max(1, h - floorHorizonY)));
-                    depthFactor = 1.0 - (depthDist * 0.12);
+                    depthFactor = 1.0 - (depthDist * 0.08);
                 }
 
-                // 2. Contact shadow preservation & Ambient Occlusion (under vanity, toilet, baseboard)
-                const shadowFactor = Math.min(1.15, Math.max(0.12, Math.pow(Math.max(0.02, roomLum), 0.72) * 1.08 * depthFactor));
+                // 2. Surface-median luminance normalization (preserves shadows & highlights for both dark & light tiles)
+                const refLum = isFloorPlane ? floorRefLum : wallRefLum;
+                const relLight = Math.min(1.35, Math.max(0.32, roomLum / Math.max(0.15, refLum)));
+                const shadowFactor = Math.min(1.22, Math.max(0.38, (0.28 + 0.72 * Math.pow(relLight, 0.85)) * depthFactor));
 
-                // 3. Ambient bounce light color tinting (5-8% room ambient warmth/coolness)
+                // 3. Ambient bounce light color tinting (subtle 6% room ambient warmth/coolness)
                 const lumClamp = Math.max(0.12, roomLum * 255.0);
                 const tintR = 0.94 + 0.06 * (rR / lumClamp);
                 const tintG = 0.94 + 0.06 * (rG / lumClamp);
@@ -1215,14 +1537,14 @@
                 let shadedG = Math.min(255, tG * shadowFactor * tintG);
                 let shadedB = Math.min(255, tB * shadowFactor * tintB);
 
-                // 4. Specular Glaze Highlights (reflects ceiling downlights & vanity mirrors)
-                if (finishType === 'glossy' && roomLum > 0.58) {
-                    const spec = Math.pow((roomLum - 0.58) / 0.42, 2.2) * 0.55;
+                // 4. Specular Glaze Highlights (relative to surface median so dark rooms don't lose gloss)
+                if (finishType === 'glossy' && relLight > 1.08) {
+                    const spec = Math.min(0.45, Math.pow((relLight - 1.08) / 0.45, 1.8) * 0.38);
                     shadedR = Math.min(255, shadedR + 255 * spec);
                     shadedG = Math.min(255, shadedG + 255 * spec);
                     shadedB = Math.min(255, shadedB + 255 * spec);
-                } else if (finishType === 'satin' && roomLum > 0.68) {
-                    const spec = Math.pow((roomLum - 0.68) / 0.32, 1.8) * 0.22;
+                } else if (finishType === 'satin' && relLight > 1.15) {
+                    const spec = Math.min(0.20, Math.pow((relLight - 1.15) / 0.40, 1.6) * 0.16);
                     shadedR = Math.min(255, shadedR + 255 * spec);
                     shadedG = Math.min(255, shadedG + 255 * spec);
                     shadedB = Math.min(255, shadedB + 255 * spec);
@@ -1421,11 +1743,12 @@
 
         const initialTileUrl = tileParam || '/textures/calacatta_gold.jpg';
         const initialTileName = productParam || 'Calacatta Gold 60×120';
-        const initialRoomUrl = roomParam || '/hero/easy_bathroom.jpg';
+        const initialRoomUrl = roomParam || '/hero/wide_living.jpg';
+        const initialRoomName = roomParam ? 'Seçilen Mekân' : 'Modern Salon';
 
         await Promise.allSettled([
             loadTile(initialTileUrl, initialTileName),
-            loadRoom(initialRoomUrl, 'Modern Banyo')
+            loadRoom(initialRoomUrl, initialRoomName)
         ]);
 
         drawMaskViewport();
