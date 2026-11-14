@@ -176,20 +176,22 @@ export async function POST(request) {
 
     let prompt = '';
     if (target === 'all' || target === 'both') {
-      prompt = `You are an expert interior architecture AI system.
-Analyze this room photo for ceramic tile remodel.
-Identify the floor and vertical wall surfaces.
+      prompt = `You are an expert interior architecture AI system (like Roomvo / Keope Match App).
+Analyze this room photo for ceramic tile remodel with pixel-accurate polygons.
+Identify the floor, vertical wall surfaces, and vanishing point.
 
 CRITICAL ARCHITECTURAL RULES:
-1. FLOOR (zemin): Ground plane starting at bottom (y=100) extending to base of walls. Exclude furniture/fixtures (bathtub, stool, vanity).
-2. WALLS (duvarlar): Only actual vertical wall surfaces.
-   - The CEILING (top 15-25% of image with lights/plaster) is NEVER a wall. Do NOT include ceiling!
-   - WINDOWS and outdoor views are NEVER walls. Exclude all windows!
-   - MIRRORS (ayna) are NEVER walls. Exclude all mirrors!
-   - Separate walls into distinct quads (left_wall, right_wall, back_wall).
+1. FLOOR (zemin): Ground plane starting at bottom (y=100) extending to base of walls.
+   - EXCLUDE all objects sitting on or overlapping the floor: rugs/bath mats (halı/paspas), freestanding bathtubs (küvet), toilets (klozet), vanity pedestals, sofas, coffee tables, chairs, planters/pots.
+2. WALLS (duvarlar): Only actual vertical wall surfaces that can be tiled.
+   - NEVER include the CEILING (tavan) — top area with recessed lights/cove lighting.
+   - EXCLUDE ALL windows (pencere), doors (kapı), mirrors (ayna), wall-mounted vanity cabinets & countertops (banyo dolabı/tezgah), vessel sinks & faucets (lavabo/batarya), wall-hung toilets & flush plates (klozet/gömme rezervuar), illuminated wall niches, towels, and plants.
+   - Separate walls into distinct quads: "left_wall", "back_wall", "right_wall" (only include walls actually visible).
+3. VANISHING POINT: Estimate the 1-point perspective vanishing point [vx, vy] in 0-100% coordinates.
 
 Return ONLY valid JSON:
 {
+  "vanishingPoint": [50, 48],
   "floor": {
     "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
     "exclude": [ [[x,y],...], ... ]
@@ -201,12 +203,12 @@ Return ONLY valid JSON:
       "exclude": [ [[x,y],...], ... ]
     },
     {
-      "name": "right_wall",
+      "name": "back_wall",
       "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
       "exclude": [ [[x,y],...], ... ]
     },
     {
-      "name": "back_wall",
+      "name": "right_wall",
       "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
       "exclude": [ [[x,y],...], ... ]
     }

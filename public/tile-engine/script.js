@@ -548,17 +548,18 @@
             textToSearch.includes('lavabo')
         );
 
-        const isAntrasitLayout = isBathroom && (isPortrait || (w > 0 && h > 0 && Math.abs((w / h) - (475 / 625)) < 0.18));
+        const aiCached = aiSegmentCache.get(url);
+        const aiVp = aiCached && Array.isArray(aiCached.vanishingPoint) ? aiCached.vanishingPoint : null;
 
         return {
-            floorY: isAntrasitLayout ? 0.856 : (isBathroom ? (isPortrait ? 0.80 : 0.76) : (isPortrait ? 0.70 : 0.62)),
-            ceilingY: isBathroom ? 0.04 : 0.06,
-            horizonY: 0.48,
-            vanishingX: 0.50,
-            vanishingY: 0.48,
+            floorY: isBathroom ? (isPortrait ? 0.78 : 0.72) : (isPortrait ? 0.70 : 0.62),
+            ceilingY: 0.14,
+            horizonY: aiVp ? Math.min(0.65, Math.max(0.30, aiVp[1] / 100)) : 0.48,
+            vanishingX: aiVp ? Math.min(0.75, Math.max(0.25, aiVp[0] / 100)) : 0.50,
+            vanishingY: aiVp ? Math.min(0.65, Math.max(0.30, aiVp[1] / 100)) : 0.48,
             fgUrl: null,
             isBathroom: isBathroom,
-            layout: isAntrasitLayout ? 'antrasit' : (isBathroom ? 'general_bathroom' : 'general')
+            layout: isBathroom ? 'general_bathroom' : 'general'
         };
     }
 
@@ -955,7 +956,7 @@
     // Call /api/ai/segment for user-uploaded photos
     async function segmentRoomWithAI(imgEl, cacheKey) {
         try {
-            const maxDim = 1024;
+            const maxDim = 768;
             let sw = imgEl.naturalWidth || imgEl.width;
             let sh = imgEl.naturalHeight || imgEl.height;
             if (sw > maxDim || sh > maxDim) {
@@ -967,10 +968,10 @@
             sc.width = sw;
             sc.height = sh;
             sc.getContext('2d').drawImage(imgEl, 0, 0, sw, sh);
-            const dataUrl = sc.toDataURL('image/jpeg', 0.85);
+            const dataUrl = sc.toDataURL('image/jpeg', 0.80);
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 6500);
+            const timeoutId = setTimeout(() => controller.abort(), 18000);
             const res = await fetch('/api/ai/segment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1573,6 +1574,23 @@
         const rCtx = rCanvas.getContext('2d');
         rCtx.drawImage(roomImageEl, 0, 0, w, h);
         const roomImgData = rCtx.getImageData(0, 0, w, h);
+
+        // Low-frequency smooth lighting map (removes old tile grout/noise so new tile looks solid, not painted)
+        const lw = Math.max(48, Math.round(w / 18));
+        const lh = Math.max(48, Math.round(h / 18));
+        const lCanvas = document.createElement('canvas');
+        lCanvas.width = lw;
+        lCanvas.height = lh;
+        const lCtx = lCanvas.getContext('2d');
+        lCtx.imageSmoothingEnabled = true;
+        lCtx.drawImage(rCanvas, 0, 0, lw, lh);
+        const lUpCanvas = document.createElement('canvas');
+        lUpCanvas.width = w;
+        lUpCanvas.height = h;
+        const lUpCtx = lUpCanvas.getContext('2d');
+        lUpCtx.imageSmoothingEnabled = true;
+        lUpCtx.drawImage(lCanvas, 0, 0, w, h);
+        const smoothLightPx = lUpCtx.getImageData(0, 0, w, h).data;
         const roomPx = roomImgData.data;
 
         // Target surface mask
@@ -1789,8 +1807,10 @@
                 const rG = roomPx[byteIdx + 1];
                 const rB = roomPx[byteIdx + 2];
 
-                // Original room luminance [0, 1]
-                const roomLum = (rR * 0.299 + rG * 0.587 + rB * 0.114) / 255.0;
+                // Low-frequency smooth room luminance [0, 1] (78% smooth broad light + 22% local contact shadow)
+                const localLum = (rR * 0.299 + rG * 0.587 + rB * 0.114) / 255.0;
+                const blurLum = (smoothLightPx[byteIdx] * 0.299 + smoothLightPx[byteIdx + 1] * 0.587 + smoothLightPx[byteIdx + 2] * 0.114) / 255.0;
+                const roomLum = blurLum * 0.78 + localLum * 0.22;
 
                 // 1. Natural photographic depth falloff for floor plane
                 let depthFactor = 1.0;
