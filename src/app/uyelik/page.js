@@ -1605,9 +1605,13 @@ export default function UyelikPage() {
         }
 
         .auth-input:focus {
-          border-color: #b38e47;
+          border-color: var(--accent-gold, #b38e47);
           background: #ffffff;
           box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15);
+        }
+
+        .auth-input:-webkit-autofill:focus {
+          -webkit-box-shadow: 0 0 0 1000px #ffffff inset, 0 0 0 3px rgba(179, 142, 71, 0.15) !important;
         }
 
         .submit-btn {
@@ -1991,6 +1995,7 @@ export default function UyelikPage() {
                 <input 
                   type="email" 
                   required 
+                  autoComplete="email"
                   placeholder="ornek@email.com" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -2002,7 +2007,8 @@ export default function UyelikPage() {
                 <input 
                   type="password" 
                   required 
-                  placeholder="••••••••" 
+                  autoComplete="current-password"
+                  placeholder="Şifrenizi girin" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="auth-input"
