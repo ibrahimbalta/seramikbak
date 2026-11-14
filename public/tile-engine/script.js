@@ -188,6 +188,88 @@
                 }
             ]
         },
+        'wide_bathroom': {
+            floorY: 0.862,
+            ceilingY: 0.095,
+            horizonY: 0.56,
+            vanishingX: 0.48,
+            vanishingY: 0.56,
+            fgUrl: null,
+            isBathroom: true,
+            defaultSurface: 'both',
+            floor: {
+                polygon: [[27.8, 89.0], [36.5, 89.0], [40.0, 86.2], [59.5, 86.2], [59.5, 100], [27.8, 100]],
+                exclude: [
+                    [[52.5, 76.5], [59.8, 76.5], [59.8, 99.0], [54.0, 99.0], [52.5, 85.0]]
+                ]
+            },
+            walls: [
+                {
+                    name: 'shower_back_wall',
+                    type: 'back_wall',
+                    polygon: [[5.0, 10.5], [39.8, 10.5], [39.8, 86.2], [5.0, 89.0]],
+                    exclude: [
+                        [[5.0, 21.0], [19.8, 25.0], [19.8, 56.5], [5.0, 62.0]],
+                        [[4.5, 80.5], [28.2, 85.5], [28.2, 100], [4.5, 100]],
+                        [[8.8, 11.8], [21.5, 11.8], [21.5, 19.2], [8.8, 19.2]]
+                    ]
+                },
+                {
+                    name: 'back_wall',
+                    type: 'back_wall',
+                    polygon: [[39.8, 9.5], [65.2, 12.0], [65.2, 86.2], [39.8, 86.2]],
+                    exclude: [
+                        [[42.8, 47.5], [51.0, 47.5], [51.0, 72.5], [42.8, 72.5]],
+                        [[53.0, 65.2], [56.0, 65.2], [56.0, 71.2], [53.0, 71.2]],
+                        [[52.5, 76.5], [59.8, 76.5], [59.8, 86.2], [52.5, 86.2]],
+                        [[58.5, 65.0], [65.2, 65.0], [65.2, 86.2], [58.5, 86.2]]
+                    ]
+                },
+                {
+                    name: 'right_wall',
+                    type: 'right_wall',
+                    polygon: [[65.2, 12.0], [100, 0], [100, 64.0], [65.2, 65.0]],
+                    exclude: [
+                        [[73.0, 0], [100, 0], [100, 61.5], [73.0, 60.5]],
+                        [[80.0, 24.0], [100, 24.0], [100, 78.0], [80.0, 78.0]],
+                        [[64.2, 28.0], [71.2, 28.0], [71.2, 50.0], [64.2, 50.0]]
+                    ]
+                }
+            ]
+        },
+        'wide_luxury_bathroom': {
+            floorY: 0.89,
+            ceilingY: 0.05,
+            horizonY: 0.50,
+            vanishingX: 0.62,
+            vanishingY: 0.50,
+            fgUrl: null,
+            isBathroom: true,
+            defaultSurface: 'both',
+            floor: {
+                polygon: [[34.0, 91.5], [43.5, 89.0], [56.5, 100], [33.5, 100]],
+                exclude: []
+            },
+            walls: [
+                {
+                    name: 'left_wall',
+                    type: 'left_wall',
+                    polygon: [[0, 0], [58.0, 18.0], [58.0, 72.0], [43.5, 89.0], [34.0, 91.5], [0, 100]],
+                    exclude: [
+                        [[5.2, 46.5], [17.2, 46.5], [17.2, 58.2], [5.2, 58.2]],
+                        [[26.5, 0], [31.5, 0], [31.5, 58.0], [26.5, 58.0]],
+                        [[46.5, 65.5], [51.0, 65.5], [51.0, 80.5], [46.5, 80.5]],
+                        [[43.5, 69.5], [58.0, 69.5], [58.0, 100], [43.5, 89.0]]
+                    ]
+                },
+                {
+                    name: 'right_wall',
+                    type: 'right_wall',
+                    polygon: [[90.5, 0], [100, 0], [100, 100], [90.5, 77.5]],
+                    exclude: []
+                }
+            ]
+        },
         'easy_bathroom': {
             floorY: 0.71,
             ceilingY: 0.198,
@@ -1351,8 +1433,9 @@
         const focalMetricY = (h - vy) * 1.85;
         const focalMetricX = (w / roomSpanCm) * focalMetricY;
         const backWallScale = roomSpanCm / w;
-        const sideWallK = focalMetricX * 145.0; // depth constant along side wall
-        const sideWallHScale = 145.0;           // height scale matching camHeightCm at horizon
+        const halfSpanCm = roomSpanCm * 0.5;
+        const sideWallK = focalMetricY * halfSpanCm; // depth constant along side wall
+        const sideWallHScale = halfSpanCm;           // vertical scale matching 1-point perspective rays
 
         // Grout & Bevel physical dimensions in centimeters
         const gHalfCm = Math.max(0.06, gw / 20.0); // e.g. 2mm -> 0.1cm half-width
