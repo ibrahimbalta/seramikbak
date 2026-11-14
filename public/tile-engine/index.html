@@ -53,10 +53,10 @@
                 </div>
 
                 <!-- Upload CTA -->
-                <button type="button" class="rv-upload-fab" id="browse-room-btn">
+                <label for="room-file-input" class="rv-upload-fab" id="browse-room-btn" style="cursor:pointer;">
                     <span>📷</span><span>Kendi Fotoğrafını Yükle</span>
-                </button>
-                <input type="file" id="room-file-input" accept="image/*" style="display:none;" />
+                </label>
+                <input type="file" id="room-file-input" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none;" />
 
                 <!-- Empty-state hint -->
                 <div class="rv-hint" id="rv-hint">Beğendiğiniz seramiğe dokunun, mekânınıza anında döşensin.</div>

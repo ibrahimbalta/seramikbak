@@ -810,15 +810,29 @@
         await executeVisualization(false);
     });
 
-    // Browse Room File
-    browseRoomBtn.addEventListener('click', () => roomFileInput.click());
+    // Browse Room File (label[for="room-file-input"] opens picker natively across desktop, mobile & iframes)
     roomFileInput.addEventListener('change', async (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         presetPills.forEach((p) => p.classList.remove('active'));
-        const url = URL.createObjectURL(file);
-        await loadRoom(url, file.name);
-        await executeVisualization(false);
+        showLoading('Fotoğrafınız yükleniyor ve yüzeyler tespit ediliyor…');
+        try {
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Dosya okunamadı'));
+                reader.readAsDataURL(file);
+            });
+            await loadRoom(dataUrl, file.name);
+            await executeVisualization(true);
+            showToast('Fotoğrafınız yüklendi ve seramik döşendi!', 'success');
+        } catch (err) {
+            console.error('Room upload failed:', err);
+            showToast('Fotoğraf yüklenirken bir hata oluştu.', 'error');
+        } finally {
+            hideLoading();
+            roomFileInput.value = '';
+        }
     });
 
     analyzeRoomBtn.addEventListener('click', async () => {
@@ -955,11 +969,15 @@
             sc.getContext('2d').drawImage(imgEl, 0, 0, sw, sh);
             const dataUrl = sc.toDataURL('image/jpeg', 0.85);
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6500);
             const res = await fetch('/api/ai/segment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: dataUrl, target: 'both' })
+                body: JSON.stringify({ image: dataUrl, target: 'both' }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
             if (!res.ok) return null;
             const json = await res.json();
             if (json && json.success && json.floor) {
