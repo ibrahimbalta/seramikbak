@@ -49,7 +49,7 @@ export function middleware(request) {
 
   if (!isEmbeddable) {
     response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   } else {
     response.headers.delete('X-Frame-Options');
     response.headers.set('Access-Control-Allow-Origin', '*');
