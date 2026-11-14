@@ -93,7 +93,8 @@ test('Security Audit - Multi-Tenant Isolation & Auth Guards Across Critical Rout
     { file: 'src/app/api/dealers/outlet/subscribers/route.js', rolePattern: /auth\.role\s*!==\s*['"]dealer['"]/ },
     { file: 'src/app/api/b2b/country-analytics/route.js', rolePattern: /auth\.role\s*!==\s*['"]brand['"]/ },
     { file: 'src/app/api/b2b/trends/route.js', rolePattern: /auth\.role\s*!==\s*['"]brand['"]/ },
-    { file: 'src/app/api/admin/security/backup/route.js', rolePattern: /verifyAuth\(request,\s*['"]admin['"],\s*['"]SUPER_ADMIN['"]\)/ }
+    { file: 'src/app/api/admin/security/backup/route.js', rolePattern: /verifyAuth\(request,\s*['"]admin['"],\s*['"]SUPER_ADMIN['"]\)/ },
+    { file: 'src/app/api/admin/system-monitor/route.js', rolePattern: /verifyAuth\(request,\s*['"]admin['"],\s*['"]SUPER_ADMIN['"]\)/ }
   ];
 
   for (const item of mustRequireAuth) {

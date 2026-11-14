@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
+import SystemMonitorTab from '@/components/admin/SystemMonitorTab';
 import ArchitectsTab from '@/components/admin/ArchitectsTab';
 
 export default function AdminPage() {
@@ -88,7 +89,8 @@ export default function AdminPage() {
     installers: 'Seramik Ustaları',
     contact_messages: 'İletişim Mesajları',
     sample_orders: 'Numune Talepleri',
-    security: 'Güvenlik & Yedekleme'
+    security: 'Güvenlik & Yedekleme',
+    system_monitor: 'Test & Sağlık Monitörü'
   };
 
   const tabIcons = {
@@ -2597,6 +2599,16 @@ export default function AdminPage() {
                     <ShieldCheck size={17} />
                   </div>
                   {!isSidebarCollapsed && <span>Güvenlik & Yedekleme</span>}
+                </button>
+                <button 
+                  className={`nav-item ${activeTab === 'system_monitor' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('system_monitor')}
+                  title="Test & Sağlık Monitörü"
+                >
+                  <div className="nav-icon-wrap">
+                    <Terminal size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Test & Sağlık Monitörü</span>}
                 </button>
               </div>
             )}
@@ -7079,6 +7091,9 @@ export default function AdminPage() {
       {/* TAB: SECURITY & BACKUP CENTER */}
       {activeTab === 'security' && (
         <SecurityBackupTab />
+      )}
+      {activeTab === 'system_monitor' && (
+        <SystemMonitorTab />
       )}
 
         </div>{/* end admin-content */}
