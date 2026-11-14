@@ -4611,19 +4611,16 @@ export default function Home() {
                 </p>
 
                 <div className="luxury-hero-actions-row">
-                  <button 
-                    type="button" 
-                    onClick={() => {
-                      setActiveTab('studio');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
+                  <Link
+                    href="/mekanimda-gor"
+                    style={{ textDecoration: 'none' }}
                     className="clean-hero-primary-btn"
                     aria-label="3D'de Canlı Dene"
                   >
                     <Box size={18} />
                     <span>{currentHeroSlide.ctaText || "3D'de Canlı Dene"}</span>
                     <ArrowRight size={16} />
-                  </button>
+                  </Link>
 
                   <label htmlFor="clean-hero-visual-search-input" className="luxury-hero-secondary-btn" title="Fotoğraftan Bul (Yapay Zeka)">
                     <Camera size={16} />
