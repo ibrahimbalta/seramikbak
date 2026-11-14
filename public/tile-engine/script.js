@@ -811,8 +811,8 @@
         await executeVisualization(false);
     });
 
-    // Browse Room File (label[for="room-file-input"] opens picker natively across desktop, mobile & iframes)
-    roomFileInput.addEventListener('change', async (e) => {
+    // Browse Room File (guarded if room upload UI is disabled)
+    if (roomFileInput) roomFileInput.addEventListener('change', async (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         presetPills.forEach((p) => p.classList.remove('active'));
