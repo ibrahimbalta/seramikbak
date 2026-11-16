@@ -2668,6 +2668,25 @@ export default function AdminPage() {
             </div>
           </div>
           <div className="topbar-actions">
+            <button
+              type="button"
+              className="topbar-portal-btn"
+              title="CRM Verilerini Yenile"
+              onClick={() => {
+                loadBrands();
+                loadDealers();
+                loadLeads();
+                loadProjects();
+                loadAdminInstallers();
+                loadContactMessages();
+                loadSampleOrders();
+                loadCampaigns();
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              <RefreshCw size={14} />
+              <span className="hide-on-mobile">Yenile</span>
+            </button>
             <Link href="/" target="_blank" className="topbar-portal-btn" title="Siteyi Yeni Sekmede İncele">
               <Globe size={15} />
               <span className="hide-on-mobile">Siteyi Gör</span>
@@ -7780,6 +7799,27 @@ export default function AdminPage() {
         }
 
         /* ===== ADMIN CONTENT ===== */
+        .admin-content :global(.glass-panel) {
+          border-radius: 14px !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        }
+        .admin-content :global(table) {
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        .admin-content :global(thead th) {
+          background: #f8fafc;
+          color: #475569;
+          font-size: 0.74rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .admin-content :global(tbody tr:hover td) {
+          background: #f8fafc;
+        }
         .admin-content {
           flex: 1;
           padding: 24px;
@@ -8240,7 +8280,28 @@ export default function AdminPage() {
             gap: 16px;
           }
 
-          .admin-content {
+          .admin-content :global(.glass-panel) {
+          border-radius: 14px !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        }
+        .admin-content :global(table) {
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        .admin-content :global(thead th) {
+          background: #f8fafc;
+          color: #475569;
+          font-size: 0.74rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .admin-content :global(tbody tr:hover td) {
+          background: #f8fafc;
+        }
+        .admin-content {
             padding: 16px;
             padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
             gap: 16px;
@@ -8290,7 +8351,28 @@ export default function AdminPage() {
             font-size: 0.72rem;
           }
 
-          .admin-content {
+          .admin-content :global(.glass-panel) {
+          border-radius: 14px !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        }
+        .admin-content :global(table) {
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        .admin-content :global(thead th) {
+          background: #f8fafc;
+          color: #475569;
+          font-size: 0.74rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .admin-content :global(tbody tr:hover td) {
+          background: #f8fafc;
+        }
+        .admin-content {
             padding: 12px;
             padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
             gap: 14px;
@@ -8364,7 +8446,28 @@ export default function AdminPage() {
         }
 
         @media (max-width: 480px) {
-          .admin-content {
+          .admin-content :global(.glass-panel) {
+          border-radius: 14px !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        }
+        .admin-content :global(table) {
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        .admin-content :global(thead th) {
+          background: #f8fafc;
+          color: #475569;
+          font-size: 0.74rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .admin-content :global(tbody tr:hover td) {
+          background: #f8fafc;
+        }
+        .admin-content {
             padding: 10px;
             padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
           }
