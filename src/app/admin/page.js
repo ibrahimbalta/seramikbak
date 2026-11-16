@@ -46,6 +46,7 @@ import BackToHomeButton from '@/components/BackToHomeButton';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
 import SystemMonitorTab from '@/components/admin/SystemMonitorTab';
 import ArchitectsTab from '@/components/admin/ArchitectsTab';
+import CrmOverviewTab from '@/components/admin/CrmOverviewTab';
 
 export default function AdminPage() {
   // Authentication State
@@ -55,7 +56,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
 
   // Active Admin Tab: 'scraper', 'dealers', 'leads', 'saas', 'projects'
-  const [activeTab, setActiveTab] = useState('scraper');
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Sidebar & Mobile State
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -77,6 +78,7 @@ export default function AdminPage() {
   }, [isMobile]);
 
   const tabLabels = {
+    overview: 'CRM Genel Bakış',
     scraper: 'Ürün Kazıma',
     products: 'Ürün Yönetimi',
     dealers: 'Bayi Teşkilatı',
@@ -95,6 +97,7 @@ export default function AdminPage() {
   };
 
   const tabIcons = {
+    overview: LayoutGrid,
     scraper: Terminal,
     products: Package,
     dealers: MapPin,
@@ -2329,6 +2332,18 @@ export default function AdminPage() {
         )}
 
         <nav className="sidebar-nav">
+          <div className="nav-group" style={{ marginBottom: '12px' }}>
+            <button
+              className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => handleTabSelect('overview')}
+              title="CRM Genel Bakış"
+            >
+              <div className="nav-icon-wrap">
+                <LayoutGrid size={17} />
+              </div>
+              {!isSidebarCollapsed && <span>CRM Genel Bakış</span>}
+            </button>
+          </div>
           {/* Grup 1: Veri Yönetimi */}
           <div className="nav-group">
             {!isSidebarCollapsed && (
@@ -2669,6 +2684,7 @@ export default function AdminPage() {
         <div className="admin-quick-pills-bar">
           <div className="admin-quick-pills-inner">
             {[
+              { id: 'overview', label: 'Genel Bakış', icon: LayoutGrid },
               { id: 'leads', label: 'Teklifler', icon: FileText, count: leads.length },
               { id: 'projects', label: 'Projeler', icon: Building2, count: projects.length },
               { id: 'dealers', label: 'Bayiler', icon: MapPin },
@@ -2706,6 +2722,26 @@ export default function AdminPage() {
 
         {/* Content */}
         <div className="admin-content">
+
+      {/* TAB 0: CRM OVERVIEW DASHBOARD */}
+      {activeTab === 'overview' && (
+        <CrmOverviewTab
+          leads={leads}
+          projects={projects}
+          dealers={dealers}
+          brands={brands}
+          adminProductsTotal={adminProductsTotal}
+          installerStats={installerStats}
+          adminInstallers={adminInstallers}
+          contactMessages={contactMessages}
+          sampleOrders={sampleOrders}
+          campaigns={campaigns}
+          saasConfigs={saasConfigs}
+          dealerSaasConfigs={dealerSaasConfigs}
+          pendingAlertsCount={pendingAlertsCount}
+          onSelectTab={handleTabSelect}
+        />
+      )}
 
       {/* TAB 1: DATA INGESTION & SCRAPER */}
       {activeTab === 'scraper' && (
@@ -7159,7 +7195,7 @@ export default function AdminPage() {
           display: flex;
           min-height: 100vh;
           position: relative;
-          background-color: #f8fafc;
+          background-color: #f1f5f9;
           font-family: var(--font-body, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
           color: #0f172a;
           -webkit-font-smoothing: antialiased;
@@ -7174,8 +7210,8 @@ export default function AdminPage() {
           top: 0;
           display: flex;
           flex-direction: column;
-          background: #ffffff;
-          border-right: 1px solid #e2e8f0;
+          background: #0f172a;
+          border-right: 1px solid #1e293b;
           z-index: 100;
           overflow-y: auto;
           overflow-x: hidden;
@@ -7202,7 +7238,7 @@ export default function AdminPage() {
           align-items: center;
           justify-content: space-between;
           padding: 18px 20px;
-          border-bottom: 1px solid #f1f5f9;
+          border-bottom: 1px solid #1e293b;
         }
 
         .sidebar-logo {
@@ -7232,7 +7268,7 @@ export default function AdminPage() {
           font-family: var(--font-title);
           font-size: 1.18rem;
           font-weight: 800;
-          color: #0f172a;
+          color: #ffffff;
           display: block;
           line-height: 1.2;
           letter-spacing: -0.02em;
@@ -7249,9 +7285,9 @@ export default function AdminPage() {
         }
 
         .sidebar-close, .sidebar-collapse-btn {
-          background: #f1f5f9;
-          border: 1px solid #e2e8f0;
-          color: #475569;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #cbd5e1;
           cursor: pointer;
           width: 34px;
           height: 34px;
@@ -7263,9 +7299,9 @@ export default function AdminPage() {
           flex-shrink: 0;
         }
         .sidebar-close:hover, .sidebar-collapse-btn:hover {
-          background: #e2e8f0;
-          color: #0f172a;
-          border-color: #cbd5e1;
+          background: rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          border-color: rgba(212, 175, 55, 0.45);
         }
 
         .admin-sidebar.collapsed .sidebar-header {
@@ -7341,7 +7377,7 @@ export default function AdminPage() {
 
         .collapsed-divider {
           height: 1px;
-          background: #f1f5f9;
+          background: #1e293b;
           margin: 6px 8px;
         }
 
@@ -7392,7 +7428,7 @@ export default function AdminPage() {
           padding: 8px 12px;
           border: none;
           background: none;
-          color: #94a3b8;
+          color: #64748b;
           font-family: var(--font-title);
           font-weight: 750;
           font-size: 0.68rem;
@@ -7407,8 +7443,8 @@ export default function AdminPage() {
           text-align: left;
         }
         .nav-group-title:hover {
-          color: #475569;
-          background: #f8fafc;
+          color: #cbd5e1;
+          background: rgba(255, 255, 255, 0.04);
         }
 
         .nav-group-items {
@@ -7427,7 +7463,8 @@ export default function AdminPage() {
           padding: 9px 12px 9px 18px;
           border: none;
           background: transparent;
-          color: #475569;
+          color: #cbd5e1;
+          white-space: nowrap;
           font-family: var(--font-body);
           font-weight: 550;
           font-size: 0.83rem;
@@ -7441,12 +7478,12 @@ export default function AdminPage() {
           text-align: left;
         }
         .nav-item:hover {
-          background: #f1f5f9;
-          color: #0f172a;
+          background: rgba(255, 255, 255, 0.06);
+          color: #ffffff;
         }
         .nav-item.active {
-          background: rgba(212, 175, 55, 0.12);
-          color: #0f172a;
+          background: rgba(212, 175, 55, 0.16);
+          color: #fcd34d;
           font-weight: 700;
         }
         .nav-item.active::before {
@@ -7479,11 +7516,11 @@ export default function AdminPage() {
         /* ===== SIDEBAR FOOTER ===== */
         .sidebar-footer {
           padding: 14px;
-          border-top: 1px solid #f1f5f9;
+          border-top: 1px solid #1e293b;
           display: flex;
           flex-direction: column;
           gap: 6px;
-          background: #ffffff;
+          background: #0f172a;
         }
 
         .sidebar-footer-btn {
@@ -7493,7 +7530,8 @@ export default function AdminPage() {
           padding: 10px 14px;
           border: 1px solid transparent;
           background: none;
-          color: #64748b;
+          color: #94a3b8;
+          white-space: nowrap;
           font-family: var(--font-body);
           font-size: 0.82rem;
           font-weight: 600;
@@ -7503,9 +7541,9 @@ export default function AdminPage() {
           transition: all 0.2s;
         }
         .sidebar-footer-btn:hover {
-          background: #f8fafc;
-          border-color: #e2e8f0;
-          color: #0f172a;
+          background: rgba(255, 255, 255, 0.06);
+          border-color: rgba(255, 255, 255, 0.12);
+          color: #ffffff;
         }
         .sidebar-footer-btn.logout {
           color: #ef4444;
@@ -7521,7 +7559,7 @@ export default function AdminPage() {
           min-width: 0;
           display: flex;
           flex-direction: column;
-          background: #f8fafc;
+          background: #f1f5f9;
         }
 
         /* ===== TOP BAR ===== */
@@ -7641,6 +7679,7 @@ export default function AdminPage() {
           background: #ffffff;
           border: 1px solid #e2e8f0;
           text-decoration: none;
+          white-space: nowrap;
           transition: all 0.2s ease;
           box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
@@ -7671,6 +7710,7 @@ export default function AdminPage() {
         }
 
         /* ===== HORIZONTAL QUICK PILLS BAR ===== */
+        @media (min-width: 1025px) { .admin-quick-pills-bar { display: none; } }
         .admin-quick-pills-bar {
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(12px);
@@ -7861,7 +7901,7 @@ export default function AdminPage() {
           display: flex;
           gap: 12px;
           align-items: flex-start;
-          border-bottom: 1px solid #f1f5f9;
+          border-bottom: 1px solid #1e293b;
           padding-bottom: 16px;
         }
 
@@ -8092,7 +8132,7 @@ export default function AdminPage() {
 
         .admin-table td {
           padding: 12px 16px;
-          border-bottom: 1px solid #f1f5f9;
+          border-bottom: 1px solid #1e293b;
           color: #1e293b;
           vertical-align: middle;
         }
@@ -8239,7 +8279,8 @@ export default function AdminPage() {
             font-size: 0.7rem;
           }
 
-          .admin-quick-pills-bar {
+          @media (min-width: 1025px) { .admin-quick-pills-bar { display: none; } }
+        .admin-quick-pills-bar {
             top: 55px;
             padding: 6px 10px;
           }
