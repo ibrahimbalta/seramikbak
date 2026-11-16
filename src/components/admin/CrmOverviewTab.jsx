@@ -520,7 +520,44 @@ export default function CrmOverviewTab({
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
+          .crm-v2-header-card {
+            padding: 18px 16px;
+            gap: 14px;
+            border-radius: 14px;
+          }
+          .crm-v2-header-copy h2 {
+            font-size: 1.15rem;
+          }
+          .crm-v2-header-right {
+            width: 100%;
+          }
+          .crm-v2-cta {
+            flex: 1;
+            justify-content: center;
+          }
+          .crm-v2-kpi-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+          }
+          .crm-v2-kpi {
+            padding: 14px;
+          }
+          .crm-v2-kpi-val {
+            font-size: 1.45rem;
+          }
+          .crm-v2-card, .crm-v2-pipeline-card {
+            padding: 14px;
+          }
+          .crm-v2-row {
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          .crm-v2-donut-wrap {
+            justify-content: center;
+          }
+        }
+        @media (max-width: 399px) {
           .crm-v2-kpi-row {
             grid-template-columns: 1fr;
           }

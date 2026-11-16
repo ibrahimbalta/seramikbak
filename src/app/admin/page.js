@@ -7148,6 +7148,17 @@ export default function AdminPage() {
         <nav className="mobile-bottom-bar" aria-label="Mobil Uygulama Hızlı Menü">
           <button 
             type="button"
+            className={`bottom-btn ${activeTab === 'overview' ? 'active' : ''}`} 
+            onClick={() => handleTabSelect('overview')}
+          >
+            <div className="bottom-btn-icon-wrap">
+              <LayoutGrid size={19} />
+            </div>
+            <span>Özet</span>
+          </button>
+
+          <button 
+            type="button"
             className={`bottom-btn ${activeTab === 'leads' ? 'active' : ''}`} 
             onClick={() => handleTabSelect('leads')}
           >
@@ -7178,17 +7189,6 @@ export default function AdminPage() {
               <Package size={19} />
             </div>
             <span>Ürünler</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`bottom-btn ${activeTab === 'saas' ? 'active' : ''}`} 
-            onClick={() => handleTabSelect('saas')}
-          >
-            <div className="bottom-btn-icon-wrap">
-              <CreditCard size={19} />
-            </div>
-            <span>SaaS</span>
           </button>
 
           <button 
@@ -8340,8 +8340,7 @@ export default function AdminPage() {
             font-size: 0.7rem;
           }
 
-          @media (min-width: 1025px) { .admin-quick-pills-bar { display: none; } }
-        .admin-quick-pills-bar {
+          .admin-quick-pills-bar {
             top: 55px;
             padding: 6px 10px;
           }
@@ -8442,6 +8441,31 @@ export default function AdminPage() {
 
           .admin-filters-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .admin-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: min(84vw, 300px);
+            min-width: 0;
+            transform: translateX(-100%);
+            z-index: 1001;
+          }
+          .admin-sidebar.open {
+            transform: translateX(0);
+            box-shadow: 12px 0 36px rgba(15, 23, 42, 0.45);
+          }
+          .admin-content {
+            padding: 16px;
+            padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+            overflow-x: hidden;
+          }
+          .form-group-row {
+            grid-template-columns: 1fr;
           }
         }
 
