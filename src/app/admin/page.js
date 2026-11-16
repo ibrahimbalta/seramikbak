@@ -7411,7 +7411,7 @@ export default function AdminPage() {
           border-radius: 10px;
           font-size: 0.73rem;
           font-weight: 650;
-          color: #dc2626;
+          color: #fca5a5;
         }
 
         .notice-dot {
@@ -7447,7 +7447,7 @@ export default function AdminPage() {
           padding: 8px 12px;
           border: none;
           background: none;
-          color: #64748b;
+          color: #94a3b8;
           font-family: var(--font-title);
           font-weight: 750;
           font-size: 0.68rem;
@@ -7482,7 +7482,7 @@ export default function AdminPage() {
           padding: 9px 12px 9px 18px;
           border: none;
           background: transparent;
-          color: #cbd5e1;
+          color: #e2e8f0;
           white-space: nowrap;
           font-family: var(--font-body);
           font-weight: 550;
@@ -7492,7 +7492,7 @@ export default function AdminPage() {
           transition: all 0.18s ease;
           position: relative;
         }
-        .nav-item span {
+        .nav-item > span:not(.nav-badge) {
           flex: 1;
           text-align: left;
         }
@@ -8108,7 +8108,7 @@ export default function AdminPage() {
 
         .error-alert {
           background: rgba(239, 68, 68, 0.08);
-          color: #dc2626;
+          color: #fca5a5;
           padding: 12px 16px;
           border-radius: 10px;
           font-size: 0.8rem;
@@ -8213,7 +8213,7 @@ export default function AdminPage() {
         }
         .badge-saas-status.active { background: rgba(16, 185, 129, 0.1); color: #059669; }
         .badge-saas-status.paused { background: rgba(245, 158, 11, 0.1); color: #d97706; }
-        .badge-saas-status.expired { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .badge-saas-status.expired { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
 
         .status-select {
           border: 1px solid #cbd5e1;
@@ -8259,7 +8259,7 @@ export default function AdminPage() {
             width: 300px;
             max-width: 86vw;
             min-width: 0 !important;
-            background: #ffffff;
+            background: #0f172a;
             box-shadow: 10px 0 35px rgba(0, 0, 0, 0.25);
             transform: translateX(-100%);
             transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
