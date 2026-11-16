@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { 
   Building2, 
   User, 
@@ -232,9 +233,9 @@ export default function ProjectDemandPage() {
         
         {/* Top Header */}
         <div className="sb-portal-header">
-          <Link href="/" className="sb-back-link">
-            <ArrowLeft size={14} /> Ana Sayfaya Dön
-          </Link>
+          <div>
+            <BackToHomeButton style={{ marginBottom: '16px' }} />
+          </div>
           
           <div className="sb-logo-badge">SB</div>
 

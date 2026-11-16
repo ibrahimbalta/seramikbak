@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { MapPin, Phone, Store, Search, Filter, ShieldCheck, Sparkles, Navigation, ArrowLeft, ChevronRight, Calculator, CheckCircle2 } from 'lucide-react';
 import './bayiler.css';
 
@@ -182,10 +183,7 @@ export default function BayilerPage() {
       {/* Page Header */}
       <header className="bayiler-header">
         <div className="header-container">
-          <Link href="/" className="back-link">
-            <ArrowLeft size={16} />
-            <span>Ana Sayfaya Dön</span>
-          </Link>
+          <BackToHomeButton variant="dark" style={{ alignSelf: 'flex-start', marginBottom: '16px' }} />
           <div className="header-badge">
             <Sparkles size={13} className="sparkle-icon" />
             <span>TÜRKİYE YETKİLİ SERAMİK BAYİLERİ</span>

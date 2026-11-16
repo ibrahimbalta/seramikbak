@@ -39,6 +39,7 @@ import {
   Sliders
 } from 'lucide-react';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import NotificationBell from '@/components/NotificationBell';
 import { matchCSBPoz, CSB_POZ_LIST } from '@/lib/csbPozMatcher';
 
@@ -657,37 +658,6 @@ export default function ArchitectPortalPage() {
           pointerEvents: 'none'
         }} />
 
-        {/* Back Link */}
-        <div style={{
-          width: '100%',
-          maxWidth: authTab === 'login' ? '460px' : '680px',
-          display: 'flex',
-          justifyContent: 'flex-start',
-          marginBottom: '16px',
-          position: 'relative',
-          zIndex: 10,
-          transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          <Link href="/" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: '#475569',
-            textDecoration: 'none',
-            fontSize: '0.82rem',
-            fontWeight: '600',
-            padding: '6px 14px',
-            borderRadius: '10px',
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.05)',
-            transition: 'all 0.2s'
-          }}>
-            <ArrowRight size={14} style={{ transform: 'rotate(180deg)' }} />
-            <span>Ana Sayfaya Dön</span>
-          </Link>
-        </div>
-
         {/* Main Card */}
         <div style={{
           position: 'relative',
@@ -704,6 +674,9 @@ export default function ArchitectPortalPage() {
         }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '22px' }}>
+            <div>
+              <BackToHomeButton style={{ marginBottom: '16px' }} />
+            </div>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',

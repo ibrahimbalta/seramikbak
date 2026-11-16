@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { 
   ArrowLeft, Globe, Layers2, Sparkles, Building2, ShieldCheck, 
   ArrowRight, CheckCircle2, DollarSign, Search, Zap, Download, 
@@ -124,11 +125,7 @@ export default function GlobalPromotionPage() {
       <header className="gt-header-bar">
         <div className="gt-header-content">
           {/* Ana Sayfaya Dön */}
-          <Link href="/" className="gt-btn-back">
-            <ArrowLeft size={16} style={{ color: '#b38e47', flexShrink: 0 }} />
-            <span className="gt-btn-back-text-full">Ana Sayfaya Dön</span>
-            <span className="gt-btn-back-text-short">Ana Sayfa</span>
-          </Link>
+          <BackToHomeButton compactOnMobile />
           
           {/* Logo Center */}
           <Link href="/" className="gt-logo-link">

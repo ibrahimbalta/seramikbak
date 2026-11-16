@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { ArrowLeft, Shield, FileText, Settings } from 'lucide-react';
 
 function sanitizeHtml(dirty) {
@@ -321,19 +322,7 @@ export default function LegalCompliancePage() {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <Link href="/" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            textDecoration: 'none',
-            color: '#0f172a',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            transition: 'color 0.2s'
-          }} className="back-link-hover">
-            <ArrowLeft size={16} />
-            <span>Ana Sayfaya Dön</span>
-          </Link>
+          <BackToHomeButton />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{

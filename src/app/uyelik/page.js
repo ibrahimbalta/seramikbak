@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Script from 'next/script';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { 
   Heart, 
   Bell, 
@@ -1762,10 +1763,9 @@ export default function UyelikPage() {
       <div className="uyelik-light-grid">
         {/* LEFT COLUMN - PROPOSITION & CERAMIC TILES SHOWCASE */}
         <div className="uyelik-left-content">
-          <button onClick={() => window.location.href = '/'} className="back-to-home-btn">
-            <Home size={14} />
-            <span>Anasayfaya Dön</span>
-          </button>
+          <div>
+            <BackToHomeButton />
+          </div>
 
           <div className="uyelik-top-pill">
             <Sparkles size={13} />

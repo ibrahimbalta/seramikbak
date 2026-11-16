@@ -42,6 +42,7 @@ import {
   Compass
 } from 'lucide-react';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
 import SystemMonitorTab from '@/components/admin/SystemMonitorTab';
 import ArchitectsTab from '@/components/admin/ArchitectsTab';
@@ -2127,19 +2128,7 @@ export default function AdminPage() {
           zIndex: 1
         }}>
           <div className="login-header" style={{ textAlign: 'center' }}>
-            <Link href="/" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              textDecoration: 'none',
-              color: 'rgba(255, 255, 255, 0.6)',
-              marginBottom: '20px',
-              fontSize: '0.8rem',
-              fontWeight: '600',
-              transition: 'color 0.2s'
-            }} onMouseOver={(e) => e.target.style.color = '#d4af37'} onMouseOut={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}>
-              <ArrowLeft size={14} /> Ana Sayfaya Dön
-            </Link>
+            <BackToHomeButton variant="dark" style={{ marginBottom: '16px' }} />
             
             <div className="logo-icon" style={{
               width: '56px',

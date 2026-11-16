@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { 
   Sparkles, 
   MapPin, 
@@ -1778,23 +1779,7 @@ Yetkili Satış & Showroom Departmanı`;
           }}>
           {/* Header */}
           <div className="login-header" style={{ textAlign: 'center', marginBottom: '26px' }}>
-            <Link href="/" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              textDecoration: 'none',
-              color: '#475569',
-              marginBottom: '16px',
-              fontSize: '0.82rem',
-              fontWeight: '600',
-              padding: '6px 14px',
-              borderRadius: '10px',
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              transition: 'all 0.2s'
-            }} className="hover-gold-text">
-              <ArrowLeft size={14} /> Ana Sayfaya Dön
-            </Link>
+            <BackToHomeButton style={{ marginBottom: '16px' }} />
             <div className="logo-icon" style={{
               width: '50px',
               height: '50px',

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import BackToHomeButton from '@/components/BackToHomeButton';
 import { Loader2, AlertCircle, RotateCcw } from 'lucide-react';
 import HtmlLookbookViewer from '@/components/brand/catalog/templates/HtmlLookbookViewer';
 
@@ -72,12 +73,7 @@ export default function PublicCatalogViewerPage() {
             <RotateCcw size={13} />
             <span>Tekrar Dene</span>
           </button>
-          <Link
-            href="/"
-            className="px-4 py-2 rounded-md bg-white border border-stone-200 text-stone-700 text-xs font-bold transition hover:bg-stone-50"
-          >
-            Ana Sayfaya Dön
-          </Link>
+          <BackToHomeButton />
         </div>
       </div>
     );
