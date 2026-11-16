@@ -8603,7 +8603,7 @@ export default function Home() {
               Türkiye'nin öncü seramik, 3D görselleştirme ve showroom ekosistemi. 40+ üretici markanın koleksiyonlarını canlı deneyin, en yakın yetkili bayilerden anında teklif alın.
             </p>
             <div className="footer-socials">
-              <a href="#" className="social-icon-btn" title="Web Sitesi" onClick={(e) => e.preventDefault()}><Globe size={15} /></a>
+              <Link href="/" className="social-icon-btn" title="Ana Sayfa"><Globe size={15} /></Link>
               <a href="mailto:destek@seramikbak.com" className="social-icon-btn" title="E-Posta Gönder"><Mail size={15} /></a>
               <a href="tel:08501234567" className="social-icon-btn" title="Müşteri Hizmetleri Ara"><Phone size={15} /></a>
               <a href="https://wa.me/908501234567" target="_blank" rel="noopener noreferrer" className="social-icon-btn" title="WhatsApp Destek Hattı"><MessageSquare size={15} /></a>
@@ -8634,16 +8634,6 @@ export default function Home() {
                   </a>
                 </li>
               ))}
-              {brands.length === 0 && (
-                <>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Çanakkale Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>NG Kütahya Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>VitrA Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Bien Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Yurtbay Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Seramiksan</a></li>
-                </>
-              )}
             </ul>
           </div>
 
