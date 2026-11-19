@@ -6,6 +6,8 @@ import { getInternalLinkCluster } from '@/lib/seo/internalLinkingEngine';
 import { COMPARISON_TABLES, EXPERT_QUOTES, TECHNICAL_GUIDES } from '@/lib/seo/guideContentEngine';
 import PSEOClient from './PSEOClient';
 
+export const revalidate = 86400;
+
 export async function generateMetadata({ params }) {
   try {
     const resolvedParams = await params;

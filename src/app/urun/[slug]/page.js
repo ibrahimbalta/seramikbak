@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
@@ -6,8 +7,10 @@ import './product-detail.css';
 import { generateProductSchema, generateBreadcrumbSchema, generateFaqSchema, generateImageObjectSchema } from '@/lib/seo/schemaGenerator';
 import { generateImageAltText } from '@/lib/seo/imageSeo';
 
-// Helper to find a product by slug, code, brand+name slug or ID
-async function getProductBySlugOrId(slug) {
+export const revalidate = 3600;
+
+// Helper to find a product by slug, code, brand+name slug or ID (deduplicated per request via React.cache)
+const getProductBySlugOrId = cache(async (slug) => {
   if (!slug) return null;
 
   try {
@@ -125,7 +128,7 @@ async function getProductBySlugOrId(slug) {
     console.error('Error fetching product by slug:', err);
     return null;
   }
-}
+});
 
 export async function generateMetadata({ params }) {
   try {

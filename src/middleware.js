@@ -62,6 +62,7 @@ export function middleware(request) {
 export const config = {
   matcher: [
     '/api/admin/:path*',
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    // Skip Next.js internals and all static public assets (images, fonts, textures, sitemaps, etc.)
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|sw.js|textures/|hero/|images/|logos/|renders/|static/|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|css|js|map|woff|woff2|ttf|eot|mp4|webm|glb|gltf|json|xml|txt)$).*)',
   ],
 };

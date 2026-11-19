@@ -73,6 +73,10 @@ export async function GET(request) {
       page,
       totalPages,
       hasMore: page < totalPages
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
     });
   } catch (error) {
     console.error('[Public Products API Error]', error);

@@ -2,9 +2,10 @@ import prisma from '@/lib/prisma';
 import { slugify } from '@/lib/slugify';
 import { CATEGORY_DEFINITIONS } from '@/lib/categories';
 
+export const revalidate = 86400;
+
 export default async function sitemap() {
   const baseUrl = 'https://www.seramikbak.com';
-  const supportedLangs = ['tr', 'en', 'de', 'fr', 'es', 'ar', 'ru'];
 
   // Top 16 Turkish Ceramic Brands
   const TOP_BRANDS = [
@@ -53,18 +54,12 @@ export default async function sitemap() {
     { path: '/yasal', priority: 0.3, changeFrequency: 'yearly' }
   ];
 
-  let staticRoutes = [];
-  staticPaths.forEach(route => {
-    supportedLangs.forEach(lang => {
-      const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
-      staticRoutes.push({
-        url: `${baseUrl}${route.path}${langParam}`,
-        lastModified: new Date(),
-        changeFrequency: route.changeFrequency,
-        priority: route.priority
-      });
-    });
-  });
+  const staticRoutes = staticPaths.map(route => ({
+    url: `${baseUrl}${route.path}`,
+    lastModified: new Date(),
+    changeFrequency: route.changeFrequency,
+    priority: route.priority
+  }));
 
   // 2. City x Brand Local SEO Matrix Routes
   let cityBrandRoutes = [];
@@ -90,28 +85,22 @@ export default async function sitemap() {
     
     products.forEach(p => {
       const slug = p.slug || slugify(`${p.brand?.name || 'seramik'} ${p.name}`);
-      supportedLangs.forEach(lang => {
-        const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
-        productRoutes.push({
-          url: `${baseUrl}/urun/${slug}${langParam}`,
-          lastModified: p.updatedAt || new Date(),
-          changeFrequency: 'daily',
-          priority: 0.95
-        });
+      productRoutes.push({
+        url: `${baseUrl}/urun/${slug}`,
+        lastModified: p.updatedAt || new Date(),
+        changeFrequency: 'daily',
+        priority: 0.95
       });
     });
   } catch (err) {
     console.error('Sitemap product route generation error (using static fallback matrix):', err);
     TOP_BRANDS.slice(0, 8).forEach(brand => {
       const brandSlug = slugify(brand);
-      supportedLangs.forEach(lang => {
-        const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
-        productRoutes.push({
-          url: `${baseUrl}/marka/${brandSlug}${langParam}`,
-          lastModified: new Date(),
-          changeFrequency: 'daily',
-          priority: 0.9
-        });
+      productRoutes.push({
+        url: `${baseUrl}/marka/${brandSlug}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.9
       });
     });
   }
@@ -124,14 +113,11 @@ export default async function sitemap() {
     });
     dealers.forEach(dealer => {
       const slug = slugify(dealer.name);
-      supportedLangs.forEach(lang => {
-        const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
-        dealerRoutes.push({
-          url: `${baseUrl}/bayi/${slug}${langParam}`,
-          lastModified: dealer.updatedAt || new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.85
-        });
+      dealerRoutes.push({
+        url: `${baseUrl}/bayi/${slug}`,
+        lastModified: dealer.updatedAt || new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.85
       });
     });
   } catch (err) {
@@ -154,14 +140,11 @@ export default async function sitemap() {
     });
     brands.forEach(brand => {
       const slug = brand.slug || slugify(brand.name);
-      supportedLangs.forEach(lang => {
-        const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
-        brandRoutes.push({
-          url: `${baseUrl}/marka/${slug}${langParam}`,
-          lastModified: brand.updatedAt || new Date(),
-          changeFrequency: 'weekly',
-          priority: 0.8
-        });
+      brandRoutes.push({
+        url: `${baseUrl}/marka/${slug}`,
+        lastModified: brand.updatedAt || new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8
       });
     });
   } catch (err) {
@@ -178,18 +161,12 @@ export default async function sitemap() {
   }
 
   // 6. Programmatic SEO Category Routes
-  let categoryRoutes = [];
-  Object.keys(CATEGORY_DEFINITIONS).forEach(slug => {
-    supportedLangs.forEach(lang => {
-      const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
-      categoryRoutes.push({
-        url: `${baseUrl}/kategori/${slug}${langParam}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.95
-      });
-    });
-  });
+  const categoryRoutes = Object.keys(CATEGORY_DEFINITIONS).map(slug => ({
+    url: `${baseUrl}/kategori/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.95
+  }));
 
   // 7. Programmatic SEO Permutations (/kesfet/{brand}-{size/room/color})
   let matrixRoutes = [];

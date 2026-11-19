@@ -2,6 +2,7 @@ export default function robots() {
   const disallowList = [
     '/admin/',
     '/api/',
+    '/*?*lang=*',
     '/*?*sort=*',
     '/*?*filter=*',
     '/*?*color=*',
@@ -20,36 +21,6 @@ export default function robots() {
         disallow: disallowList,
       },
       {
-        userAgent: 'GPTBot',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
-        userAgent: 'PerplexityBot',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
-        userAgent: 'ClaudeBot',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
-        userAgent: 'ChatGPT-User',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
-        userAgent: 'Google-Extended',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
-        userAgent: 'Applebot-Extended',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
         userAgent: 'Bingbot',
         allow: '/',
         disallow: disallowList,
@@ -58,6 +29,29 @@ export default function robots() {
         userAgent: 'Yandex',
         allow: '/',
         disallow: disallowList,
+      },
+      {
+        userAgent: 'PerplexityBot',
+        allow: '/',
+        disallow: disallowList,
+      },
+      {
+        userAgent: 'ChatGPT-User',
+        allow: '/',
+        disallow: disallowList,
+      },
+      {
+        // Block AI model training & aggressive scraping bots to conserve server CPU
+        userAgent: [
+          'GPTBot',
+          'ClaudeBot',
+          'Google-Extended',
+          'Applebot-Extended',
+          'Bytespider',
+          'CCBot',
+          'anthropic-ai',
+        ],
+        disallow: '/',
       },
       {
         userAgent: '*',

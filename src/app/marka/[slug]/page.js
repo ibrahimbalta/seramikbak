@@ -1,10 +1,13 @@
+import { cache } from 'react';
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import BrandShowcaseClient from './BrandShowcaseClient';
 
-// Helper to find a brand by slug, username, or ID (O(1) indexed database query)
-async function getBrandBySlugOrId(slug) {
+export const revalidate = 3600;
+
+// Helper to find a brand by slug, username, or ID (O(1) indexed database query, deduplicated via React.cache)
+const getBrandBySlugOrId = cache(async (slug) => {
   if (!slug) return null;
 
   try {
@@ -50,7 +53,7 @@ async function getBrandBySlugOrId(slug) {
     console.error('Error fetching brand by slug:', err);
     return null;
   }
-}
+});
 
 export async function generateMetadata({ params }) {
   try {
@@ -146,15 +149,16 @@ export default async function BrandShowcasePage({ params }) {
   let dealers = [];
 
   try {
-    products = await prisma.product.findMany({
-      where: { brandId: brand.id },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    dealers = await prisma.dealer.findMany({
-      where: { brandId: brand.id, status: 'APPROVED' },
-      orderBy: { city: 'asc' }
-    });
+    [products, dealers] = await Promise.all([
+      prisma.product.findMany({
+        where: { brandId: brand.id },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.dealer.findMany({
+        where: { brandId: brand.id, status: 'APPROVED' },
+        orderBy: { city: 'asc' }
+      })
+    ]);
   } catch (err) {
     console.error('Error fetching brand products/dealers:', err);
   }

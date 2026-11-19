@@ -1,8 +1,48 @@
+import { cache } from 'react';
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import { generateLocalBusinessSchema } from '@/lib/seo/schemaGenerator';
 import DealerProfileClient from './DealerProfileClient';
+
+export const revalidate = 3600;
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const resolveDealerId = cache(async (id) => {
+  if (!id) return null;
+  if (UUID_REGEX.test(id)) return id;
+
+  // Fetch only lightweight id + name pairs instead of full nested dealer relations
+  const dealerSummaries = await prisma.dealer.findMany({
+    select: { id: true, name: true }
+  });
+  const match = dealerSummaries.find(d => slugify(d.name) === id);
+  return match ? match.id : null;
+});
+
+const getDealerWithRelations = cache(async (id) => {
+  const resolvedId = await resolveDealerId(id);
+  if (!resolvedId) return null;
+
+  return prisma.dealer.findUnique({
+    where: { id: resolvedId },
+    include: {
+      brand: true,
+      inventories: {
+        include: {
+          product: true
+        }
+      },
+      outletListings: {
+        include: {
+          product: true
+        },
+        orderBy: { createdAt: 'desc' }
+      }
+    }
+  });
+});
 
 export async function generateMetadata({ params }) {
   try {
@@ -11,21 +51,7 @@ export async function generateMetadata({ params }) {
 
     if (!id) return {};
 
-    let dealer = null;
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-    if (isUuid) {
-      dealer = await prisma.dealer.findUnique({
-        where: { id },
-        include: { brand: true }
-      });
-    }
-
-    if (!dealer) {
-      const allDealers = await prisma.dealer.findMany({
-        include: { brand: true }
-      });
-      dealer = allDealers.find(d => slugify(d.name) === id);
-    }
+    const dealer = await getDealerWithRelations(id);
 
     if (!dealer) {
       return {
@@ -91,48 +117,7 @@ export default async function Page({ params }) {
   let products = [];
 
   try {
-    // Try to find by UUID first
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-    if (isUuid) {
-      dealer = await prisma.dealer.findUnique({
-        where: { id },
-        include: {
-          brand: true,
-          inventories: {
-            include: {
-              product: true
-            }
-          },
-          outletListings: {
-            include: {
-              product: true
-            },
-            orderBy: { createdAt: 'desc' }
-          }
-        }
-      });
-    }
-
-    // If not found (or not UUID), try to match by name slug
-    if (!dealer) {
-      const allDealers = await prisma.dealer.findMany({
-        include: {
-          brand: true,
-          inventories: {
-            include: {
-              product: true
-            }
-          },
-          outletListings: {
-            include: {
-              product: true
-            },
-            orderBy: { createdAt: 'desc' }
-          }
-        }
-      });
-      dealer = allDealers.find(d => slugify(d.name) === id);
-    }
+    dealer = await getDealerWithRelations(id);
 
     if (dealer) {
       let rawFeatured = [];

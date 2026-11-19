@@ -840,7 +840,10 @@ export default function Home() {
       }
     };
     fetchLiveStats();
-    const interval = setInterval(fetchLiveStats, 60000); // Live poll gently every 60 seconds
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchLiveStats();
+    }, 300000); // Poll every 5 minutes only when tab is visible
     return () => clearInterval(interval);
   }, []);
 

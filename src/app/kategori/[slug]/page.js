@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { CATEGORY_DEFINITIONS } from '@/lib/categories';
 import CategoryPageClient from './CategoryPageClient';
 
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   return Object.keys(CATEGORY_DEFINITIONS).map(slug => ({ slug }));
 }
