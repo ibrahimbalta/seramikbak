@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { cropWhiteBorders } from '../utils/imageTextureUtils';
+import {
+  cropWhiteBorders,
+  getMatchingFallbackTexture,
+  GLOBAL_TEXTURE_IMAGE_CACHE,
+  resolveWebGLTextureUrl,
+  loadTextureImageCached,
+  preloadProductTexture
+} from '../utils/imageTextureUtils';
 
 export default function StudioCanvas({ 
   activeProduct, 
@@ -116,6 +123,36 @@ export default function StudioCanvas({
   const ROOM_DEPTH = 3.6;
   const ROOM_HEIGHT = 2.8;
 
+  // Pre-warm core local high-res ceramic textures on mount for 0ms instant rendering
+  useEffect(() => {
+    const coreTextures = [
+      '/textures/calacatta_gold.jpg',
+      '/textures/natural_oak.jpg',
+      '/textures/concrete_light_grey.jpg',
+      '/textures/albatros_antrasit.jpg',
+      '/textures/borneo_antrasit.jpg',
+      '/textures/vista_bej.jpg',
+      '/textures/vista_antrasit.jpg',
+      '/textures/keops_bej.jpg',
+      '/textures/loft_beton.jpg',
+      '/textures/magma_antrasit.jpg',
+      '/textures/portland_fume.jpg',
+      '/textures/pulpis_gri.jpg',
+      '/textures/sedir_akcaagac.jpg',
+      '/textures/sedir_gri.jpg',
+      '/textures/senzo_beyaz.jpg',
+      '/textures/swan_bone.jpg',
+      '/textures/teak_ahsap.jpg',
+      '/textures/thor_gri.jpg',
+      '/textures/travertino_classico.jpg',
+      '/textures/trax_oxido.jpg',
+      '/textures/vintage_gri.jpg'
+    ];
+    coreTextures.forEach((url) => {
+      loadTextureImageCached(url);
+    });
+  }, []);
+
   // Procedural texture generator (returns raw canvas element to draw grout overlay)
   const generateProceduralTexture = (product) => {
     const canvas = document.createElement('canvas');
@@ -123,61 +160,37 @@ export default function StudioCanvas({
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    const style = product.style || 'Beton';
-    const color = product.color || 'Gri';
+    const rawStyle = (product?.style || 'Beton').toLowerCase();
+    const rawColor = (product?.color || 'Gri').toLowerCase();
+    const rawName = (product?.name || '').toLowerCase();
+    const full = `${rawStyle} ${rawColor} ${rawName}`;
 
-    // Draw baseline
-    if (style === 'Mermer') {
-      const isDark = color.toLowerCase().includes('antrasit') || color.toLowerCase().includes('siyah') || color.toLowerCase().includes('karanlık') || color.toLowerCase().includes('füme');
-      
-      // Base marble color
-      ctx.fillStyle = isDark ? '#1e222b' : '#f0f1f4';
-      ctx.fillRect(0, 0, 512, 512);
+    const isDark =
+      full.includes('antrasit') ||
+      full.includes('siyah') ||
+      full.includes('karanlık') ||
+      full.includes('füme') ||
+      full.includes('fume') ||
+      full.includes('koyu') ||
+      full.includes('nero') ||
+      full.includes('black');
+    const isBeige =
+      full.includes('bej') ||
+      full.includes('krem') ||
+      full.includes('fildişi') ||
+      full.includes('kemik') ||
+      full.includes('vizon') ||
+      full.includes('grej') ||
+      full.includes('bone') ||
+      full.includes('ivory') ||
+      full.includes('crema');
 
-      // Draw subtle marble clouds
-      for (let i = 0; i < 6; i++) {
-        const x = Math.random() * 512;
-        const y = Math.random() * 512;
-        const r = 100 + Math.random() * 150;
-        const grad = ctx.createRadialGradient(x, y, 10, x, y, r);
-        if (isDark) {
-          grad.addColorStop(0, 'rgba(26, 30, 38, 0.4)');
-          grad.addColorStop(1, 'rgba(30, 34, 43, 0)');
-        } else {
-          grad.addColorStop(0, 'rgba(230, 232, 237, 0.5)');
-          grad.addColorStop(1, 'rgba(240, 241, 244, 0)');
-        }
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Draw marble veins
-      ctx.lineWidth = 2;
-      for (let j = 0; j < 6; j++) {
-        ctx.beginPath();
-        ctx.moveTo(Math.random() * 512, 0);
-        ctx.bezierCurveTo(
-          150 + Math.random() * 200, 100 + Math.random() * 100,
-          150 + Math.random() * 200, 250 + Math.random() * 100,
-          Math.random() * 512, 512
-        );
-        
-        if (isDark) {
-          ctx.strokeStyle = j % 2 === 0 ? 'rgba(220, 225, 230, 0.3)' : 'rgba(100, 110, 120, 0.15)';
-        } else {
-          ctx.strokeStyle = j % 2 === 0 ? 'rgba(180, 185, 195, 0.4)' : 'rgba(197, 160, 89, 0.35)'; // goldish
-        }
-        ctx.stroke();
-      }
-    } 
-    else if (style === 'Ahşap') {
-      ctx.fillStyle = '#835227';
+    if (rawStyle.includes('ahşap') || rawStyle.includes('wood') || rawName.includes('wood') || rawName.includes('oak') || rawName.includes('meşe') || rawName.includes('ceviz')) {
+      ctx.fillStyle = isDark ? '#5c3a1d' : '#835227';
       ctx.fillRect(0, 0, 512, 512);
 
       // Wood grain lines
-      ctx.strokeStyle = 'rgba(75, 45, 18, 0.3)';
+      ctx.strokeStyle = 'rgba(75, 45, 18, 0.35)';
       for (let x = -20; x < 532; x += 15) {
         ctx.beginPath();
         ctx.lineWidth = 1 + Math.random() * 2;
@@ -199,12 +212,66 @@ export default function StudioCanvas({
       ctx.moveTo(384, 0); ctx.lineTo(384, 512);
       ctx.stroke();
     } 
-    else if (style === 'Beton') {
-      ctx.fillStyle = color.toLowerCase().includes('bej') ? '#d8cbb8' : '#8e9196';
+    else if (rawStyle.includes('mermer') || rawStyle.includes('marble') || rawName.includes('calacatta') || rawName.includes('carrara')) {
+      // Base marble color
+      ctx.fillStyle = isDark ? '#1e222b' : (isBeige ? '#e8dfd1' : '#e6e9ef');
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Draw subtle marble clouds
+      for (let i = 0; i < 6; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const r = 100 + Math.random() * 150;
+        const grad = ctx.createRadialGradient(x, y, 10, x, y, r);
+        if (isDark) {
+          grad.addColorStop(0, 'rgba(38, 44, 56, 0.45)');
+          grad.addColorStop(1, 'rgba(30, 34, 43, 0)');
+        } else {
+          grad.addColorStop(0, 'rgba(210, 215, 224, 0.55)');
+          grad.addColorStop(1, 'rgba(240, 241, 244, 0)');
+        }
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw marble veins
+      ctx.lineWidth = 2.2;
+      for (let j = 0; j < 7; j++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * 512, 0);
+        ctx.bezierCurveTo(
+          150 + Math.random() * 200, 100 + Math.random() * 100,
+          150 + Math.random() * 200, 250 + Math.random() * 100,
+          Math.random() * 512, 512
+        );
+        
+        if (isDark) {
+          ctx.strokeStyle = j % 2 === 0 ? 'rgba(220, 225, 230, 0.35)' : 'rgba(197, 160, 89, 0.25)';
+        } else {
+          ctx.strokeStyle = j % 2 === 0 ? 'rgba(145, 152, 165, 0.5)' : 'rgba(184, 145, 70, 0.42)';
+        }
+        ctx.stroke();
+      }
+    } 
+    else {
+      // Rich stone / concrete / color-accurate porcelain base (never blank white)
+      let baseHex = '#8e9196';
+      if (isDark) baseHex = '#2a2e37';
+      else if (isBeige) baseHex = '#d4c6b0';
+      else if (full.includes('kahve') || full.includes('brown')) baseHex = '#755843';
+      else if (full.includes('kırmızı') || full.includes('oksit') || full.includes('terracotta')) baseHex = '#9e4735';
+      else if (full.includes('mavi') || full.includes('blue')) baseHex = '#486884';
+      else if (full.includes('yeşil') || full.includes('green')) baseHex = '#4b6b58';
+      else if (full.includes('sarı') || full.includes('yellow')) baseHex = '#c59b38';
+      else if (full.includes('beyaz') || full.includes('white')) baseHex = '#dfe3ea';
+
+      ctx.fillStyle = baseHex;
       ctx.fillRect(0, 0, 512, 512);
 
       for (let i = 0; i < 8; i++) {
-        ctx.fillStyle = color.toLowerCase().includes('bej') ? 'rgba(205, 193, 175, 0.2)' : 'rgba(120, 122, 126, 0.25)';
+        ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.06)';
         ctx.beginPath();
         const rx = 80 + Math.random() * 120;
         const ry = 40 + Math.random() * 60;
@@ -219,16 +286,6 @@ export default function StudioCanvas({
         ctx.fillStyle = `rgba(${ncolor}, ${ncolor}, ${ncolor}, 0.05)`;
         ctx.fillRect(nx, ny, 2, 2);
       }
-    } 
-    else {
-      ctx.fillStyle = '#f1f3f7';
-      ctx.fillRect(0, 0, 512, 512);
-      ctx.strokeStyle = 'rgba(180, 185, 195, 0.4)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(100, 0); ctx.lineTo(400, 512);
-      ctx.moveTo(300, 0); ctx.lineTo(100, 512);
-      ctx.stroke();
     }
 
     return canvas;
@@ -1974,40 +2031,43 @@ export default function StudioCanvas({
       };
     };
 
-    // Instant (0-ms) procedural preview + RAM cached high-res JPG loader helper
+    // Instant (0-ms) RAM cached high-res texture loader with automatic fallback & guaranteed WebGL wake-up
     const loadAndApplyTexture = (product, applyCallback) => {
       if (!product) return;
 
-      // 1. INSTANT 0-MS PROCEDURAL TILE RENDER (Zero lag, zero delay)
-      const proceduralCanvas = generateProceduralTexture(product);
-      applyCallback(proceduralCanvas, false);
+      const rawTextureUrl = product.textureUrl || product.imageUrl;
+      const fallbackUrl = getMatchingFallbackTexture(product);
+      const finalUrl = resolveWebGLTextureUrl(rawTextureUrl || fallbackUrl) || fallbackUrl;
 
-      // 2. ASYNC HIGH-RES JPG PHOTO UPGRADE WITH RAM CACHING
-      const realTextureUrl = product.textureUrl || product.imageUrl;
-      if (realTextureUrl) {
-        const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
-        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
+      // 1. DIRECT 0-MS RAM CACHE HIT (Zero lag, zero procedural flash!)
+      const cachedReal =
+        (finalUrl && (GLOBAL_TEXTURE_IMAGE_CACHE.get(finalUrl) || imageCacheRef.current.get(finalUrl))) ||
+        null;
 
-        if (imageCacheRef.current.has(finalUrl)) {
-          // Direct 0ms RAM retrieval from cache!
-          const cachedImg = imageCacheRef.current.get(finalUrl);
-          applyCallback(cachedImg, true);
-        } else {
-          loader.load(
-            finalUrl,
-            (loadedTexture) => {
-              if (loadedTexture && loadedTexture.image) {
-                imageCacheRef.current.set(finalUrl, loadedTexture.image);
-                applyCallback(loadedTexture.image, true);
-              }
-            },
-            undefined,
-            () => {
-              // Keep procedural preview if load fails
-            }
-          );
-        }
+      if (cachedReal) {
+        applyCallback(cachedReal, true);
+        if (requestRenderRef.current) requestRenderRef.current(45);
+        return;
       }
+
+      // 2. INSTANT 0-MS PREVIEW: Use pre-warmed high-res local texture if ready, otherwise color-matched procedural
+      const prewarmedFallback = fallbackUrl ? GLOBAL_TEXTURE_IMAGE_CACHE.get(fallbackUrl) : null;
+      if (prewarmedFallback) {
+        applyCallback(prewarmedFallback, false);
+      } else {
+        const proceduralCanvas = generateProceduralTexture(product);
+        applyCallback(proceduralCanvas, false);
+      }
+      if (requestRenderRef.current) requestRenderRef.current(35);
+
+      // 3. ASYNC HIGH-RES PHOTO UPGRADE WITH AUTOMATIC FALLBACK & GUARANTEED WEBGL RENDER WAKE-UP
+      preloadProductTexture(product).then((loadedImg) => {
+        if (loadedImg) {
+          if (finalUrl) imageCacheRef.current.set(finalUrl, loadedImg);
+          applyCallback(loadedImg, true);
+          if (requestRenderRef.current) requestRenderRef.current(45);
+        }
+      });
     };
 
     // 1. FLOOR TILING LOGIC

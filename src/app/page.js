@@ -125,6 +125,7 @@ import TileVisualPreview from '@/components/TileVisualPreview';
 import ProductCard from '@/components/ProductCard';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
+import { getMatchingFallbackTexture, preloadProductTexture } from '@/utils/imageTextureUtils';
 
 const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
@@ -6300,11 +6301,13 @@ export default function Home() {
                         <div 
                           key={prod.id} 
                           onClick={() => handleApplyProductToTarget(prod, studioTarget)}
+                          onMouseEnter={() => preloadProductTexture(prod)}
+                          onTouchStart={() => preloadProductTexture(prod)}
                           className={`swapper-card ${isCurrentOnTarget ? 'active' : ''}`}
                           style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
                           title={`${prod.name} modelini ${getTargetLabel(studioTarget)} yüzeyine uygula`}
                         >
-                          <TileVisualPreview style={prod.style} color={prod.color} finish={prod.finish} width={prod.width} height={prod.height} imageUrl={prod.imageUrl} />
+                          <TileVisualPreview style={prod.style} color={prod.color} finish={prod.finish} width={prod.width} height={prod.height} imageUrl={prod.imageUrl} productName={prod.name} />
                           {isCurrentOnTarget && (
                             <span className="swapper-active-tag">✓ Uygulandı</span>
                           )}

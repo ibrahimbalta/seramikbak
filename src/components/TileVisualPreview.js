@@ -128,10 +128,7 @@ export default function TileVisualPreview({ style, color, finish, width, height,
   }
 
   const handleImageError = () => {
-    // If direct CDN load failed for an external URL and proxy hasn't been tried yet, try proxy once
-    if (!useFallbackTexture && !useProxyFallback && imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
-      setUseProxyFallback(true);
-    } else if (!useFallbackTexture && fallbackTexture) {
+    if (!useFallbackTexture && fallbackTexture) {
       setUseFallbackTexture(true);
     } else {
       setImageError(true);

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { slugify } from '@/lib/slugify';
+import { getMatchingFallbackTexture, preloadProductTexture } from '@/utils/imageTextureUtils';
 import { 
   Sparkles, 
   Layers, 
@@ -650,6 +651,18 @@ export default function BrandConsumerStudioPage() {
   // Lazy progressive slice (loads 16 initially, more as user scrolls)
   const displayedProducts = filteredProducts.slice(0, visibleCount);
 
+  // Background pre-warm visible catalog tiles into RAM so clicking renders in 0ms
+  useEffect(() => {
+    if (!displayedProducts || displayedProducts.length === 0) return;
+    const batch = displayedProducts.slice(0, 10);
+    const timer = setTimeout(() => {
+      batch.forEach((tile) => {
+        preloadProductTexture(tile);
+      });
+    }, 60);
+    return () => clearTimeout(timer);
+  }, [displayedProducts]);
+
   // Smooth scroll handler to auto-load next batch before reaching the bottom
   const handleGridScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -1061,6 +1074,8 @@ export default function BrandConsumerStudioPage() {
                 <div
                   key={tile.id}
                   onClick={() => handleApplyTile(tile)}
+                  onMouseEnter={() => preloadProductTexture(tile)}
+                  onTouchStart={() => preloadProductTexture(tile)}
                   style={{
                     background: isSelected 
                       ? (isLight ? `${themeColor}18` : 'rgba(255, 255, 255, 0.08)') 
@@ -1094,8 +1109,18 @@ export default function BrandConsumerStudioPage() {
                     flexShrink: 0
                   }}>
                     <img 
-                      src={tile.textureUrl || tile.imageUrl} 
+                      src={tile.textureUrl || tile.imageUrl || getMatchingFallbackTexture(tile)} 
                       alt={tile.name}
+                      referrerPolicy="no-referrer"
+                      decoding="async"
+                      onError={(e) => {
+                        const fb = getMatchingFallbackTexture(tile);
+                        if (e.currentTarget.src && !e.currentTarget.src.endsWith(fb)) {
+                          tile.textureUrl = fb;
+                          tile.imageUrl = fb;
+                          e.currentTarget.src = fb;
+                        }
+                      }}
                       style={{ 
                         width: '100%', 
                         height: '100%', 
