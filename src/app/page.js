@@ -4333,11 +4333,13 @@ export default function Home() {
 
           {/* 5 Cards Row */}
           <div className="showcase-cards-grid">
-            {visibleVitrinCards.map((item, idx) => (
+            {visibleVitrinCards.map((item, idx) => {
+              const fallbackBg = item.product ? getMatchingFallbackTexture(item.product) : '/hero/luxury_bathroom.png';
+              return (
               <div 
                 key={`vitrin-luxury-${item.code || item.id}-${idx}`}
                 className="showcase-luxury-card animate-fade-in"
-                style={{ backgroundImage: `url(${item.img || '/hero/luxury_bathroom.png'})` }}
+                style={{ backgroundImage: `url(${item.img || fallbackBg}), url(${fallbackBg})` }}
                 onClick={() => handleVitrinItemClick(item)}
               >
                 <div className="showcase-card-overlay" />
@@ -4367,7 +4369,8 @@ export default function Home() {
                   <ArrowRight size={12} />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Next Arrow */}
@@ -5556,11 +5559,17 @@ export default function Home() {
                           position: 'relative'
                         }}>
                           <img 
-                            src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
+                            src={p.imageUrl || getMatchingFallbackTexture(p)} 
                             alt={p.name} 
                             loading="lazy"
                             decoding="async"
                             referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              const fb = getMatchingFallbackTexture(p);
+                              if (e.currentTarget.src !== window.location.origin + fb) {
+                                e.currentTarget.src = fb;
+                              }
+                            }}
                             style={{
                               width: '100%',
                               height: '100%',
@@ -8975,8 +8984,17 @@ export default function Home() {
                 {userFavorites.map(fav => (
                   <div key={fav.id} className="favorite-item" onClick={() => { if (fav.product) { handleProductCardClick(fav.product); setShowFavoritesPanel(false); } }}>
                     <div className="favorite-item-preview">
-                      {fav.product?.imageUrl ? (
-                        <img src={fav.product.imageUrl} alt={fav.product.name} />
+                      {fav.product ? (
+                        <img
+                          src={fav.product.imageUrl || getMatchingFallbackTexture(fav.product)}
+                          alt={fav.product.name}
+                          onError={(e) => {
+                            const fb = getMatchingFallbackTexture(fav.product);
+                            if (e.currentTarget.src !== window.location.origin + fb) {
+                              e.currentTarget.src = fb;
+                            }
+                          }}
+                        />
                       ) : (
                         <div className="favorite-item-placeholder">
                           <Layers size={20} />

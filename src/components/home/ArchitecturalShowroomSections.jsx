@@ -577,6 +577,97 @@ export function PopularCollectionsSection({ onSelectCollection }) {
  * SECTION 8: LİDER SERAMİK MARKALARI
  * Horizontal interactive brand showcase using real brand data & authentic brand links.
  */
+function BrandCardLogo({ brand, isSelected }) {
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  // Known broken seed placeholder paths (/logos/xxx.png) that do not exist in public/
+  const hasValidLogo =
+    brand?.logoUrl &&
+    !logoFailed &&
+    !brand.logoUrl.startsWith('/logos/');
+
+  const getBrandTypographyStyle = (name = '') => {
+    const lower = name.toLowerCase();
+    if (lower.includes('vitra')) {
+      return { fontWeight: 900, fontStyle: 'italic', fontSize: '1.15rem', letterSpacing: '-0.02em' };
+    }
+    if (lower.includes('qua')) {
+      return { fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: '0.88rem' };
+    }
+    if (lower.includes('bien')) {
+      return { fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.88rem', color: isSelected ? '#F3E5AB' : '#926F28' };
+    }
+    if (lower.includes('kütahya') || lower.includes('kutahya')) {
+      return { fontWeight: 900, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.84rem' };
+    }
+    return { fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.86rem' };
+  };
+
+  const initials = (brand?.name || 'SB')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '34px', minWidth: 0 }}>
+      {hasValidLogo ? (
+        <img
+          src={brand.logoUrl}
+          alt={brand.name}
+          loading="lazy"
+          onError={() => setLogoFailed(true)}
+          style={{
+            maxHeight: '30px',
+            maxWidth: '130px',
+            objectFit: 'contain',
+            filter: isSelected ? 'brightness(1.15)' : 'none'
+          }}
+        />
+      ) : (
+        <>
+          <span
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '9px',
+              background: isSelected
+                ? 'rgba(212, 175, 55, 0.22)'
+                : 'linear-gradient(135deg, #242424 0%, #3F3F46 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.45)',
+              color: '#F3E5AB',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.72rem',
+              fontWeight: 900,
+              letterSpacing: '0.04em',
+              flexShrink: 0
+            }}
+          >
+            {initials}
+          </span>
+          <span
+            style={{
+              color: isSelected ? '#FAF9F6' : '#242424',
+              fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              ...getBrandTypographyStyle(brand?.name)
+            }}
+          >
+            {brand?.name}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand }) {
   const featuredNames = [
     'NG Kütahya Seramik',
@@ -682,7 +773,7 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
             <div
               key={brand.id}
               style={{
-                minWidth: '205px',
+                minWidth: '220px',
                 background: isSelected ? '#242424' : '#FAF9F6',
                 border: isSelected ? '1.5px solid #D4AF37' : '1px solid #E7E5E4',
                 borderRadius: '14px',
@@ -699,31 +790,7 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
                 onClick={() => onSelectBrand(isSelected ? '' : brand.id)}
                 style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}
               >
-                {brand.logoUrl ? (
-                  <img
-                    src={brand.logoUrl}
-                    alt={brand.name}
-                    loading="lazy"
-                    style={{
-                      maxHeight: '28px',
-                      maxWidth: '120px',
-                      objectFit: 'contain',
-                      filter: isSelected ? 'brightness(1.2)' : 'none'
-                    }}
-                  />
-                ) : (
-                  <span
-                    style={{
-                      fontSize: '0.9rem',
-                      fontWeight: 900,
-                      color: isSelected ? '#FAF9F6' : '#242424',
-                      letterSpacing: '0.02em',
-                      fontFamily: 'var(--font-title, "Outfit", sans-serif)'
-                    }}
-                  >
-                    {brand.name}
-                  </span>
-                )}
+                <BrandCardLogo brand={brand} isSelected={isSelected} />
                 <span
                   style={{
                     width: '8px',

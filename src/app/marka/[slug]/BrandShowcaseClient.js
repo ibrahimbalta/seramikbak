@@ -27,6 +27,12 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
   const [selectedFinish, setSelectedFinish] = useState('ALL');
   const [selectedCity, setSelectedCity] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  const hasValidLogo =
+    brand?.logoUrl &&
+    !logoFailed &&
+    !brand.logoUrl.startsWith('/logos/');
 
   // Extract unique filter values
   const styles = useMemo(() => {
@@ -137,14 +143,20 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
               boxShadow: '0 12px 30px rgba(0, 0, 0, 0.5)',
               overflow: 'hidden'
             }}>
-              {brand.logoUrl ? (
+              {hasValidLogo ? (
                 <img
                   src={brand.logoUrl}
                   alt={`${brand.name} Logo`}
+                  onError={() => setLogoFailed(true)}
                   style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                 />
               ) : (
-                <Building2 size={44} style={{ color: '#d4af37' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                  <Building2 size={32} style={{ color: '#d4af37' }} />
+                  <span style={{ fontSize: '0.7rem', fontWeight: 900, color: '#F3E5AB', letterSpacing: '0.06em', textAlign: 'center', lineHeight: 1.1 }}>
+                    {(brand.name || 'SB').split(' ')[0].toUpperCase()}
+                  </span>
+                </div>
               )}
             </div>
 
