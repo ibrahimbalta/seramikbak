@@ -30,9 +30,9 @@ export function PerformanceChart({
   metric = 'views',
   onMetricChange,
   metricOptions = [
-    { id: 'views', label: 'Görüntülenme', color: '#4778E8' },
-    { id: 'clicks', label: 'Tıklanma', color: '#C6A04A' },
-    { id: 'leads', label: 'Bayi Talepleri', color: '#0D9B72' }
+    { id: 'views', label: 'Görüntülenme', color: '#6338F5' },
+    { id: 'clicks', label: 'Tıklanma', color: '#F59E0B' },
+    { id: 'leads', label: 'Bayi Talepleri', color: '#10B981' }
   ],
   dateFilter = '30d',
   onDateFilterChange
@@ -51,12 +51,13 @@ export function PerformanceChart({
 
   return (
     <div
+      id="brand-performance-section"
       style={{
         background: 'var(--bp-surface, #FFFFFF)',
         border: '1px solid var(--bp-border, #E5E8EE)',
-        borderRadius: '16px',
+        borderRadius: '18px',
         padding: '22px 24px',
-        boxShadow: '0 1px 3px rgba(32, 38, 51, 0.03)',
+        boxShadow: '0 4px 18px -4px rgba(15, 23, 42, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         gap: '16px'

@@ -9,7 +9,8 @@ import {
   CheckCircle, 
   AlertCircle, 
   Loader2, 
-  ArrowLeft, 
+  ArrowLeft,
+  ArrowRight, 
   User, 
   Lock, 
   ShieldCheck, 
@@ -1986,69 +1987,304 @@ export default function BrandPortalPage() {
 
               {/* -------------------- TAB 1: DASHBOARD -------------------- */}
               {activePortalTab === 'dashboard' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {/* A. KARŞILAMA ALANI */}
-                  <PageHeader
-                    title="Marka Yönetim Merkezinize Hoş Geldiniz."
-                    subtitle="Ürünlerinizi, kataloglarınızı, bayi ağınızı ve pazar performansınızı tek merkezden yönetin."
-                    dateRange={dateRange}
-                    onDateRangeChange={setDateRange}
-                  />
-
-                  {/* B. BALANCED 5 KPI PERFORMANCE CARDS */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '22px' }}>
+                  {/* A. HERO BANNER + 2x2 HIZLI AKSİYON KAROLARI (REFERANS SAAS TASARIMI) */}
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(5, minmax(0, 1fr))',
+                      gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 2.35fr) minmax(0, 1fr)',
+                      gap: isMobile ? '12px' : '18px',
+                      alignItems: 'stretch'
+                    }}
+                  >
+                    {/* Left: Brand Welcome Banner */}
+                    <div
+                      style={{
+                        position: 'relative',
+                        borderRadius: isMobile ? '18px' : '20px',
+                        overflow: 'hidden',
+                        minHeight: isMobile ? '196px' : '220px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        padding: isMobile ? '22px 18px' : '30px 34px',
+                        boxShadow: '0 14px 32px -10px rgba(17, 24, 39, 0.22)'
+                      }}
+                    >
+                      <img
+                        src={brandInfo?.bannerUrl || '/hero/wide_luxury_bathroom.jpg'}
+                        alt="SeramikBak Marka Paneli"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: 'center right',
+                          zIndex: 0
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: isMobile
+                            ? 'linear-gradient(180deg, rgba(17, 24, 39, 0.90) 0%, rgba(17, 24, 39, 0.94) 100%)'
+                            : 'linear-gradient(95deg, rgba(17, 24, 39, 0.96) 0%, rgba(20, 27, 45, 0.86) 46%, rgba(20, 27, 45, 0.22) 100%)',
+                          zIndex: 1
+                        }}
+                      />
+
+                      <div style={{ position: 'relative', zIndex: 2, maxWidth: '540px' }}>
+                        <h2
+                          style={{
+                            fontSize: isMobile ? '1.35rem' : '1.85rem',
+                            fontWeight: 900,
+                            color: '#ffffff',
+                            margin: '0 0 8px 0',
+                            fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+                            letterSpacing: '-0.025em',
+                            lineHeight: 1.18
+                          }}
+                        >
+                          Hoş Geldiniz, {brandInfo?.name || 'Değerli Markamız'}!
+                        </h2>
+                        <p
+                          style={{
+                            fontSize: isMobile ? '0.82rem' : '0.92rem',
+                            color: '#E2E8F0',
+                            margin: '0 0 20px 0',
+                            lineHeight: 1.5
+                          }}
+                        >
+                          SeramikBak marka panelinde ürünlerinizi, dijital kataloglarınızı ve bayi ağınızı kolayca yönetebilirsiniz.
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const el = document.getElementById('brand-performance-section');
+                            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'linear-gradient(135deg, #F5B841 0%, #D4952B 100%)',
+                            color: '#111827',
+                            border: 'none',
+                            borderRadius: '11px',
+                            padding: '10px 18px',
+                            fontSize: '0.82rem',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            boxShadow: '0 6px 16px rgba(212, 149, 43, 0.35)'
+                          }}
+                        >
+                          <TrendingUp size={15} />
+                          <span>Performans Verilerinizi Görüntüle</span>
+                          <ArrowRight size={14} />
+                        </button>
+                      </div>
+
+                      {/* Pagination Dots */}
+                      <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '14px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F5B841' }} />
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                      </div>
+                    </div>
+
+                    {/* Right: 2x2 White Quick Action Tiles */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                        gap: '12px'
+                      }}
+                    >
+                      {[
+                        {
+                          label: 'Yeni Ürün Ekle',
+                          icon: <Plus size={20} />,
+                          color: '#6338F5',
+                          bg: 'rgba(99, 56, 245, 0.1)',
+                          onClick: () => setActivePortalTab('products')
+                        },
+                        {
+                          label: 'Katalog Tasarla',
+                          icon: <BookOpen size={20} />,
+                          color: '#2563EB',
+                          bg: 'rgba(37, 99, 235, 0.1)',
+                          onClick: () => {
+                            setActivePortalTab('catalogs');
+                            setCatalogSubSection('create');
+                          }
+                        },
+                        {
+                          label: 'Bayi Ağını Yönet',
+                          icon: <Users size={20} />,
+                          color: '#4F46E5',
+                          bg: 'rgba(79, 70, 229, 0.1)',
+                          onClick: () => setActivePortalTab('dealers')
+                        },
+                        {
+                          label: 'B2B İhaleler',
+                          icon: <Building2 size={20} />,
+                          color: '#0EA5E9',
+                          bg: 'rgba(14, 165, 233, 0.1)',
+                          onClick: () => setActivePortalTab('b2b-projects')
+                        }
+                      ].map((tile) => (
+                        <button
+                          key={tile.label}
+                          type="button"
+                          onClick={tile.onClick}
+                          style={{
+                            background: '#ffffff',
+                            border: '1px solid #E4E8EF',
+                            borderRadius: '16px',
+                            padding: isMobile ? '14px 10px' : '16px 12px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 14px -4px rgba(15, 23, 42, 0.04)',
+                            textAlign: 'center'
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '12px',
+                              background: tile.bg,
+                              color: tile.color,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            {tile.icon}
+                          </div>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#202938', lineHeight: 1.25 }}>
+                            {tile.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* B. 4 RENKLİ KPI KARTI (MOR, AMBER, YEŞİL, MAVİ + SPARKLINE) */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
                       gap: isMobile ? '10px' : '16px'
                     }}
                   >
-                    <StatCard
-                      label="Toplam Ürün"
-                      value={brandProducts.length.toLocaleString('tr-TR')}
-                      subtext={`${brandProducts.filter((p) => p.isActive !== false).length} aktif koleksiyon modeli`}
-                      icon={<Layers size={16} />}
-                      isMobile={isMobile}
-                      onClick={() => setActivePortalTab('products')}
-                    />
-                    <StatCard
-                      label="Katalog Görüntülenme"
-                      value={(b2bStats.summary?.totalViews || 0).toLocaleString('tr-TR')}
-                      subtext="Seçili dönem ziyaretçi gösterimi"
-                      icon={<Eye size={16} />}
-                      accentColor="var(--bp-text-primary, #202633)"
-                      isMobile={isMobile}
-                    />
-                    <StatCard
-                      label="Tıklanma Oranı (CTR)"
-                      value={`%${b2bStats.summary?.ctr || 0}`}
-                      subtext="Ürün & katalog tıklama dönüşümü"
-                      icon={<MousePointerClick size={16} />}
-                      accentColor="var(--bp-info, #4778E8)"
-                      isMobile={isMobile}
-                    />
-                    <StatCard
-                      label="Müşteri Teklif Talepleri"
-                      value={(b2bStats.summary?.totalLeads || 0).toLocaleString('tr-TR')}
-                      subtext={`${dealers.length} yetkili bayi ağı üzerinden`}
-                      icon={<Handshake size={16} />}
-                      accentColor="var(--bp-success, #0D9B72)"
-                      isMobile={isMobile}
-                      onClick={() => setActivePortalTab('dealers')}
-                    />
-                    <StatCard
-                      label="Küresel Ülke İlgisi"
-                      value={`${countryAnalytics?.summary?.activeCountriesCount || 0} Ülke`}
-                      subtext={countryAnalytics?.summary?.topExportMarket ? `Lider pazar: ${countryAnalytics.summary.topExportMarket}` : 'İhracat trafiği analizi'}
-                      icon={<Globe size={16} />}
-                      accentColor="var(--bp-accent-gold, #C6A04A)"
-                      isMobile={isMobile}
-                      onClick={() => setActivePortalTab('country-analytics')}
-                    />
+                    {[
+                      {
+                        label: 'Toplam Ürün',
+                        value: brandProducts.length.toLocaleString('tr-TR'),
+                        trend: `${brandProducts.filter((p) => p.isActive !== false).length} Aktif`,
+                        color: '#7C3AED',
+                        bg: 'rgba(124, 58, 237, 0.1)',
+                        icon: <Layers size={18} />,
+                        pts: '0,22 18,18 36,20 54,11 72,13 90,5',
+                        onClick: () => setActivePortalTab('products')
+                      },
+                      {
+                        label: 'Katalog Görüntülenme',
+                        value: (b2bStats.summary?.totalViews || 0).toLocaleString('tr-TR'),
+                        trend: `%${b2bStats.summary?.ctr || 0} CTR`,
+                        color: '#F59E0B',
+                        bg: 'rgba(245, 158, 11, 0.12)',
+                        icon: <Eye size={18} />,
+                        pts: '0,24 18,19 36,12 54,15 72,7 90,9',
+                        onClick: () => setActivePortalTab('brand-health')
+                      },
+                      {
+                        label: 'Bayi & Müşteri Talebi',
+                        value: (b2bStats.summary?.totalLeads || 0).toLocaleString('tr-TR'),
+                        trend: `${dealers.length} Bayi`,
+                        color: '#10B981',
+                        bg: 'rgba(16, 185, 129, 0.12)',
+                        icon: <Handshake size={18} />,
+                        pts: '0,23 18,17 36,15 54,10 72,8 90,4',
+                        onClick: () => setActivePortalTab('dealers')
+                      },
+                      {
+                        label: 'Küresel Ülke İlgisi',
+                        value: `${countryAnalytics?.summary?.activeCountriesCount || 0} Ülke`,
+                        trend: countryAnalytics?.summary?.topExportMarket || 'İhracat',
+                        color: '#3B82F6',
+                        bg: 'rgba(59, 130, 246, 0.12)',
+                        icon: <Globe size={18} />,
+                        pts: '0,22 18,16 36,18 54,9 72,6 90,4',
+                        onClick: () => setActivePortalTab('country-analytics')
+                      }
+                    ].map((kpi) => (
+                      <div
+                        key={kpi.label}
+                        onClick={kpi.onClick}
+                        style={{
+                          background: '#ffffff',
+                          border: '1px solid #E4E8EF',
+                          borderRadius: '16px',
+                          padding: isMobile ? '14px 12px' : '18px 20px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          gap: '10px',
+                          boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                          cursor: 'pointer',
+                          minWidth: 0
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                          <div
+                            style={{
+                              width: isMobile ? '34px' : '38px',
+                              height: isMobile ? '34px' : '38px',
+                              borderRadius: '11px',
+                              background: kpi.bg,
+                              color: kpi.color,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}
+                          >
+                            {kpi.icon}
+                          </div>
+                          <span style={{ fontSize: isMobile ? '0.72rem' : '0.78rem', fontWeight: 700, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {kpi.label}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '6px' }}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: isMobile ? '1.25rem' : '1.6rem', fontWeight: 900, color: '#202938', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
+                              {kpi.value}
+                            </div>
+                            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#10A37F', display: 'inline-block', marginTop: '4px', whiteSpace: 'nowrap' }}>
+                              ↑ {kpi.trend}
+                            </span>
+                          </div>
+                          <svg width={isMobile ? '50' : '78'} height={isMobile ? '22' : '28'} viewBox="0 0 90 28" style={{ flexShrink: 0, overflow: 'visible' }}>
+                            <polyline fill="none" stroke={kpi.color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" points={kpi.pts} />
+                          </svg>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* C & D. RECHARTS PERFORMANCE CHART + MARKET SHARE CARD */}
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: isMobile ? '16px' : '20px' }} className="brand-campaign-grid">
+                  {/* C & D. PERFORMANS GRAFİĞİ + SAĞ KOLON (KISAYOLLAR & KOLEKSİYON PROMO) */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.75fr 1fr', gap: isMobile ? '16px' : '20px', alignItems: 'stretch' }} className="brand-campaign-grid">
                     <PerformanceChart
                       title="Marka Dijital Performansı"
                       subtitle="Seçili dönemdeki katalog görüntülenme, tıklanma ve bayi talep hareketliliği."
@@ -2059,157 +2295,339 @@ export default function BrandPortalPage() {
                       onDateFilterChange={(d) => setDateRange(d)}
                     />
 
-                    <MarketShareCard
-                      title="Pazar Payı ve Marka Konumu"
-                      subtitle="SeramikBak pazar yeri genelinde markanızın gerçek görüntülenme payı."
-                      sharePercent={Number(b2bStats.summary?.marketShare || 0)}
-                      rankLabel={b2bStats.summary?.marketRank ? `#${b2bStats.summary.marketRank} Marka Sıralaması` : `${currentPlan} Paket Üyeliği`}
-                      rankSubLabel={`${brandProducts.length} ürün • ${dealers.length} yetkili bayi`}
-                      categories={[
-                        { label: 'Aktif Ürün Kapsamı', percent: brandProducts.length > 0 ? Math.round((brandProducts.filter((p) => p.isActive !== false).length / brandProducts.length) * 100) : 0, color: '#C6A04A' },
-                        { label: 'Dijital Katalog & AI Hazırlığı', percent: brandProducts.length > 0 ? Math.round((brandProducts.filter((p) => Boolean(p.imageUrl)).length / brandProducts.length) * 100) : 0, color: '#0D9B72' }
-                      ]}
-                    />
+                    {/* Right Column: Kısayollar + Yeni Koleksiyonlar Promo Card */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'space-between' }}>
+                      <div
+                        style={{
+                          background: '#FFFFFF',
+                          border: '1px solid #E4E8EF',
+                          borderRadius: '18px',
+                          padding: '18px 20px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '14px',
+                          boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                            <Sparkles size={16} style={{ color: '#F59E0B' }} />
+                            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#202938' }}>
+                              Kısayollar
+                            </h4>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setActivePortalTab('products')}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#6338F5',
+                              fontSize: '0.73rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <span>Tümünü Gör</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' }}>
+                          {[
+                            {
+                              label: 'Yeni Ürün Ekle',
+                              icon: <Plus size={15} />,
+                              bg: '#F3EEFF',
+                              color: '#6338F5',
+                              onClick: () => setActivePortalTab('products')
+                            },
+                            {
+                              label: 'Kampanya Yönet',
+                              icon: <Megaphone size={15} />,
+                              bg: '#FEF4E4',
+                              color: '#D97706',
+                              onClick: () => setActivePortalTab('campaigns')
+                            },
+                            {
+                              label: 'Marka Sağlığı',
+                              icon: <Award size={15} />,
+                              bg: '#E8FAF3',
+                              color: '#059669',
+                              onClick: () => setActivePortalTab('brand-health')
+                            },
+                            {
+                              label: 'Ülke Analitiği',
+                              icon: <Globe size={15} />,
+                              bg: '#EAF2FF',
+                              color: '#2563EB',
+                              onClick: () => setActivePortalTab('country-analytics')
+                            }
+                          ].map((sc) => (
+                            <button
+                              key={sc.label}
+                              type="button"
+                              onClick={sc.onClick}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '10px 11px',
+                                borderRadius: '12px',
+                                border: 'none',
+                                background: sc.bg,
+                                color: '#202938',
+                                fontSize: '0.74rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                minWidth: 0
+                              }}
+                            >
+                              <span style={{ color: sc.color, flexShrink: 0, display: 'inline-flex' }}>{sc.icon}</span>
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sc.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Purple Gradient Promo Card */}
+                      <div
+                        style={{
+                          position: 'relative',
+                          background: 'linear-gradient(135deg, #3B2296 0%, #6338F5 58%, #7C5CFA 100%)',
+                          borderRadius: '18px',
+                          padding: '20px 22px',
+                          color: '#ffffff',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          gap: '14px',
+                          boxShadow: '0 12px 26px -8px rgba(99, 56, 245, 0.45)',
+                          flex: 1
+                        }}
+                      >
+                        <div style={{ position: 'relative', zIndex: 2, maxWidth: '72%' }}>
+                          <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: 900, lineHeight: 1.22 }}>
+                            Dijital Katalogları Keşfedin
+                          </h4>
+                          <p style={{ margin: '0 0 14px 0', fontSize: '0.74rem', color: 'rgba(255,255,255,0.84)', lineHeight: 1.45 }}>
+                            Kurumsal lookbook tasarlayın ve {dealers.length} yetkili bayinizle anında paylaşın.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setActivePortalTab('catalogs')}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              background: '#ffffff',
+                              color: '#202938',
+                              border: 'none',
+                              borderRadius: '10px',
+                              padding: '8px 14px',
+                              fontSize: '0.76rem',
+                              fontWeight: 800,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <span>Katalogları İncele</span>
+                            <ArrowRight size={13} />
+                          </button>
+                        </div>
+                        <img
+                          src={brandProducts[0]?.imageUrl || '/hero/wide_luxury_bathroom.jpg'}
+                          alt=""
+                          style={{
+                            position: 'absolute',
+                            right: '-10px',
+                            bottom: '-10px',
+                            width: '108px',
+                            height: '108px',
+                            objectFit: 'cover',
+                            borderRadius: '14px',
+                            border: '2px solid rgba(255,255,255,0.25)',
+                            transform: 'rotate(-6deg)',
+                            boxShadow: '0 10px 24px rgba(0,0,0,0.28)',
+                            zIndex: 1
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* E. HIZLI İŞLEM MERKEZİ */}
-                  <div
-                    style={{
-                      background: 'var(--bp-surface, #FFFFFF)',
-                      border: '1px solid var(--bp-border, #E5E8EE)',
-                      borderRadius: '16px',
-                      padding: '20px 24px',
-                      boxShadow: '0 1px 3px rgba(32, 38, 51, 0.03)'
-                    }}
-                  >
-                    <div style={{ marginBottom: '14px' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--bp-text-primary, #202633)' }}>
-                        Hızlı İşlem Merkezi
-                      </h3>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--bp-text-secondary, #778196)', margin: '2px 0 0 0' }}>
-                        En sık kullanılan marka operasyonlarına tek tıkla ulaşın.
-                      </p>
-                    </div>
+                  {/* E. ALT SATIR: SON AKTİVİTELER + POPÜLER KOLEKSİYONLAR */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 1fr', gap: isMobile ? '16px' : '20px', alignItems: 'stretch' }}>
+                    {/* Left: Son Aktiviteler */}
                     <div
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
-                        gap: '12px'
+                        background: 'var(--bp-surface, #FFFFFF)',
+                        border: '1px solid var(--bp-border, #E5E8EE)',
+                        borderRadius: '18px',
+                        padding: '20px 24px',
+                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)'
                       }}
                     >
-                      <QuickActionCard
-                        title="Yeni Ürün Ekle"
-                        description="Kataloğunuza yeni seramik modeli ekleyin"
-                        icon={<Plus size={18} />}
-                        onClick={() => setActivePortalTab('products')}
-                      />
-                      <QuickActionCard
-                        title="Dijital Katalog Oluştur"
-                        description="Studio ile kurumsal lookbook tasarlayın"
-                        icon={<BookOpen size={18} />}
-                        onClick={() => {
-                          setActivePortalTab('catalogs');
-                          setCatalogSubSection('create');
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                        <div>
+                          <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--bp-text-primary, #202633)' }}>
+                            Son İşlemler & Aktiviteler
+                          </h3>
+                          <p style={{ fontSize: '0.76rem', color: 'var(--bp-text-secondary, #778196)', margin: '2px 0 0 0' }}>
+                            Marka hesabınızdaki son ürün, bayi ve B2B proje hareketleri.
+                          </p>
+                        </div>
+                        <StatusBadge variant="info">{brandProducts.length + projects.length + bids.length} Kayıt</StatusBadge>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {[
+                          ...brandProducts.slice(0, 2).map((p) => ({
+                            id: `prod-${p.id}`,
+                            title: `Ürün Kaydı: ${p.name}`,
+                            meta: `${p.code || 'SKU'} • ${p.width || 60}x${p.height || 120} cm`,
+                            badge: 'Ürün',
+                            variant: 'gold'
+                          })),
+                          ...projects.slice(0, 2).map((pr) => ({
+                            id: `prj-${pr.id}`,
+                            title: `B2B Proje Talebi: ${pr.projectName || pr.title || 'Proje'}`,
+                            meta: `${pr.city || 'Türkiye'} • İhale havuzu`,
+                            badge: 'B2B Talep',
+                            variant: 'info'
+                          })),
+                          ...bids.slice(0, 2).map((b) => ({
+                            id: `bd-${b.id}`,
+                            title: `Gönderilen İhale Teklifi: ${b.projectName}`,
+                            meta: `₺${Number(b.totalPrice || 0).toLocaleString('tr-TR')} • ${b.timeline || 'Teslimat'}`,
+                            badge: 'Teklif',
+                            variant: 'success'
+                          }))
+                        ].slice(0, 5).map((act) => (
+                          <div
+                            key={act.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '12px',
+                              padding: '10px 14px',
+                              borderRadius: '10px',
+                              background: 'var(--bp-bg, #F6F7F9)',
+                              border: '1px solid var(--bp-border, #E5E8EE)'
+                            }}
+                          >
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--bp-text-primary, #202633)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {act.title}
+                              </div>
+                              <div style={{ fontSize: '0.72rem', color: 'var(--bp-text-secondary, #778196)', marginTop: '2px' }}>
+                                {act.meta}
+                              </div>
+                            </div>
+                            <StatusBadge variant={act.variant}>{act.badge}</StatusBadge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Right: Popüler Koleksiyonlar */}
+                    <div
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #E4E8EF',
+                        borderRadius: '18px',
+                        padding: '20px 24px',
+                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '14px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Sparkles size={17} style={{ color: '#F97316' }} />
+                          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#202938' }}>
+                            Popüler Koleksiyonlar
+                          </h3>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setActivePortalTab('products')}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#6338F5',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>Tüm Ürünler</span>
+                          <ArrowRight size={13} />
+                        </button>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                          gap: '12px'
                         }}
-                      />
-                      <QuickActionCard
-                        title="Kampanya Yönet"
-                        description="Vitrin ve podyum reklamlarını başlatın"
-                        icon={<Megaphone size={18} />}
-                        onClick={() => setActivePortalTab('campaigns')}
-                      />
-                      <QuickActionCard
-                        title="B2B Taleplerini Gör"
-                        description={`${projects.length} açık proje ihalesini inceleyin`}
-                        icon={<Building2 size={18} />}
-                        onClick={() => setActivePortalTab('b2b-projects')}
-                      />
-                      <QuickActionCard
-                        title="Performans Raporu"
-                        description="Marka sağlığı ve SEO skorunu inceleyin"
-                        icon={<Award size={18} />}
-                        onClick={() => setActivePortalTab('brand-health')}
-                      />
-                      <QuickActionCard
-                        title="Bayi Ağını Yönet"
-                        description={`${dealers.length} yetkili satış noktasını yönetin`}
-                        icon={<Users size={18} />}
-                        onClick={() => setActivePortalTab('dealers')}
-                      />
+                      >
+                        {brandProducts.slice(0, 4).map((prod) => (
+                          <button
+                            key={prod.id}
+                            type="button"
+                            onClick={() => setActivePortalTab('products')}
+                            style={{
+                              background: '#F8FAFC',
+                              border: '1px solid #E4E8EF',
+                              borderRadius: '14px',
+                              padding: '8px',
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '8px',
+                              minWidth: 0
+                            }}
+                          >
+                            <div style={{ width: '100%', aspectRatio: '1.45', borderRadius: '10px', overflow: 'hidden', background: '#E2E8F0' }}>
+                              <img
+                                src={prod.imageUrl || '/hero/wide_luxury_bathroom.jpg'}
+                                alt={prod.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                              />
+                            </div>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#202938', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {prod.name}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* F. SON AKTİVİTELER */}
-                  <div
-                    style={{
-                      background: 'var(--bp-surface, #FFFFFF)',
-                      border: '1px solid var(--bp-border, #E5E8EE)',
-                      borderRadius: '16px',
-                      padding: '20px 24px',
-                      boxShadow: '0 1px 3px rgba(32, 38, 51, 0.03)'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                      <div>
-                        <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--bp-text-primary, #202633)' }}>
-                          Son Aktiviteler
-                        </h3>
-                        <p style={{ fontSize: '0.78rem', color: 'var(--bp-text-secondary, #778196)', margin: '2px 0 0 0' }}>
-                          Marka hesabınızdaki son ürün, bayi ve B2B proje hareketleri.
-                        </p>
-                      </div>
-                      <StatusBadge variant="info">{brandProducts.length + projects.length + bids.length} Kayıt</StatusBadge>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {[
-                        ...brandProducts.slice(0, 2).map((p) => ({
-                          id: `prod-${p.id}`,
-                          title: `Ürün Kaydı: ${p.name}`,
-                          meta: `${p.code || 'SKU'} • ${p.width || 60}x${p.height || 120} cm`,
-                          badge: 'Ürün',
-                          variant: 'gold'
-                        })),
-                        ...projects.slice(0, 2).map((pr) => ({
-                          id: `prj-${pr.id}`,
-                          title: `B2B Proje Talebi: ${pr.projectName || pr.title || 'Proje'}`,
-                          meta: `${pr.city || 'Türkiye'} • İhale havuzu`,
-                          badge: 'B2B Talep',
-                          variant: 'info'
-                        })),
-                        ...bids.slice(0, 2).map((b) => ({
-                          id: `bd-${b.id}`,
-                          title: `Gönderilen İhale Teklifi: ${b.projectName}`,
-                          meta: `₺${Number(b.totalPrice || 0).toLocaleString('tr-TR')} • ${b.timeline || 'Teslimat'}`,
-                          badge: 'Teklif',
-                          variant: 'success'
-                        }))
-                      ].slice(0, 5).map((act) => (
-                        <div
-                          key={act.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '12px',
-                            padding: '10px 14px',
-                            borderRadius: '10px',
-                            background: 'var(--bp-bg, #F6F7F9)',
-                            border: '1px solid var(--bp-border, #E5E8EE)'
-                          }}
-                        >
-                          <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--bp-text-primary, #202633)' }}>
-                              {act.title}
-                            </div>
-                            <div style={{ fontSize: '0.72rem', color: 'var(--bp-text-secondary, #778196)', marginTop: '2px' }}>
-                              {act.meta}
-                            </div>
-                          </div>
-                          <StatusBadge variant={act.variant}>{act.badge}</StatusBadge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  {/* F. PAZAR PAYI & MARKA KONUMU */}
+                  <MarketShareCard
+                    title="Pazar Payı ve Marka Konumu"
+                    subtitle="SeramikBak pazar yeri genelinde markanızın gerçek görüntülenme payı."
+                    sharePercent={Number(b2bStats.summary?.marketShare || 0)}
+                    rankLabel={b2bStats.summary?.marketRank ? `#${b2bStats.summary.marketRank} Marka Sıralaması` : `${currentPlan} Paket Üyeliği`}
+                    rankSubLabel={`${brandProducts.length} ürün • ${dealers.length} yetkili bayi`}
+                    categories={[
+                      { label: 'Aktif Ürün Kapsamı', percent: brandProducts.length > 0 ? Math.round((brandProducts.filter((p) => p.isActive !== false).length / brandProducts.length) * 100) : 0, color: '#C6A04A' },
+                      { label: 'Dijital Katalog & AI Hazırlığı', percent: brandProducts.length > 0 ? Math.round((brandProducts.filter((p) => Boolean(p.imageUrl)).length / brandProducts.length) * 100) : 0, color: '#0D9B72' }
+                    ]}
+                  />
 
                   {/* 3D / AR STÜDYO Raporu */}
                   <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
