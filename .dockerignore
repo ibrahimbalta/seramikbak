@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+.env
+scratch
+Virtual-Tile-Visualization-System-main
+tests
+*.log
