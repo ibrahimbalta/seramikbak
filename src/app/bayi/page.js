@@ -8492,146 +8492,202 @@ Yetkili Satış & Showroom Departmanı`;
                   </div>
                 )}
 
-                {/* B. PREMIUM KOLEKSİYON BANNERI */}
+                {/* B. HERO BANNER + 2x2 HIZLI AKSİYON KAROLARI (REFERANS SAAS TASARIMI) */}
                 <div
-                  className="dealer-hero-banner"
                   style={{
-                    position: 'relative',
-                    borderRadius: isMobile ? '18px' : '22px',
-                    overflow: 'hidden',
-                    minHeight: isMobile ? '220px' : '240px',
-                    display: 'flex',
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: isMobile ? 'flex-start' : 'center',
-                    justifyContent: 'space-between',
-                    padding: isMobile ? '22px 18px' : '34px 38px',
-                    gap: '24px',
-                    border: '1px solid rgba(212, 175, 55, 0.4)',
-                    boxShadow: '0 16px 36px -10px rgba(15, 23, 42, 0.22)'
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 2.35fr) minmax(0, 1fr)',
+                    gap: isMobile ? '12px' : '18px',
+                    alignItems: 'stretch'
                   }}
                 >
-                  {/* Architectural Ceramic / Bathroom Background Image */}
-                  <img
-                    src={profileBannerUrl || '/hero/wide_luxury_bathroom.jpg'}
-                    alt="Yeni Koleksiyonları Keşfedin"
+                  {/* Left: Welcome Architectural Banner */}
+                  <div
+                    className="dealer-hero-banner"
                     style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center',
-                      zIndex: 0
+                      position: 'relative',
+                      borderRadius: isMobile ? '18px' : '20px',
+                      overflow: 'hidden',
+                      minHeight: isMobile ? '196px' : '220px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      padding: isMobile ? '22px 18px' : '30px 34px',
+                      boxShadow: '0 14px 32px -10px rgba(17, 24, 39, 0.22)'
                     }}
-                  />
-                  {/* Luxury Dark Anthracite + Warm Bronze Architectural Gradient Overlay */}
+                  >
+                    <img
+                      src={profileBannerUrl || '/hero/wide_luxury_bathroom.jpg'}
+                      alt="SeramikBak Bayi Portalı"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center right',
+                        zIndex: 0
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: isMobile
+                          ? 'linear-gradient(180deg, rgba(17, 24, 39, 0.90) 0%, rgba(17, 24, 39, 0.94) 100%)'
+                          : 'linear-gradient(95deg, rgba(17, 24, 39, 0.96) 0%, rgba(20, 27, 45, 0.86) 46%, rgba(20, 27, 45, 0.22) 100%)',
+                        zIndex: 1
+                      }}
+                    />
+
+                    <div style={{ position: 'relative', zIndex: 2, maxWidth: '540px' }}>
+                      <h2
+                        style={{
+                          fontSize: isMobile ? '1.35rem' : '1.85rem',
+                          fontWeight: 900,
+                          color: '#ffffff',
+                          margin: '0 0 8px 0',
+                          fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+                          letterSpacing: '-0.025em',
+                          lineHeight: 1.18
+                        }}
+                      >
+                        Hoş Geldiniz, {dealerInfo?.ownerName || dealerInfo?.name || 'Değerli Bayimiz'}!
+                      </h2>
+                      <p
+                        style={{
+                          fontSize: isMobile ? '0.82rem' : '0.92rem',
+                          color: '#E2E8F0',
+                          margin: '0 0 20px 0',
+                          lineHeight: 1.5
+                        }}
+                      >
+                        SeramikBak bayi portalında tüm işlemlerinizi kolayca yönetebilirsiniz.
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = document.getElementById('dealer-sales-performance-section');
+                          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          background: 'linear-gradient(135deg, #F5B841 0%, #D4952B 100%)',
+                          color: '#111827',
+                          border: 'none',
+                          borderRadius: '11px',
+                          padding: '10px 18px',
+                          fontSize: '0.82rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          boxShadow: '0 6px 16px rgba(212, 149, 43, 0.35)'
+                        }}
+                      >
+                        <TrendingUp size={15} />
+                        <span>Satış Verilerinizi Görüntüle</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+
+                    {/* Pagination Dots */}
+                    <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '14px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F5B841' }} />
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.35)' }} />
+                    </div>
+                  </div>
+
+                  {/* Right: 2x2 White Quick Action Tiles */}
                   <div
                     style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: isMobile
-                        ? 'linear-gradient(180deg, rgba(11, 17, 30, 0.88) 0%, rgba(11, 17, 30, 0.94) 100%)'
-                        : 'linear-gradient(90deg, rgba(11, 17, 30, 0.94) 0%, rgba(15, 23, 42, 0.84) 55%, rgba(15, 23, 42, 0.45) 100%)',
-                      zIndex: 1
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                      gap: '12px'
                     }}
-                  />
-
-                  <div style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                      <span
+                  >
+                    {[
+                      {
+                        label: 'Yeni Teklif Oluştur',
+                        icon: <Calculator size={20} />,
+                        color: '#6338F5',
+                        bg: 'rgba(99, 56, 245, 0.1)',
+                        onClick: () => setActivePortalTab('quick-quote')
+                      },
+                      {
+                        label: 'Müşteri Talebi İncele',
+                        icon: <FileText size={20} />,
+                        color: '#2563EB',
+                        bg: 'rgba(37, 99, 235, 0.1)',
+                        onClick: () => {
+                          const el = document.getElementById('dealer-recent-quotes-section');
+                          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      },
+                      {
+                        label: 'Ürün Kataloğu',
+                        icon: <Grid size={20} />,
+                        color: '#4F46E5',
+                        bg: 'rgba(79, 70, 229, 0.1)',
+                        onClick: () => setActivePortalTab('catalog')
+                      },
+                      {
+                        label: 'Destek Al',
+                        icon: <HelpCircle size={20} />,
+                        color: '#0EA5E9',
+                        bg: 'rgba(14, 165, 233, 0.1)',
+                        onClick: () => setActivePortalTab('settings')
+                      }
+                    ].map((tile) => (
+                      <button
+                        key={tile.label}
+                        type="button"
+                        onClick={tile.onClick}
                         style={{
-                          background: 'rgba(212, 175, 55, 0.22)',
-                          border: '1px solid rgba(212, 175, 55, 0.45)',
-                          color: '#fde68a',
-                          padding: '4px 11px',
-                          borderRadius: '999px',
-                          fontSize: '0.68rem',
-                          fontWeight: 800,
-                          letterSpacing: '0.05em',
-                          textTransform: 'uppercase',
-                          display: 'inline-flex',
+                          background: '#ffffff',
+                          border: '1px solid #E4E8EF',
+                          borderRadius: '16px',
+                          padding: isMobile ? '14px 10px' : '16px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
-                          gap: '5px'
+                          justifyContent: 'center',
+                          gap: '10px',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px -4px rgba(15, 23, 42, 0.04)',
+                          transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                          textAlign: 'center'
                         }}
                       >
-                        <Crown size={12} style={{ color: '#C5A04B' }} />
-                        {dealerInfo?.brandName ? `${dealerInfo.brandName} Yetkili Satış Noktası` : 'Yetkili Showroom'}
-                      </span>
-                      <span
-                        style={{
-                          background: 'rgba(16, 185, 129, 0.2)',
-                          border: '1px solid rgba(16, 185, 129, 0.4)',
-                          color: '#34d399',
-                          padding: '4px 11px',
-                          borderRadius: '999px',
-                          fontSize: '0.68rem',
-                          fontWeight: 800,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px'
-                        }}
-                      >
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10A37F' }} />
-                        Showroom Canlıda Aktif
-                      </span>
-                    </div>
-
-                    <h2
-                      style={{
-                        fontSize: isMobile ? '1.38rem' : '1.85rem',
-                        fontWeight: 900,
-                        color: '#ffffff',
-                        margin: '0 0 8px 0',
-                        fontFamily: 'var(--font-title, "Outfit", sans-serif)',
-                        letterSpacing: '-0.02em',
-                        lineHeight: 1.2
-                      }}
-                    >
-                      Yeni Koleksiyonları Keşfedin
-                    </h2>
-                    <p
-                      style={{
-                        fontSize: isMobile ? '0.8rem' : '0.9rem',
-                        color: '#E4E8EF',
-                        margin: '0 0 18px 0',
-                        lineHeight: 1.55
-                      }}
-                    >
-                      Mekânlarınıza değer katan en yeni seramik koleksiyonlarını keşfedin. {dealerInfo?.district ? `${dealerInfo.district}, ${dealerInfo.city}` : 'Showroom'} müşterileriniz için 3D stüdyo, QR etiket ve hızlı teklif araçlarını hemen kullanın.
-                    </p>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <PremiumButton
-                        variant="gold"
-                        size="md"
-                        icon={<Grid size={15} />}
-                        onClick={() => setActivePortalTab('catalog')}
-                      >
-                        Koleksiyonları İncele
-                      </PremiumButton>
-                      <PremiumButton
-                        variant="dark"
-                        size="md"
-                        icon={<QrCode size={15} />}
-                        onClick={() => setActivePortalTab('showroom-qr')}
-                      >
-                        Stant QR Bas
-                      </PremiumButton>
-                      <PremiumButton
-                        variant="ghost"
-                        size="md"
-                        icon={<Calculator size={15} style={{ color: '#C5A04B' }} />}
-                        onClick={() => setActivePortalTab('quick-quote')}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.12)',
-                          color: '#ffffff',
-                          border: '1px solid rgba(255, 255, 255, 0.22)',
-                          backdropFilter: 'blur(8px)'
-                        }}
-                      >
-                        Hızlı Teklif Yaz
-                      </PremiumButton>
-                    </div>
+                        <div
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '12px',
+                            background: tile.bg,
+                            color: tile.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {tile.icon}
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            color: '#202938',
+                            lineHeight: 1.25
+                          }}
+                        >
+                          {tile.label}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -8651,7 +8707,7 @@ Yetkili Satış & Showroom Departmanı`;
                     changeText={savedQuotesList.length > 0 ? `${savedQuotesList.length} PDF Teklif` : 'Aktif Dönem'}
                     changeType="positive"
                     icon={<FileText size={20} />}
-                    accentColor="#C6A04A"
+                    accentColor="#7C3AED"
                     sparklinePoints={[12, 18, 16, 25, 24, 32, Math.max(totalQuotesCount * 10, 28)]}
                     isMobile={isMobile}
                     onClick={() => setActivePortalTab('quick-quote')}
@@ -8664,7 +8720,7 @@ Yetkili Satış & Showroom Departmanı`;
                     changeText={stats.pendingLeads > 0 ? `${stats.pendingLeads} Bekleyen` : 'Tümü Yanıtlandı'}
                     changeType={stats.pendingLeads > 0 ? 'warning' : 'positive'}
                     icon={<Activity size={20} />}
-                    accentColor="#E59A36"
+                    accentColor="#F59E0B"
                     sparklinePoints={[10, 15, 22, 19, 28, 25, Math.max(customerRequestsCount * 12, 24)]}
                     isMobile={isMobile}
                     onClick={() => {
@@ -8684,7 +8740,7 @@ Yetkili Satış & Showroom Departmanı`;
                     }
                     changeType="positive"
                     icon={<CheckCircle size={20} />}
-                    accentColor="#0D9B72"
+                    accentColor="#10B981"
                     sparklinePoints={[8, 14, 16, 22, 26, 30, Math.max(completedOrdersCount * 15, 26)]}
                     isMobile={isMobile}
                   />
@@ -8699,7 +8755,7 @@ Yetkili Satış & Showroom Departmanı`;
                     changeText={savedQuotesList.length > 0 ? `${savedQuotesList.length} Tekliften` : 'Canlı Ciro'}
                     changeType="info"
                     icon={<TrendingUp size={20} />}
-                    accentColor="#4778E8"
+                    accentColor="#3B82F6"
                     sparklinePoints={[18, 24, 21, 35, 42, 48, Math.max(Math.round(monthlySalesVolumeTL / 1000), 30)]}
                     isMobile={isMobile}
                     onClick={() => setActivePortalTab('quick-quote')}
@@ -8722,195 +8778,258 @@ Yetkili Satış & Showroom Departmanı`;
                     onCreateQuote={() => setActivePortalTab('quick-quote')}
                   />
 
-                  {/* Right Column: Showroom Kiosk & Regional Demand Summary */}
+                  {/* Right Column: Kısayollar + Yeni Koleksiyonları Keşfedin Promo Card */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'space-between' }}>
-                    {/* Kiosk Mode Card */}
+                    {/* Kısayollar Card */}
                     <div
                       style={{
-                        background: 'var(--bp-surface, #FFFFFF)',
-                        border: hasActiveSaaS ? '1.5px solid rgba(198, 160, 74, 0.45)' : '1px solid var(--bp-border, #E5E8EE)',
-                        borderRadius: '16px',
+                        background: '#FFFFFF',
+                        border: '1px solid #E4E8EF',
+                        borderRadius: '18px',
+                        padding: '18px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '14px',
+                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                          <Sparkles size={16} style={{ color: '#F59E0B' }} />
+                          <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#202938' }}>
+                            Kısayollar
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setActivePortalTab('catalog')}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#6338F5',
+                            fontSize: '0.73rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>Tümünü Gör</span>
+                          <ArrowRight size={12} />
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' }}>
+                        {[
+                          {
+                            label: 'Ürün Kataloğu Gözat',
+                            icon: <Grid size={15} />,
+                            bg: '#F3EEFF',
+                            color: '#6338F5',
+                            onClick: () => setActivePortalTab('catalog')
+                          },
+                          {
+                            label: 'Teklif Oluştur',
+                            icon: <FileText size={15} />,
+                            bg: '#FEF4E4',
+                            color: '#D97706',
+                            onClick: () => setActivePortalTab('quick-quote')
+                          },
+                          {
+                            label: 'Stant QR Bas',
+                            icon: <QrCode size={15} />,
+                            bg: '#E8FAF3',
+                            color: '#059669',
+                            onClick: () => setActivePortalTab('showroom-qr')
+                          },
+                          {
+                            label: hasActiveSaaS ? 'Kiosk Teşhir Modu' : 'Bölge Analizi',
+                            icon: <Eye size={15} />,
+                            bg: '#EAF2FF',
+                            color: '#2563EB',
+                            onClick: () => {
+                              if (hasActiveSaaS) {
+                                window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank');
+                              } else {
+                                setActivePortalTab('analytics');
+                              }
+                            }
+                          }
+                        ].map((sc) => (
+                          <button
+                            key={sc.label}
+                            type="button"
+                            onClick={sc.onClick}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '10px 11px',
+                              borderRadius: '12px',
+                              border: 'none',
+                              background: sc.bg,
+                              color: '#202938',
+                              fontSize: '0.74rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              minWidth: 0
+                            }}
+                          >
+                            <span style={{ color: sc.color, flexShrink: 0, display: 'inline-flex' }}>{sc.icon}</span>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sc.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Yeni Koleksiyonları Keşfedin Purple Gradient Promo Card */}
+                    <div
+                      style={{
+                        position: 'relative',
+                        background: 'linear-gradient(135deg, #3B2296 0%, #6338F5 58%, #7C5CFA 100%)',
+                        borderRadius: '18px',
                         padding: '20px 22px',
+                        color: '#ffffff',
+                        overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
                         gap: '14px',
-                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                        boxShadow: '0 12px 26px -8px rgba(99, 56, 245, 0.45)',
                         flex: 1
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div
-                            style={{
-                              width: '40px',
-                              height: '40px',
-                              borderRadius: '11px',
-                              background: 'rgba(179, 142, 71, 0.14)',
-                              color: '#C5A04B',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0
-                            }}
-                          >
-                            <Eye size={19} />
-                          </div>
-                          <div>
-                            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: 'var(--bp-text-primary, #202633)' }}>
-                              Kiosk Teşhir Modu
-                            </h4>
-                            <span style={{ fontSize: '0.73rem', color: 'var(--bp-text-secondary, #778196)' }}>
-                              Mağaza içi dijital seramik ekranı
-                            </span>
-                          </div>
-                        </div>
-                        <StatusBadge
-                          status={hasActiveSaaS ? 'ACTIVE' : 'PENDING'}
-                          label={hasActiveSaaS ? `${saasInfo?.plan} Aktif` : 'Paket Gerekli'}
-                        />
-                      </div>
-
-                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#475569', lineHeight: 1.48 }}>
-                        Bu cihazı veya mağazadaki bir tableti tam ekran 3D dijital seramik teşhir kioskuna dönüştürün.
-                      </p>
-
-                      {hasActiveSaaS ? (
-                        <PremiumButton
-                          variant="dark"
-                          size="md"
-                          fullWidth
-                          icon={<ExternalLink size={14} style={{ color: '#C5A04B' }} />}
-                          onClick={() => window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank')}
-                        >
-                          Kiosk Teşhir Modunu Aç
-                        </PremiumButton>
-                      ) : (
-                        <PremiumButton
-                          variant="gold"
-                          size="md"
-                          fullWidth
-                          icon={<Lock size={14} />}
-                          onClick={() => setActivePortalTab('subscription')}
-                        >
-                          Paket Aboneliği Başlat
-                        </PremiumButton>
-                      )}
-                    </div>
-
-                    {/* Regional Search Analytics Summary Card */}
-                    <div
-                      style={{
-                        background: '#ffffff',
-                        border: '1px solid #E4E8EF',
-                        borderRadius: '18px',
-                        padding: '20px 22px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        gap: '12px',
-                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
-                        flex: 1
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div
+                      <div style={{ position: 'relative', zIndex: 2, maxWidth: '72%' }}>
+                        <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: 900, lineHeight: 1.22 }}>
+                          Yeni Koleksiyonları Keşfedin
+                        </h4>
+                        <p style={{ margin: '0 0 14px 0', fontSize: '0.74rem', color: 'rgba(255,255,255,0.84)', lineHeight: 1.45 }}>
+                          Modern tasarımlar, zamansız şıklık ve {brandProducts.length > 0 ? `${brandProducts.length} güncel model` : 'showroom katalogları'}.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setActivePortalTab('catalog')}
                           style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '11px',
-                            background: 'rgba(37, 99, 235, 0.1)',
-                            color: '#2563eb',
-                            display: 'flex',
+                            display: 'inline-flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0
+                            gap: '6px',
+                            background: '#ffffff',
+                            color: '#202938',
+                            border: 'none',
+                            borderRadius: '10px',
+                            padding: '8px 14px',
+                            fontSize: '0.76rem',
+                            fontWeight: 800,
+                            cursor: 'pointer'
                           }}
                         >
-                          <TrendingUp size={19} />
-                        </div>
-                        <div>
-                          <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#202938' }}>
-                            Bölgesel Arama Analizleri
-                          </h4>
-                          <span style={{ fontSize: '0.73rem', color: '#758195' }}>
-                            {dealerInfo?.city || 'Bölgeniz'} seramik talep trendleri
-                          </span>
-                        </div>
+                          <span>Koleksiyonları İncele</span>
+                          <ArrowRight size={13} />
+                        </button>
                       </div>
-
-                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#475569', lineHeight: 1.48 }}>
-                        {dealerInfo?.city || 'Şehriniz'} bölgesindeki müşterilerin en çok aradığı ebat, doku ve modelleri inceleyin.
-                      </p>
-
-                      <PremiumButton
-                        variant="outline"
-                        size="md"
-                        fullWidth
-                        icon={<TrendingUp size={14} style={{ color: '#2563eb' }} />}
-                        onClick={() => setActivePortalTab('analytics')}
-                      >
-                        Detaylı Bölge Analitiğini Gör
-                      </PremiumButton>
+                      <img
+                        src={brandProducts[0]?.imageUrl || '/hero/wide_luxury_bathroom.jpg'}
+                        alt=""
+                        style={{
+                          position: 'absolute',
+                          right: '-10px',
+                          bottom: '-10px',
+                          width: '108px',
+                          height: '108px',
+                          objectFit: 'cover',
+                          borderRadius: '14px',
+                          border: '2px solid rgba(255,255,255,0.25)',
+                          transform: 'rotate(-6deg)',
+                          boxShadow: '0 10px 24px rgba(0,0,0,0.28)',
+                          zIndex: 1
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* E. HIZLI İŞLEMLER (4 HIZLI İŞLEM KARTI) */}
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
-                      Hızlı İşlemler
-                    </h3>
-                    <span style={{ fontSize: '0.75rem', color: '#758195', fontWeight: 600 }}>
-                      Sık kullanılan mağaza araçları
-                    </span>
-                  </div>
-
+                {/* E. POPÜLER KOLEKSİYONLAR VİTRİNİ (REFERANS ALT SAĞ KART) */}
+                {brandProducts.length > 0 && (
                   <div
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, minmax(0, 1fr))',
-                      gap: isMobile ? '10px' : '16px'
+                      background: '#ffffff',
+                      border: '1px solid #E4E8EF',
+                      borderRadius: '18px',
+                      padding: isMobile ? '16px 14px' : '20px 24px',
+                      boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '14px'
                     }}
                   >
-                    <QuickActionCard
-                      title="Ürün Kataloğu"
-                      description={`${dealerInfo?.brandName || 'Marka'} koleksiyonlarını ve stok kodlarını inceleyin.`}
-                      icon={<Grid size={20} />}
-                      badge={brandProducts.length > 0 ? `${brandProducts.length} Model` : 'Katalog'}
-                      accentColor="#C5A04B"
-                      onClick={() => setActivePortalTab('catalog')}
-                    />
-
-                    <QuickActionCard
-                      title="AI Görselleştirici"
-                      description="Seramikleri müşterinizin mekanında 3D olarak canlı uygulayın."
-                      icon={<Sparkles size={20} />}
-                      badge="3D Stüdyo"
-                      accentColor="#2563eb"
-                      href="/mekanimda-gor"
-                    />
-
-                    <QuickActionCard
-                      title="Teklif Oluştur"
-                      description="Saniyeler içinde fire, yapıştırıcı ve derz dahil PDF teklif üretin."
-                      icon={<Calculator size={20} />}
-                      badge="WhatsApp & PDF"
-                      accentColor="#10A37F"
-                      onClick={() => setActivePortalTab('quick-quote')}
-                    />
-
-                    <QuickActionCard
-                      title="Destek Al"
-                      description="Şube ayarlarınızı düzenleyin veya teknik destek ekibine ulaşın."
-                      icon={<HelpCircle size={20} />}
-                      badge="7/24 Bayi Hattı"
-                      accentColor="#E9A23B"
-                      onClick={() => setActivePortalTab('settings')}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Sparkles size={17} style={{ color: '#F97316' }} />
+                        <h3 style={{ margin: 0, fontSize: '1.02rem', fontWeight: 800, color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                          Popüler Koleksiyonlar
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActivePortalTab('catalog')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#6338F5',
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <span>Tüm Koleksiyonlar</span>
+                        <ArrowRight size={13} />
+                      </button>
+                    </div>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
+                        gap: '12px'
+                      }}
+                    >
+                      {brandProducts.slice(0, 4).map((prod) => (
+                        <button
+                          key={prod.id}
+                          type="button"
+                          onClick={() => setActivePortalTab('catalog')}
+                          style={{
+                            background: '#F8FAFC',
+                            border: '1px solid #E4E8EF',
+                            borderRadius: '14px',
+                            padding: '8px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                            minWidth: 0
+                          }}
+                        >
+                          <div style={{ width: '100%', aspectRatio: '1.35', borderRadius: '10px', overflow: 'hidden', background: '#E2E8F0' }}>
+                            <img
+                              src={prod.imageUrl || '/hero/wide_luxury_bathroom.jpg'}
+                              alt={prod.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                          </div>
+                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#202938', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {prod.name}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* F. SON TEKLİFLER & MÜŞTERİ TALEPLERİ */}
                 <div

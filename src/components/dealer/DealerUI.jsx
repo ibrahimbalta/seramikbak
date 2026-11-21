@@ -926,7 +926,15 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
 
   const linePath = useMemo(() => {
     if (points.length === 0) return '';
-    return points.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    if (points.length === 1) return `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+    let d = `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cx = ((p0.x + p1.x) / 2).toFixed(1);
+      d += ` C ${cx},${p0.y.toFixed(1)} ${cx},${p1.y.toFixed(1)} ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`;
+    }
+    return d;
   }, [points]);
 
   const areaPath = useMemo(() => {
@@ -939,15 +947,19 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
 
   return (
     <div
+      id="dealer-sales-performance-section"
       style={{
         background: '#ffffff',
         border: '1px solid var(--dp-border, #E4E8EF)',
         borderRadius: '18px',
-        padding: isMobile ? '18px 14px' : '24px 26px',
+        padding: isMobile ? '18px 14px' : '22px 24px',
         boxShadow: '0 4px 18px -4px rgba(15, 23, 42, 0.04)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '18px'
+        justifyContent: 'space-between',
+        gap: '14px',
+        height: '100%',
+        boxSizing: 'border-box'
       }}
     >
       {/* Header & Period Switcher */}
@@ -962,47 +974,92 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                width: '30px',
+                height: '30px',
+                borderRadius: '9px',
+                background: 'rgba(99, 56, 245, 0.1)',
+                color: '#6338F5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <TrendingUp size={16} />
+            </div>
             <h3
               style={{
                 margin: 0,
-                fontSize: '1.05rem',
+                fontSize: '1.02rem',
                 fontWeight: 800,
                 color: 'var(--dp-text-primary, #202938)',
                 fontFamily: 'var(--font-title, "Outfit", sans-serif)'
               }}
             >
-              Satış & Teklif Performansı
+              Satış Performansı
             </h3>
             <StatusBadge status="ACTIVE" label="Canlı Veri" />
           </div>
-          <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: 'var(--dp-text-secondary, #758195)' }}>
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.76rem', color: 'var(--dp-text-secondary, #758195)' }}>
             {totalVolume > 0
               ? `Seçili dönemde toplam ₺${totalVolume.toLocaleString('tr-TR')} teklif hacmi (${totalCount} işlem)`
               : `Seçili dönemde toplam ${totalCount} müşteri talebi ve teklif hareketi`}
           </p>
         </div>
 
-        <FilterPanel
-          activeId={period}
-          onChange={setPeriod}
-          options={[
-            { id: 'daily', label: 'Günlük' },
-            { id: 'weekly', label: 'Haftalık' },
-            { id: 'monthly', label: 'Aylık' }
-          ]}
-        />
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            background: '#F4F6FA',
+            padding: '4px',
+            borderRadius: '11px',
+            border: '1px solid #E4E8EF'
+          }}
+        >
+          {[
+            { id: 'daily', label: 'Bu Hafta' },
+            { id: 'weekly', label: 'Bu Ay' },
+            { id: 'monthly', label: 'Bu Yıl' }
+          ].map((opt) => {
+            const active = period === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setPeriod(opt.id)}
+                style={{
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '6px 12px',
+                  fontSize: '0.73rem',
+                  fontWeight: active ? 700 : 600,
+                  background: active ? '#2D266F' : 'transparent',
+                  color: active ? '#ffffff' : '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.18s ease',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* SVG Responsive Chart */}
       <div style={{ position: 'relative', width: '100%' }}>
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          style={{ width: '100%', height: isMobile ? '190px' : '220px', overflow: 'visible', display: 'block' }}
+          style={{ width: '100%', height: isMobile ? '190px' : '235px', overflow: 'visible', display: 'block' }}
         >
           <defs>
-            <linearGradient id="dealerGoldArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#C5A04B" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#C5A04B" stopOpacity="0.0" />
+            <linearGradient id="dealerVioletArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#6338F5" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#6338F5" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -1017,7 +1074,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                   y1={y}
                   x2={width - padRight}
                   y2={y}
-                  stroke="var(--dp-bg, #F5F6F8)"
+                  stroke="#EEF2F7"
                   strokeWidth="1.5"
                   strokeDasharray="4 4"
                 />
@@ -1031,7 +1088,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                 >
                   {totalVolume > 0
                     ? labelVal >= 1000
-                      ? `₺${(labelVal / 1000).toFixed(0)}B`
+                      ? `₺${(labelVal / 1000).toFixed(0)}k`
                       : `₺${labelVal}`
                     : `${labelVal}`}
                 </text>
@@ -1039,12 +1096,12 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
             );
           })}
 
-          {/* Area & Line */}
-          <path d={areaPath} fill="url(#dealerGoldArea)" />
+          {/* Area & Smooth Line */}
+          <path d={areaPath} fill="url(#dealerVioletArea)" />
           <path
             d={linePath}
             fill="none"
-            stroke="#C5A04B"
+            stroke="#6338F5"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -1070,7 +1127,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                     y1={padTop}
                     x2={pt.x}
                     y2={padTop + plotH}
-                    stroke="#C5A04B"
+                    stroke="#6338F5"
                     strokeWidth="1.5"
                     strokeDasharray="3 3"
                   />
@@ -1081,7 +1138,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                   cy={pt.y}
                   r={isHovered ? 6 : 4.5}
                   fill="#ffffff"
-                  stroke="#C5A04B"
+                  stroke="#6338F5"
                   strokeWidth={isHovered ? 3 : 2.5}
                 />
 
@@ -1092,29 +1149,29 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                   textAnchor="middle"
                   fontSize="11"
                   fontWeight={isHovered ? '800' : '600'}
-                  fill={isHovered ? 'var(--dp-text-primary, #202938)' : 'var(--dp-text-secondary, #758195)'}
+                  fill={isHovered ? '#202938' : '#758195'}
                 >
                   {pt.label}
                 </text>
 
-                {/* Tooltip Box */}
+                {/* Floating White Tooltip Pill */}
                 {isHovered && (
-                  <g transform={`translate(${Math.min(Math.max(pt.x - 65, 10), width - 145)}, ${Math.max(pt.y - 54, 4)})`}>
+                  <g transform={`translate(${Math.min(Math.max(pt.x - 68, 10), width - 148)}, ${Math.max(pt.y - 54, 4)})`}>
                     <rect
-                      width="130"
+                      width="136"
                       height="42"
-                      rx="8"
-                      fill="var(--dp-text-primary, #202938)"
-                      stroke="#C5A04B"
+                      rx="10"
+                      fill="#ffffff"
+                      stroke="#E4E8EF"
                       strokeWidth="1"
                     />
-                    <text x="65" y="16" textAnchor="middle" fontSize="10" fontWeight="700" fill="#fde68a">
-                      {pt.label}
-                    </text>
-                    <text x="65" y="32" textAnchor="middle" fontSize="11" fontWeight="800" fill="#ffffff">
+                    <text x="68" y="17" textAnchor="middle" fontSize="11.5" fontWeight="800" fill="#202938">
                       {pt.amount > 0
-                        ? `₺${pt.amount.toLocaleString('tr-TR')} (${pt.count})`
+                        ? `₺${pt.amount.toLocaleString('tr-TR')}`
                         : `${pt.count} Talep / Teklif`}
+                    </text>
+                    <text x="68" y="32" textAnchor="middle" fontSize="10" fontWeight="600" fill="#6338F5">
+                      ● {pt.label}
                     </text>
                   </g>
                 )}
