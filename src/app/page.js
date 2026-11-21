@@ -11400,8 +11400,8 @@ export default function Home() {
           justify-content: space-between;
           gap: 32px;
           overflow: hidden;
-          border: 1px solid rgba(181, 139, 80, 0.32);
-          box-shadow: 0 22px 50px -12px rgba(37, 37, 34, 0.28), 0 4px 12px rgba(37, 37, 34, 0.08);
+          border: 1px solid rgba(181, 139, 80, 0.36);
+          box-shadow: 0 -8px 28px rgba(245, 240, 230, 0.65), 0 22px 48px -12px rgba(48, 39, 28, 0.22), inset 0 1px 0 rgba(255, 248, 235, 0.35);
           margin-bottom: 24px;
           box-sizing: border-box;
         }
@@ -11423,7 +11423,7 @@ export default function Home() {
         :global(.clean-hero-overlay) {
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, #252522 0%, rgba(37, 37, 34, 0.92) 38%, rgba(37, 37, 34, 0.58) 68%, rgba(37, 37, 34, 0.2) 100%);
+          background: linear-gradient(180deg, rgba(246, 241, 232, 0.16) 0%, rgba(46, 39, 31, 0.35) 18%, rgba(36, 30, 24, 0.80) 100%), linear-gradient(95deg, rgba(46, 39, 31, 0.88) 0%, rgba(56, 47, 36, 0.72) 40%, rgba(74, 61, 46, 0.36) 72%, rgba(246, 241, 232, 0.06) 100%);
           z-index: 1;
           pointer-events: none;
         }
@@ -12054,7 +12054,7 @@ export default function Home() {
             display: none;
           }
           :global(.clean-hero-overlay) {
-            background: linear-gradient(135deg, rgba(37, 37, 34, 0.94) 0%, rgba(37, 37, 34, 0.86) 55%, rgba(37, 37, 34, 0.68) 100%);
+            background: linear-gradient(180deg, rgba(246, 241, 232, 0.14) 0%, rgba(46, 39, 31, 0.74) 22%, rgba(38, 32, 25, 0.88) 100%);
           }
           :global(.luxury-hero-eyebrow) {
             font-size: 0.68rem;

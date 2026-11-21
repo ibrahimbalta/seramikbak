@@ -125,9 +125,9 @@ export default function LiveDealsTicker() {
       <style jsx>{`
         .live-ticker-fullwidth-wrapper {
           width: 100%;
-          max-width: 100%;
-          margin-top: 10px;
-          margin-bottom: 16px;
+          max-width: 1440px;
+          margin: 10px auto 14px auto;
+          padding: 0 16px;
           overflow: hidden;
           z-index: 90;
           box-sizing: border-box;
@@ -136,15 +136,17 @@ export default function LiveDealsTicker() {
         .live-ticker-bar {
           width: 100%;
           max-width: 100%;
-          background: var(--sb-bg-secondary, #EAE5DC);
-          border-top: 1px solid var(--sb-border, #E5DED3);
-          border-bottom: 1px solid var(--sb-border, #E5DED3);
-          padding: 8px 24px;
+          background: linear-gradient(90deg, rgba(250, 248, 244, 0.94) 0%, rgba(242, 235, 224, 0.94) 50%, rgba(250, 248, 244, 0.94) 100%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(181, 139, 80, 0.24);
+          border-radius: 16px;
+          padding: 8px 18px;
           display: flex;
           align-items: center;
           gap: 16px;
           position: relative;
-          box-shadow: 0 2px 10px rgba(41, 40, 36, 0.03);
+          box-shadow: 0 6px 20px rgba(46, 39, 31, 0.05);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -161,7 +163,7 @@ export default function LiveDealsTicker() {
           gap: 8px;
           padding: 6px 14px;
           border-radius: 20px;
-          background: var(--sb-surface-dark, #252522);
+          background: #2E271F;
           border: 1px solid rgba(181, 139, 80, 0.45);
           color: #F3E5AB;
           font-size: 0.75rem;
