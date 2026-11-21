@@ -4880,23 +4880,26 @@ export default function Home() {
               id="smart-search-section"
               className="smart-search-hero-dock"
               style={{
-                background: 'rgba(37, 37, 34, 0.48)',
-                backdropFilter: 'blur(18px)',
-                WebkitBackdropFilter: 'blur(18px)',
-                border: '1px solid rgba(216, 201, 181, 0.28)',
-                borderRadius: '22px',
-                padding: '16px 18px',
+                background: 'rgba(255, 255, 255, 0.14)',
+                backdropFilter: 'blur(22px)',
+                WebkitBackdropFilter: 'blur(22px)',
+                border: '1px solid rgba(255, 255, 255, 0.24)',
+                borderRadius: '20px',
+                padding: '11px 13px',
                 position: 'relative',
                 zIndex: 3,
                 width: '100%',
+                maxWidth: '1080px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
                 boxSizing: 'border-box',
-                boxShadow: '0 20px 44px -12px rgba(0, 0, 0, 0.35)'
+                boxShadow: '0 18px 40px -12px rgba(0, 0, 0, 0.28)'
               }}
             >
 
 
               {/* MODERN ULTRA-SLEEK SEARCH CONTAINER */}
-              <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative', margin: '0 0 12px 0' }}>
+              <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative', margin: '0 0 9px 0' }}>
                 <div className="clean-search-pill-box">
                   <div className="modern-search-icon-circle">
                     <SearchIcon size={20} strokeWidth={2.4} />
@@ -5024,11 +5027,13 @@ export default function Home() {
 
               {/* Tek Satır Cam Kategori & Filtre Çubuğu (Image 1 Referansı) */}
               <div
+                className="hero-dock-pills-row"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   flexWrap: 'wrap',
-                  gap: '7px'
+                  gap: '6px'
                 }}
               >
                 {[
@@ -5053,17 +5058,18 @@ export default function Home() {
                         }, 80);
                       }}
                       style={{
-                        height: '33px',
-                        padding: '0 13px',
+                        height: '28px',
+                        padding: '0 11px',
                         borderRadius: '999px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
+                        fontSize: '0.71rem',
+                        fontWeight: 600,
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        background: isCatActive ? '#B58B50' : 'rgba(255, 255, 255, 0.14)',
+                        background: isCatActive ? '#B58B50' : 'rgba(255, 255, 255, 0.15)',
                         color: isCatActive ? '#FFFFFF' : '#F6F3EE',
-                        border: isCatActive ? '1px solid #D8C9B5' : '1px solid rgba(255, 255, 255, 0.22)',
-                        backdropFilter: 'blur(8px)'
+                        border: isCatActive ? '1px solid #D8C9B5' : '1px solid rgba(255, 255, 255, 0.2)',
+                        backdropFilter: 'blur(8px)',
+                        whiteSpace: 'nowrap'
                       }}
                     >
                       {cat.label}
@@ -5080,14 +5086,15 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '33px',
-                    padding: '0 12px',
+                    height: '28px',
+                    padding: '0 9px',
+                    maxWidth: '104px',
                     borderRadius: '999px',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
-                    background: 'rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
+                    fontSize: '0.71rem',
+                    fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
                     backdropFilter: 'blur(8px)'
@@ -5107,14 +5114,15 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '33px',
-                    padding: '0 12px',
+                    height: '28px',
+                    padding: '0 9px',
+                    maxWidth: '104px',
                     borderRadius: '999px',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
-                    background: 'rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
+                    fontSize: '0.71rem',
+                    fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
                     backdropFilter: 'blur(8px)'
@@ -5137,14 +5145,15 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '33px',
-                    padding: '0 12px',
+                    height: '28px',
+                    padding: '0 9px',
+                    maxWidth: '104px',
                     borderRadius: '999px',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
-                    background: 'rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
+                    fontSize: '0.71rem',
+                    fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
                     backdropFilter: 'blur(8px)'
@@ -5167,14 +5176,15 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '33px',
-                    padding: '0 12px',
+                    height: '28px',
+                    padding: '0 9px',
+                    maxWidth: '104px',
                     borderRadius: '999px',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
-                    background: 'rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
+                    fontSize: '0.71rem',
+                    fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
                     backdropFilter: 'blur(8px)'
@@ -5195,14 +5205,15 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '33px',
-                    padding: '0 12px',
+                    height: '28px',
+                    padding: '0 9px',
+                    maxWidth: '104px',
                     borderRadius: '999px',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
-                    background: 'rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
+                    fontSize: '0.71rem',
+                    fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
                     backdropFilter: 'blur(8px)'
@@ -11765,13 +11776,13 @@ export default function Home() {
         :global(.clean-search-pill-box) {
           display: flex;
           align-items: center;
-          background: #ffffff;
+          background: rgba(248, 244, 237, 0.94);
           border-radius: 9999px;
-          border: 1.5px solid rgba(179, 142, 71, 0.45);
-          padding: 6px 8px 6px 14px;
-          box-shadow: 0 18px 44px -8px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.65) inset;
-          gap: 10px;
-          height: 64px;
+          border: 1px solid rgba(255, 255, 255, 0.65);
+          padding: 5px 6px 5px 12px;
+          box-shadow: 0 10px 26px -6px rgba(0, 0, 0, 0.16);
+          gap: 8px;
+          height: 52px;
           box-sizing: border-box;
           transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
         }
@@ -11782,8 +11793,8 @@ export default function Home() {
         }
 
         :global(.modern-search-icon-circle) {
-          width: 42px;
-          height: 42px;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
           background: linear-gradient(135deg, rgba(197, 143, 39, 0.14) 0%, rgba(197, 143, 39, 0.05) 100%);
           color: #c58f27;
@@ -11881,14 +11892,14 @@ export default function Home() {
         :global(.modern-camera-pill-btn) {
           display: flex;
           align-items: center;
-          gap: 7px;
-          padding: 9px 18px;
+          gap: 6px;
+          padding: 7px 14px;
           border-radius: 9999px;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          color: #0f172a;
+          background: rgba(234, 229, 220, 0.72);
+          border: 1px solid rgba(181, 139, 80, 0.22);
+          color: #292824;
           font-weight: 700;
-          font-size: 0.85rem;
+          font-size: 0.78rem;
           cursor: pointer;
           transition: all 0.2s ease;
           white-space: nowrap;
@@ -11921,14 +11932,14 @@ export default function Home() {
         :global(.modern-search-submit-btn) {
           display: flex;
           align-items: center;
-          gap: 7px;
-          padding: 11px 26px;
+          gap: 6px;
+          padding: 9px 20px;
           border-radius: 9999px;
           background: linear-gradient(135deg, #B58B50 0%, #98713B 100%);
           color: #FFFFFF;
-          border: 1.5px solid #D8C9B5;
+          border: 1px solid rgba(255, 255, 255, 0.35);
           font-weight: 700;
-          font-size: 0.92rem;
+          font-size: 0.84rem;
           cursor: pointer;
           box-shadow: 0 6px 20px rgba(37, 37, 34, 0.2);
           transition: all 0.22s ease;
