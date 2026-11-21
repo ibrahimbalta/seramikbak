@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Cookie, X } from 'lucide-react';
+import { Cookie } from 'lucide-react';
 import { useLanguage } from '@/lib/languageContext';
 
 export default function CookieBanner() {
@@ -37,10 +37,10 @@ export default function CookieBanner() {
 
   return (
     <div className="cookie-banner-overlay">
-      <div className="cookie-banner-card glass-panel">
+      <div className="cookie-banner-card">
         <div className="cookie-banner-content">
           <div className="cookie-banner-icon-box">
-            <Cookie size={24} className="cookie-icon" />
+            <Cookie size={22} className="cookie-icon" />
           </div>
           
           <div className="cookie-banner-text">
@@ -79,12 +79,12 @@ export default function CookieBanner() {
           max-width: 680px;
           margin: 0 auto;
           z-index: 99999;
-          animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes slideUp {
           from {
-            transform: translateY(100px);
+            transform: translateY(30px);
             opacity: 0;
           }
           to {
@@ -94,14 +94,14 @@ export default function CookieBanner() {
         }
 
         .cookie-banner-card {
-          background: rgba(15, 23, 42, 0.92);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid #e2e8f0;
           border-radius: 16px;
           padding: 18px 22px;
-          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), 0 0 24px rgba(212, 175, 55, 0.1);
-          color: #f8fafc;
+          box-shadow: 0 18px 40px -8px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.05);
+          color: #0f172a;
           display: flex;
           flex-direction: column;
           gap: 14px;
@@ -114,11 +114,11 @@ export default function CookieBanner() {
         }
 
         .cookie-banner-icon-box {
-          background: rgba(212, 175, 55, 0.14);
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          background: #fffbeb;
+          border: 1px solid #fde68a;
           padding: 10px;
           border-radius: 12px;
-          color: #d4af37;
+          color: #b38e47;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -126,27 +126,27 @@ export default function CookieBanner() {
         }
 
         .cookie-banner-text h4 {
-          font-size: 0.95rem;
+          font-size: 0.92rem;
           font-weight: 800;
           margin: 0 0 4px 0;
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .cookie-banner-text p {
           font-size: 0.8rem;
-          color: #94a3b8;
-          line-height: 1.45;
+          color: #475569;
+          line-height: 1.5;
           margin: 0;
         }
 
         .cookie-link {
-          color: #d4af37;
+          color: #b38e47;
           text-decoration: underline;
-          font-weight: 600;
+          font-weight: 700;
         }
 
         .cookie-link:hover {
-          color: #e5c158;
+          color: #967434;
         }
 
         .cookie-banner-actions {
@@ -154,16 +154,16 @@ export default function CookieBanner() {
           align-items: center;
           justify-content: flex-end;
           gap: 10px;
-          border-top: 1px dashed rgba(255, 255, 255, 0.1);
+          border-top: 1px solid #f1f5f9;
           padding-top: 12px;
         }
 
         .cookie-btn-secondary {
           padding: 8px 14px;
           border-radius: 10px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: #cbd5e1;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #475569;
           font-size: 0.78rem;
           font-weight: 700;
           cursor: pointer;
@@ -171,31 +171,33 @@ export default function CookieBanner() {
         }
 
         .cookie-btn-secondary:hover {
-          background: rgba(255, 255, 255, 0.1);
-          color: #ffffff;
+          background: #f1f5f9;
+          color: #0f172a;
+          border-color: #cbd5e1;
         }
 
         .cookie-btn-primary {
           padding: 8px 18px;
           border-radius: 10px;
-          background: linear-gradient(135deg, #c5a059 0%, #d4af37 50%, #b38e47 100%);
+          background: linear-gradient(135deg, #b38e47 0%, #c89d4c 100%);
           border: none;
-          color: #0f172a;
+          color: #ffffff;
           font-size: 0.78rem;
-          font-weight: 900;
+          font-weight: 800;
           cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 2px 10px rgba(179, 142, 71, 0.24);
         }
 
         .cookie-btn-primary:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(212, 175, 55, 0.45);
+          filter: brightness(1.04);
+          box-shadow: 0 6px 16px rgba(179, 142, 71, 0.34);
         }
 
         @media (max-width: 640px) {
           .cookie-banner-overlay {
-            bottom: 12px;
+            bottom: 84px;
             left: 12px;
             right: 12px;
           }

@@ -183,7 +183,7 @@ export default function BayilerPage() {
       {/* Page Header */}
       <header className="bayiler-header">
         <div className="header-container">
-          <BackToHomeButton variant="dark" style={{ alignSelf: 'flex-start', marginBottom: '16px' }} />
+          <BackToHomeButton variant="light" style={{ alignSelf: 'flex-start', marginBottom: '16px' }} />
           <div className="header-badge">
             <Sparkles size={13} className="sparkle-icon" />
             <span>TÜRKİYE YETKİLİ SERAMİK BAYİLERİ</span>
@@ -348,7 +348,7 @@ export default function BayilerPage() {
                 </div>
 
                 <Link href={`/bayi/${dealer.id}`} style={{ textDecoration: 'none' }}>
-                  <h4 className="dealer-name hover:text-amber-400 transition-colors">{dealer.name}</h4>
+                  <h4 className="dealer-name hover:text-[#b38e47] transition-colors">{dealer.name}</h4>
                 </Link>
 
                 <div className="dealer-info-rows">

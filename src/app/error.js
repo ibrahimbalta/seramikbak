@@ -68,30 +68,30 @@ export default function Error({ error, reset }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
       {/* Background Decorative Glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-xl w-full text-center z-10 space-y-8 backdrop-blur-md bg-slate-900/70 p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-2xl">
+      <div className="max-w-xl w-full text-center z-10 space-y-8 bg-white p-8 sm:p-12 rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/5">
         
         {/* Error Warning Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs sm:text-sm font-medium tracking-wide">
-          {isChunkError ? <Sparkles className="w-4 h-4 text-amber-400" /> : <AlertTriangle className="w-4 h-4 text-amber-400" />}
-          <span>{isChunkError ? 'Yeni Sürüm Güncellemesi Algılandı' : 'Sistem Hatası (500)'}</span>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs sm:text-sm font-bold tracking-wide">
+          {isChunkError ? <Sparkles className="w-4 h-4 text-[#b38e47]" /> : <AlertTriangle className="w-4 h-4 text-[#b38e47]" />}
+          <span>{isChunkError ? 'Yeni Sürüm Güncellemesi Algılandı' : 'Sistem Bildirimi'}</span>
         </div>
 
         {/* Error Icon Graphic */}
         <div className="relative flex justify-center items-center my-4">
-          <span className="text-8xl sm:text-9xl font-extrabold text-slate-800 tracking-tighter select-none opacity-40">
+          <span className="text-8xl sm:text-9xl font-black text-slate-100 tracking-tighter select-none">
             {isChunkError ? 'NEW' : '500'}
           </span>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 p-0.5 shadow-lg shadow-amber-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#b38e47] to-[#d4af37] p-0.5 shadow-lg shadow-amber-500/20">
+              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
                 {isChunkError ? (
-                  <RefreshCw className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 animate-spin" />
+                  <RefreshCw className="w-10 h-10 sm:w-12 sm:h-12 text-[#b38e47] animate-spin" />
                 ) : (
-                  <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 animate-pulse" />
+                  <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-[#b38e47]" />
                 )}
               </div>
             </div>
@@ -100,41 +100,41 @@ export default function Error({ error, reset }) {
 
         {/* Title & Description */}
         <div className="space-y-3">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             {isChunkError ? 'Sayfa Güncelleniyor...' : 'Beklenmeyen Bir Hata Oluştu'}
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
             {isChunkError
               ? 'Sistemde yeni bir sürüm yayınlandı. Tarayıcınızdaki eski önbellek temizlenerek sayfa yenileniyor...'
-              : 'İsteğiniz işlenirken sunucularımızda geçici bir aksaklık yaşandı. Lütfen sayfayı yenileyiniz.'}
+              : 'İsteğiniz işlenirken geçici bir aksaklık yaşandı. Lütfen sayfayı yenileyiniz.'}
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={handleHardReload}
             disabled={reloading}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-200 shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#b38e47] to-[#c89d4c] text-white font-bold hover:brightness-105 transition-all duration-200 shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${reloading ? 'animate-spin' : ''}`} />
             <span>{reloading ? 'Yenileniyor...' : 'Sayfayı Yenile'}</span>
           </button>
           
           <Link
-            href="/marka"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-200 font-medium hover:bg-slate-800 hover:text-white transition-all duration-200 active:scale-95"
+            href="/"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 active:scale-95"
           >
-            <Home className="w-4 h-4 text-amber-400" />
-            <span>Marka Paneline Dön</span>
+            <Home className="w-4 h-4 text-[#b38e47]" />
+            <span>Ana Sayfaya Dön</span>
           </Link>
         </div>
 
         {/* Support Link */}
-        <div className="pt-6 border-t border-slate-800/60 flex items-center justify-center gap-2 text-xs text-slate-400">
-          <Mail className="w-3.5 h-3.5 text-amber-400" />
+        <div className="pt-6 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-500">
+          <Mail className="w-3.5 h-3.5 text-[#b38e47]" />
           <span>Sorun devam ederse lütfen </span>
-          <Link href="/iletisim" className="text-amber-400 underline hover:text-amber-300 transition-colors">
+          <Link href="/iletisim" className="text-[#b38e47] font-semibold underline hover:text-amber-700 transition-colors">
             destek ekibimizle iletişime geçin
           </Link>
         </div>

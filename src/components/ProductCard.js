@@ -106,14 +106,14 @@ export default function ProductCard({
                 onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}
                 title={isInCart ? t('inCart') : t('addQuote')}
                 style={{
-                  height: '24px',
+                  height: '26px',
                   minWidth: '58px',
-                  padding: '0 6px',
+                  padding: '0 8px',
                   boxSizing: 'border-box',
-                  background: isInCart ? '#059669' : '#fdfaf3',
-                  color: isInCart ? '#ffffff' : '#a27b38',
-                  border: isInCart ? '1px solid #059669' : '1px solid #e7d8bf',
-                  borderRadius: '6px',
+                  background: isInCart ? '#059669' : '#fffbeb',
+                  color: isInCart ? '#ffffff' : '#967434',
+                  border: isInCart ? '1px solid #059669' : '1px solid rgba(179, 142, 71, 0.35)',
+                  borderRadius: '8px',
                   fontSize: '0.68rem',
                   fontWeight: '700',
                   cursor: 'pointer',
@@ -122,7 +122,7 @@ export default function ProductCard({
                   justifyContent: 'center',
                   whiteSpace: 'nowrap',
                   flexShrink: 0,
-                  transition: 'all 0.15s ease'
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
                 <span>{isInCart ? t('inCart') : t('addQuote')}</span>
@@ -133,14 +133,14 @@ export default function ProductCard({
               onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
               title={t('comparePrices')}
               style={{
-                height: '24px',
+                height: '26px',
                 minWidth: '58px',
-                padding: '0 6px',
+                padding: '0 8px',
                 boxSizing: 'border-box',
-                background: isCompared ? '#b38e47' : '#ffffff',
-                color: isCompared ? '#ffffff' : '#64748b',
-                border: isCompared ? '1px solid #b38e47' : '1px solid #e2e8f0',
-                borderRadius: '6px',
+                background: isCompared ? '#0f172a' : '#f8fafc',
+                color: isCompared ? '#ffffff' : '#475569',
+                border: isCompared ? '1px solid #0f172a' : '1px solid #e2e8f0',
+                borderRadius: '8px',
                 fontSize: '0.68rem',
                 fontWeight: '700',
                 cursor: 'pointer',
@@ -149,7 +149,7 @@ export default function ProductCard({
                 justifyContent: 'center',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
-                transition: 'all 0.15s ease'
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
               <span>{isCompared ? t('compared') : t('compare')}</span>

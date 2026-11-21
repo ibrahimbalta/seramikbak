@@ -5064,7 +5064,7 @@ export default function Home() {
                 gap: '16px', 
                 marginBottom: '32px',
                 padding: '24px',
-                background: '#eef0f4'
+                background: '#ffffff'
               }}>
                 <div className="weekly-products-header" style={{ 
                   display: 'flex', 
@@ -5125,7 +5125,7 @@ export default function Home() {
                           borderRadius: 'var(--border-radius-md)',
                           overflow: 'hidden',
                           background: '#f8f9fb',
-                          border: '1.5px solid #cfd7e3',
+                          border: '1px solid #e2e8f0',
                           boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
                           display: 'flex',
                           flexDirection: 'column',
@@ -5380,7 +5380,7 @@ export default function Home() {
                   borderRadius: '12px', 
                   background: selectedIsPremium === 'true' 
                     ? 'linear-gradient(135deg, rgba(179,142,71,0.15) 0%, rgba(140,107,48,0.06) 100%)' 
-                    : '#e2e6ed', 
+                    : '#f8fafc', 
                   border: selectedIsPremium === 'true' 
                     ? '1px solid rgba(179,142,71,0.35)' 
                     : '1px solid #cbd5e1', 
@@ -6232,7 +6232,7 @@ export default function Home() {
                     <div>
                       <h3 className="studio-step-title">Seramik Seçin & Giydirin</h3>
                       <p className="studio-step-desc">
-                        Dokunduğunuz seramik doğrudan <strong>"{getTargetLabel(studioTarget)}"</strong> yüzeyine giydirilir.
+                        Dokunduğunuz seramik doğrudan <strong>&quot;{getTargetLabel(studioTarget)}&quot;</strong> yüzeyine giydirilir.
                       </p>
                     </div>
                   </div>
@@ -8046,7 +8046,7 @@ export default function Home() {
                     style={{ marginTop: '3px', cursor: 'pointer', accentColor: '#b38e47', width: '16px', height: '16px' }}
                   />
                   <label htmlFor="lead-kvkk-check" style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
-                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>KVKK Aydınlatma Metni&apos;ni</Link> okudum ve kabul ediyorum.
                   </label>
                 </div>
 
@@ -8606,7 +8606,7 @@ export default function Home() {
               </div>
             </div>
             <p className="footer-tagline">
-              Türkiye'nin öncü seramik, 3D görselleştirme ve showroom ekosistemi. 40+ üretici markanın koleksiyonlarını canlı deneyin, en yakın yetkili bayilerden anında teklif alın.
+              Türkiye&apos;nin öncü seramik, 3D görselleştirme ve showroom ekosistemi. 40+ üretici markanın koleksiyonlarını canlı deneyin, en yakın yetkili bayilerden anında teklif alın.
             </p>
             <div className="footer-socials">
               <Link href="/" className="social-icon-btn" title="Ana Sayfa"><Globe size={15} /></Link>
@@ -8690,7 +8690,7 @@ export default function Home() {
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <div className="footer-bottom-left">
-            <p>© 2026 SeramikBak Global A.Ş. Tüm hakları saklıdır. Türkiye'nin Uluslararası Seramik Ekosistemi.</p>
+            <p>© 2026 SeramikBak Global A.Ş. Tüm hakları saklıdır. Türkiye&apos;nin Uluslararası Seramik Ekosistemi.</p>
           </div>
           <div className="footer-bottom-badges">
             <span className="footer-security-tag">
@@ -10182,11 +10182,11 @@ export default function Home() {
            LUXURY LIGHT TWO-TONE TOP NAVBAR & DROPDOWNS
            ========================================================================== */
         :global(.luxury-dark-header) {
-          background: rgba(244, 246, 249, 0.94);
+          background: rgba(255, 255, 255, 0.96);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border-bottom: 2px solid rgba(212, 175, 55, 0.45);
-          border-radius: 0 0 24px 24px;
+          border-bottom: 1px solid #e2e8f0;
+          border-radius: 0;
           padding: 10px 24px;
           color: #0f172a;
           position: sticky;
@@ -11285,7 +11285,7 @@ export default function Home() {
         }
 
         :global(.trend-chip-btn) {
-          background: #eef1f6;
+          background: #f8fafc;
           border: 1px solid #cbd5e1;
           border-radius: 999px;
           padding: 5px 13px;
@@ -11318,7 +11318,7 @@ export default function Home() {
         :global(.clean-search-pill-box) {
           display: flex;
           align-items: center;
-          background: #f8f9fb;
+          background: #ffffff;
           border-radius: 9999px;
           border: 1.5px solid rgba(179, 142, 71, 0.45);
           padding: 6px 8px 6px 14px;
@@ -11437,8 +11437,8 @@ export default function Home() {
           gap: 7px;
           padding: 9px 18px;
           border-radius: 9999px;
-          background: #eef1f6;
-          border: 1.5px solid #cbd5e1;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           color: #0f172a;
           font-weight: 700;
           font-size: 0.85rem;
@@ -11513,8 +11513,8 @@ export default function Home() {
         :global(.clean-nav-card-item) {
           position: relative;
           overflow: hidden;
-          background: linear-gradient(180deg, #f4f6fa 0%, #eceff5 100%);
-          border: 1.5px solid #cbd5e1;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 18px;
           padding: 16px 10px;
           display: flex;
@@ -11718,7 +11718,7 @@ export default function Home() {
           /* Top Header Mobile Clean Fit (No Overflow) */
           :global(.luxury-dark-header) {
             padding: 8px 12px !important;
-            border-radius: 0 0 16px 16px !important;
+            border-radius: 0 !important;
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
@@ -14178,7 +14178,7 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          background: #eceff4;
+          background: #ffffff;
           border: 1px solid #cbd5e1;
           box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
           border-radius: var(--border-radius-lg);
@@ -14238,7 +14238,7 @@ export default function Home() {
           height: 18px;
           width: 18px;
           background-color: #f8fafc;
-          border: 1.5px solid #cbd5e1;
+          border: 1px solid #e2e8f0;
           border-radius: 6px;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
@@ -17752,7 +17752,7 @@ export default function Home() {
         }
 
         .spec-item-box:hover {
-          background: #f8f9fb;
+          background: #ffffff;
           border-color: rgba(179, 142, 71, 0.4);
           transform: translateY(-2px);
           box-shadow: 0 8px 18px rgba(179, 142, 71, 0.12);
@@ -18174,7 +18174,7 @@ export default function Home() {
 
         .detail-modal-content-premium .channel-box:hover {
           border-color: rgba(179, 142, 71, 0.45);
-          background: #f8f9fb;
+          background: #ffffff;
           box-shadow: 0 6px 18px rgba(179, 142, 71, 0.1);
         }
 
@@ -18232,7 +18232,7 @@ export default function Home() {
 
         .detail-modal-content-premium .calc-input, 
         .detail-modal-content-premium .calc-select {
-          background: #f8f9fb;
+          background: #ffffff;
           border: 1px solid #cbd5e1;
           border-radius: 8px;
           padding: 10px 12px;
@@ -18265,7 +18265,7 @@ export default function Home() {
         }
 
         .calc-res-item {
-          background: #f8f9fb;
+          background: #ffffff;
           border: 1px solid #cbd5e1;
           padding: 10px 12px;
           border-radius: 8px;
@@ -20276,7 +20276,7 @@ export default function Home() {
             height: 54px !important;
             padding: 0 14px !important;
             margin: 0 !important;
-            border-radius: 0 0 16px 16px !important;
+            border-radius: 0 !important;
             background: rgba(255, 255, 255, 0.94) !important;
             backdrop-filter: blur(20px) !important;
             -webkit-backdrop-filter: blur(20px) !important;
@@ -21218,7 +21218,7 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           padding: 8px 10px;
-          background: #f8f9fb;
+          background: #ffffff;
           border: 1px solid #cbd5e1;
           border-radius: 8px; /* Sleek modern rounded rectangle */
           font-size: 0.76rem;

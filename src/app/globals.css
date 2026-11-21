@@ -4,12 +4,23 @@
 
 :root {
   /* Color Palette (Warm Stone Light Mode - Soft & Low-Glare) */
-  --bg-dark: #e6e8ec;
-  --bg-card: rgba(242, 243, 246, 0.92);
-  --bg-card-solid: #f2f3f6;
-  --bg-input: #e0e3e8;
-  --border-color: rgba(15, 23, 42, 0.09);
-  --border-hover: rgba(15, 23, 42, 0.18);
+  --bg-dark: #f4f6f9;
+  --bg-canvas: #f8fafc;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.05), 0 1px 3px -1px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 16px 36px -6px rgba(15, 23, 42, 0.09), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  --shadow-gold: 0 8px 24px -4px rgba(179, 142, 71, 0.22);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --bg-card: rgba(255, 255, 255, 0.96);
+  --bg-card-solid: #ffffff;
+  --bg-input: #f8fafc;
+  --border-color: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --border-hover: #cbd5e1;
   --border-gold: rgba(197, 160, 89, 0.4);
   
   --accent-gold: #b38e47;
@@ -20,9 +31,9 @@
   --accent-green: #059669;
   --accent-orange: #d97706;
   
-  --text-primary: #1e293b;
+  --text-primary: #0f172a;
   --text-secondary: #475569;
-  --text-muted: #8e9bb0;
+  --text-muted: #64748b;
   
   /* Layout & Mobile Viewport Support (MOB-1) */
   --max-width: 1400px;
@@ -89,7 +100,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Harmonize browser autofill styling across all forms with the warm light theme */
+/*Harmonize-autofill*/
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -103,10 +114,10 @@ select:-webkit-autofill {
 
 /* Glassmorphism Class Utilities (Light theme) */
 .glass-panel {
-  background: rgba(241, 243, 246, 0.92);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(16px) saturate(120%);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid #e2e8f0;
   border-radius: var(--border-radius-md);
   box-shadow: 0 8px 32px rgba(15, 23, 42, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8);
   transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -217,7 +228,7 @@ select:-webkit-autofill {
 }
 
 .brand-marquee-section {
-  background: #dfe3ea;
+  background: #ffffff;
   border-top: 1px solid #cbd5e1;
   border-bottom: 1px solid #cbd5e1;
   padding: 20px 0;
@@ -1025,7 +1036,7 @@ select:-webkit-autofill {
 }
 
 .quote-btn, .btn-primary {
-  animation: pulse-gold 4s infinite ease-in-out;
+  animation: none;
 }
 
 /* ============================================ */
@@ -1041,7 +1052,7 @@ select:-webkit-autofill {
 
 /* Premium Minimal Product Card */
 .product-card-new {
-  background: #f8f9fb;
+  background: #ffffff;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -1050,8 +1061,8 @@ select:-webkit-autofill {
   cursor: pointer;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
   position: relative;
-  border: 1.5px solid #d5dce6;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
 .product-card-new:hover {
@@ -1066,7 +1077,7 @@ select:-webkit-autofill {
 }
 
 .card-texture-container-new {
-  height: 140px;
+  height: 152px;
   position: relative;
   background: #f1f3f7;
   overflow: hidden;
@@ -4099,7 +4110,18 @@ button, a, select, input {
   .product-card-new.glass-panel {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: #f8f9fb !important;
+    background: #ffffff !important;
+
+  /* Respect user prefers-reduced-motion accessibility setting */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
   }
 
   /* GPU layer promotion for smooth 60fps mobile navigation */
