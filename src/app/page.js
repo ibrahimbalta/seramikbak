@@ -4759,7 +4759,8 @@ export default function Home() {
               }}
             >
               <div className="clean-hero-overlay" />
-              
+
+              <div className="clean-hero-top-row">
               <div className="clean-hero-content">
                 <div className="luxury-hero-eyebrow">
                   <Sparkles size={12} className="hero-eyebrow-icon" />
@@ -4872,106 +4873,30 @@ export default function Home() {
                   <ArrowRight size={13} />
                 </div>
               </div>
-            </div>
+              </div>
 
-            {/* SECTION 5: AKILLI SERAMİK ARAMA MOTORU */}
+            {/* SECTION 5: AKILLI SERAMİK ARAMA MOTORU (HERO INTEGRATED GLASS DOCK) */}
             <div
               id="smart-search-section"
               className="smart-search-hero-dock"
               style={{
-                background: 'rgba(255, 255, 255, 0.97)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: '1px solid var(--sb-border, #E5DED3)',
+                background: 'rgba(37, 37, 34, 0.48)',
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+                border: '1px solid rgba(216, 201, 181, 0.28)',
                 borderRadius: '22px',
-                padding: 'clamp(20px, 3vw, 30px)',
+                padding: '16px 18px',
                 position: 'relative',
-                zIndex: 10,
-                boxShadow: '0 22px 50px -12px rgba(37, 37, 34, 0.16)'
+                zIndex: 3,
+                width: '100%',
+                boxSizing: 'border-box',
+                boxShadow: '0 20px 44px -12px rgba(0, 0, 0, 0.35)'
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: '12px',
-                  marginBottom: '16px'
-                }}
-              >
-                <div>
-                  <span
-                    style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 800,
-                      color: 'var(--sb-accent-bronze, #B58B50)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                      display: 'block',
-                      marginBottom: '4px'
-                    }}
-                  >
-                    AKILLI SERAMİK ARAMA MOTORU
-                  </span>
-                  <h2
-                    style={{
-                      fontSize: 'clamp(1.35rem, 2.2vw, 1.8rem)',
-                      fontWeight: 900,
-                      color: 'var(--sb-text-primary, #292824)',
-                      margin: 0,
-                      letterSpacing: '-0.02em',
-                      fontFamily: 'var(--font-title, "Outfit", sans-serif)'
-                    }}
-                  >
-                    Aradığınız Seramik Burada.
-                  </h2>
-                </div>
 
-                {/* Hızlı Kategori Seçenekleri */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  {[
-                    { label: 'Mermer', val: 'Mermer' },
-                    { label: 'Beton', val: 'Beton' },
-                    { label: 'Ahşap', val: 'Ahşap' },
-                    { label: 'Doğal Taş', val: 'Doğal Taş' },
-                    { label: 'Traverten', val: 'Traverten' },
-                    { label: 'Mozaik', val: 'Mozaik' },
-                    { label: 'Dekor', val: 'Dekor' }
-                  ].map((cat) => {
-                    const isCatActive = selectedStyle === cat.val;
-                    return (
-                      <button
-                        key={cat.val}
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSelectedStyle(isCatActive ? '' : cat.val);
-                          setTimeout(() => {
-                            catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          }, 80);
-                        }}
-                        style={{
-                          padding: '7px 14px',
-                          borderRadius: '999px',
-                          fontSize: '0.78rem',
-                          fontWeight: 800,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          background: isCatActive ? 'var(--sb-surface-dark, #252522)' : 'var(--sb-bg-primary, #F6F3EE)',
-                          color: isCatActive ? '#F6F3EE' : 'var(--sb-text-primary, #292824)',
-                          border: isCatActive ? '1px solid var(--sb-accent-bronze, #B58B50)' : '1px solid var(--sb-border, #E5DED3)'
-                        }}
-                      >
-                        {cat.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
 
               {/* MODERN ULTRA-SLEEK SEARCH CONTAINER */}
-              <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative', margin: '0 0 16px 0' }}>
+              <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative', margin: '0 0 12px 0' }}>
                 <div className="clean-search-pill-box">
                   <div className="modern-search-icon-circle">
                     <SearchIcon size={20} strokeWidth={2.4} />
@@ -5097,16 +5022,56 @@ export default function Home() {
                 )}
               </form>
 
-              {/* Hızlı Filtreler: Marka, Ebat, Renk, Yüzey, Mekân Tipi */}
+              {/* Tek Satır Cam Kategori & Filtre Çubuğu (Image 1 Referansı) */}
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                  gap: '10px',
-                  paddingTop: '12px',
-                  borderTop: '1px solid #F3F2EE'
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '7px'
                 }}
               >
+                {[
+                  { label: 'Mermer', val: 'Mermer' },
+                  { label: 'Beton', val: 'Beton' },
+                  { label: 'Ahşap', val: 'Ahşap' },
+                  { label: 'Doğal Taş', val: 'Doğal Taş' },
+                  { label: 'Traverten', val: 'Traverten' },
+                  { label: 'Mozaik', val: 'Mozaik' },
+                  { label: 'Dekor', val: 'Dekor' }
+                ].map((cat) => {
+                  const isCatActive = selectedStyle === cat.val;
+                  return (
+                    <button
+                      key={cat.val}
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedStyle(isCatActive ? '' : cat.val);
+                        setTimeout(() => {
+                          catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 80);
+                      }}
+                      style={{
+                        height: '33px',
+                        padding: '0 13px',
+                        borderRadius: '999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        background: isCatActive ? '#B58B50' : 'rgba(255, 255, 255, 0.14)',
+                        color: isCatActive ? '#FFFFFF' : '#F6F3EE',
+                        border: isCatActive ? '1px solid #D8C9B5' : '1px solid rgba(255, 255, 255, 0.22)',
+                        backdropFilter: 'blur(8px)'
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
+
+                <span style={{ width: '1px', height: '20px', background: 'rgba(255, 255, 255, 0.24)', margin: '0 4px' }} className="hidden md:inline-block" />
                 <select
                   aria-label="Marka Filtresi"
                   value={selectedBrand}
@@ -5115,18 +5080,20 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '40px',
+                    height: '33px',
                     padding: '0 12px',
-                    borderRadius: '10px',
-                    border: '1px solid #E8E2D5',
-                    background: '#FAF9F6',
-                    color: '#242424',
-                    fontSize: '0.8rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    background: 'rgba(255, 255, 255, 0.14)',
+                    color: '#F6F3EE',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
-                    outline: 'none'
+                    outline: 'none',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)'
                   }}
                 >
-                  <option value="">Marka: Tümü</option>
+                  <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Marka</option>
                   {brands.filter(b => b.name?.toLowerCase() !== 'kalebodur').map((b) => (
                     <option key={b.id} value={b.id}>{b.name}</option>
                   ))}
@@ -5140,18 +5107,20 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '40px',
+                    height: '33px',
                     padding: '0 12px',
-                    borderRadius: '10px',
-                    border: '1px solid #E8E2D5',
-                    background: '#FAF9F6',
-                    color: '#242424',
-                    fontSize: '0.8rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    background: 'rgba(255, 255, 255, 0.14)',
+                    color: '#F6F3EE',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
-                    outline: 'none'
+                    outline: 'none',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)'
                   }}
                 >
-                  <option value="">Ebat: Tümü</option>
+                  <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Ebat</option>
                   <option value="60x120">60×120 cm</option>
                   <option value="60x60">60×60 cm</option>
                   <option value="30x60">30×60 cm</option>
@@ -5168,18 +5137,20 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '40px',
+                    height: '33px',
                     padding: '0 12px',
-                    borderRadius: '10px',
-                    border: '1px solid #E8E2D5',
-                    background: '#FAF9F6',
-                    color: '#242424',
-                    fontSize: '0.8rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    background: 'rgba(255, 255, 255, 0.14)',
+                    color: '#F6F3EE',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
-                    outline: 'none'
+                    outline: 'none',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)'
                   }}
                 >
-                  <option value="">Renk: Tümü</option>
+                  <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Renk</option>
                   <option value="Beyaz">Beyaz</option>
                   <option value="Bej">Bej / Krem</option>
                   <option value="Gri">Gri</option>
@@ -5196,18 +5167,20 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '40px',
+                    height: '33px',
                     padding: '0 12px',
-                    borderRadius: '10px',
-                    border: '1px solid #E8E2D5',
-                    background: '#FAF9F6',
-                    color: '#242424',
-                    fontSize: '0.8rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    background: 'rgba(255, 255, 255, 0.14)',
+                    color: '#F6F3EE',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
-                    outline: 'none'
+                    outline: 'none',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)'
                   }}
                 >
-                  <option value="">Yüzey: Tümü</option>
+                  <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Yüzey</option>
                   <option value="Mat">Mat</option>
                   <option value="Parlak">Parlak</option>
                   <option value="Lappato">Lappato (Yarı Parlak)</option>
@@ -5222,24 +5195,27 @@ export default function Home() {
                     setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
                   }}
                   style={{
-                    height: '40px',
+                    height: '33px',
                     padding: '0 12px',
-                    borderRadius: '10px',
-                    border: '1px solid #E8E2D5',
-                    background: '#FAF9F6',
-                    color: '#242424',
-                    fontSize: '0.8rem',
+                    borderRadius: '999px',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    background: 'rgba(255, 255, 255, 0.14)',
+                    color: '#F6F3EE',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
-                    outline: 'none'
+                    outline: 'none',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(8px)'
                   }}
                 >
-                  <option value="">Mekân Tipi: Tümü</option>
+                  <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Mekân Tipi</option>
                   <option value="Banyo">Banyo</option>
                   <option value="Mutfak">Mutfak</option>
                   <option value="Salon">Salon &amp; Yaşam Alanı</option>
-                  <option value="Teras">Dış Mekân / Teras</option>
+                  <option value="Teras" style={{ background: '#252522', color: '#F6F3EE' }}>Dış Mekân / Teras</option>
                 </select>
               </div>
+            </div>
             </div>
 
             {/* SECTION C: HIZLI KEŞİF & DOKU KATEGORİLERİ */}
@@ -11391,24 +11367,35 @@ export default function Home() {
            ========================================================================== */
         :global(.clean-hero-card) {
           position: relative;
-          border-radius: 22px;
+          border-radius: 24px;
           background-size: cover;
           background-position: center right;
           background-repeat: no-repeat;
-          padding: 56px 52px 136px 52px;
-          min-height: 600px;
+          padding: 52px 48px 34px 48px;
+          min-height: 650px;
           display: flex;
-          align-items: center;
+          flex-direction: column;
           justify-content: space-between;
+          gap: 32px;
           overflow: hidden;
           border: 1px solid rgba(181, 139, 80, 0.32);
           box-shadow: 0 22px 50px -12px rgba(37, 37, 34, 0.28), 0 4px 12px rgba(37, 37, 34, 0.08);
-          margin-bottom: 0;
+          margin-bottom: 24px;
           box-sizing: border-box;
         }
 
+        :global(.clean-hero-top-row) {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+        }
+
         :global(.smart-search-hero-dock) {
-          margin: -92px 24px 28px 24px;
+          margin: 0;
         }
 
         :global(.clean-hero-overlay) {
@@ -11937,9 +11924,9 @@ export default function Home() {
           gap: 7px;
           padding: 11px 26px;
           border-radius: 9999px;
-          background: linear-gradient(135deg, #252522 0%, #3A3832 100%);
-          color: #F6F3EE;
-          border: 1.5px solid var(--sb-accent-bronze, #B58B50);
+          background: linear-gradient(135deg, #B58B50 0%, #98713B 100%);
+          color: #FFFFFF;
+          border: 1.5px solid #D8C9B5;
           font-weight: 700;
           font-size: 0.92rem;
           cursor: pointer;
@@ -12023,13 +12010,19 @@ export default function Home() {
         /* MOBILE ADAPTATION (< 768px) */
         @media (max-width: 768px) {
           :global(.clean-hero-card) {
-            padding: 28px 18px 64px 18px;
-            min-height: 360px;
+            padding: 24px 16px 20px 16px;
+            min-height: auto;
             border-radius: 20px;
-            margin-bottom: 0;
+            margin-bottom: 18px;
+            gap: 20px;
+          }
+          :global(.clean-hero-top-row) {
+            flex-direction: column;
+            align-items: flex-start;
           }
           :global(.smart-search-hero-dock) {
-            margin: -38px 8px 24px 8px;
+            margin: 0;
+            padding: 12px !important;
           }
           :global(.clean-hero-overlay) {
             background: linear-gradient(135deg, rgba(37, 37, 34, 0.94) 0%, rgba(37, 37, 34, 0.86) 55%, rgba(37, 37, 34, 0.68) 100%);
