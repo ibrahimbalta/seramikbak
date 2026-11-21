@@ -4877,13 +4877,17 @@ export default function Home() {
             {/* SECTION 5: AKILLI SERAMİK ARAMA MOTORU */}
             <div
               id="smart-search-section"
+              className="smart-search-hero-dock"
               style={{
-                background: 'var(--sb-surface, #FFFFFF)',
+                background: 'rgba(255, 255, 255, 0.97)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
                 border: '1px solid var(--sb-border, #E5DED3)',
                 borderRadius: '22px',
-                padding: 'clamp(20px, 3vw, 32px)',
-                marginBottom: '28px',
-                boxShadow: '0 12px 34px -10px rgba(41, 40, 36, 0.06)'
+                padding: 'clamp(20px, 3vw, 30px)',
+                position: 'relative',
+                zIndex: 10,
+                boxShadow: '0 22px 50px -12px rgba(37, 37, 34, 0.16)'
               }}
             >
               <div
@@ -11391,16 +11395,20 @@ export default function Home() {
           background-size: cover;
           background-position: center right;
           background-repeat: no-repeat;
-          padding: 58px 52px;
-          min-height: 480px;
+          padding: 56px 52px 136px 52px;
+          min-height: 600px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           overflow: hidden;
           border: 1px solid rgba(181, 139, 80, 0.32);
           box-shadow: 0 22px 50px -12px rgba(37, 37, 34, 0.28), 0 4px 12px rgba(37, 37, 34, 0.08);
-          margin-bottom: 14px;
+          margin-bottom: 0;
           box-sizing: border-box;
+        }
+
+        :global(.smart-search-hero-dock) {
+          margin: -92px 24px 28px 24px;
         }
 
         :global(.clean-hero-overlay) {
@@ -12015,13 +12023,16 @@ export default function Home() {
         /* MOBILE ADAPTATION (< 768px) */
         @media (max-width: 768px) {
           :global(.clean-hero-card) {
-            padding: 28px 18px;
-            min-height: 260px;
+            padding: 28px 18px 64px 18px;
+            min-height: 360px;
             border-radius: 20px;
-            margin-bottom: 12px;
+            margin-bottom: 0;
+          }
+          :global(.smart-search-hero-dock) {
+            margin: -38px 8px 24px 8px;
           }
           :global(.clean-hero-overlay) {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(15, 23, 42, 0.92) 55%, rgba(15, 23, 42, 0.78) 100%);
+            background: linear-gradient(135deg, rgba(37, 37, 34, 0.94) 0%, rgba(37, 37, 34, 0.86) 55%, rgba(37, 37, 34, 0.68) 100%);
           }
           :global(.luxury-hero-eyebrow) {
             font-size: 0.68rem;
