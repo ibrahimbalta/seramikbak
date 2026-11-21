@@ -57,6 +57,16 @@ import EmbedStudioTab from '@/components/brand/EmbedStudioTab';
 import BrandHealthTab from '@/components/brand/BrandHealthTab';
 import MarketIntelligenceTab from '@/components/brand/MarketIntelligenceTab';
 import CatalogStudioTab from '@/components/brand/CatalogStudioTab';
+import {
+  PortalSidebar,
+  PortalHeader,
+  PageHeader,
+  StatCard,
+  QuickActionCard,
+  StatusBadge
+} from '@/components/portal/PortalUI';
+import { PerformanceChart, MarketShareCard } from '@/components/portal/PortalDataWidgets';
+import { resolveBrandLogo } from '@/lib/brandLogos';
 
 const TURKEY_CITIES = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
@@ -209,6 +219,9 @@ export default function BrandPortalPage() {
   
   // Chart toggle metric: 'views', 'clicks', 'leads'
   const [chartMetric, setChartMetric] = useState('views');
+  const [dateRange, setDateRange] = useState('30d');
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [globalHeaderSearch, setGlobalHeaderSearch] = useState('');
 
   // Catalog search and filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -1697,529 +1710,217 @@ export default function BrandPortalPage() {
     <div style={{
       minHeight: '100vh',
       background: '#f8fafc',
-      color: '#0f172a',
+      background: 'var(--bp-bg, #F6F7F9)',
+      color: 'var(--bp-text-primary, #202633)',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
       overflowX: 'hidden'
     }}>
-      {/* SOLID SIDEBAR */}
-      {!isMobile && (
-        <aside style={{
-          width: isSidebarCollapsed ? '70px' : '260px',
-          background: '#090d16',
-          color: '#cbd5e1',
-          display: 'flex',
-          flexDirection: 'column',
-          flexShrink: 0,
-          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          maxHeight: '100vh',
-          overflow: 'hidden',
-          zIndex: 200
-        }}>
-          {/* Sidebar Header (Fixed at top) */}
-          <div style={{
-            padding: isSidebarCollapsed ? '16px 8px' : '18px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
-            gap: isSidebarCollapsed ? '0' : '12px',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-            overflow: 'hidden',
-            flexShrink: 0
-          }}>
-            {isSidebarCollapsed ? (
-              <button
-                type="button"
-                onClick={toggleSidebar}
-                title="Menüyü Genişlet"
-                aria-label="Menüyü Genişlet"
-                style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
-                  color: '#ffffff',
-                  border: '1.5px solid #d4af37',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '900',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 0 12px rgba(212,175,55,0.25)',
-                  transition: 'all 0.2s ease',
-                  padding: 0
-                }}
-              >
-                SB
-              </button>
-            ) : (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
-                    color: '#ffffff',
-                    border: '1.5px solid #d4af37',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '900',
-                    fontSize: '1.1rem',
-                    flexShrink: 0,
-                    boxShadow: '0 0 10px rgba(212,175,55,0.2)'
-                  }}>SB</div>
-                  <div style={{ minWidth: 0 }}>
-                    <h2 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {brandInfo.name}
-                    </h2>
-                    <span style={{ 
-                      fontSize: '0.62rem', 
-                      padding: '2px 6px', 
-                      borderRadius: '8px', 
-                      display: 'inline-block',
-                      marginTop: '2px',
-                      ...getPlanBadgeStyle(currentPlan)
-                    }}>
-                      {currentPlan} ÜYE
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={toggleSidebar}
-                  title="Menüyü Daralt"
-                  aria-label="Menüyü Daralt"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '8px',
-                    width: '30px',
-                    height: '30px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: '#94a3b8',
-                    flexShrink: 0,
-                    transition: 'all 0.15s ease'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)'; }}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Sidebar Nav Items (Scrollable when needed) */}
-          <nav 
-            className="brand-sidebar-nav"
-            style={{ 
-              flex: 1, 
-              padding: isSidebarCollapsed ? '10px 6px' : '10px 8px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: '3px',
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(212, 175, 55, 0.3) transparent'
-            }}
-          >
-            {[
-              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={17} /> },
-              { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={17} /> },
+      {/* CATEGORIZED CORPORATE SIDEBAR */}
+      {(() => {
+        const brandMenuGroups = [
+          {
+            id: 'genel',
+            label: 'GENEL',
+            items: [
+              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={17} /> }
+            ]
+          },
+          {
+            id: 'urun',
+            label: 'ÜRÜN VE KATALOG',
+            items: [
+              { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={17} />, badge: brandProducts.length > 0 ? brandProducts.length : null },
               { id: 'catalogs', label: 'Dijital Kataloglar (Studio)', icon: <BookOpen size={17} /> },
               { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={17} /> },
+              { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={17} /> }
+            ]
+          },
+          {
+            id: 'pazar',
+            label: 'PAZAR ANALİZİ',
+            items: [
               { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={17} /> },
               { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={17} /> },
-              { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={17} /> },
-              { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={17} /> },
               { id: 'country-analytics', label: 'Küresel Ülke Analitiği', icon: <Globe size={17} /> },
-              { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={17} /> },
-              { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={17} /> },
+              { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={17} /> }
+            ]
+          },
+          {
+            id: 'bayi',
+            label: 'BAYİ VE PROJE',
+            items: [
+              { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={17} />, badge: projects.length > 0 ? projects.length : null },
+              { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={17} />, badge: dealers.length > 0 ? dealers.length : null }
+            ]
+          },
+          {
+            id: 'ticari',
+            label: 'TİCARİ YÖNETİM',
+            items: [
               { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={17} /> },
               { id: 'outlet', label: 'Outlet & Seri Sonu', icon: <Tag size={17} /> },
               { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={17} /> }
-            ].map(item => {
-              const isActive = activePortalTab === item.id;
-              return (
-                <div key={item.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <button
-                    onClick={() => {
-                      setActivePortalTab(item.id);
-                      if (item.id === 'catalogs') setCatalogSubSection('all');
-                    }}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: isSidebarCollapsed ? 'center' : 'space-between',
-                      gap: isSidebarCollapsed ? '0' : '10px',
-                      padding: isSidebarCollapsed ? '10px 0' : '8px 12px',
-                      borderRadius: '8px',
-                      border: isActive && isSidebarCollapsed ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
-                      background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
-                      color: isActive ? '#d4af37' : '#94a3b8',
-                      cursor: 'pointer',
-                      fontSize: '0.82rem',
-                      fontWeight: isActive ? '700' : '500',
-                      textAlign: isSidebarCollapsed ? 'center' : 'left',
-                      transition: 'all 0.15s',
-                      boxSizing: 'border-box'
-                    }}
-                    title={item.label}
-                    className="sidebar-link-btn"
-                  >
-                    <span style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                      gap: '10px', 
-                      minWidth: 0,
-                      width: isSidebarCollapsed ? '100%' : 'auto'
-                    }}>
-                      {item.icon}
-                      {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
-                    </span>
-                    {!isSidebarCollapsed && item.id === 'catalogs' && (
-                      <ChevronRight
-                        size={14}
-                        style={{
-                          transform: isActive ? 'rotate(90deg)' : 'rotate(0deg)',
-                          transition: 'transform 0.2s'
-                        }}
-                      />
-                    )}
-                  </button>
+            ]
+          }
+        ];
 
-                  {/* Sub-tree for Dijital Kataloglar (Studio) matching visual reference */}
-                  {!isSidebarCollapsed && item.id === 'catalogs' && isActive && (
-                    <div
-                      style={{
-                        marginLeft: '22px',
-                        marginTop: '4px',
-                        marginBottom: '6px',
-                        paddingLeft: '12px',
-                        borderLeft: '1px solid rgba(212, 175, 55, 0.3)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '2px'
-                      }}
-                    >
-                      {[
-                        { subId: 'all', label: 'Tüm Kataloglar' },
-                        { subId: 'inquiries', label: 'Gelen Teklifler', isNew: true },
-                        { subId: 'create', label: 'Yeni Katalog Oluştur' },
-                        { subId: 'templates', label: 'Şablonlar' },
-                        { subId: 'published', label: 'Yayınlananlar' },
-                        { subId: 'draft', label: 'Taslaklar' },
-                        { subId: 'archived', label: 'Arşiv' }
-                      ].map((sub) => {
-                        const isSubActive = catalogSubSection === sub.subId;
-                        return (
-                          <button
-                            key={sub.subId}
-                            type="button"
-                            onClick={() => setCatalogSubSection(sub.subId)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              padding: '5px 8px',
-                              borderRadius: '6px',
-                              textAlign: 'left',
-                              fontSize: '0.75rem',
-                              fontWeight: isSubActive ? '700' : '500',
-                              color: isSubActive ? '#d4af37' : '#94a3b8',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px'
-                            }}
-                          >
-                            <span
-                              style={{
-                                width: '5px',
-                                height: '5px',
-                                borderRadius: '50%',
-                                background: isSubActive ? '#d4af37' : 'rgba(148,163,184,0.4)'
-                              }}
-                            />
-                            <span>{sub.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+        const resolvedBrandLogo = resolveBrandLogo(brandInfo);
+
+        return (
+          <PortalSidebar
+            entityName={brandInfo?.name || 'Marka Portalı'}
+            entitySubtitle="Marka Merkezi"
+            entityLogoUrl={resolvedBrandLogo.url}
+            planLabel={`${currentPlan} ÜYE`}
+            groups={brandMenuGroups}
+            activeTab={activePortalTab}
+            onSelectTab={(tabId) => {
+              setActivePortalTab(tabId);
+              if (tabId === 'catalogs') setCatalogSubSection('all');
+            }}
+            collapsed={isSidebarCollapsed}
+            onToggleCollapse={toggleSidebar}
+            onLogout={handleLogout}
+            isMobile={isMobile}
+            mobileOpen={mobileDrawerOpen}
+            onCloseMobile={() => setMobileDrawerOpen(false)}
+            renderSubItems={(item, isActive) => {
+              if (item.id !== 'catalogs' || !isActive) return null;
+              return (
+                <div
+                  style={{
+                    marginLeft: '20px',
+                    marginTop: '4px',
+                    marginBottom: '6px',
+                    paddingLeft: '12px',
+                    borderLeft: '1px solid rgba(198, 160, 74, 0.35)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px'
+                  }}
+                >
+                  {[
+                    { subId: 'all', label: 'Tüm Kataloglar' },
+                    { subId: 'inquiries', label: 'Gelen Teklifler' },
+                    { subId: 'create', label: 'Yeni Katalog Oluştur' },
+                    { subId: 'templates', label: 'Şablonlar' },
+                    { subId: 'published', label: 'Yayınlananlar' },
+                    { subId: 'draft', label: 'Taslaklar' },
+                    { subId: 'archived', label: 'Arşiv' }
+                  ].map((sub) => {
+                    const isSubActive = catalogSubSection === sub.subId;
+                    return (
+                      <button
+                        key={sub.subId}
+                        type="button"
+                        onClick={() => setCatalogSubSection(sub.subId)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          padding: '5px 8px',
+                          borderRadius: '6px',
+                          textAlign: 'left',
+                          fontSize: '0.74rem',
+                          fontWeight: isSubActive ? 700 : 500,
+                          color: isSubActive ? '#C6A04A' : '#9CA3AF',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: '5px',
+                            height: '5px',
+                            borderRadius: '50%',
+                            background: isSubActive ? '#C6A04A' : 'rgba(156, 163, 175, 0.45)'
+                          }}
+                        />
+                        <span>{sub.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               );
-            })}
-          </nav>
-
-          {/* Sidebar Collapse Toggle & Logout (Fixed at bottom) */}
-          <div style={{
-            padding: isSidebarCollapsed ? '10px 6px' : '10px 8px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-            flexShrink: 0,
-            background: '#090d16'
-          }}>
-            <button
-              onClick={toggleSidebar}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                gap: '10px',
-                padding: isSidebarCollapsed ? '10px 0' : '8px 12px',
-                borderRadius: '8px',
-                border: 'none',
-                background: isSidebarCollapsed ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
-                color: isSidebarCollapsed ? '#d4af37' : '#64748b',
-                cursor: 'pointer',
-                fontSize: '0.78rem',
-                textAlign: isSidebarCollapsed ? 'center' : 'left',
-                transition: 'all 0.15s'
-              }}
-              title={isSidebarCollapsed ? "Paneli Genişlet" : "Paneli Daralt"}
-            >
-              {isSidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={16} />}
-              {!isSidebarCollapsed && <span>Paneli Daralt</span>}
-            </button>
-            <button
-              onClick={handleLogout}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                gap: '10px',
-                padding: isSidebarCollapsed ? '10px 0' : '8px 12px',
-                borderRadius: '8px',
-                border: 'none',
-                background: 'rgba(239, 68, 68, 0.08)',
-                color: '#f87171',
-                cursor: 'pointer',
-                fontSize: '0.78rem',
-                fontWeight: '700',
-                textAlign: isSidebarCollapsed ? 'center' : 'left',
-                transition: 'all 0.15s'
-              }}
-              title={isSidebarCollapsed ? "Çıkış Yap" : undefined}
-            >
-              <LogOut size={16} />
-              {!isSidebarCollapsed && <span>Çıkış Yap</span>}
-            </button>
-          </div>
-        </aside>
-      )}
+            }}
+          />
+        );
+      })()}
 
       {/* PORTAL CONTENT WRAPPER */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* UPPER HEADER BAR */}
-        <header style={{
-          background: '#fff',
-          borderBottom: '1px solid #e2e8f0',
-          padding: isMobile ? '12px 16px' : '16px 32px',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100
-        }}>
-          {isMobile ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '6px',
-                    background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
-                    color: '#ffffff',
-                    border: '1.5px solid #d4af37',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '900',
-                    fontSize: '0.85rem'
-                  }}>SB</div>
-                  <div>
-                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>{brandInfo.name}</h4>
-                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
-                      {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                      {activePortalTab === 'products' && 'Ürün Kataloğu'}
-                      {activePortalTab === 'catalogs' && 'Dijital Kataloglar'}
-                      {activePortalTab === 'embed-studio' && '3D Kiosk & Embed SDK'}
-                      {activePortalTab === 'market-intel' && 'Pazar Trend Radarı'}
-                      {activePortalTab === 'brand-health' && 'Marka Sağlığı & SEO'}
-                      {activePortalTab === 'bulk-import' && 'Toplu Ürün & ERP'}
-                      {activePortalTab === 'b2b-projects' && 'B2B Talepleri'}
-                      {activePortalTab === 'country-analytics' && 'Ülke Analitiği'}
-                      {activePortalTab === 'trends' && 'Pazar Trendleri'}
-                      {activePortalTab === 'dealers' && 'Bayi Ağı'}
-                      {activePortalTab === 'campaigns' && 'Reklam Yönetimi'}
-                      {activePortalTab === 'outlet' && 'Outlet & Seri Sonu'}
-                      {activePortalTab === 'saas' && 'Lisans & Ödemeler'}
-                    </span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{
-                    fontSize: '0.6rem',
-                    padding: '3px 8px',
-                    borderRadius: '10px',
-                    ...getPlanBadgeStyle(currentPlan)
-                  }}>
-                    {currentPlan} PLAN
-                  </span>
-                </div>
-              </div>
+        {/* UPPER CORPORATE HEADER */}
+        {(() => {
+          const tabMeta = {
+            dashboard: { group: 'Genel', title: 'Gösterge Paneli', desc: `${brandInfo.name} için B2B2C marka yönetim merkezi.` },
+            products: { group: 'Ürün ve Katalog', title: 'Ürün Kataloğumuz', desc: 'Tüm seramik ve porselen koleksiyonlarınızı yönetin.' },
+            catalogs: { group: 'Ürün ve Katalog', title: 'Dijital Kataloglar (Studio)', desc: 'Kurumsal lookbook ve PDF katalog projelerinizi tasarlayın.' },
+            'embed-studio': { group: 'Ürün ve Katalog', title: '3D Kiosk & Embed SDK', desc: 'White-label 3D görselleştirici ve mağaza kiosk entegrasyonu.' },
+            'bulk-import': { group: 'Ürün ve Katalog', title: 'Toplu Ürün & ERP', desc: 'Excel, XML ve ERP ürün beslemelerinizi aktarın.' },
+            'market-intel': { group: 'Pazar Analizi', title: 'Pazar Trend Radarı', desc: 'Canlı pazar istihbaratı ve kategori talep trendleri.' },
+            'brand-health': { group: 'Pazar Analizi', title: 'Marka Sağlığı & SEO', desc: 'Dijital marka görünürlüğü ve SERP performans raporu.' },
+            'country-analytics': { group: 'Pazar Analizi', title: 'Küresel Ülke Analitiği', desc: 'Uluslararası ihracat trafiği ve ülke bazlı ilgi analizi.' },
+            trends: { group: 'Pazar Analizi', title: 'Bölgesel Trendler', desc: 'İl ve bölge bazlı seramik doku ve ebat talepleri.' },
+            'b2b-projects': { group: 'Bayi ve Proje', title: 'B2B Proje Talepleri', desc: 'İnşaat, otel ve mimari proje ihale taleplerine teklif verin.' },
+            dealers: { group: 'Bayi ve Proje', title: 'Bayi Ağı Yönetimi', desc: 'Yetkili satış noktalarınızı ve showroom performanslarını izleyin.' },
+            campaigns: { group: 'Ticari Yönetim', title: 'Reklam Yönetimi', desc: 'Vitrin ve öne çıkan ürün kampanyalarınızı yönetin.' },
+            outlet: { group: 'Ticari Yönetim', title: 'Outlet & Seri Sonu', desc: 'Fabrika çıkışı seri sonu ve proje fazlası stoklarınızı listeleyin.' },
+            saas: { group: 'Ticari Yönetim', title: 'Lisans & Ödemeler', desc: 'Abonelik paketi, fatura ve lisans yenileme yönetimi.' }
+          };
+          const currentMeta = tabMeta[activePortalTab] || tabMeta.dashboard;
+          const brandNotifications = [
+            ...(projects.slice(0, 2).map((pr) => ({
+              id: `proj-${pr.id}`,
+              title: `Yeni B2B Proje: ${pr.projectName || pr.title || 'Proje Talebi'}`,
+              desc: pr.city ? `${pr.city} • Teklif bekliyor` : 'İhale talebi açık',
+              read: false,
+              tab: 'b2b-projects'
+            }))),
+            ...(bids.slice(0, 2).map((b) => ({
+              id: `bid-${b.id}`,
+              title: `Teklif Durumu: ${b.projectName}`,
+              desc: `₺${Number(b.totalPrice || 0).toLocaleString('tr-TR')} • Onay bekliyor`,
+              read: true,
+              tab: 'b2b-projects'
+            })))
+          ];
 
-              {/* Mobile Quick Horizontal Scrollable Tabs */}
-              <div style={{
-                display: 'flex',
-                gap: '6px',
-                overflowX: 'auto',
-                paddingBottom: '2px',
-                scrollbarWidth: 'none',
-                WebkitOverflowScrolling: 'touch',
-                margin: '0 -8px',
-                paddingLeft: '8px',
-                paddingRight: '8px'
-              }} className="no-scrollbar">
-                {[
-                  { id: 'dashboard', label: 'Panel', icon: <Activity size={13} /> },
-                  { id: 'products', label: 'Ürünler', icon: <Layers size={13} /> },
-                  { id: 'embed-studio', label: '3D Kiosk & SDK', icon: <Box size={13} /> },
-                  { id: 'market-intel', label: 'Pazar Trendi', icon: <BarChart3 size={13} /> },
-                  { id: 'brand-health', label: 'SEO & İtibar', icon: <Award size={13} /> },
-                  { id: 'outlet', label: 'Seri Sonu / Outlet', icon: <Tag size={13} /> },
-                  { id: 'b2b-projects', label: 'B2B İhale', icon: <Building2 size={13} /> },
-                  { id: 'dealers', label: 'Bayiler', icon: <Users size={13} /> },
-                  { id: 'campaigns', label: 'Reklam', icon: <Megaphone size={13} /> },
-                  { id: 'bulk-import', label: 'ERP & Toplu', icon: <UploadCloud size={13} /> },
-                  { id: 'country-analytics', label: 'Ülke Analizi', icon: <Globe size={13} /> },
-                  { id: 'trends', label: 'Trendler', icon: <TrendingUp size={13} /> },
-                  { id: 'saas', label: 'Lisans & Plan', icon: <CreditCard size={13} /> }
-                ].map(tabItem => {
-                  const isSel = activePortalTab === tabItem.id;
-                  return (
-                    <button
-                      key={tabItem.id}
-                      type="button"
-                      onClick={() => handleMobileTabChange(tabItem.id)}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        border: isSel ? '1.5px solid #d4af37' : '1px solid #e2e8f0',
-                        background: isSel ? '#090d16' : '#f8fafc',
-                        color: isSel ? '#d4af37' : '#475569',
-                        fontSize: '0.72rem',
-                        fontWeight: isSel ? '800' : '600',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        boxShadow: isSel ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      {tabItem.icon}
-                      <span>{tabItem.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <button
-                  type="button"
-                  onClick={toggleSidebar}
-                  title={isSidebarCollapsed ? "Sol Menüyü Genişlet (Çalışma Alanı Daralır)" : "Sol Menüyü Daralt (Geniş Çalışma Alanı)"}
-                  aria-label={isSidebarCollapsed ? "Sol Menüyü Genişlet" : "Sol Menüyü Daralt"}
-                  style={{
-                    background: isSidebarCollapsed ? '#090d16' : '#f8fafc',
-                    color: isSidebarCollapsed ? '#d4af37' : '#475569',
-                    border: isSidebarCollapsed ? '1.5px solid #d4af37' : '1px solid #e2e8f0',
-                    borderRadius: '9px',
-                    padding: '7px 12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '7px',
-                    cursor: 'pointer',
-                    fontSize: '0.78rem',
-                    fontWeight: '700',
-                    boxShadow: isSidebarCollapsed ? '0 2px 10px rgba(212,175,55,0.2)' : '0 1px 2px rgba(0,0,0,0.04)',
-                    transition: 'all 0.2s ease',
-                    flexShrink: 0
-                  }}
-                >
-                  {isSidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-                  <span className="hidden sm:inline">{isSidebarCollapsed ? 'Menüyü Aç' : 'Menüyü Daralt'}</span>
-                </button>
-                <div>
-                  <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
-                    {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                    {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
-                    {activePortalTab === 'catalogs' && '📖 Dijital Kataloglar & Lookbook Oluşturucu'}
-                    {activePortalTab === 'embed-studio' && '🎮 White-Label 3D Visualizer & Mağaza Kiosk SDK'}
-                    {activePortalTab === 'market-intel' && '📊 Canlı Pazar İstihbaratı & Trend Radarı'}
-                    {activePortalTab === 'brand-health' && '🏆 Dijital Marka Sağlığı & Google SERP Görünürlüğü'}
-                    {activePortalTab === 'bulk-import' && '⚡ Toplu Ürün & ERP Aktarım Sihirbazı'}
-                    {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
-                    {activePortalTab === 'country-analytics' && 'Küresel Ülke Analitiği & İhracat Trafiği'}
-                    {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
-                    {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
-                    {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
-                    {activePortalTab === 'outlet' && 'Fabrika Çıkışlı Outlet & Seri Sonu İlan Yönetimi'}
-                    {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
-                  </h1>
-                  <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
-                    {brandInfo.name} fabrikası için B2B2C yönetim merkezi.
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {b2bStats?.saas?.expiresAt && (
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px' }}>
-                    <Calendar size={12} style={{ color: '#d4af37' }} />
-                    <span>Lisans Bitiş: <strong>{new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
-                  </div>
-                )}
-                <span style={{
-                  fontSize: '0.75rem',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  fontWeight: '700',
-                  ...getPlanBadgeStyle(currentPlan)
-                }}>
-                  {currentPlan} PLAN
-                </span>
-              </div>
-            </div>
-          )}
-        </header>
+          return (
+            <PortalHeader
+              portalLabel="Marka Portalı"
+              groupLabel={currentMeta.group}
+              pageTitle={currentMeta.title}
+              pageDescription={currentMeta.desc}
+              searchValue={globalHeaderSearch}
+              onSearchChange={(val) => {
+                setGlobalHeaderSearch(val);
+                if (val.trim()) {
+                  setSearchQuery(val);
+                  if (activePortalTab !== 'products') setActivePortalTab('products');
+                }
+              }}
+              searchPlaceholder="Ürün adı veya SKU ara..."
+              notifications={brandNotifications}
+              onSelectNotification={(n) => {
+                if (n.tab) setActivePortalTab(n.tab);
+              }}
+              licenseExpiresAt={b2bStats?.saas?.expiresAt}
+              planLabel={`${currentPlan} PLAN`}
+              userName={brandInfo?.name}
+              onLogout={handleLogout}
+              isMobile={isMobile}
+              onOpenMobileMenu={() => setMobileDrawerOpen(true)}
+            />
+          );
+        })()}
 
         {/* PORTAL MAIN TAB CONTAINER */}
         <main style={{ 
-          padding: isMobile ? '16px 12px 120px 12px' : (activePortalTab === 'catalogs' ? '20px 24px' : '32px'), 
-          maxWidth: activePortalTab === 'catalogs' ? '100%' : (isSidebarCollapsed ? '1600px' : '1400px'), 
+          padding: isMobile ? '16px 12px 100px 12px' : (activePortalTab === 'catalogs' ? '20px 24px' : '28px 32px'), 
+          maxWidth: activePortalTab === 'catalogs' ? '100%' : (isSidebarCollapsed ? '1600px' : '1420px'), 
           width: '100%', 
           boxSizing: 'border-box', 
           margin: '0 auto', 
@@ -2228,16 +1929,16 @@ export default function BrandPortalPage() {
         }}>
           
           {statsLoading && !b2bStats ? (
-            <div style={{ textAlign: 'center', padding: '120px 0', color: '#64748b' }}>
-              <Loader2 className="animate-spin" style={{ margin: '0 auto 16px auto', width: '40px', height: '40px', color: '#d4af37' }} />
-              <h4 style={{ fontWeight: '700', color: '#0f172a', margin: '0 0 4px 0' }}>Veriler Derleniyor</h4>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Markanıza ait pazar istatistikleri ve analizler güncelleniyor...</p>
+            <div style={{ textAlign: 'center', padding: '120px 0', color: 'var(--bp-text-secondary, #778196)' }}>
+              <Loader2 className="animate-spin" style={{ margin: '0 auto 16px auto', width: '40px', height: '40px', color: 'var(--bp-accent-gold, #C6A04A)' }} />
+              <h4 style={{ fontWeight: '700', color: 'var(--bp-text-primary, #202633)', margin: '0 0 4px 0' }}>Veriler Derleniyor</h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--bp-text-secondary, #778196)', margin: 0 }}>Markanıza ait pazar istatistikleri ve analizler güncelleniyor...</p>
             </div>
           ) : !b2bStats ? (
-            <div style={{ textAlign: 'center', padding: '64px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-              <AlertCircle size={32} style={{ color: '#ef4444', margin: '0 auto 12px auto' }} />
+            <div style={{ textAlign: 'center', padding: '64px', background: '#fff', borderRadius: '16px', border: '1px solid var(--bp-border, #E5E8EE)' }}>
+              <AlertCircle size={32} style={{ color: '#D94C4C', margin: '0 auto 12px auto' }} />
               <h4>Veri Yükleme Hatası</h4>
-              <p style={{ color: '#64748b' }}>B2B istatistikleri yüklenemedi. Lütfen sayfayı yenileyip tekrar deneyin.</p>
+              <p style={{ color: 'var(--bp-text-secondary, #778196)' }}>B2B istatistikleri yüklenemedi. Lütfen sayfayı yenileyip tekrar deneyin.</p>
             </div>
           ) : (
             <>
@@ -2285,267 +1986,229 @@ export default function BrandPortalPage() {
 
               {/* -------------------- TAB 1: DASHBOARD -------------------- */}
               {activePortalTab === 'dashboard' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                  {/* METRICS SUMMARY GRID */}
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(auto-fit, minmax(220px, 1fr))',
-                    gap: isMobile ? '10px' : '20px'
-                  }}>
-                    
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', position: 'relative', overflow: 'hidden' }} className="stats-card hover-lift">
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase', letterSpacing: '0.04em' }}>SaaS Planı</h4>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#d4af37', textShadow: '0 2px 4px rgba(212,175,55,0.1)' }}>{currentPlan}</span>
-                        <span style={{
-                          fontSize: '0.62rem',
-                          color: b2bStats.saas?.status === 'ACTIVE' ? '#10b981' : '#f59e0b',
-                          fontWeight: '700',
-                          background: b2bStats.saas?.status === 'ACTIVE' ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
-                          padding: '2px 6px',
-                          borderRadius: '10px'
-                        }}>
-                          {b2bStats.saas?.status === 'ACTIVE' ? 'Aktif' : 'Bekliyor'}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginTop: '4px' }}>B2B Projeler & Analiz</span>
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {/* A. KARŞILAMA ALANI */}
+                  <PageHeader
+                    title="Marka Yönetim Merkezinize Hoş Geldiniz."
+                    subtitle="Ürünlerinizi, kataloglarınızı, bayi ağınızı ve pazar performansınızı tek merkezden yönetin."
+                    dateRange={dateRange}
+                    onDateRangeChange={setDateRange}
+                  />
 
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }} className="stats-card hover-lift">
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Katalog Görüntülenme</h4>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#0f172a' }}>{b2bStats.summary?.totalViews.toLocaleString('tr-TR')}</span>
-                        <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: '700' }}>+12.4%</span>
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginTop: '4px' }}>Ziyaretçi gösterimleri</span>
-                    </div>
-
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }} className="stats-card hover-lift">
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tıklanma Oranı (CTR)</h4>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#2563eb' }}>%{b2bStats.summary?.ctr}</span>
-                        <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: '700' }}>İyi</span>
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginTop: '4px' }}>Tıklama / Gösterim</span>
-                    </div>
-
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }} className="stats-card hover-lift">
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Müşteri Talepleri</h4>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#059669' }}>{b2bStats.summary?.totalLeads}</span>
-                        <span style={{ fontSize: '0.68rem', color: '#2563eb', fontWeight: '700' }}>{dealers.length} Bayi</span>
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginTop: '4px' }}>Teklif formları</span>
-                    </div>
-
-                    <div 
+                  {/* B. BALANCED 5 KPI PERFORMANCE CARDS */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(5, minmax(0, 1fr))',
+                      gap: isMobile ? '10px' : '16px'
+                    }}
+                  >
+                    <StatCard
+                      label="Toplam Ürün"
+                      value={brandProducts.length.toLocaleString('tr-TR')}
+                      subtext={`${brandProducts.filter((p) => p.isActive !== false).length} aktif koleksiyon modeli`}
+                      icon={<Layers size={16} />}
+                      isMobile={isMobile}
+                      onClick={() => setActivePortalTab('products')}
+                    />
+                    <StatCard
+                      label="Katalog Görüntülenme"
+                      value={(b2bStats.summary?.totalViews || 0).toLocaleString('tr-TR')}
+                      subtext="Seçili dönem ziyaretçi gösterimi"
+                      icon={<Eye size={16} />}
+                      accentColor="var(--bp-text-primary, #202633)"
+                      isMobile={isMobile}
+                    />
+                    <StatCard
+                      label="Tıklanma Oranı (CTR)"
+                      value={`%${b2bStats.summary?.ctr || 0}`}
+                      subtext="Ürün & katalog tıklama dönüşümü"
+                      icon={<MousePointerClick size={16} />}
+                      accentColor="var(--bp-info, #4778E8)"
+                      isMobile={isMobile}
+                    />
+                    <StatCard
+                      label="Müşteri Teklif Talepleri"
+                      value={(b2bStats.summary?.totalLeads || 0).toLocaleString('tr-TR')}
+                      subtext={`${dealers.length} yetkili bayi ağı üzerinden`}
+                      icon={<Handshake size={16} />}
+                      accentColor="var(--bp-success, #0D9B72)"
+                      isMobile={isMobile}
+                      onClick={() => setActivePortalTab('dealers')}
+                    />
+                    <StatCard
+                      label="Küresel Ülke İlgisi"
+                      value={`${countryAnalytics?.summary?.activeCountriesCount || 0} Ülke`}
+                      subtext={countryAnalytics?.summary?.topExportMarket ? `Lider pazar: ${countryAnalytics.summary.topExportMarket}` : 'İhracat trafiği analizi'}
+                      icon={<Globe size={16} />}
+                      accentColor="var(--bp-accent-gold, #C6A04A)"
+                      isMobile={isMobile}
                       onClick={() => setActivePortalTab('country-analytics')}
-                      style={{
-                        background: '#fff',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: isMobile ? '14px' : '16px',
-                        padding: isMobile ? '14px 12px' : '24px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
-                        cursor: 'pointer',
-                        gridColumn: isMobile ? 'span 2' : 'auto'
-                      }} 
-                      className="stats-card hover-lift"
-                    >
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span>Küresel Ülke İlgisi</span>
-                        <Globe size={14} style={{ color: '#b38e47' }} />
-                      </h4>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                        <span style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#b38e47' }}>
-                          {countryAnalytics?.summary?.activeCountriesCount || 8} Ülke
-                        </span>
-                        <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: '700' }}>
-                          Lider: {countryAnalytics?.summary?.topExportMarket || 'Almanya'}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginTop: '4px' }}>Detaylı ihracat analizlerini incele ↗</span>
-                    </div>
-
+                    />
                   </div>
 
-                  {/* VISUAL ANALYTICS & MARKET SHARE ROW */}
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: isMobile ? '16px' : '24px' }} className="brand-campaign-grid">
-                    
-                    {/* DYNAMIC TIMELINE CHART WIDGET */}
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-                        <div>
-                          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <TrendingUp size={18} style={{ color: '#2563eb' }} />
-                            Dinamik Mağaza Etkileşim Trendi
-                          </h3>
-                          <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>Son 30 gündeki mağaza tıklama, gösterim ve teklif hareketliliği.</p>
-                        </div>
+                  {/* C & D. RECHARTS PERFORMANCE CHART + MARKET SHARE CARD */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: isMobile ? '16px' : '20px' }} className="brand-campaign-grid">
+                    <PerformanceChart
+                      title="Marka Dijital Performansı"
+                      subtitle="Seçili dönemdeki katalog görüntülenme, tıklanma ve bayi talep hareketliliği."
+                      data={b2bStats.timeline || []}
+                      metric={chartMetric}
+                      onMetricChange={setChartMetric}
+                      dateFilter={dateRange === 'custom' ? '30d' : dateRange}
+                      onDateFilterChange={(d) => setDateRange(d)}
+                    />
 
-                        {/* Metric Selector Buttons */}
-                        <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '8px', gap: '2px' }}>
-                          <button 
-                            onClick={() => setChartMetric('views')}
-                            style={{
-                              border: 'none',
-                              background: chartMetric === 'views' ? '#fff' : 'transparent',
-                              color: chartMetric === 'views' ? '#0f172a' : '#64748b',
-                              fontSize: '0.7rem',
-                              fontWeight: '700',
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              boxShadow: chartMetric === 'views' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                              transition: 'all 0.15s'
-                            }}
-                          >
-                            Görüntülenme
-                          </button>
-                          <button 
-                            onClick={() => setChartMetric('clicks')}
-                            style={{
-                              border: 'none',
-                              background: chartMetric === 'clicks' ? '#fff' : 'transparent',
-                              color: chartMetric === 'clicks' ? '#0f172a' : '#64748b',
-                              fontSize: '0.7rem',
-                              fontWeight: '700',
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              boxShadow: chartMetric === 'clicks' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                              transition: 'all 0.15s'
-                            }}
-                          >
-                            Tıklanma
-                          </button>
-                          <button 
-                            onClick={() => setChartMetric('leads')}
-                            style={{
-                              border: 'none',
-                              background: chartMetric === 'leads' ? '#fff' : 'transparent',
-                              color: chartMetric === 'leads' ? '#0f172a' : '#64748b',
-                              fontSize: '0.7rem',
-                              fontWeight: '700',
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              boxShadow: chartMetric === 'leads' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                              transition: 'all 0.15s'
-                            }}
-                          >
-                            Bayi Talebi
-                          </button>
-                        </div>
-                      </div>
+                    <MarketShareCard
+                      title="Pazar Payı ve Marka Konumu"
+                      subtitle="SeramikBak pazar yeri genelinde markanızın gerçek görüntülenme payı."
+                      sharePercent={Number(b2bStats.summary?.marketShare || 0)}
+                      rankLabel={b2bStats.summary?.marketRank ? `#${b2bStats.summary.marketRank} Marka Sıralaması` : `${currentPlan} Paket Üyeliği`}
+                      rankSubLabel={`${brandProducts.length} ürün • ${dealers.length} yetkili bayi`}
+                      categories={[
+                        { label: 'Aktif Ürün Kapsamı', percent: brandProducts.length > 0 ? Math.round((brandProducts.filter((p) => p.isActive !== false).length / brandProducts.length) * 100) : 0, color: '#C6A04A' },
+                        { label: 'Dijital Katalog & AI Hazırlığı', percent: brandProducts.length > 0 ? Math.round((brandProducts.filter((p) => Boolean(p.imageUrl)).length / brandProducts.length) * 100) : 0, color: '#0D9B72' }
+                      ]}
+                    />
+                  </div>
 
-                      {/* SVG Line Chart based on real timeline data */}
-                      <div style={{ width: '100%', height: '220px', position: 'relative', marginTop: '16px' }}>
-                        <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
-                          <defs>
-                            <linearGradient id="dynamicChartGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#b38e47' : '#059669')} stopOpacity="0.25"/>
-                              <stop offset="100%" stopColor={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#b38e47' : '#059669')} stopOpacity="0.00"/>
-                            </linearGradient>
-                          </defs>
-
-                          {/* Horizontal grid lines */}
-                          <line x1="0" y1="40" x2="500" y2="40" stroke="#f1f5f9" strokeWidth="1"/>
-                          <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeWidth="1"/>
-                          <line x1="0" y1="140" x2="500" y2="140" stroke="#f1f5f9" strokeWidth="1"/>
-                          <line x1="0" y1="180" x2="500" y2="180" stroke="#e2e8f0" strokeWidth="2"/>
-
-                          {/* Render Dynamic Area Path */}
-                          {areaPath && (
-                            <path d={areaPath} fill="url(#dynamicChartGrad)"/>
-                          )}
-
-                          {/* Render Dynamic Line Path */}
-                          {linePath && (
-                            <path d={linePath} fill="none" stroke={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#d4af37' : '#059669')} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                          )}
-
-                          {/* Glow dots for data points */}
-                          {points.map((pt, idx) => {
-                            // Only render dots every 4th element to keep graph clean
-                            if (idx % 5 !== 0 && idx !== points.length - 1) return null;
-                            const isLast = idx === points.length - 1;
-
-                            return (
-                              <g key={idx}>
-                                <circle 
-                                  cx={pt.x} 
-                                  cy={pt.y} 
-                                  r={isLast ? "6" : "4"} 
-                                  fill={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#d4af37' : '#059669')} 
-                                  stroke="#fff" 
-                                  strokeWidth="2"
-                                />
-                                {/* Simple text bubble on hover simulator */}
-                                <title>{pt.label}: {pt.val} {chartMetric === 'views' ? 'görüntülenme' : (chartMetric === 'clicks' ? 'tıklama' : 'talep')}</title>
-                              </g>
-                            );
-                          })}
-                        </svg>
-
-                        {/* Chart Y-axis scale value indicators */}
-                        <div style={{ position: 'absolute', left: '-5px', top: '32px', fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>{maxVal}</div>
-                        <div style={{ position: 'absolute', left: '-5px', top: '102px', fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>{Math.round(maxVal / 2)}</div>
-                        <div style={{ position: 'absolute', left: '-5px', top: '172px', fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>0</div>
-
-                        {/* Chart Date labels */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '0.65rem', color: '#94a3b8', fontWeight: '600', padding: '0 5px' }}>
-                          <span>{b2bStats.timeline?.[0]?.date || '30 gün önce'}</span>
-                          <span>{b2bStats.timeline?.[14]?.date || '15 gün önce'}</span>
-                          <span>{b2bStats.timeline?.[29]?.date || 'Bugün'}</span>
-                        </div>
-                      </div>
+                  {/* E. HIZLI İŞLEM MERKEZİ */}
+                  <div
+                    style={{
+                      background: 'var(--bp-surface, #FFFFFF)',
+                      border: '1px solid var(--bp-border, #E5E8EE)',
+                      borderRadius: '16px',
+                      padding: '20px 24px',
+                      boxShadow: '0 1px 3px rgba(32, 38, 51, 0.03)'
+                    }}
+                  >
+                    <div style={{ marginBottom: '14px' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--bp-text-primary, #202633)' }}>
+                        Hızlı İşlem Merkezi
+                      </h3>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--bp-text-secondary, #778196)', margin: '2px 0 0 0' }}>
+                        En sık kullanılan marka operasyonlarına tek tıkla ulaşın.
+                      </p>
                     </div>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
+                        gap: '12px'
+                      }}
+                    >
+                      <QuickActionCard
+                        title="Yeni Ürün Ekle"
+                        description="Kataloğunuza yeni seramik modeli ekleyin"
+                        icon={<Plus size={18} />}
+                        onClick={() => setActivePortalTab('products')}
+                      />
+                      <QuickActionCard
+                        title="Dijital Katalog Oluştur"
+                        description="Studio ile kurumsal lookbook tasarlayın"
+                        icon={<BookOpen size={18} />}
+                        onClick={() => {
+                          setActivePortalTab('catalogs');
+                          setCatalogSubSection('create');
+                        }}
+                      />
+                      <QuickActionCard
+                        title="Kampanya Yönet"
+                        description="Vitrin ve podyum reklamlarını başlatın"
+                        icon={<Megaphone size={18} />}
+                        onClick={() => setActivePortalTab('campaigns')}
+                      />
+                      <QuickActionCard
+                        title="B2B Taleplerini Gör"
+                        description={`${projects.length} açık proje ihalesini inceleyin`}
+                        icon={<Building2 size={18} />}
+                        onClick={() => setActivePortalTab('b2b-projects')}
+                      />
+                      <QuickActionCard
+                        title="Performans Raporu"
+                        description="Marka sağlığı ve SEO skorunu inceleyin"
+                        icon={<Award size={18} />}
+                        onClick={() => setActivePortalTab('brand-health')}
+                      />
+                      <QuickActionCard
+                        title="Bayi Ağını Yönet"
+                        description={`${dealers.length} yetkili satış noktasını yönetin`}
+                        icon={<Users size={18} />}
+                        onClick={() => setActivePortalTab('dealers')}
+                      />
+                    </div>
+                  </div>
 
-                    {/* MARKET SHARE ENDEKS */}
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between' }} className="stats-card">
+                  {/* F. SON AKTİVİTELER */}
+                  <div
+                    style={{
+                      background: 'var(--bp-surface, #FFFFFF)',
+                      border: '1px solid var(--bp-border, #E5E8EE)',
+                      borderRadius: '16px',
+                      padding: '20px 24px',
+                      boxShadow: '0 1px 3px rgba(32, 38, 51, 0.03)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                       <div>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <ShieldCheck size={18} style={{ color: '#d4af37' }} />
-                          Pazar Payı Endeksi
+                        <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--bp-text-primary, #202633)' }}>
+                          Son Aktiviteler
                         </h3>
-                        <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 16px 0' }}>SeramikBak pazar yeri genelinde markanızın toplam görüntülenme payı.</p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--bp-text-secondary, #778196)', margin: '2px 0 0 0' }}>
+                          Marka hesabınızdaki son ürün, bayi ve B2B proje hareketleri.
+                        </p>
                       </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', margin: '10px 0' }}>
-                        <div style={{ position: 'relative', width: '120px', height: '120px' }}>
-                          <svg width="120" height="120" viewBox="0 0 36 36">
-                            <path
-                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                              fill="none"
-                              stroke="#f1f5f9"
-                              strokeWidth="3.5"
-                            />
-                            <path
-                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                              fill="none"
-                              stroke="url(#goldGradient)"
-                              strokeDasharray="24.8, 100"
-                              strokeWidth="3.5"
-                              strokeLinecap="round"
-                            />
-                            <defs>
-                              <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#b38e47" />
-                                <stop offset="100%" stopColor="#d4af37" />
-                              </linearGradient>
-                            </defs>
-                          </svg>
-                          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                            <span style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a' }}>%24.8</span>
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>2. En Popüler Marka</span>
-                          <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '2px' }}>Qua Granite'in ardından</span>
-                        </div>
-                      </div>
+                      <StatusBadge variant="info">{brandProducts.length + projects.length + bids.length} Kayıt</StatusBadge>
                     </div>
-
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {[
+                        ...brandProducts.slice(0, 2).map((p) => ({
+                          id: `prod-${p.id}`,
+                          title: `Ürün Kaydı: ${p.name}`,
+                          meta: `${p.code || 'SKU'} • ${p.width || 60}x${p.height || 120} cm`,
+                          badge: 'Ürün',
+                          variant: 'gold'
+                        })),
+                        ...projects.slice(0, 2).map((pr) => ({
+                          id: `prj-${pr.id}`,
+                          title: `B2B Proje Talebi: ${pr.projectName || pr.title || 'Proje'}`,
+                          meta: `${pr.city || 'Türkiye'} • İhale havuzu`,
+                          badge: 'B2B Talep',
+                          variant: 'info'
+                        })),
+                        ...bids.slice(0, 2).map((b) => ({
+                          id: `bd-${b.id}`,
+                          title: `Gönderilen İhale Teklifi: ${b.projectName}`,
+                          meta: `₺${Number(b.totalPrice || 0).toLocaleString('tr-TR')} • ${b.timeline || 'Teslimat'}`,
+                          badge: 'Teklif',
+                          variant: 'success'
+                        }))
+                      ].slice(0, 5).map((act) => (
+                        <div
+                          key={act.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '12px',
+                            padding: '10px 14px',
+                            borderRadius: '10px',
+                            background: 'var(--bp-bg, #F6F7F9)',
+                            border: '1px solid var(--bp-border, #E5E8EE)'
+                          }}
+                        >
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--bp-text-primary, #202633)' }}>
+                              {act.title}
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--bp-text-secondary, #778196)', marginTop: '2px' }}>
+                              {act.meta}
+                            </div>
+                          </div>
+                          <StatusBadge variant={act.variant}>{act.badge}</StatusBadge>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {/* 3D / AR STÜDYO Raporu */}

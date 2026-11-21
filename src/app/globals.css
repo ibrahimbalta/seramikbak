@@ -15,6 +15,22 @@
   --sb-warm-beige: #D8C9B5;
   --sb-border: #E5DED3;
 
+  /* PREMIUM CORPORATE BRAND & DEALER PORTAL TOKENS */
+  --bp-sidebar-bg: #171B24;
+  --bp-sidebar-border: rgba(255, 255, 255, 0.08);
+  --bp-sidebar-hover: rgba(255, 255, 255, 0.06);
+  --bp-sidebar-active: rgba(198, 160, 74, 0.14);
+  --bp-bg: #F6F7F9;
+  --bp-surface: #FFFFFF;
+  --bp-border: #E5E8EE;
+  --bp-text-primary: #202633;
+  --bp-text-secondary: #778196;
+  --bp-accent-gold: #C6A04A;
+  --bp-success: #0D9B72;
+  --bp-warning: #E59A36;
+  --bp-error: #D94C4C;
+  --bp-info: #4778E8;
+
   /* Global Legacy & Component Mapping */
   --bg-dark: #F6F3EE;
   --bg-canvas: #F6F3EE;

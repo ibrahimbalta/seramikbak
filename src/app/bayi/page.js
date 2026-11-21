@@ -2434,9 +2434,9 @@ Yetkili Satış & Showroom Departmanı`;
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#f4f6f9',
-      backgroundImage: 'radial-gradient(ellipse 80% 35% at 50% -8%, rgba(179, 142, 71, 0.09), transparent 70%)',
-      color: '#0f172a',
+      backgroundColor: 'var(--bp-bg, #F6F7F9)',
+      backgroundImage: 'none',
+      color: 'var(--bp-text-primary, #202633)',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
@@ -2459,10 +2459,9 @@ Yetkili Satış & Showroom Departmanı`;
       {/* Sol Sidebar Navigasyon */}
       {!isMobile && (
         <aside className="no-print dealer-sidebar" style={{
-          width: isSidebarCollapsed ? '74px' : '284px',
-          background: 'linear-gradient(180deg, #0b111e 0%, #090e18 100%)',
-          backdropFilter: 'blur(20px)',
-          borderRight: '1px solid rgba(212, 175, 55, 0.2)',
+          width: isSidebarCollapsed ? '74px' : '268px',
+          background: 'var(--bp-sidebar-bg, #171B24)',
+          borderRight: '1px solid var(--bp-sidebar-border, rgba(255, 255, 255, 0.08))',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -2738,10 +2737,11 @@ Yetkili Satış & Showroom Departmanı`;
                           gap: '10px',
                           width: '100%',
                           padding: isSidebarCollapsed ? '10px 8px' : '9px 12px',
-                          background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
+                          background: isActive ? 'rgba(198, 160, 74, 0.16)' : 'transparent',
                           border: 'none',
+                          borderLeft: isActive && !isSidebarCollapsed ? '3px solid #C6A04A' : '3px solid transparent',
                           borderRadius: '9px',
-                          color: isActive ? '#090d16' : '#cbd5e1',
+                          color: isActive ? '#F3DFAA' : '#B4BCC8',
                           cursor: 'pointer',
                           fontSize: '0.8rem',
                           fontWeight: isActive ? '800' : '600',
@@ -2753,7 +2753,7 @@ Yetkili Satış & Showroom Departmanı`;
                         title={link.label}
                         className={isActive ? '' : 'hover-gold-text'}
                       >
-                        <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, color: isActive ? '#090d16' : '#94a3b8' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, color: isActive ? '#C6A04A' : '#8A94A6' }}>
                           {link.icon}
                         </span>
                         {!isSidebarCollapsed && (
@@ -2868,8 +2868,8 @@ Yetkili Satış & Showroom Departmanı`;
           <header className="no-print dealer-header" style={{
             height: isMobile ? '58px' : '72px',
             minHeight: isMobile ? '58px' : '72px',
-            borderBottom: isMobile ? '1.5px solid rgba(212, 175, 55, 0.3)' : '1px solid #e2e8f0',
-            background: isMobile ? 'rgba(11, 17, 30, 0.96)' : 'rgba(255, 255, 255, 0.94)',
+            borderBottom: isMobile ? '1.5px solid rgba(198, 160, 74, 0.35)' : '1px solid var(--bp-border, #E5E8EE)',
+            background: isMobile ? '#171B24' : 'var(--bp-surface, #FFFFFF)',
             backdropFilter: 'blur(20px)',
             display: 'flex',
             alignItems: 'center',
@@ -8702,7 +8702,7 @@ Yetkili Satış & Showroom Departmanı`;
                     changeText={savedQuotesList.length > 0 ? `${savedQuotesList.length} PDF Teklif` : 'Aktif Dönem'}
                     changeType="positive"
                     icon={<FileText size={20} />}
-                    accentColor="#b38e47"
+                    accentColor="#C6A04A"
                     sparklinePoints={[12, 18, 16, 25, 24, 32, Math.max(totalQuotesCount * 10, 28)]}
                     isMobile={isMobile}
                     onClick={() => setActivePortalTab('quick-quote')}
@@ -8715,7 +8715,7 @@ Yetkili Satış & Showroom Departmanı`;
                     changeText={stats.pendingLeads > 0 ? `${stats.pendingLeads} Bekleyen` : 'Tümü Yanıtlandı'}
                     changeType={stats.pendingLeads > 0 ? 'warning' : 'positive'}
                     icon={<Activity size={20} />}
-                    accentColor="#d97706"
+                    accentColor="#E59A36"
                     sparklinePoints={[10, 15, 22, 19, 28, 25, Math.max(customerRequestsCount * 12, 24)]}
                     isMobile={isMobile}
                     onClick={() => {
@@ -8735,7 +8735,7 @@ Yetkili Satış & Showroom Departmanı`;
                     }
                     changeType="positive"
                     icon={<CheckCircle size={20} />}
-                    accentColor="#059669"
+                    accentColor="#0D9B72"
                     sparklinePoints={[8, 14, 16, 22, 26, 30, Math.max(completedOrdersCount * 15, 26)]}
                     isMobile={isMobile}
                   />
@@ -8750,7 +8750,7 @@ Yetkili Satış & Showroom Departmanı`;
                     changeText={savedQuotesList.length > 0 ? `${savedQuotesList.length} Tekliften` : 'Canlı Ciro'}
                     changeType="info"
                     icon={<TrendingUp size={20} />}
-                    accentColor="#2563eb"
+                    accentColor="#4778E8"
                     sparklinePoints={[18, 24, 21, 35, 42, 48, Math.max(Math.round(monthlySalesVolumeTL / 1000), 30)]}
                     isMobile={isMobile}
                     onClick={() => setActivePortalTab('quick-quote')}
@@ -8778,9 +8778,9 @@ Yetkili Satış & Showroom Departmanı`;
                     {/* Kiosk Mode Card */}
                     <div
                       style={{
-                        background: '#ffffff',
-                        border: hasActiveSaaS ? '1.5px solid rgba(179, 142, 71, 0.45)' : '1px solid #e2e8f0',
-                        borderRadius: '18px',
+                        background: 'var(--bp-surface, #FFFFFF)',
+                        border: hasActiveSaaS ? '1.5px solid rgba(198, 160, 74, 0.45)' : '1px solid var(--bp-border, #E5E8EE)',
+                        borderRadius: '16px',
                         padding: '20px 22px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -8808,10 +8808,10 @@ Yetkili Satış & Showroom Departmanı`;
                             <Eye size={19} />
                           </div>
                           <div>
-                            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>
+                            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: 'var(--bp-text-primary, #202633)' }}>
                               Kiosk Teşhir Modu
                             </h4>
-                            <span style={{ fontSize: '0.73rem', color: '#64748b' }}>
+                            <span style={{ fontSize: '0.73rem', color: 'var(--bp-text-secondary, #778196)' }}>
                               Mağaza içi dijital seramik ekranı
                             </span>
                           </div>
