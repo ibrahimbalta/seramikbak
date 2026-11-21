@@ -22,6 +22,7 @@ import {
   SlidersHorizontal
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
+import { resolveBrandLogo } from '@/lib/brandLogos';
 import { TURKEY_CITIES } from '@/lib/turkeyCities';
 
 /**
@@ -588,12 +589,8 @@ export function PopularCollectionsSection({ onSelectCollection }) {
  */
 function BrandCardLogo({ brand, isSelected }) {
   const [logoFailed, setLogoFailed] = useState(false);
-
-  // Known broken seed placeholder paths (/logos/xxx.png) that do not exist in public/
-  const hasValidLogo =
-    brand?.logoUrl &&
-    !logoFailed &&
-    !brand.logoUrl.startsWith('/logos/');
+  const resolved = resolveBrandLogo(brand);
+  const hasValidLogo = Boolean(resolved.url && !logoFailed);
 
   const getBrandTypographyStyle = (name = '') => {
     const lower = name.toLowerCase();
@@ -621,20 +618,33 @@ function BrandCardLogo({ brand, isSelected }) {
     .toUpperCase();
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '34px', minWidth: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '38px', minWidth: 0 }}>
       {hasValidLogo ? (
-        <img
-          src={brand.logoUrl}
-          alt={brand.name}
-          loading="lazy"
-          onError={() => setLogoFailed(true)}
+        <div
           style={{
-            maxHeight: '30px',
-            maxWidth: '130px',
-            objectFit: 'contain',
-            filter: isSelected ? 'brightness(1.15)' : 'none'
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: isSelected ? '#FFFFFF' : 'transparent',
+            padding: isSelected ? '4px 10px' : '0',
+            borderRadius: isSelected ? '8px' : '0',
+            transition: 'all 0.2s ease'
           }}
-        />
+        >
+          <img
+            src={resolved.url}
+            alt={brand.name}
+            loading="lazy"
+            onError={() => setLogoFailed(true)}
+            style={{
+              height: '28px',
+              maxWidth: '140px',
+              width: 'auto',
+              objectFit: 'contain',
+              filter: resolved.isWhite ? 'brightness(0) saturate(100%)' : 'none'
+            }}
+          />
+        </div>
       ) : (
         <>
           <span

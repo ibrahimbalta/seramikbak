@@ -20,6 +20,7 @@ import {
   Box
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
+import { resolveBrandLogo } from '@/lib/brandLogos';
 import TileVisualPreview from '@/components/TileVisualPreview';
 
 export default function BrandShowcaseClient({ brand, products = [], dealers = [] }) {
@@ -29,10 +30,8 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
   const [searchQuery, setSearchQuery] = useState('');
   const [logoFailed, setLogoFailed] = useState(false);
 
-  const hasValidLogo =
-    brand?.logoUrl &&
-    !logoFailed &&
-    !brand.logoUrl.startsWith('/logos/');
+  const resolvedLogo = resolveBrandLogo(brand);
+  const hasValidLogo = Boolean(resolvedLogo.url && !logoFailed);
 
   // Extract unique filter values
   const styles = useMemo(() => {
@@ -134,7 +133,7 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
               width: '110px',
               height: '110px',
               borderRadius: '20px',
-              background: '#0b0f19',
+              background: hasValidLogo ? '#ffffff' : '#0b0f19',
               border: '2px solid rgba(212, 175, 55, 0.3)',
               display: 'flex',
               alignItems: 'center',
@@ -145,10 +144,10 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
             }}>
               {hasValidLogo ? (
                 <img
-                  src={brand.logoUrl}
+                  src={resolvedLogo.url}
                   alt={`${brand.name} Logo`}
                   onError={() => setLogoFailed(true)}
-                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: resolvedLogo.isWhite ? 'brightness(0) saturate(100%)' : 'none' }}
                 />
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
