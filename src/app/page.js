@@ -4245,6 +4245,7 @@ export default function Home() {
             ) : (
               <Link
                 href="/uyelik"
+                className="header-login-btn"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -4262,13 +4263,14 @@ export default function Home() {
                 title="Giriş Yap / Üye Ol"
               >
                 <UserIcon size={14} />
-                <span>Giriş Yap</span>
+                <span className="header-login-label">Giriş Yap</span>
               </Link>
             )}
 
             {/* Teklif Taleplerim (Quote Cart Drawer Trigger) */}
             <button
               type="button"
+              className="header-quote-cart-btn"
               onClick={() => setShowQuoteCartDrawer(true)}
               style={{
                 display: 'inline-flex',
@@ -4287,8 +4289,8 @@ export default function Home() {
               }}
               title="Teklif Taleplerim & Numune Sepeti"
             >
-              <ShoppingBag size={14} />
-              <span>Teklif Taleplerim</span>
+              <ShoppingBag size={15} />
+              <span className="header-quote-cart-label">Teklif Taleplerim</span>
               {quoteCartItems.length > 0 && (
                 <span
                   style={{
@@ -12205,7 +12207,7 @@ export default function Home() {
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
-            overflow: hidden !important;
+            overflow: visible !important;
           }
           :global(.luxury-header-inner) {
             width: 100% !important;
@@ -12261,6 +12263,28 @@ export default function Home() {
           :global(.luxury-header-actions .luxury-icon-circle-btn) {
             width: 32px !important;
             height: 32px !important;
+          }
+          :global(.luxury-header-actions .header-login-btn) {
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0 !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #0f172a !important;
+          }
+          :global(.luxury-header-actions .header-login-label) {
+            display: none !important;
+          }
+          :global(.luxury-header-actions .header-quote-cart-btn) {
+            height: 32px !important;
+            padding: 0 9px !important;
+            gap: 4px !important;
+            border-radius: 10px !important;
+          }
+          :global(.luxury-header-actions .header-quote-cart-label) {
+            display: none !important;
           }
           :global(.luxury-hamburger-btn) {
             display: flex !important;
