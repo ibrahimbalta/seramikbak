@@ -4876,13 +4876,14 @@ export default function Home() {
 
             {/* SECTION 5: AKILLI SERAMİK ARAMA MOTORU */}
             <div
+              id="smart-search-section"
               style={{
-                background: '#FFFFFF',
-                border: '1px solid #E8E2D5',
-                borderRadius: '24px',
+                background: 'var(--sb-surface, #FFFFFF)',
+                border: '1px solid var(--sb-border, #E5DED3)',
+                borderRadius: '22px',
                 padding: 'clamp(20px, 3vw, 32px)',
                 marginBottom: '28px',
-                boxShadow: '0 14px 40px -12px rgba(36, 36, 36, 0.06)'
+                boxShadow: '0 12px 34px -10px rgba(41, 40, 36, 0.06)'
               }}
             >
               <div
@@ -4900,7 +4901,7 @@ export default function Home() {
                     style={{
                       fontSize: '0.7rem',
                       fontWeight: 800,
-                      color: '#B38E47',
+                      color: 'var(--sb-accent-bronze, #B58B50)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.1em',
                       display: 'block',
@@ -4913,7 +4914,7 @@ export default function Home() {
                     style={{
                       fontSize: 'clamp(1.35rem, 2.2vw, 1.8rem)',
                       fontWeight: 900,
-                      color: '#242424',
+                      color: 'var(--sb-text-primary, #292824)',
                       margin: 0,
                       letterSpacing: '-0.02em',
                       fontFamily: 'var(--font-title, "Outfit", sans-serif)'
@@ -4953,9 +4954,9 @@ export default function Home() {
                           fontWeight: 800,
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
-                          background: isCatActive ? '#242424' : '#FAF9F6',
-                          color: isCatActive ? '#F3E5AB' : '#242424',
-                          border: isCatActive ? '1px solid #D4AF37' : '1px solid #E8E2D5'
+                          background: isCatActive ? 'var(--sb-surface-dark, #252522)' : 'var(--sb-bg-primary, #F6F3EE)',
+                          color: isCatActive ? '#F6F3EE' : 'var(--sb-text-primary, #292824)',
+                          border: isCatActive ? '1px solid var(--sb-accent-bronze, #B58B50)' : '1px solid var(--sb-border, #E5DED3)'
                         }}
                       >
                         {cat.label}
@@ -5237,6 +5238,17 @@ export default function Home() {
               </div>
             </div>
 
+            {/* SECTION C: HIZLI KEŞİF & DOKU KATEGORİLERİ */}
+            <section
+              id="quick-discovery-section"
+              style={{
+                background: 'var(--sb-bg-secondary, #EAE5DC)',
+                border: '1px solid var(--sb-border, #E5DED3)',
+                borderRadius: '22px',
+                padding: 'clamp(18px, 2.5vw, 26px)',
+                marginBottom: '32px'
+              }}
+            >
             {/* 4 QUICK ACTION CARDS - Matching Image 1 */}
             <div className="clean-quick-nav-cards">
               {/* Card 1: Seramik Bul */}
@@ -5425,6 +5437,7 @@ export default function Home() {
                 </button>
               </div>
             </div>
+            </section>
 
             {/* SECTION 6: AI İLE MEKÂNINI TASARLA */}
             <AiDesignShowcaseSection
@@ -5463,7 +5476,9 @@ export default function Home() {
                 gap: '16px', 
                 marginBottom: '32px',
                 padding: '24px',
-                background: '#ffffff'
+                background: 'var(--sb-surface, #FFFFFF)',
+                border: '1px solid var(--sb-border, #E5DED3)',
+                borderRadius: '22px'
               }}>
                 <div className="weekly-products-header" style={{ 
                   display: 'flex', 
@@ -5523,9 +5538,9 @@ export default function Home() {
                           width: '230px',
                           borderRadius: 'var(--border-radius-md)',
                           overflow: 'hidden',
-                          background: '#f8f9fb',
-                          border: '1px solid #e2e8f0',
-                          boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
+                          background: 'var(--sb-bg-primary, #F6F3EE)',
+                          border: '1px solid var(--sb-border, #E5DED3)',
+                          boxShadow: '0 4px 14px rgba(41, 40, 36, 0.05)',
                           display: 'flex',
                           flexDirection: 'column',
                           padding: '12px',
@@ -5550,7 +5565,7 @@ export default function Home() {
                         {/* Product Image */}
                         <div style={{
                           height: '130px',
-                          background: '#f8fafc',
+                          background: 'var(--sb-bg-secondary, #EAE5DC)',
                           borderRadius: 'var(--border-radius-sm)',
                           overflow: 'hidden',
                           display: 'flex',
@@ -5615,10 +5630,10 @@ export default function Home() {
                             </span>
                             <span style={{ 
                               fontSize: '0.65rem', 
-                              color: 'var(--text-muted)',
+                              color: 'var(--sb-text-secondary, #77736B)',
                               fontWeight: '600',
-                              background: '#f1f5f9',
-                              padding: '1px 6px',
+                              background: 'var(--sb-bg-secondary, #EAE5DC)',
+                              padding: '2px 7px',
                               borderRadius: '4px'
                             }}>
                               {p.style}
@@ -5637,7 +5652,7 @@ export default function Home() {
               {/* Left Sidebar Filter Section */}
               <aside className="filters-sidebar-new glass-panel desktop-sidebar" style={{ position: 'relative' }}>
                 <div className="filter-header-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '12px' }}>
-                  <h3 className="filter-title-main" style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0, border: 'none', padding: 0, letterSpacing: '-0.02em' }}>Filtreler</h3>
+                  <h3 className="filter-title-main" style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', margin: 0, border: 'none', padding: 0, letterSpacing: '-0.02em' }}>Filtreler</h3>
                   <button onClick={() => {
                     setSelectedBrand('');
                     setSelectedColor('');
@@ -10622,14 +10637,14 @@ export default function Home() {
           background: rgba(255, 255, 255, 0.96);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--sb-border, #E5DED3);
           border-radius: 0;
           padding: 10px 24px;
-          color: #0f172a;
+          color: var(--sb-text-primary, #292824);
           position: sticky;
           top: 0;
           z-index: 1000;
-          box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 6px 24px rgba(41, 40, 36, 0.05), 0 1px 3px rgba(41, 40, 36, 0.03);
           width: 100%;
           box-sizing: border-box;
           transition: background 0.3s ease, border-color 0.3s ease;
@@ -10657,16 +10672,16 @@ export default function Home() {
         :global(.luxury-logo-badge) {
           width: 40px;
           height: 40px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          border: 2px solid #d4af37;
+          background: linear-gradient(135deg, #252522 0%, #3A3832 100%);
+          border: 2px solid var(--sb-accent-bronze, #B58B50);
           border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 900;
           font-size: 1.1rem;
-          color: #fef08a;
-          box-shadow: 0 3px 10px rgba(212, 175, 55, 0.25);
+          color: #F6F3EE;
+          box-shadow: 0 3px 10px rgba(181, 139, 80, 0.25);
         }
 
         :global(.luxury-logo-text-col) {
@@ -10678,13 +10693,13 @@ export default function Home() {
           font-size: 1.3rem;
           font-weight: 900;
           letter-spacing: -0.02em;
-          color: #0f172a;
+          color: var(--sb-text-primary, #292824);
           line-height: 1.1;
         }
 
         :global(.luxury-logo-subtitle) {
           font-size: 0.68rem;
-          color: #64748b;
+          color: var(--sb-text-secondary, #77736B);
           font-weight: 600;
           letter-spacing: 0.02em;
         }
@@ -11372,7 +11387,7 @@ export default function Home() {
            ========================================================================== */
         :global(.clean-hero-card) {
           position: relative;
-          border-radius: 24px;
+          border-radius: 22px;
           background-size: cover;
           background-position: center right;
           background-repeat: no-repeat;
@@ -11382,8 +11397,8 @@ export default function Home() {
           align-items: center;
           justify-content: space-between;
           overflow: hidden;
-          border: 1px solid rgba(197, 143, 39, 0.25);
-          box-shadow: 0 22px 50px -12px rgba(15, 23, 42, 0.28), 0 4px 12px rgba(0, 0, 0, 0.08);
+          border: 1px solid rgba(181, 139, 80, 0.32);
+          box-shadow: 0 22px 50px -12px rgba(37, 37, 34, 0.28), 0 4px 12px rgba(37, 37, 34, 0.08);
           margin-bottom: 14px;
           box-sizing: border-box;
         }
@@ -11391,7 +11406,7 @@ export default function Home() {
         :global(.clean-hero-overlay) {
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, #0f172a 0%, rgba(15, 23, 42, 0.94) 38%, rgba(15, 23, 42, 0.65) 68%, rgba(15, 23, 42, 0.25) 100%);
+          background: linear-gradient(90deg, #252522 0%, rgba(37, 37, 34, 0.92) 38%, rgba(37, 37, 34, 0.58) 68%, rgba(37, 37, 34, 0.2) 100%);
           z-index: 1;
           pointer-events: none;
         }
@@ -11428,14 +11443,14 @@ export default function Home() {
         :global(.clean-hero-heading) {
           font-size: 2.35rem;
           font-weight: 850;
-          color: #f8fafc;
+          color: #F6F3EE;
           line-height: 1.14;
           margin: 0;
           letter-spacing: -0.03em;
         }
 
         :global(.clean-hero-highlight) {
-          background: linear-gradient(135deg, #f3d285 0%, #d4af37 50%, #c58f27 100%);
+          background: linear-gradient(135deg, #EAE5DC 0%, #D8C9B5 48%, #B58B50 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-weight: 850;
@@ -11444,7 +11459,7 @@ export default function Home() {
 
         :global(.clean-hero-sub) {
           font-size: 0.92rem;
-          color: #cbd5e1;
+          color: #D8C9B5;
           line-height: 1.5;
           margin: 2px 0 6px 0;
           max-width: 440px;
@@ -11460,7 +11475,7 @@ export default function Home() {
         }
 
         :global(.clean-hero-primary-btn) {
-          background: linear-gradient(135deg, #c58f27 0%, #996515 100%);
+          background: linear-gradient(135deg, #B58B50 0%, #98713B 100%);
           color: #ffffff;
           border: none;
           border-radius: 9999px;
@@ -11576,10 +11591,10 @@ export default function Home() {
           position: relative;
           z-index: 2;
           width: 230px;
-          background: rgba(15, 23, 42, 0.78);
+          background: rgba(37, 37, 34, 0.82);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          border: 1.5px solid rgba(255, 255, 255, 0.16);
+          border: 1.5px solid rgba(216, 201, 181, 0.22);
           box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.12);
           border-radius: 20px;
           padding: 18px 20px;
@@ -11914,13 +11929,13 @@ export default function Home() {
           gap: 7px;
           padding: 11px 26px;
           border-radius: 9999px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #2a374f 100%);
-          color: #fde68a;
-          border: 1.5px solid #d4af37;
+          background: linear-gradient(135deg, #252522 0%, #3A3832 100%);
+          color: #F6F3EE;
+          border: 1.5px solid var(--sb-accent-bronze, #B58B50);
           font-weight: 700;
           font-size: 0.92rem;
           cursor: pointer;
-          box-shadow: 0 6px 20px rgba(15, 23, 42, 0.24);
+          box-shadow: 0 6px 20px rgba(37, 37, 34, 0.2);
           transition: all 0.22s ease;
           white-space: nowrap;
           flex-shrink: 0;
@@ -11950,8 +11965,8 @@ export default function Home() {
         :global(.clean-nav-card-item) {
           position: relative;
           overflow: hidden;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--sb-surface, #FFFFFF);
+          border: 1px solid var(--sb-border, #E5DED3);
           border-radius: 18px;
           padding: 16px 10px;
           display: flex;
@@ -11961,25 +11976,25 @@ export default function Home() {
           text-align: center;
           gap: 10px;
           cursor: pointer;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+          box-shadow: 0 4px 14px rgba(41, 40, 36, 0.05);
           transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
           user-select: none;
         }
 
         :global(.clean-nav-card-item:hover) {
           transform: translateY(-3px);
-          background: #f8fafc;
-          box-shadow: 0 8px 22px rgba(179, 142, 71, 0.15);
-          border-color: #b38e47;
+          background: var(--sb-bg-primary, #F6F3EE);
+          box-shadow: 0 8px 22px rgba(181, 139, 80, 0.15);
+          border-color: var(--sb-accent-bronze, #B58B50);
         }
 
         :global(.clean-nav-card-icon) {
           width: 46px;
           height: 46px;
           border-radius: 14px;
-          background: linear-gradient(135deg, #182235 0%, #0f172a 100%);
-          color: #e5c158;
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+          background: linear-gradient(135deg, #252522 0%, #3A3832 100%);
+          color: #D8C9B5;
+          box-shadow: 0 4px 12px rgba(37, 37, 34, 0.16);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -11993,7 +12008,7 @@ export default function Home() {
         :global(.clean-nav-card-title) {
           font-size: 0.85rem;
           font-weight: 700;
-          color: #111e38;
+          color: var(--sb-text-primary, #292824);
           line-height: 1.25;
         }
 
@@ -14373,18 +14388,18 @@ export default function Home() {
           width: 50px;
           height: 50px;
           border-radius: 50%;
-          border: 2px solid #cbd5e1;
+          border: 2px solid var(--sb-warm-beige, #D8C9B5);
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #f4f6f9;
-          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+          background-color: var(--sb-surface, #FFFFFF);
+          box-shadow: 0 3px 10px rgba(41, 40, 36, 0.07);
           transition: all 0.3s ease;
         }
 
         .category-circle-btn span {
           font-size: 0.75rem;
-          color: #334155;
+          color: var(--sb-text-primary, #292824);
           font-weight: 600;
           font-family: var(--font-body);
         }
@@ -14615,9 +14630,9 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+          background: var(--sb-surface, #FFFFFF);
+          border: 1px solid var(--sb-border, #E5DED3);
+          box-shadow: 0 6px 24px rgba(41, 40, 36, 0.05);
           border-radius: var(--border-radius-lg);
           transition: all 0.3s ease;
         }
@@ -14625,7 +14640,7 @@ export default function Home() {
         .filter-title-main {
           font-size: 1.15rem;
           font-weight: 800;
-          color: #0f172a;
+          color: var(--sb-text-primary, #292824);
           border-bottom: 1px solid rgba(0, 0, 0, 0.05);
           padding-bottom: 14px;
           letter-spacing: -0.015em;
@@ -14690,8 +14705,8 @@ export default function Home() {
         }
 
         .checkbox-label-wrapper input:checked ~ .checkbox-custom-box {
-          background-color: #0f172a;
-          border-color: #0f172a;
+          background-color: var(--sb-surface-dark, #252522);
+          border-color: var(--sb-surface-dark, #252522);
         }
 
         .checkbox-custom-box::after {
@@ -19280,16 +19295,16 @@ export default function Home() {
 
         /* PREMIUM LUXURY FOOTER STYLES */
         .site-footer {
-          background: linear-gradient(180deg, #0d121d 0%, #05070c 100%);
-          border-top: 1px solid rgba(212, 175, 55, 0.25);
+          background: linear-gradient(180deg, #252522 0%, #1B1B18 100%);
+          border-top: 1px solid rgba(181, 139, 80, 0.35);
           border-radius: var(--border-radius-lg);
           padding: 64px 48px 32px 48px;
-          color: #94a3b8;
+          color: #B8B2A6;
           display: flex;
           flex-direction: column;
           gap: 40px;
           margin-top: 48px;
-          box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 -20px 50px rgba(37, 37, 34, 0.25);
           position: relative;
         }
 
@@ -19318,7 +19333,7 @@ export default function Home() {
         }
 
         .footer-col h4 {
-          color: #f8fafc;
+          color: #F6F3EE;
           font-family: var(--font-title);
           font-size: 0.82rem;
           font-weight: 800;
@@ -19350,7 +19365,7 @@ export default function Home() {
         }
 
         .footer-col ul :global(a) {
-          color: #94a3b8;
+          color: #B8B2A6;
           text-decoration: none;
           font-size: 0.82rem;
           font-family: var(--font-body);

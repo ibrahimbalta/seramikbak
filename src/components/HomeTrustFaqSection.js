@@ -78,228 +78,250 @@ export default function HomeTrustFaqSection({ onNavigateToStudio }) {
   };
 
   return (
-    <section className="home-trust-faq-section" style={{ margin: '60px 0 30px 0', width: '100%' }}>
+    <section className="home-trust-faq-section" style={{ margin: '36px 0 24px 0', width: '100%', display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Schema.org FAQPage */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
-      {/* 1. NASIL ÇALIŞIR? 3 ADIMLI REHBER */}
-      <div className="how-it-works-block" style={{ marginBottom: '60px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', background: 'rgba(179,142,71,0.1)', border: '1px solid rgba(179,142,71,0.3)', borderRadius: '999px', fontSize: '0.78rem', color: '#B38E47', fontWeight: '700', marginBottom: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+      {/* 1. NASIL ÇALIŞIR? 3 ADIMLI REHBER & GÜVEN KARTLARI (Section K: Kırık beyaz ve açık taş tonu) */}
+      <div
+        className="how-it-works-block"
+        style={{
+          background: 'var(--sb-bg-primary, #F6F3EE)',
+          border: '1px solid var(--sb-border, #E5DED3)',
+          borderRadius: '24px',
+          padding: 'clamp(28px, 4vw, 44px)',
+          boxShadow: '0 8px 28px -8px rgba(41, 40, 36, 0.04)'
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 14px', background: 'rgba(181,139,80,0.12)', border: '1px solid rgba(181,139,80,0.3)', borderRadius: '999px', fontSize: '0.72rem', color: 'var(--sb-accent-bronze, #B58B50)', fontWeight: '800', marginBottom: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             <Sparkles size={13} />
             <span>NASIL ÇALIŞIR?</span>
           </div>
-          <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.3rem)', fontWeight: '800', color: '#242424', margin: '0 0 10px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.45rem, 2.4vw, 1.95rem)', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', margin: '0 0 10px 0', letterSpacing: '-0.02em', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
             3 Adımda Dijital Seramik Showroom Deneyimi
           </h2>
-          <p style={{ fontSize: '0.96rem', color: '#5C5A54', maxWidth: '640px', margin: '0 auto', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.92rem', color: 'var(--sb-text-secondary, #77736B)', maxWidth: '620px', margin: '0 auto', lineHeight: '1.6' }}>
             Karoları tek platformda keşfedin, kendi mekânınızda yapay zekâ ve 3D ile deneyimleyin, yetkili bayilerden teklif alın.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '18px', marginBottom: '24px' }}>
           {/* Step 1 */}
-          <div className="glass-panel" style={{ padding: '30px 26px', borderRadius: '20px', position: 'relative', overflow: 'hidden', border: '1px solid #E8E2D5', background: '#FFFFFF', boxShadow: '0 8px 24px rgba(36,36,36,0.03)' }}>
-            <div style={{ position: 'absolute', top: '18px', right: '22px', fontSize: '2.6rem', fontWeight: '900', color: 'rgba(179,142,71,0.14)', lineHeight: 1 }}>
+          <div style={{ padding: '26px 24px', borderRadius: '18px', position: 'relative', overflow: 'hidden', border: '1px solid var(--sb-border, #E5DED3)', background: 'var(--sb-surface, #FFFFFF)', boxShadow: '0 4px 16px -4px rgba(41,40,36,0.03)' }}>
+            <div style={{ position: 'absolute', top: '16px', right: '20px', fontSize: '2.3rem', fontWeight: '900', color: 'rgba(181,139,80,0.14)', lineHeight: 1 }}>
               01
             </div>
-            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#FAF9F6', border: '1px solid #E8E2D5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', marginBottom: '20px' }}>
-              <Search size={22} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'var(--sb-bg-primary, #F6F3EE)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', marginBottom: '18px' }}>
+              <Search size={20} />
             </div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#242424', marginBottom: '10px', letterSpacing: '-0.01em' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '8px', letterSpacing: '-0.01em' }}>
               01 — Keşfet
             </h3>
-            <p style={{ fontSize: '0.92rem', color: '#5C5A54', lineHeight: '1.65', margin: 0 }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.6', margin: 0 }}>
               Binlerce seramik modelini tek platformda karşılaştırın. Ebat, doku, yüzey ve mekân tipine göre projenize en uygun koleksiyonu seçin.
             </p>
           </div>
 
           {/* Step 2 */}
-          <div className="glass-panel" style={{ padding: '30px 26px', borderRadius: '20px', position: 'relative', overflow: 'hidden', border: '1px solid #E8E2D5', background: '#FFFFFF', boxShadow: '0 8px 24px rgba(36,36,36,0.03)' }}>
-            <div style={{ position: 'absolute', top: '18px', right: '22px', fontSize: '2.6rem', fontWeight: '900', color: 'rgba(179,142,71,0.14)', lineHeight: 1 }}>
+          <div style={{ padding: '26px 24px', borderRadius: '18px', position: 'relative', overflow: 'hidden', border: '1px solid var(--sb-border, #E5DED3)', background: 'var(--sb-surface, #FFFFFF)', boxShadow: '0 4px 16px -4px rgba(41,40,36,0.03)' }}>
+            <div style={{ position: 'absolute', top: '16px', right: '20px', fontSize: '2.3rem', fontWeight: '900', color: 'rgba(181,139,80,0.14)', lineHeight: 1 }}>
               02
             </div>
-            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#FAF9F6', border: '1px solid #E8E2D5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', marginBottom: '20px' }}>
-              <Sparkles size={22} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'var(--sb-bg-primary, #F6F3EE)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', marginBottom: '18px' }}>
+              <Sparkles size={20} />
             </div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#242424', marginBottom: '10px', letterSpacing: '-0.01em' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '8px', letterSpacing: '-0.01em' }}>
               02 — Mekânında Dene
             </h3>
-            <p style={{ fontSize: '0.92rem', color: '#5C5A54', lineHeight: '1.65', margin: 0 }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.6', margin: 0 }}>
               3D Sanal Stüdyo ve AI teknolojisiyle seçiminizi gerçek mekânınızda görün. Derz rengi, döşeme yönü ve ışık uyumunu satın almadan önce test edin.
             </p>
           </div>
 
           {/* Step 3 */}
-          <div className="glass-panel" style={{ padding: '30px 26px', borderRadius: '20px', position: 'relative', overflow: 'hidden', border: '1px solid #E8E2D5', background: '#FFFFFF', boxShadow: '0 8px 24px rgba(36,36,36,0.03)' }}>
-            <div style={{ position: 'absolute', top: '18px', right: '22px', fontSize: '2.6rem', fontWeight: '900', color: 'rgba(179,142,71,0.14)', lineHeight: 1 }}>
+          <div style={{ padding: '26px 24px', borderRadius: '18px', position: 'relative', overflow: 'hidden', border: '1px solid var(--sb-border, #E5DED3)', background: 'var(--sb-surface, #FFFFFF)', boxShadow: '0 4px 16px -4px rgba(41,40,36,0.03)' }}>
+            <div style={{ position: 'absolute', top: '16px', right: '20px', fontSize: '2.3rem', fontWeight: '900', color: 'rgba(181,139,80,0.14)', lineHeight: 1 }}>
               03
             </div>
-            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#FAF9F6', border: '1px solid #E8E2D5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', marginBottom: '20px' }}>
-              <CheckCircle2 size={22} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'var(--sb-bg-primary, #F6F3EE)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', marginBottom: '18px' }}>
+              <CheckCircle2 size={20} />
             </div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#242424', marginBottom: '10px', letterSpacing: '-0.01em' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '8px', letterSpacing: '-0.01em' }}>
               03 — Teklif Al
             </h3>
-            <p style={{ fontSize: '0.92rem', color: '#5C5A54', lineHeight: '1.65', margin: 0 }}>
+            <p style={{ fontSize: '0.88rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.6', margin: 0 }}>
               Türkiye genelindeki yetkili bayilerden ücretsiz fiyat teklifi alın. Metrajınıza uygun stok ve teslimat bilgisini doğrudan yetkili satıcıdan öğrenin.
             </p>
           </div>
         </div>
+
+        {/* 2. GÜVEN VE MARKA DEĞERİ (4 KART) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '18px', borderRadius: '16px', background: 'var(--sb-bg-secondary, #EAE5DC)', border: '1px solid var(--sb-border, #E5DED3)' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--sb-surface, #FFFFFF)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', flexShrink: 0 }}>
+              <ShieldCheck size={19} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '3px' }}>Orijinal Ürünler</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.45' }}>Lider seramik üreticilerinin orijinal katalog koleksiyonları</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '18px', borderRadius: '16px', background: 'var(--sb-bg-secondary, #EAE5DC)', border: '1px solid var(--sb-border, #E5DED3)' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--sb-surface, #FFFFFF)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', flexShrink: 0 }}>
+              <Layers size={19} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '3px' }}>Yetkili Bayi Ağı</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.45' }}>Türkiye genelindeki yetkili showroom ve satış noktaları</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '18px', borderRadius: '16px', background: 'var(--sb-bg-secondary, #EAE5DC)', border: '1px solid var(--sb-border, #E5DED3)' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--sb-surface, #FFFFFF)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', flexShrink: 0 }}>
+              <Sparkles size={19} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '3px' }}>AI Destekli Görselleştirme</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.45' }}>Satın almadan önce kendi fotoğrafınızda ve 3D stüdyoda deneyim</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '18px', borderRadius: '16px', background: 'var(--sb-bg-secondary, #EAE5DC)', border: '1px solid var(--sb-border, #E5DED3)' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--sb-surface, #FFFFFF)', border: '1px solid var(--sb-border, #E5DED3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sb-accent-bronze, #B58B50)', flexShrink: 0 }}>
+              <Calculator size={19} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '3px' }}>Ücretsiz Teklif Alma</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--sb-text-secondary, #77736B)', lineHeight: '1.45' }}>Komisyonsuz ve ücretsiz doğrudan bayi fiyat teklifi talebi</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 2. GÜVEN VE MARKA DEĞERİ (4 KART) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '16px', marginBottom: '60px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '20px', borderRadius: '16px', background: '#FAF9F6', border: '1px solid #E8E2D5' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(179,142,71,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', flexShrink: 0 }}>
-            <ShieldCheck size={22} />
+      {/* 3. SIKÇA SORULAN SORULAR (Section L: Açık nötr yüzey) */}
+      <div
+        className="home-faq-container"
+        style={{
+          background: 'var(--sb-surface, #FFFFFF)',
+          border: '1px solid var(--sb-border, #E5DED3)',
+          borderRadius: '24px',
+          padding: 'clamp(28px, 4vw, 44px)',
+          boxShadow: '0 8px 28px -8px rgba(41, 40, 36, 0.04)'
+        }}
+      >
+        <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--sb-accent-bronze, #B58B50)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '6px' }}>
+              YARDIM VE REHBER
+            </span>
+            <h2 style={{ fontSize: 'clamp(1.4rem, 2.3vw, 1.85rem)', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', margin: '0 0 8px 0', letterSpacing: '-0.02em', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+              Sıkça Sorulan Sorular
+            </h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--sb-text-secondary, #77736B)', margin: 0 }}>
+              SeramikBak kullanımı, bayi fiyat teklifleri ve 3D stüdyo hakkında merak ettikleriniz.
+            </p>
           </div>
-          <div>
-            <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#242424', marginBottom: '4px' }}>Orijinal Ürünler</div>
-            <div style={{ fontSize: '0.8rem', color: '#5C5A54', lineHeight: '1.5' }}>Lider seramik üreticilerinin orijinal katalog koleksiyonları</div>
-          </div>
-        </div>
 
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '20px', borderRadius: '16px', background: '#FAF9F6', border: '1px solid #E8E2D5' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(179,142,71,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', flexShrink: 0 }}>
-            <Layers size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#242424', marginBottom: '4px' }}>Yetkili Bayi Ağı</div>
-            <div style={{ fontSize: '0.8rem', color: '#5C5A54', lineHeight: '1.5' }}>Türkiye genelindeki yetkili showroom ve satış noktaları</div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '20px', borderRadius: '16px', background: '#FAF9F6', border: '1px solid #E8E2D5' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(179,142,71,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', flexShrink: 0 }}>
-            <Sparkles size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#242424', marginBottom: '4px' }}>AI Destekli Görselleştirme</div>
-            <div style={{ fontSize: '0.8rem', color: '#5C5A54', lineHeight: '1.5' }}>Satın almadan önce kendi fotoğrafınızda ve 3D stüdyoda deneyim</div>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '20px', borderRadius: '16px', background: '#FAF9F6', border: '1px solid #E8E2D5' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(179,142,71,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B38E47', flexShrink: 0 }}>
-            <Calculator size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#242424', marginBottom: '4px' }}>Ücretsiz Teklif Alma</div>
-            <div style={{ fontSize: '0.8rem', color: '#5C5A54', lineHeight: '1.5' }}>Komisyonsuz ve ücretsiz doğrudan bayi fiyat teklifi talebi</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. SIKÇA SORULAN SORULAR (FAQ ACCORDION) */}
-      <div className="home-faq-container" style={{ maxWidth: '860px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', fontWeight: '800', color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
-            Sıkça Sorulan Sorular
-          </h2>
-          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0 }}>
-            SeramikBak kullanımı, bayi fiyat teklifleri ve 3D stüdyo hakkında merak ettikleriniz.
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {FAQ_ITEMS.map((item, idx) => {
-            const isOpen = openIdx === idx;
-            return (
-              <div
-                key={idx}
-                className="glass-panel"
-                style={{
-                  borderRadius: '12px',
-                  border: '1px solid var(--border-color)',
-                  background: 'var(--bg-card, #ffffff)',
-                  overflow: 'hidden',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleFaq(idx)}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {FAQ_ITEMS.map((item, idx) => {
+              const isOpen = openIdx === idx;
+              return (
+                <div
+                  key={idx}
                   style={{
-                    width: '100%',
-                    padding: '18px 20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '16px',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontFamily: 'inherit'
+                    borderRadius: '14px',
+                    border: isOpen ? '1px solid var(--sb-accent-bronze, #B58B50)' : '1px solid var(--sb-border, #E5DED3)',
+                    background: isOpen ? 'var(--sb-bg-primary, #F6F3EE)' : 'var(--sb-surface, #FFFFFF)',
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease'
                   }}
-                  aria-expanded={isOpen}
                 >
-                  <span style={{ fontSize: '0.96rem', fontWeight: '700', lineHeight: '1.4' }}>
-                    {item.q}
-                  </span>
-                  <ChevronDown
-                    size={18}
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(idx)}
                     style={{
-                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                      transition: 'transform 0.25s ease',
-                      color: isOpen ? '#d4af37' : 'var(--text-muted)',
-                      flexShrink: 0
+                      width: '100%',
+                      padding: '16px 20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: 'var(--sb-text-primary, #292824)',
+                      fontFamily: 'inherit'
                     }}
-                  />
-                </button>
-
-                {isOpen && (
-                  <div
-                    style={{
-                      padding: '0 20px 20px 20px',
-                      fontSize: '0.9rem',
-                      lineHeight: '1.65',
-                      color: 'var(--text-secondary)',
-                      borderTop: '1px solid var(--border-subtle, #f1f5f9)',
-                      paddingTop: '14px'
-                    }}
+                    aria-expanded={isOpen}
                   >
-                    {item.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                    <span style={{ fontSize: '0.94rem', fontWeight: '700', lineHeight: '1.4' }}>
+                      {item.q}
+                    </span>
+                    <ChevronDown
+                      size={18}
+                      style={{
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.25s ease',
+                        color: isOpen ? 'var(--sb-accent-bronze, #B58B50)' : 'var(--sb-text-secondary, #77736B)',
+                        flexShrink: 0
+                      }}
+                    />
+                  </button>
 
-        {/* Callout box under FAQ */}
-        <div style={{ marginTop: '36px', padding: '24px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.02) 100%)', border: '1px solid rgba(212,175,55,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>
-              Sorunuza yanıt bulamadınız mı?
-            </div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Mimar ve teknik danışmanlarımız aklınıza takılan her konuda yardımcı olmaya hazır.
-            </div>
+                  {isOpen && (
+                    <div
+                      style={{
+                        padding: '14px 20px 18px 20px',
+                        fontSize: '0.88rem',
+                        lineHeight: '1.65',
+                        color: 'var(--sb-text-secondary, #77736B)',
+                        borderTop: '1px solid var(--sb-border, #E5DED3)'
+                      }}
+                    >
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <Link
-            href="/iletisim"
-            style={{
-              padding: '10px 20px',
-              borderRadius: '10px',
-              background: '#d4af37',
-              color: '#000000',
-              fontWeight: '700',
-              fontSize: '0.88rem',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <span>Bize Ulaşın</span>
-            <ArrowRight size={14} />
-          </Link>
+
+          {/* Callout box under FAQ */}
+          <div style={{ marginTop: '28px', padding: '22px 24px', borderRadius: '16px', background: 'var(--sb-bg-primary, #F6F3EE)', border: '1px solid var(--sb-warm-beige, #D8C9B5)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontSize: '0.98rem', fontWeight: '800', color: 'var(--sb-text-primary, #292824)', marginBottom: '4px' }}>
+                Sorunuza yanıt bulamadınız mı?
+              </div>
+              <div style={{ fontSize: '0.84rem', color: 'var(--sb-text-secondary, #77736B)' }}>
+                Mimar ve teknik danışmanlarımız aklınıza takılan her konuda yardımcı olmaya hazır.
+              </div>
+            </div>
+            <Link
+              href="/iletisim"
+              style={{
+                padding: '11px 22px',
+                borderRadius: '12px',
+                background: 'var(--sb-surface-dark, #252522)',
+                border: '1px solid var(--sb-accent-bronze, #B58B50)',
+                color: '#F3E5AB',
+                fontWeight: '700',
+                fontSize: '0.86rem',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <span>Bize Ulaşın</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

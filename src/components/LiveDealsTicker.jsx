@@ -136,15 +136,15 @@ export default function LiveDealsTicker() {
         .live-ticker-bar {
           width: 100%;
           max-width: 100%;
-          background: rgba(255, 255, 255, 0.96);
-          border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid #e2e8f0;
+          background: var(--sb-bg-secondary, #EAE5DC);
+          border-top: 1px solid var(--sb-border, #E5DED3);
+          border-bottom: 1px solid var(--sb-border, #E5DED3);
           padding: 8px 24px;
           display: flex;
           align-items: center;
           gap: 16px;
           position: relative;
-          box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+          box-shadow: 0 2px 10px rgba(41, 40, 36, 0.03);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -161,29 +161,29 @@ export default function LiveDealsTicker() {
           gap: 8px;
           padding: 6px 14px;
           border-radius: 20px;
-          background: #fffbeb;
-          border: 1px solid #fde68a;
-          color: #b45309;
-          font-size: 0.76rem;
+          background: var(--sb-surface-dark, #252522);
+          border: 1px solid rgba(181, 139, 80, 0.45);
+          color: #F3E5AB;
+          font-size: 0.75rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08);
+          box-shadow: 0 2px 8px rgba(41, 40, 36, 0.12);
           transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
         }
 
         .live-badge-content:hover {
           transform: scale(1.03);
-          background: #fef3c7;
-          border-color: #f59e0b;
+          background: #1C1B19;
+          border-color: var(--sb-accent-bronze, #B58B50);
         }
 
         .live-pulse-dot {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #d97706;
+          background: var(--sb-accent-bronze, #B58B50);
           display: inline-block;
-          box-shadow: 0 0 6px rgba(217, 119, 6, 0.6);
+          box-shadow: 0 0 6px rgba(181, 139, 80, 0.6);
           animation: pulse 1.5s infinite;
         }
 
@@ -236,25 +236,25 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: #f8fafc !important;
+          background: var(--sb-surface, #FFFFFF) !important;
           backdrop-filter: blur(8px) !important;
           padding: 6px 14px !important;
           border-radius: 12px !important;
-          border: 1px solid #e2e8f0 !important;
+          border: 1px solid var(--sb-border, #E5DED3) !important;
           font-size: 0.80rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
-          color: #1e293b !important;
-          box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
+          color: var(--sb-text-primary, #292824) !important;
+          box-shadow: 0 1px 4px rgba(41, 40, 36, 0.03) !important;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
           flex-shrink: 0 !important;
         }
 
         :global(a.ticker-event-card:hover) {
-          background: #ffffff !important;
-          border-color: #b38e47 !important;
+          background: #FFFFFF !important;
+          border-color: var(--sb-accent-bronze, #B58B50) !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.15) !important;
+          box-shadow: 0 4px 14px rgba(181, 139, 80, 0.14) !important;
         }
 
         .event-badge-tag {

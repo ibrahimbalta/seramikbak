@@ -33,13 +33,13 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
     <section
       id="ai-design-showcase-section"
       style={{
-        margin: '44px 0',
-        borderRadius: '24px',
-        background: 'linear-gradient(135deg, #18181B 0%, #242424 55%, #1C1917 100%)',
-        border: '1px solid rgba(197, 160, 89, 0.32)',
+        margin: '32px 0',
+        borderRadius: '22px',
+        background: 'linear-gradient(135deg, var(--sb-surface-dark, #252522) 0%, #1E1D1A 100%)',
+        border: '1px solid rgba(181, 139, 80, 0.35)',
         overflow: 'hidden',
-        boxShadow: '0 24px 60px -15px rgba(24, 24, 27, 0.22)',
-        color: '#FAF9F6'
+        boxShadow: '0 20px 50px -15px rgba(37, 37, 34, 0.2)',
+        color: '#F6F3EE'
       }}
     >
       <div
@@ -69,9 +69,9 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                 gap: '8px',
                 padding: '5px 14px',
                 borderRadius: '999px',
-                background: 'rgba(197, 160, 89, 0.16)',
-                border: '1px solid rgba(197, 160, 89, 0.4)',
-                color: '#F3E5AB',
+                background: 'rgba(181, 139, 80, 0.16)',
+                border: '1px solid rgba(181, 139, 80, 0.42)',
+                color: '#D8C9B5',
                 fontSize: '0.72rem',
                 fontWeight: 800,
                 letterSpacing: '0.08em',
@@ -79,7 +79,7 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                 marginBottom: '18px'
               }}
             >
-              <Sparkles size={13} style={{ color: '#D4AF37' }} />
+              <Sparkles size={13} style={{ color: 'var(--sb-accent-bronze, #B58B50)' }} />
               <span>AI DESTEKLİ DİJİTAL SERAMİK STÜDYOSU</span>
             </div>
 
@@ -87,7 +87,7 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
               style={{
                 fontSize: 'clamp(1.75rem, 3.2vw, 2.5rem)',
                 fontWeight: 900,
-                color: '#FAF9F6',
+                color: '#F6F3EE',
                 lineHeight: 1.15,
                 letterSpacing: '-0.025em',
                 margin: '0 0 14px 0',
@@ -98,7 +98,7 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
               <br />
               <span
                 style={{
-                  background: 'linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #B38E47 100%)',
+                  background: 'linear-gradient(135deg, #EAE5DC 0%, #D8C9B5 45%, #B58B50 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}
@@ -110,7 +110,7 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
             <p
               style={{
                 fontSize: '0.96rem',
-                color: '#D6D3CD',
+                color: '#D8C9B5',
                 lineHeight: 1.65,
                 margin: 0,
                 maxWidth: '520px'
@@ -151,8 +151,8 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
               <div
                 key={step.num}
                 style={{
-                  background: 'rgba(250, 249, 246, 0.05)',
-                  border: '1px solid rgba(250, 249, 246, 0.1)',
+                  background: 'rgba(246, 243, 238, 0.05)',
+                  border: '1px solid rgba(216, 201, 181, 0.14)',
                   borderRadius: '14px',
                   padding: '14px',
                   display: 'flex',
@@ -166,8 +166,8 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                       width: '32px',
                       height: '32px',
                       borderRadius: '9px',
-                      background: 'rgba(197, 160, 89, 0.18)',
-                      color: '#F3E5AB',
+                      background: 'rgba(181, 139, 80, 0.18)',
+                      color: '#D8C9B5',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -179,17 +179,17 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                     style={{
                       fontSize: '0.78rem',
                       fontWeight: 900,
-                      color: 'rgba(243, 229, 171, 0.45)',
+                      color: 'rgba(216, 201, 181, 0.5)',
                       letterSpacing: '0.05em'
                     }}
                   >
                     ADIM {step.num}
                   </span>
                 </div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#FAF9F6', lineHeight: 1.3 }}>
+                <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#F6F3EE', lineHeight: 1.3 }}>
                   {step.title}
                 </div>
-                <div style={{ fontSize: '0.73rem', color: '#A8A29E', lineHeight: 1.4 }}>
+                <div style={{ fontSize: '0.73rem', color: '#B8B2A6', lineHeight: 1.4 }}>
                   {step.desc}
                 </div>
               </div>
@@ -204,14 +204,14 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '10px',
-                background: 'linear-gradient(135deg, #B38E47 0%, #D4AF37 100%)',
-                color: '#18181B',
+                background: 'linear-gradient(135deg, #B58B50 0%, #C99F63 100%)',
+                color: '#252522',
                 padding: '14px 26px',
                 borderRadius: '12px',
                 fontSize: '0.92rem',
                 fontWeight: 800,
                 textDecoration: 'none',
-                boxShadow: '0 10px 25px rgba(179, 142, 71, 0.32)',
+                boxShadow: '0 10px 25px rgba(181, 139, 80, 0.28)',
                 transition: 'all 0.2s ease'
               }}
             >
@@ -227,9 +227,9 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'rgba(250, 249, 246, 0.08)',
-                color: '#FAF9F6',
-                border: '1px solid rgba(250, 249, 246, 0.2)',
+                background: 'rgba(246, 243, 238, 0.08)',
+                color: '#F6F3EE',
+                border: '1px solid rgba(216, 201, 181, 0.25)',
                 padding: '14px 22px',
                 borderRadius: '12px',
                 fontSize: '0.88rem',
@@ -238,7 +238,7 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                 transition: 'all 0.2s ease'
               }}
             >
-              <Box size={16} style={{ color: '#D4AF37' }} />
+              <Box size={16} style={{ color: 'var(--sb-accent-bronze, #B58B50)' }} />
               <span>3D Sanal Stüdyo</span>
             </button>
           </div>
@@ -271,7 +271,7 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(180deg, rgba(24,24,27,0.12) 0%, rgba(24,24,27,0.78) 100%)'
+              background: 'linear-gradient(180deg, rgba(37,37,34,0.08) 0%, rgba(37,37,34,0.72) 100%)'
             }}
           />
 
@@ -281,9 +281,9 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
               position: 'relative',
               zIndex: 2,
               width: '100%',
-              background: 'rgba(24, 24, 27, 0.86)',
+              background: 'rgba(37, 37, 34, 0.88)',
               backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(197, 160, 89, 0.38)',
+              border: '1px solid rgba(181, 139, 80, 0.42)',
               borderRadius: '16px',
               padding: '16px 18px',
               display: 'flex',
@@ -302,14 +302,14 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
                   height: '46px',
                   borderRadius: '10px',
                   objectFit: 'cover',
-                  border: '1.5px solid #D4AF37'
+                  border: '1.5px solid var(--sb-accent-bronze, #B58B50)'
                 }}
               />
               <div>
-                <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#F3E5AB', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#D8C9B5', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   CANLI AI PERSPEKTİF MOTORU
                 </div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#FAF9F6' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#F6F3EE' }}>
                   60×120 Rektifiyeli Porselen & Doğal Işık Koruma
                 </div>
               </div>
@@ -317,9 +317,9 @@ export function AiDesignShowcaseSection({ onOpenStudio }) {
             <Link
               href="/mekanimda-gor"
               style={{
-                background: 'rgba(250, 249, 246, 0.12)',
-                border: '1px solid rgba(243, 229, 171, 0.35)',
-                color: '#F3E5AB',
+                background: 'rgba(246, 243, 238, 0.12)',
+                border: '1px solid rgba(216, 201, 181, 0.38)',
+                color: '#D8C9B5',
                 padding: '8px 14px',
                 borderRadius: '9px',
                 fontSize: '0.76rem',
@@ -403,7 +403,16 @@ export function PopularCollectionsSection({ onSelectCollection }) {
   ];
 
   return (
-    <section id="popular-collections-section" style={{ margin: '48px 0' }}>
+    <section
+      id="popular-collections-section"
+      style={{
+        margin: '32px 0',
+        padding: 'clamp(22px, 3vw, 32px)',
+        background: 'var(--sb-bg-primary, #F6F3EE)',
+        border: '1px solid var(--sb-border, #E5DED3)',
+        borderRadius: '22px'
+      }}
+    >
       <div
         style={{
           display: 'flex',
@@ -419,7 +428,7 @@ export function PopularCollectionsSection({ onSelectCollection }) {
             style={{
               fontSize: '0.72rem',
               fontWeight: 800,
-              color: '#B38E47',
+              color: 'var(--sb-accent-bronze, #B58B50)',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               display: 'block',
@@ -432,7 +441,7 @@ export function PopularCollectionsSection({ onSelectCollection }) {
             style={{
               fontSize: 'clamp(1.45rem, 2.5vw, 2rem)',
               fontWeight: 900,
-              color: '#242424',
+              color: 'var(--sb-text-primary, #292824)',
               margin: 0,
               letterSpacing: '-0.02em',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)'
@@ -441,7 +450,7 @@ export function PopularCollectionsSection({ onSelectCollection }) {
             Popüler Seramik Koleksiyonları
           </h2>
         </div>
-        <p style={{ fontSize: '0.88rem', color: '#57534E', margin: 0, maxWidth: '420px' }}>
+        <p style={{ fontSize: '0.88rem', color: 'var(--sb-text-secondary, #77736B)', margin: 0, maxWidth: '420px' }}>
           Mekânınızın mimari karakterine uygun seramik dokusunu seçin ve tüm üretici modellerini karşılaştırın.
         </p>
       </div>
@@ -450,8 +459,8 @@ export function PopularCollectionsSection({ onSelectCollection }) {
         className="popular-collections-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-          gap: '20px'
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+          gap: '18px'
         }}
       >
         {collections.map((col) => (
@@ -459,19 +468,19 @@ export function PopularCollectionsSection({ onSelectCollection }) {
             key={col.id}
             onClick={() => onSelectCollection(col.title, col.filterType, col.filterVal)}
             style={{
-              background: '#FFFFFF',
-              border: '1px solid #E7E5E4',
+              background: 'var(--sb-surface, #FFFFFF)',
+              border: '1px solid var(--sb-border, #E5DED3)',
               borderRadius: '18px',
               overflow: 'hidden',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0 4px 20px -4px rgba(24, 24, 27, 0.05)',
+              boxShadow: '0 4px 18px -4px rgba(41, 40, 36, 0.05)',
               transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
             className="architectural-collection-card"
           >
-            <div style={{ position: 'relative', height: '210px', width: '100%', overflow: 'hidden', background: '#F5F5F4' }}>
+            <div style={{ position: 'relative', height: '210px', width: '100%', overflow: 'hidden', background: 'var(--sb-bg-secondary, #EAE5DC)' }}>
               <img
                 src={col.image}
                 alt={col.title}
@@ -487,7 +496,7 @@ export function PopularCollectionsSection({ onSelectCollection }) {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(180deg, rgba(24,24,27,0.05) 0%, rgba(24,24,27,0.45) 100%)'
+                  background: 'linear-gradient(180deg, rgba(37,37,34,0.04) 0%, rgba(37,37,34,0.4) 100%)'
                 }}
               />
               <span
@@ -495,10 +504,10 @@ export function PopularCollectionsSection({ onSelectCollection }) {
                   position: 'absolute',
                   top: '12px',
                   left: '12px',
-                  background: 'rgba(24, 24, 27, 0.82)',
+                  background: 'rgba(37, 37, 34, 0.85)',
                   backdropFilter: 'blur(8px)',
-                  color: '#F3E5AB',
-                  border: '1px solid rgba(197, 160, 89, 0.4)',
+                  color: '#F6F3EE',
+                  border: '1px solid rgba(181, 139, 80, 0.45)',
                   padding: '4px 10px',
                   borderRadius: '999px',
                   fontSize: '0.68rem',
@@ -525,14 +534,14 @@ export function PopularCollectionsSection({ onSelectCollection }) {
                   style={{
                     fontSize: '1.12rem',
                     fontWeight: 800,
-                    color: '#242424',
+                    color: 'var(--sb-text-primary, #292824)',
                     margin: '0 0 6px 0',
                     fontFamily: 'var(--font-title, "Outfit", sans-serif)'
                   }}
                 >
                   {col.title}
                 </h3>
-                <p style={{ fontSize: '0.82rem', color: '#57534E', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.82rem', color: 'var(--sb-text-secondary, #77736B)', margin: 0, lineHeight: 1.5 }}>
                   {col.subtitle}
                 </p>
               </div>
@@ -543,10 +552,10 @@ export function PopularCollectionsSection({ onSelectCollection }) {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   paddingTop: '12px',
-                  borderTop: '1px solid #F5F5F4'
+                  borderTop: '1px solid var(--sb-border, #E5DED3)'
                 }}
               >
-                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#B38E47' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--sb-accent-bronze, #B58B50)' }}>
                   Koleksiyonu Keşfet
                 </span>
                 <span
@@ -554,12 +563,12 @@ export function PopularCollectionsSection({ onSelectCollection }) {
                     width: '30px',
                     height: '30px',
                     borderRadius: '50%',
-                    background: '#FAF9F6',
-                    border: '1px solid #E7E5E4',
+                    background: 'var(--sb-bg-primary, #F6F3EE)',
+                    border: '1px solid var(--sb-border, #E5DED3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#242424'
+                    color: 'var(--sb-text-primary, #292824)'
                   }}
                 >
                   <ArrowRight size={14} />
@@ -634,10 +643,10 @@ function BrandCardLogo({ brand, isSelected }) {
               height: '32px',
               borderRadius: '9px',
               background: isSelected
-                ? 'rgba(212, 175, 55, 0.22)'
-                : 'linear-gradient(135deg, #242424 0%, #3F3F46 100%)',
-              border: '1px solid rgba(212, 175, 55, 0.45)',
-              color: '#F3E5AB',
+                ? 'rgba(181, 139, 80, 0.22)'
+                : 'linear-gradient(135deg, #252522 0%, #3A3832 100%)',
+              border: '1px solid rgba(181, 139, 80, 0.45)',
+              color: '#D8C9B5',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -651,7 +660,7 @@ function BrandCardLogo({ brand, isSelected }) {
           </span>
           <span
             style={{
-              color: isSelected ? '#FAF9F6' : '#242424',
+              color: isSelected ? '#F6F3EE' : 'var(--sb-text-primary, #292824)',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               lineHeight: 1.2,
               overflow: 'hidden',
@@ -688,12 +697,12 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
     <section
       id="leading-brands-section"
       style={{
-        margin: '44px 0',
+        margin: '32px 0',
         padding: '28px 26px',
-        background: '#FFFFFF',
-        border: '1px solid #E7E5E4',
-        borderRadius: '20px',
-        boxShadow: '0 4px 18px -4px rgba(24, 24, 27, 0.04)'
+        background: 'var(--sb-surface, #FFFFFF)',
+        border: '1px solid var(--sb-border, #E5DED3)',
+        borderRadius: '22px',
+        boxShadow: '0 4px 18px -4px rgba(41, 40, 36, 0.04)'
       }}
     >
       <div
@@ -711,7 +720,7 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
             style={{
               fontSize: '0.68rem',
               fontWeight: 800,
-              color: '#B38E47',
+              color: 'var(--sb-accent-bronze, #B58B50)',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               display: 'block',
@@ -724,7 +733,7 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
             style={{
               fontSize: '1.35rem',
               fontWeight: 900,
-              color: '#242424',
+              color: 'var(--sb-text-primary, #292824)',
               margin: 0,
               fontFamily: 'var(--font-title, "Outfit", sans-serif)'
             }}
@@ -739,9 +748,9 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
               type="button"
               onClick={() => onSelectBrand('')}
               style={{
-                background: '#FAF9F6',
-                border: '1px solid #D6D3CD',
-                color: '#242424',
+                background: 'var(--sb-bg-primary, #F6F3EE)',
+                border: '1px solid var(--sb-border, #E5DED3)',
+                color: 'var(--sb-text-primary, #292824)',
                 padding: '6px 12px',
                 borderRadius: '8px',
                 fontSize: '0.76rem',
@@ -774,9 +783,9 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
               key={brand.id}
               style={{
                 minWidth: '220px',
-                background: isSelected ? '#242424' : '#FAF9F6',
-                border: isSelected ? '1.5px solid #D4AF37' : '1px solid #E7E5E4',
-                borderRadius: '14px',
+                background: isSelected ? 'var(--sb-surface-dark, #252522)' : 'var(--sb-bg-primary, #F6F3EE)',
+                border: isSelected ? '1.5px solid var(--sb-accent-bronze, #B58B50)' : '1px solid var(--sb-border, #E5DED3)',
+                borderRadius: '16px',
                 padding: '14px 16px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -796,13 +805,13 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
-                    background: isSelected ? '#D4AF37' : '#D6D3CD',
+                    background: isSelected ? 'var(--sb-accent-bronze, #B58B50)' : 'var(--sb-warm-beige, #D8C9B5)',
                     flexShrink: 0
                   }}
                 />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingTop: '8px', borderTop: isSelected ? '1px solid rgba(255,255,255,0.12)' : '1px solid #E7E5E4' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingTop: '8px', borderTop: isSelected ? '1px solid rgba(246, 243, 238, 0.14)' : '1px solid var(--sb-border, #E5DED3)' }}>
                 <button
                   type="button"
                   onClick={() => onSelectBrand(isSelected ? '' : brand.id)}
@@ -810,7 +819,7 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
                     background: 'transparent',
                     border: 'none',
                     padding: 0,
-                    color: isSelected ? '#F3E5AB' : '#57534E',
+                    color: isSelected ? '#D8C9B5' : 'var(--sb-text-secondary, #77736B)',
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     cursor: 'pointer'
@@ -824,7 +833,7 @@ export function LeadingBrandsSection({ brands = [], selectedBrand, onSelectBrand
                   style={{
                     fontSize: '0.72rem',
                     fontWeight: 800,
-                    color: '#B38E47',
+                    color: 'var(--sb-accent-bronze, #B58B50)',
                     textDecoration: 'none',
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -861,12 +870,12 @@ export function AuthorizedDealerNetworkSection({
     <section
       id="authorized-dealer-network-section"
       style={{
-        margin: '48px 0',
-        background: '#FFFFFF',
-        border: '1px solid #E7E5E4',
+        margin: '32px 0',
+        background: 'var(--sb-bg-secondary, #EAE5DC)',
+        border: '1px solid var(--sb-border, #E5DED3)',
         borderRadius: '22px',
         padding: 'clamp(24px, 3.5vw, 40px)',
-        boxShadow: '0 8px 30px -6px rgba(24, 24, 27, 0.05)'
+        boxShadow: '0 8px 26px -6px rgba(41, 40, 36, 0.05)'
       }}
     >
       <div
@@ -885,8 +894,9 @@ export function AuthorizedDealerNetworkSection({
               gap: '6px',
               padding: '4px 12px',
               borderRadius: '999px',
-              background: 'rgba(179, 142, 71, 0.12)',
-              color: '#926F28',
+              background: 'rgba(181, 139, 80, 0.14)',
+              border: '1px solid rgba(181, 139, 80, 0.3)',
+              color: '#8E6832',
               fontSize: '0.7rem',
               fontWeight: 800,
               letterSpacing: '0.06em',
@@ -902,7 +912,7 @@ export function AuthorizedDealerNetworkSection({
             style={{
               fontSize: 'clamp(1.45rem, 2.5vw, 2rem)',
               fontWeight: 900,
-              color: '#242424',
+              color: 'var(--sb-text-primary, #292824)',
               margin: '0 0 10px 0',
               letterSpacing: '-0.02em',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)'
@@ -910,7 +920,7 @@ export function AuthorizedDealerNetworkSection({
           >
             Size En Yakın Yetkili Bayiyi Bulun.
           </h2>
-          <p style={{ fontSize: '0.92rem', color: '#57534E', margin: '0 0 20px 0', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '0.92rem', color: 'var(--sb-text-secondary, #77736B)', margin: '0 0 20px 0', lineHeight: 1.6 }}>
             Türkiye genelindeki yetkili satış noktalarını keşfedin. Projeniz için size en yakın bayiden doğrudan fiyat ve stok teklifi alın.
           </p>
 
@@ -924,9 +934,9 @@ export function AuthorizedDealerNetworkSection({
                   onSelectCityAndOpenDealers(city, selectedBrandId);
                 }}
                 style={{
-                  background: selectedCityName === city ? '#242424' : '#FAF9F6',
-                  color: selectedCityName === city ? '#F3E5AB' : '#57534E',
-                  border: '1px solid #E7E5E4',
+                  background: selectedCityName === city ? 'var(--sb-surface-dark, #252522)' : 'var(--sb-surface, #FFFFFF)',
+                  color: selectedCityName === city ? '#F6F3EE' : 'var(--sb-text-secondary, #77736B)',
+                  border: selectedCityName === city ? '1px solid var(--sb-accent-bronze, #B58B50)' : '1px solid var(--sb-border, #E5DED3)',
                   padding: '6px 13px',
                   borderRadius: '999px',
                   fontSize: '0.76rem',
@@ -943,18 +953,19 @@ export function AuthorizedDealerNetworkSection({
         {/* Interactive City & Brand Finder Box */}
         <div
           style={{
-            background: '#FAF9F6',
-            border: '1px solid #E7E5E4',
+            background: 'var(--sb-surface, #FFFFFF)',
+            border: '1px solid var(--sb-border, #E5DED3)',
             borderRadius: '18px',
             padding: '22px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px'
+            gap: '14px',
+            boxShadow: '0 4px 16px rgba(41, 40, 36, 0.04)'
           }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#242424' }}>İl Seçimi</label>
+              <label style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--sb-text-primary, #292824)' }}>İl Seçimi</label>
               <select
                 value={selectedCityName}
                 onChange={(e) => setSelectedCityName(e.target.value)}
@@ -962,9 +973,9 @@ export function AuthorizedDealerNetworkSection({
                   height: '42px',
                   padding: '0 12px',
                   borderRadius: '10px',
-                  border: '1px solid #D6D3CD',
-                  background: '#FFFFFF',
-                  color: '#242424',
+                  border: '1px solid var(--sb-border, #E5DED3)',
+                  background: 'var(--sb-bg-primary, #F6F3EE)',
+                  color: 'var(--sb-text-primary, #292824)',
                   fontSize: '0.84rem',
                   fontWeight: 700,
                   outline: 'none'
@@ -979,7 +990,7 @@ export function AuthorizedDealerNetworkSection({
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '0.74rem', fontWeight: 800, color: '#242424' }}>Marka (İsteğe Bağlı)</label>
+              <label style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--sb-text-primary, #292824)' }}>Marka (İsteğe Bağlı)</label>
               <select
                 value={selectedBrandId}
                 onChange={(e) => setSelectedBrandId(e.target.value)}
@@ -987,9 +998,9 @@ export function AuthorizedDealerNetworkSection({
                   height: '42px',
                   padding: '0 12px',
                   borderRadius: '10px',
-                  border: '1px solid #D6D3CD',
-                  background: '#FFFFFF',
-                  color: '#242424',
+                  border: '1px solid var(--sb-border, #E5DED3)',
+                  background: 'var(--sb-bg-primary, #F6F3EE)',
+                  color: 'var(--sb-text-primary, #292824)',
                   fontSize: '0.84rem',
                   fontWeight: 700,
                   outline: 'none'
@@ -1012,9 +1023,9 @@ export function AuthorizedDealerNetworkSection({
               style={{
                 flex: 1,
                 height: '44px',
-                background: 'linear-gradient(135deg, #242424 0%, #18181B 100%)',
-                color: '#F3E5AB',
-                border: '1px solid #D4AF37',
+                background: 'var(--sb-surface-dark, #252522)',
+                color: '#F6F3EE',
+                border: '1px solid var(--sb-accent-bronze, #B58B50)',
                 borderRadius: '11px',
                 fontSize: '0.86rem',
                 fontWeight: 800,
@@ -1025,7 +1036,7 @@ export function AuthorizedDealerNetworkSection({
                 gap: '8px'
               }}
             >
-              <MapPin size={16} style={{ color: '#D4AF37' }} />
+              <MapPin size={16} style={{ color: 'var(--sb-accent-bronze, #B58B50)' }} />
               <span>Haritada Yetkili Bayileri Göster</span>
               <ArrowRight size={15} />
             </button>
@@ -1035,9 +1046,9 @@ export function AuthorizedDealerNetworkSection({
               style={{
                 height: '44px',
                 padding: '0 16px',
-                background: '#FFFFFF',
-                color: '#242424',
-                border: '1px solid #D6D3CD',
+                background: 'var(--sb-bg-primary, #F6F3EE)',
+                color: 'var(--sb-text-primary, #292824)',
+                border: '1px solid var(--sb-border, #E5DED3)',
                 borderRadius: '11px',
                 fontSize: '0.82rem',
                 fontWeight: 700,
@@ -1065,13 +1076,13 @@ export function ArchitectsProfessionalsSection() {
     <section
       id="architects-professionals-section"
       style={{
-        margin: '48px 0',
+        margin: '32px 0',
         borderRadius: '22px',
-        background: 'linear-gradient(135deg, #242424 0%, #18181B 100%)',
-        border: '1px solid rgba(197, 160, 89, 0.35)',
+        background: 'linear-gradient(135deg, var(--sb-surface-dark, #252522) 0%, #1E1D1A 100%)',
+        border: '1px solid rgba(181, 139, 80, 0.35)',
         padding: 'clamp(28px, 4vw, 44px)',
-        color: '#FAF9F6',
-        boxShadow: '0 20px 50px -15px rgba(24, 24, 27, 0.18)'
+        color: '#F6F3EE',
+        boxShadow: '0 20px 50px -15px rgba(37, 37, 34, 0.2)'
       }}
     >
       <div
@@ -1090,9 +1101,9 @@ export function ArchitectsProfessionalsSection() {
               gap: '6px',
               padding: '4px 12px',
               borderRadius: '999px',
-              background: 'rgba(197, 160, 89, 0.16)',
-              border: '1px solid rgba(197, 160, 89, 0.38)',
-              color: '#F3E5AB',
+              background: 'rgba(181, 139, 80, 0.16)',
+              border: '1px solid rgba(181, 139, 80, 0.42)',
+              color: '#D8C9B5',
               fontSize: '0.7rem',
               fontWeight: 800,
               letterSpacing: '0.08em',
@@ -1100,7 +1111,7 @@ export function ArchitectsProfessionalsSection() {
               marginBottom: '14px'
             }}
           >
-            <Compass size={13} />
+            <Compass size={13} style={{ color: 'var(--sb-accent-bronze, #B58B50)' }} />
             <span>MİMARLAR, İÇ MİMARLAR VE PROJE FİRMALARI</span>
           </div>
 
@@ -1108,7 +1119,7 @@ export function ArchitectsProfessionalsSection() {
             style={{
               fontSize: 'clamp(1.6rem, 2.8vw, 2.25rem)',
               fontWeight: 900,
-              color: '#FAF9F6',
+              color: '#F6F3EE',
               margin: '0 0 12px 0',
               lineHeight: 1.18,
               letterSpacing: '-0.02em',
@@ -1117,10 +1128,10 @@ export function ArchitectsProfessionalsSection() {
           >
             Profesyonel Projeler İçin
             <br />
-            <span style={{ color: '#D4AF37' }}>Dijital Seramik Kütüphanesi.</span>
+            <span style={{ color: 'var(--sb-accent-bronze, #B58B50)' }}>Dijital Seramik Kütüphanesi.</span>
           </h2>
 
-          <p style={{ fontSize: '0.92rem', color: '#D6D3CD', lineHeight: 1.65, margin: '0 0 24px 0', maxWidth: '520px' }}>
+          <p style={{ fontSize: '0.92rem', color: '#D8C9B5', lineHeight: 1.65, margin: '0 0 24px 0', maxWidth: '520px' }}>
             Konut, otel ve ticari projeleriniz için üretici markaların teknik şartname verilerine, yüksek çözünürlüklü PBR yüzey dokularına ve toplu proje ihale havuzuna tek merkezden erişin.
           </p>
 
@@ -1131,14 +1142,14 @@ export function ArchitectsProfessionalsSection() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'linear-gradient(135deg, #B38E47 0%, #D4AF37 100%)',
-                color: '#18181B',
+                background: 'linear-gradient(135deg, #B58B50 0%, #C99F63 100%)',
+                color: '#252522',
                 padding: '13px 24px',
                 borderRadius: '11px',
                 fontSize: '0.88rem',
                 fontWeight: 800,
                 textDecoration: 'none',
-                boxShadow: '0 8px 20px rgba(179, 142, 71, 0.28)'
+                boxShadow: '0 8px 20px rgba(181, 139, 80, 0.28)'
               }}
             >
               <Compass size={16} />
@@ -1152,9 +1163,9 @@ export function ArchitectsProfessionalsSection() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'rgba(250, 249, 246, 0.08)',
-                color: '#FAF9F6',
-                border: '1px solid rgba(250, 249, 246, 0.2)',
+                background: 'rgba(246, 243, 238, 0.08)',
+                color: '#F6F3EE',
+                border: '1px solid rgba(216, 201, 181, 0.25)',
                 padding: '13px 20px',
                 borderRadius: '11px',
                 fontSize: '0.86rem',
@@ -1162,7 +1173,7 @@ export function ArchitectsProfessionalsSection() {
                 textDecoration: 'none'
               }}
             >
-              <Building2 size={16} style={{ color: '#D4AF37' }} />
+              <Building2 size={16} style={{ color: 'var(--sb-accent-bronze, #B58B50)' }} />
               <span>B2B Proje & İhale Talebi</span>
             </Link>
           </div>
@@ -1201,8 +1212,8 @@ export function ArchitectsProfessionalsSection() {
             <div
               key={idx}
               style={{
-                background: 'rgba(250, 249, 246, 0.05)',
-                border: '1px solid rgba(250, 249, 246, 0.1)',
+                background: 'rgba(246, 243, 238, 0.05)',
+                border: '1px solid rgba(216, 201, 181, 0.14)',
                 borderRadius: '14px',
                 padding: '18px',
                 display: 'flex',
@@ -1215,8 +1226,8 @@ export function ArchitectsProfessionalsSection() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '10px',
-                  background: 'rgba(197, 160, 89, 0.18)',
-                  color: '#F3E5AB',
+                  background: 'rgba(181, 139, 80, 0.18)',
+                  color: '#D8C9B5',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -1224,10 +1235,10 @@ export function ArchitectsProfessionalsSection() {
               >
                 {feat.icon}
               </div>
-              <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#FAF9F6' }}>
+              <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#F6F3EE' }}>
                 {feat.title}
               </h4>
-              <p style={{ margin: 0, fontSize: '0.76rem', color: '#A8A29E', lineHeight: 1.45 }}>
+              <p style={{ margin: 0, fontSize: '0.76rem', color: '#B8B2A6', lineHeight: 1.45 }}>
                 {feat.desc}
               </p>
             </div>
@@ -1283,7 +1294,16 @@ export function InspirationGallerySection({ onSelectInspiration }) {
   ];
 
   return (
-    <section id="inspiration-gallery-section" style={{ margin: '48px 0' }}>
+    <section
+      id="inspiration-gallery-section"
+      style={{
+        margin: '32px 0',
+        padding: 'clamp(22px, 3vw, 32px)',
+        background: 'var(--sb-bg-primary, #F6F3EE)',
+        border: '1px solid var(--sb-border, #E5DED3)',
+        borderRadius: '22px'
+      }}
+    >
       <div
         style={{
           display: 'flex',
@@ -1299,7 +1319,7 @@ export function InspirationGallerySection({ onSelectInspiration }) {
             style={{
               fontSize: '0.72rem',
               fontWeight: 800,
-              color: '#B38E47',
+              color: 'var(--sb-accent-bronze, #B58B50)',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               display: 'block',
@@ -1312,7 +1332,7 @@ export function InspirationGallerySection({ onSelectInspiration }) {
             style={{
               fontSize: 'clamp(1.45rem, 2.5vw, 2rem)',
               fontWeight: 900,
-              color: '#242424',
+              color: 'var(--sb-text-primary, #292824)',
               margin: 0,
               letterSpacing: '-0.02em',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)'
@@ -1330,7 +1350,7 @@ export function InspirationGallerySection({ onSelectInspiration }) {
             gap: '6px',
             fontSize: '0.84rem',
             fontWeight: 800,
-            color: '#B38E47',
+            color: 'var(--sb-accent-bronze, #B58B50)',
             textDecoration: 'none'
           }}
         >
@@ -1342,7 +1362,7 @@ export function InspirationGallerySection({ onSelectInspiration }) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
           gap: '18px'
         }}
       >
@@ -1356,8 +1376,8 @@ export function InspirationGallerySection({ onSelectInspiration }) {
               borderRadius: '18px',
               overflow: 'hidden',
               cursor: 'pointer',
-              border: '1px solid #E7E5E4',
-              boxShadow: '0 6px 20px -4px rgba(24, 24, 27, 0.08)'
+              border: '1px solid var(--sb-border, #E5DED3)',
+              boxShadow: '0 6px 20px -4px rgba(41, 40, 36, 0.08)'
             }}
             className="architectural-collection-card"
           >
@@ -1376,7 +1396,7 @@ export function InspirationGallerySection({ onSelectInspiration }) {
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(180deg, rgba(24,24,27,0.08) 0%, rgba(24,24,27,0.86) 100%)'
+                background: 'linear-gradient(180deg, rgba(37,37,34,0.06) 0%, rgba(37,37,34,0.84) 100%)'
               }}
             />
             <span
@@ -1384,8 +1404,8 @@ export function InspirationGallerySection({ onSelectInspiration }) {
                 position: 'absolute',
                 top: '14px',
                 left: '14px',
-                background: 'rgba(250, 249, 246, 0.92)',
-                color: '#242424',
+                background: 'rgba(246, 243, 238, 0.94)',
+                color: 'var(--sb-text-primary, #292824)',
                 padding: '4px 10px',
                 borderRadius: '999px',
                 fontSize: '0.68rem',
@@ -1402,13 +1422,13 @@ export function InspirationGallerySection({ onSelectInspiration }) {
                 left: 0,
                 right: 0,
                 padding: '18px',
-                color: '#FAF9F6'
+                color: '#F6F3EE'
               }}
             >
-              <div style={{ fontSize: '0.72rem', color: '#F3E5AB', fontWeight: 700, marginBottom: '3px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#D8C9B5', fontWeight: 700, marginBottom: '3px' }}>
                 {item.material}
               </div>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '1.02rem', fontWeight: 800, color: '#FAF9F6', lineHeight: 1.25 }}>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '1.02rem', fontWeight: 800, color: '#F6F3EE', lineHeight: 1.25 }}>
                 {item.title}
               </h3>
               <span
@@ -1418,7 +1438,7 @@ export function InspirationGallerySection({ onSelectInspiration }) {
                   gap: '5px',
                   fontSize: '0.76rem',
                   fontWeight: 800,
-                  color: '#D4AF37'
+                  color: 'var(--sb-accent-bronze, #B58B50)'
                 }}
               >
                 <span>Bu Dokuyu Keşfet</span>
