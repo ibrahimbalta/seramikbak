@@ -49,13 +49,36 @@ import {
   QrCode,
   Eye,
   Copy,
-  CheckCheck
+  CheckCheck,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  ShoppingBag,
+  BarChart3,
+  HelpCircle,
+  Grid,
+  SlidersHorizontal
 } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import QuotePDFTemplate from '@/components/QuotePDFTemplate';
 import { calculateQuote, formatQuoteWhatsAppText, getWhatsAppUrl } from '@/lib/quoteCalculator';
 import NotificationBell from '@/components/NotificationBell';
+import {
+  PremiumButton,
+  StatCard,
+  PageHeader,
+  SearchInput,
+  DataTable,
+  StatusBadge,
+  FilterPanel,
+  EmptyState,
+  LoadingSkeleton,
+  ConfirmDialog,
+  QuickActionCard,
+  ProductCard,
+  SalesPerformanceChart
+} from '@/components/dealer/DealerUI';
 
 export default function DealerPortalPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -126,11 +149,23 @@ export default function DealerPortalPage() {
   const [paymentSuccess, setPaymentSuccess] = useState('');
   const [paymentError, setPaymentError] = useState('');
 
-  // Portal navigation: 'dashboard', 'quick-quote', 'b2b-projects', 'subscription', 'settings'
+  // Portal navigation: 'dashboard', 'catalog', 'quick-quote', 'b2b-projects', 'subscription', 'settings'
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMoreMenu, setShowMobileMoreMenu] = useState(false);
+  const [collapsedNavGroups, setCollapsedNavGroups] = useState({});
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [showGlobalSearchDropdown, setShowGlobalSearchDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [dashboardDateFilter, setDashboardDateFilter] = useState('all'); // 'today' | 'week' | 'month' | 'all'
+  const [recentQuotesTab, setRecentQuotesTab] = useState('all'); // 'all' | 'leads' | 'quotes'
+  const [catalogSearchQuery, setCatalogSearchQuery] = useState('');
+  const [catalogDimensionFilter, setCatalogDimensionFilter] = useState('ALL');
+
+  const toggleNavGroup = (groupId) => {
+    setCollapsedNavGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
 
   // 30-Second Quick Quote Builder States
   const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -2399,8 +2434,8 @@ Yetkili Satış & Showroom Departmanı`;
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#e6e8ec',
-      backgroundImage: 'radial-gradient(ellipse 85% 40% at 50% -6%, rgba(197, 160, 89, 0.14), transparent 70%), radial-gradient(circle at 12% 28%, rgba(15, 23, 42, 0.035), transparent 45%), radial-gradient(circle at 88% 42%, rgba(197, 160, 89, 0.05), transparent 45%)',
+      backgroundColor: '#f4f6f9',
+      backgroundImage: 'radial-gradient(ellipse 80% 35% at 50% -8%, rgba(179, 142, 71, 0.09), transparent 70%)',
       color: '#0f172a',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
       display: 'flex',
@@ -2408,15 +2443,15 @@ Yetkili Satış & Showroom Departmanı`;
       overflowX: 'hidden',
       position: 'relative'
     }}>
-      {/* Subtle Architectural Grid Overlay matching Homepage */}
+      {/* Subtle Architectural Grid Overlay */}
       <div style={{
         position: 'fixed',
         inset: 0,
         backgroundImage: `
-          linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)
+          linear-gradient(rgba(15, 23, 42, 0.022) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(15, 23, 42, 0.022) 1px, transparent 1px)
         `,
-        backgroundSize: '24px 24px',
+        backgroundSize: '28px 28px',
         pointerEvents: 'none',
         zIndex: 0
       }} />
@@ -2424,16 +2459,16 @@ Yetkili Satış & Showroom Departmanı`;
       {/* Sol Sidebar Navigasyon */}
       {!isMobile && (
         <aside className="no-print dealer-sidebar" style={{
-          width: isSidebarCollapsed ? '70px' : '280px',
+          width: isSidebarCollapsed ? '74px' : '284px',
           background: 'linear-gradient(180deg, #0b111e 0%, #090e18 100%)',
           backdropFilter: 'blur(20px)',
-          borderRight: '1.5px solid rgba(212, 175, 55, 0.22)',
+          borderRight: '1px solid rgba(212, 175, 55, 0.2)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: isSidebarCollapsed ? '16px 8px' : '16px 14px',
           boxSizing: 'border-box',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
           position: 'sticky',
           top: 0,
           height: '100vh',
@@ -2442,18 +2477,18 @@ Yetkili Satış & Showroom Departmanı`;
           overflowX: 'hidden',
           zIndex: 100,
           flexShrink: 0,
-          boxShadow: '4px 0 25px rgba(15, 23, 42, 0.12)'
+          boxShadow: '4px 0 28px rgba(15, 23, 42, 0.14)'
         }}>
           {/* Top Part of Sidebar: Logo & Dealer Profile */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0, marginBottom: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0, marginBottom: '12px' }}>
             {/* Logo & Toggle */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarCollapsed ? 'center' : 'space-between' }}>
               {!isSidebarCollapsed && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '9px',
                     background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
                     color: '#ffffff',
                     border: '1.5px solid #d4af37',
@@ -2461,62 +2496,82 @@ Yetkili Satış & Showroom Departmanı`;
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: '900',
-                    fontSize: '1rem',
-                    boxShadow: '0 0 10px rgba(212,175,55,0.2)'
+                    fontSize: '0.95rem',
+                    boxShadow: '0 0 12px rgba(212,175,55,0.2)'
                   }}>SB</div>
                   <div>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#fff', margin: 0 }}>SeramikBak</h4>
-                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bayi Portalı</span>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>SeramikBak</h4>
+                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Bayi Portalı</span>
                   </div>
                 </div>
               )}
               <button 
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                 style={{
-                  background: 'transparent',
-                  border: 'none',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '8px',
                   color: '#94a3b8',
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: '6px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}
+                title={isSidebarCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
               >
-                {isSidebarCollapsed ? <Menu size={18} /> : <X size={18} />}
+                {isSidebarCollapsed ? <Menu size={17} /> : <X size={17} />}
               </button>
             </div>
 
             {/* Profile Card inside Sidebar */}
             {!isSidebarCollapsed && dealerInfo && (
               <div style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '12px',
-                padding: '10px 12px',
+                background: 'rgba(255, 255, 255, 0.035)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                borderRadius: '14px',
+                padding: '12px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '6px'
+                gap: '7px'
               }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {dealerInfo.name}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <div style={{ fontSize: '0.84rem', fontWeight: '800', color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {dealerInfo.name}
+                  </div>
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.6rem',
+                    fontWeight: '800',
+                    color: '#34d399',
+                    background: 'rgba(16, 185, 129, 0.14)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    padding: '2px 6px',
+                    borderRadius: '999px',
+                    flexShrink: 0
+                  }}>
+                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981' }} />
+                    Aktif Bayi
+                  </span>
                 </div>
-                <div style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <MapPin size={10} />
-                  <span>{dealerInfo.district}, {dealerInfo.city}</span>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <MapPin size={11} style={{ color: '#d4af37', flexShrink: 0 }} />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dealerInfo.district}, {dealerInfo.city}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
-                  <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontWeight: '700' }}>
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
+                  <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: '5px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontWeight: '700' }}>
                     {dealerInfo.brandName} Bayisi
                   </span>
                   {saasInfo && (
                     <span style={{ 
                       fontSize: '0.62rem', 
-                      padding: '2px 6px', 
-                      borderRadius: '4px', 
-                      background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, #111 0%, #333 100%)' : '#d4af37', 
-                      color: saasInfo.plan === 'PREMIUM' ? '#d4af37' : '#000', 
-                      fontWeight: '700' 
+                      padding: '2px 7px', 
+                      borderRadius: '5px', 
+                      background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'rgba(255,255,255,0.12)', 
+                      color: saasInfo.plan === 'PREMIUM' ? '#090d16' : '#f8fafc', 
+                      fontWeight: '800' 
                     }}>
                       {saasInfo.plan}
                     </span>
@@ -2534,16 +2589,17 @@ Yetkili Satış & Showroom Departmanı`;
                     justifyContent: 'center',
                     gap: '6px',
                     width: '100%',
-                    padding: '6px 10px',
+                    padding: '7px 10px',
                     borderRadius: '8px',
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                     color: '#090d16',
                     fontSize: '0.74rem',
                     fontWeight: '800',
                     textDecoration: 'none',
-                    marginTop: '2px',
+                    marginTop: '3px',
                     transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)'
+                    boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)',
+                    boxSizing: 'border-box'
                   }}
                   title="Showroom / Bayi Sayfanızı Müşteri Tarafında Görüntüleyin"
                 >
@@ -2554,11 +2610,11 @@ Yetkili Satış & Showroom Departmanı`;
             )}
           </div>
 
-          {/* Navigation Links - Scrollable Middle Area */}
+          {/* Categorized Navigation Links - Scrollable Middle Area */}
           <nav className="dealer-sidebar-nav" style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
+            gap: '10px',
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
@@ -2568,108 +2624,196 @@ Yetkili Satış & Showroom Departmanı`;
             paddingRight: isSidebarCollapsed ? '0' : '4px'
           }}>
             {[
-              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
-              { id: 'kiosk-mode', label: '🖥️ Kiosk Teşhir Modu', icon: <Eye size={18} />, isSaaSFeature: true },
-              { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
-              { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
-              { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} />, isPremiumFeature: true },
-              { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
-              { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
-              { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
-              { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={18} /> },
-              { id: 'subscription', label: 'Abonelik Yönetimi', icon: <CreditCard size={18} /> },
-              { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> },
-            ].map(link => {
-              const isActive = activePortalTab === link.id;
-              const isLocked = link.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
+              {
+                groupId: 'genel',
+                groupLabel: 'GENEL',
+                items: [
+                  { id: 'dashboard', label: 'Ana Panel', icon: <Activity size={17} /> }
+                ]
+              },
+              {
+                groupId: 'satis',
+                groupLabel: 'SATIŞ VE MÜŞTERİ',
+                items: [
+                  { id: 'quick-quote', label: 'Teklif Yönetimi', icon: <Calculator size={17} />, isPremiumFeature: true },
+                  { id: 'customer-leads', label: 'Müşteri Talepleri', icon: <FileText size={17} />, badgeCount: stats.pendingLeads > 0 ? stats.pendingLeads : null },
+                  { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={17} /> }
+                ]
+              },
+              {
+                groupId: 'urun',
+                groupLabel: 'ÜRÜN VE MAĞAZA',
+                items: [
+                  { id: 'catalog', label: 'Ürün Kataloğu', icon: <Grid size={17} />, badgeCount: brandProducts.length > 0 ? brandProducts.length : null },
+                  { id: 'inventory', label: 'Envanter ve Stok', icon: <Package size={17} /> },
+                  { id: 'outlet-exchange', label: 'Outlet ve Proje Fazlası', icon: <Sparkles size={17} /> },
+                  { id: 'stock-exchange', label: 'Bayi Stok Borsası', icon: <RefreshCw size={17} /> },
+                  { id: 'kiosk-mode', label: 'Showroom Kiosk Modu', icon: <Eye size={17} />, isSaaSFeature: true },
+                  { id: 'showroom-qr', label: 'QR Etiket ve Stant', icon: <QrCode size={17} />, isPremiumFeature: true }
+                ]
+              },
+              {
+                groupId: 'analiz',
+                groupLabel: 'ANALİZ',
+                items: [
+                  { id: 'analytics', label: 'Bölge Analitiği & Raporlar', icon: <TrendingUp size={17} /> }
+                ]
+              },
+              {
+                groupId: 'yonetim',
+                groupLabel: 'YÖNETİM',
+                items: [
+                  { id: 'subscription', label: 'Abonelik Yönetimi', icon: <CreditCard size={17} /> },
+                  { id: 'settings', label: 'Şube & Hesap Ayarları', icon: <Settings size={17} /> }
+                ]
+              }
+            ].map(group => {
+              const isGroupCollapsed = Boolean(collapsedNavGroups[group.groupId]);
               return (
-                <button
-                  key={link.id}
-                  onClick={() => {
-                    if (link.id === 'kiosk-mode') {
-                      if (hasActiveSaaS) {
-                        window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank');
-                      } else {
-                        setActivePortalTab('subscription');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
-                      return;
-                    }
-                    if (link.id === 'stock-exchange') {
-                      window.location.href = '/bayi/stok-borsasi';
-                      return;
-                    }
-                    setActivePortalTab(link.id);
-                    if (link.id === 'settings') {
-                      setShowSettings(true);
-                    } else {
-                      setShowSettings(false);
-                    }
-                  }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    width: '100%',
-                    padding: isSidebarCollapsed ? '10px 8px' : '10px 12px',
-                    background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
-                    border: 'none',
-                    borderRadius: '8px',
-                    color: isActive ? '#090d16' : '#94a3b8',
-                    cursor: 'pointer',
-                    fontSize: '0.82rem',
-                    fontWeight: isActive ? '800' : '600',
-                    textAlign: 'left',
-                    justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                    transition: 'all 0.2s',
-                    flexShrink: 0
-                  }}
-                  title={link.label}
-                  className={isActive ? "" : "hover-gold-text"}
-                >
-                  {link.icon}
+                <div key={group.groupId} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   {!isSidebarCollapsed && (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1, gap: '6px', overflow: 'hidden' }}>
-                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.label}</span>
-                      {link.isSaaSFeature && (
-                        <span style={{
-                          fontSize: '0.6rem',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          background: hasActiveSaaS ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                          color: hasActiveSaaS ? '#34d399' : '#fbbf24',
-                          border: hasActiveSaaS ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
-                          fontWeight: '800',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '3px',
-                          flexShrink: 0
-                        }}>
-                          {hasActiveSaaS ? <Check size={9} /> : <Lock size={9} />}
-                          {hasActiveSaaS ? 'AKTİF' : 'PAKET'}
-                        </span>
-                      )}
-                      {link.isPremiumFeature && (
-                        <span style={{
-                          fontSize: '0.6rem',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          background: isLocked ? 'rgba(212, 175, 55, 0.15)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
-                          color: '#d4af37',
-                          border: '1px solid rgba(212, 175, 55, 0.3)',
-                          fontWeight: '800',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '3px',
-                          flexShrink: 0
-                        }}>
-                          {isLocked ? <Lock size={9} /> : <Crown size={9} />}
-                          {isLocked ? 'KİLİTLİ' : 'PRO'}
-                        </span>
-                      )}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleNavGroup(group.groupId)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: 'transparent',
+                        border: 'none',
+                        padding: '4px 10px',
+                        color: '#64748b',
+                        fontSize: '0.64rem',
+                        fontWeight: '800',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        userSelect: 'none'
+                      }}
+                    >
+                      <span>{group.groupLabel}</span>
+                      {isGroupCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+                    </button>
                   )}
-                </button>
+
+                  {(!isGroupCollapsed || isSidebarCollapsed) && group.items.map(link => {
+                    const isActive = activePortalTab === link.id || (link.id === 'customer-leads' && activePortalTab === 'dashboard' && recentQuotesTab === 'leads');
+                    const isLocked = link.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
+                    return (
+                      <button
+                        key={link.id}
+                        onClick={() => {
+                          if (link.id === 'kiosk-mode') {
+                            if (hasActiveSaaS) {
+                              window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank');
+                            } else {
+                              setActivePortalTab('subscription');
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                            return;
+                          }
+                          if (link.id === 'stock-exchange') {
+                            window.location.href = '/bayi/stok-borsasi';
+                            return;
+                          }
+                          if (link.id === 'customer-leads') {
+                            setActivePortalTab('dashboard');
+                            setRecentQuotesTab('leads');
+                            setTimeout(() => {
+                              const el = document.getElementById('dealer-recent-quotes-section');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 80);
+                            return;
+                          }
+                          setActivePortalTab(link.id);
+                          if (link.id === 'settings') {
+                            setShowSettings(true);
+                          } else {
+                            setShowSettings(false);
+                          }
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          width: '100%',
+                          padding: isSidebarCollapsed ? '10px 8px' : '9px 12px',
+                          background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
+                          border: 'none',
+                          borderRadius: '9px',
+                          color: isActive ? '#090d16' : '#cbd5e1',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          fontWeight: isActive ? '800' : '600',
+                          textAlign: 'left',
+                          justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                          transition: 'all 0.18s ease',
+                          flexShrink: 0
+                        }}
+                        title={link.label}
+                        className={isActive ? '' : 'hover-gold-text'}
+                      >
+                        <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, color: isActive ? '#090d16' : '#94a3b8' }}>
+                          {link.icon}
+                        </span>
+                        {!isSidebarCollapsed && (
+                          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1, gap: '6px', overflow: 'hidden' }}>
+                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.label}</span>
+                            {link.badgeCount && (
+                              <span style={{
+                                fontSize: '0.62rem',
+                                padding: '1px 6px',
+                                borderRadius: '999px',
+                                background: isActive ? 'rgba(9, 13, 22, 0.18)' : 'rgba(212, 175, 55, 0.16)',
+                                color: isActive ? '#090d16' : '#fde68a',
+                                fontWeight: '800',
+                                flexShrink: 0
+                              }}>
+                                {link.badgeCount}
+                              </span>
+                            )}
+                            {link.isSaaSFeature && (
+                              <span style={{
+                                fontSize: '0.58rem',
+                                padding: '2px 5px',
+                                borderRadius: '4px',
+                                background: hasActiveSaaS ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                                color: hasActiveSaaS ? '#34d399' : '#fbbf24',
+                                border: hasActiveSaaS ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
+                                fontWeight: '800',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                flexShrink: 0
+                              }}>
+                                {hasActiveSaaS ? <Check size={9} /> : <Lock size={9} />}
+                                {hasActiveSaaS ? 'AKTİF' : 'PAKET'}
+                              </span>
+                            )}
+                            {link.isPremiumFeature && (
+                              <span style={{
+                                fontSize: '0.58rem',
+                                padding: '2px 5px',
+                                borderRadius: '4px',
+                                background: isLocked ? 'rgba(212, 175, 55, 0.15)' : (isActive ? 'rgba(9,13,22,0.85)' : 'linear-gradient(135deg, #111 0%, #333 100%)'),
+                                color: '#d4af37',
+                                border: '1px solid rgba(212, 175, 55, 0.3)',
+                                fontWeight: '800',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                flexShrink: 0
+                              }}>
+                                {isLocked ? <Lock size={9} /> : <Crown size={9} />}
+                                {isLocked ? 'KİLİTLİ' : 'PRO'}
+                              </span>
+                            )}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               );
             })}
           </nav>
@@ -2691,10 +2835,10 @@ Yetkili Satış & Showroom Departmanı`;
                 padding: isSidebarCollapsed ? '10px 8px' : '10px 12px',
                 background: 'rgba(239, 68, 68, 0.08)',
                 border: '1px solid rgba(239, 68, 68, 0.2)',
-                borderRadius: '8px',
+                borderRadius: '9px',
                 color: '#ef4444',
                 cursor: 'pointer',
-                fontSize: '0.82rem',
+                fontSize: '0.8rem',
                 fontWeight: '700',
                 textAlign: 'left',
                 justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
@@ -2703,7 +2847,7 @@ Yetkili Satış & Showroom Departmanı`;
               title="Çıkış Yap"
               className="hover-gold-text"
             >
-              <LogOut size={18} />
+              <LogOut size={17} />
               {!isSidebarCollapsed && <span>Çıkış Yap</span>}
             </button>
           </div>
@@ -2716,14 +2860,16 @@ Yetkili Satış & Showroom Departmanı`;
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
-          background: 'transparent'
+          background: 'transparent',
+          position: 'relative',
+          zIndex: 1
         }}>
           {/* Top Bar Header */}
           <header className="no-print dealer-header" style={{
-            height: isMobile ? '56px' : '70px',
-            minHeight: isMobile ? '56px' : '70px',
-            borderBottom: isMobile ? '1.5px solid rgba(212, 175, 55, 0.3)' : '1px solid #cbd5e1',
-            background: isMobile ? 'rgba(11, 17, 30, 0.96)' : 'rgba(255, 255, 255, 0.88)',
+            height: isMobile ? '58px' : '72px',
+            minHeight: isMobile ? '58px' : '72px',
+            borderBottom: isMobile ? '1.5px solid rgba(212, 175, 55, 0.3)' : '1px solid #e2e8f0',
+            background: isMobile ? 'rgba(11, 17, 30, 0.96)' : 'rgba(255, 255, 255, 0.94)',
             backdropFilter: 'blur(20px)',
             display: 'flex',
             alignItems: 'center',
@@ -2732,7 +2878,7 @@ Yetkili Satış & Showroom Departmanı`;
             position: 'sticky',
             top: 0,
             zIndex: 90,
-            boxShadow: isMobile ? '0 4px 18px rgba(0,0,0,0.2)' : '0 4px 20px -2px rgba(15, 23, 42, 0.04)'
+            boxShadow: isMobile ? '0 4px 18px rgba(0,0,0,0.2)' : '0 2px 12px rgba(15, 23, 42, 0.03)'
           }}>
             {isMobile ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '6px' }}>
@@ -2775,14 +2921,15 @@ Yetkili Satış & Showroom Departmanı`;
                       {dealerInfo ? dealerInfo.name : 'SeramikBak'}
                     </h4>
                     <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700', whiteSpace: 'nowrap', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                      {activePortalTab === 'quick-quote' && 'WhatsApp Teklif'}
-                      {activePortalTab === 'showroom-qr' && 'Showroom QR'}
-                      {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
-                      {activePortalTab === 'analytics' && 'Arama Analitiği'}
-                      {activePortalTab === 'inventory' && 'Envanter & Stok'}
-                      {activePortalTab === 'outlet-exchange' && 'Outlet Borsası'}
-                      {activePortalTab === 'subscription' && 'Abonelik & SaaS'}
+                      {activePortalTab === 'dashboard' && 'Ana Gösterge Paneli'}
+                      {activePortalTab === 'catalog' && 'Ürün Kataloğu'}
+                      {activePortalTab === 'quick-quote' && 'Teklif Yönetimi'}
+                      {activePortalTab === 'showroom-qr' && 'QR Etiket ve Stant'}
+                      {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
+                      {activePortalTab === 'analytics' && 'Bölge Analitiği'}
+                      {activePortalTab === 'inventory' && 'Envanter ve Stok'}
+                      {activePortalTab === 'outlet-exchange' && 'Outlet ve Proje Fazlası'}
+                      {activePortalTab === 'subscription' && 'Abonelik Yönetimi'}
                       {activePortalTab === 'settings' && 'Şube Ayarları'}
                     </span>
                   </div>
@@ -2816,100 +2963,457 @@ Yetkili Satış & Showroom Departmanı`;
                       <span className="dealer-header-showroom-txt">Showroom</span>
                     </a>
                   )}
-                  {saasInfo && (
-                    <span style={{
-                      fontSize: '0.58rem',
-                      padding: '0 6px',
-                      height: '34px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: '8px',
-                      background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.1) 100%)' : 'rgba(255,255,255,0.05)',
-                      border: saasInfo.plan === 'PREMIUM' ? '1px solid rgba(212,175,55,0.35)' : '1px solid rgba(255,255,255,0.1)',
-                      color: saasInfo.plan === 'PREMIUM' ? '#d4af37' : '#cbd5e1',
-                      fontWeight: '800',
-                      letterSpacing: '0.04em',
-                      boxSizing: 'border-box'
-                    }}>
-                      {saasInfo.plan === 'PREMIUM' ? 'PRO' : saasInfo.plan}
-                    </span>
-                  )}
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', width: '100%' }}>
-                <div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0, fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
-                    {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                    {activePortalTab === 'quick-quote' && 'WhatsApp & PDF Teklif Motoru'}
-                    {activePortalTab === 'showroom-qr' && 'Showroom Akıllı QR Etiket Üretici'}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', width: '100%' }}>
+                {/* Left: Active Module Title & Store Breadcrumb */}
+                <div style={{ minWidth: 0 }}>
+                  <h2 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a', margin: 0, fontFamily: 'var(--font-title, "Outfit", sans-serif)', whiteSpace: 'nowrap' }}>
+                    {activePortalTab === 'dashboard' && 'Ana Gösterge Paneli'}
+                    {activePortalTab === 'catalog' && 'Ürün & Koleksiyon Kataloğu'}
+                    {activePortalTab === 'quick-quote' && 'Teklif Yönetimi & WhatsApp CRM'}
+                    {activePortalTab === 'showroom-qr' && 'Showroom QR Etiket & Stant Üretici'}
                     {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
-                    {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği'}
+                    {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği & Raporlar'}
                     {activePortalTab === 'inventory' && 'Envanter & Stok Yönetimi'}
-                    {activePortalTab === 'outlet-exchange' && 'Bayiden Outlet & Proje Fazlası Borsası'}
-                    {activePortalTab === 'subscription' && 'Abonelik & SaaS Yönetimi'}
-                    {activePortalTab === 'settings' && 'Şube Ayarları & Görünüm'}
+                    {activePortalTab === 'outlet-exchange' && 'Outlet & Proje Fazlası Yönetimi'}
+                    {activePortalTab === 'subscription' && 'Abonelik & Paket Yönetimi'}
+                    {activePortalTab === 'settings' && 'Şube & Hesap Ayarları'}
                   </h2>
-                {dealerInfo && (
-                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <MapPin size={13} style={{ color: '#b38e47' }} />
-                    <span style={{ fontWeight: '600', color: '#334155' }}>{dealerInfo.district}, {dealerInfo.city}</span>
-                    <span style={{ color: '#cbd5e1' }}>•</span>
-                    <span style={{ color: '#b38e47', fontWeight: '800' }}>{dealerInfo.brandName} Yetkili Bayisi</span>
-                  </p>
-                )}
-              </div>
+                  {dealerInfo && (
+                    <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MapPin size={12} style={{ color: '#b38e47' }} />
+                      <span style={{ fontWeight: '600', color: '#334155' }}>{dealerInfo.district}, {dealerInfo.city}</span>
+                      <span style={{ color: '#cbd5e1' }}>•</span>
+                      <span style={{ color: '#b38e47', fontWeight: '800' }}>{dealerInfo.brandName} Yetkili Bayisi</span>
+                    </p>
+                  )}
+                </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <NotificationBell userType="DEALER" userId={dealerInfo?.id} />
-                {dealerInfo && (
-                  <a
-                    href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                      border: '1.5px solid #d4af37',
-                      padding: '8px 16px',
-                      borderRadius: '10px',
-                      fontSize: '0.78rem',
-                      color: '#fde68a',
-                      fontWeight: '800',
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 14px rgba(15, 23, 42, 0.12)',
-                      transition: 'all 0.2s ease'
+                {/* Center: Global Search Input (Products, Collections, Leads, Modules) */}
+                <div style={{ position: 'relative', flex: '1 1 380px', maxWidth: '440px' }}>
+                  <SearchInput
+                    value={globalSearchQuery}
+                    onChange={(val) => {
+                      setGlobalSearchQuery(val);
+                      setShowGlobalSearchDropdown(Boolean(val.trim()));
                     }}
-                    title="Canlı Showroom Sayfanızı Yeni Sekmede Açın"
-                  >
-                    <ExternalLink size={14} style={{ color: '#d4af37' }} />
-                    <span>Showroom Sayfamı Gör</span>
-                  </a>
-                )}
+                    onClear={() => {
+                      setGlobalSearchQuery('');
+                      setShowGlobalSearchDropdown(false);
+                    }}
+                    placeholder="Ürün, koleksiyon, müşteri talebi veya modül ara..."
+                  />
 
-                {saasInfo?.expiresAt && (
-                  <div style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    padding: '6px 12px',
-                    borderRadius: '8px',
-                    fontSize: '0.72rem',
-                    color: '#cbd5e1',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}>
-                    <Calendar size={13} style={{ color: '#d4af37' }} />
-                    <span>Paket Bitiş: {new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                  </div>
-                )}
+                  {/* Instant Global Search Dropdown */}
+                  {showGlobalSearchDropdown && globalSearchQuery.trim().length > 0 && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '44px',
+                        left: 0,
+                        right: 0,
+                        background: '#ffffff',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '14px',
+                        boxShadow: '0 16px 40px rgba(15, 23, 42, 0.14)',
+                        padding: '10px',
+                        zIndex: 200,
+                        maxHeight: '360px',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                      }}
+                    >
+                      {(() => {
+                        const q = globalSearchQuery.toLowerCase();
+                        const matchedModules = [
+                          { id: 'dashboard', label: 'Ana Gösterge Paneli', desc: 'Genel özet ve satış istatistikleri' },
+                          { id: 'catalog', label: 'Ürün Kataloğu', desc: 'Marka koleksiyonları ve 3D stüdyo modelleri' },
+                          { id: 'quick-quote', label: 'Teklif Yönetimi & WhatsApp', desc: 'Hızlı metraj ve PDF teklif hazırlayıcı' },
+                          { id: 'showroom-qr', label: 'QR Etiket ve Stant', desc: 'Mağaza teşhir QR etiketleri' },
+                          { id: 'b2b-projects', label: 'B2B Proje Talepleri', desc: 'Müteahhit ve mimar ihale havuzu' },
+                          { id: 'inventory', label: 'Envanter ve Stok', desc: 'Excel/XML stok eşitleme' },
+                          { id: 'outlet-exchange', label: 'Outlet ve Proje Fazlası', desc: 'İndirimli seri sonu ilanları' },
+                          { id: 'analytics', label: 'Bölge Analitiği', desc: 'Şehir bazlı arama trendleri' },
+                          { id: 'settings', label: 'Şube & Hesap Ayarları', desc: 'Showroom profil ve tema ayarları' }
+                        ].filter(m => m.label.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q));
+
+                        const matchedProducts = brandProducts.filter(
+                          p => (p.name || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q)
+                        ).slice(0, 4);
+
+                        const matchedLeads = leads.filter(
+                          l => (l.clientName || '').toLowerCase().includes(q) || (l.product?.name || '').toLowerCase().includes(q)
+                        ).slice(0, 3);
+
+                        if (matchedModules.length === 0 && matchedProducts.length === 0 && matchedLeads.length === 0) {
+                          return (
+                            <div style={{ padding: '14px', textAlign: 'center', fontSize: '0.8rem', color: '#64748b' }}>
+                              &ldquo;{globalSearchQuery}&rdquo; için eşleşen ürün, koleksiyon veya modül bulunamadı.
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <>
+                            {matchedModules.length > 0 && (
+                              <div>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', padding: '4px 8px', textTransform: 'uppercase' }}>
+                                  Portal Özellikleri
+                                </div>
+                                {matchedModules.map(m => (
+                                  <button
+                                    key={m.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setActivePortalTab(m.id);
+                                      setShowGlobalSearchDropdown(false);
+                                      setGlobalSearchQuery('');
+                                    }}
+                                    style={{
+                                      width: '100%',
+                                      textAlign: 'left',
+                                      background: 'transparent',
+                                      border: 'none',
+                                      padding: '8px 10px',
+                                      borderRadius: '8px',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between'
+                                    }}
+                                  >
+                                    <div>
+                                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a' }}>{m.label}</div>
+                                      <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{m.desc}</div>
+                                    </div>
+                                    <ChevronRight size={14} style={{ color: '#94a3b8' }} />
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            {matchedProducts.length > 0 && (
+                              <div>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', padding: '4px 8px', textTransform: 'uppercase' }}>
+                                  Seramik & Koleksiyonlar
+                                </div>
+                                {matchedProducts.map(prod => (
+                                  <button
+                                    key={prod.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setActivePortalTab('catalog');
+                                      setCatalogSearchQuery(prod.name || prod.code || '');
+                                      setShowGlobalSearchDropdown(false);
+                                      setGlobalSearchQuery('');
+                                    }}
+                                    style={{
+                                      width: '100%',
+                                      textAlign: 'left',
+                                      background: 'transparent',
+                                      border: 'none',
+                                      padding: '8px 10px',
+                                      borderRadius: '8px',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '10px'
+                                    }}
+                                  >
+                                    <img
+                                      src={prod.imageUrl || '/hero/luxury_bathroom.png'}
+                                      alt={prod.name}
+                                      style={{ width: '32px', height: '32px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }}
+                                    />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        {prod.name}
+                                      </div>
+                                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                                        Kod: {prod.code} • {prod.dimensions || '60x120 cm'}
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            {matchedLeads.length > 0 && (
+                              <div>
+                                <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#94a3b8', padding: '4px 8px', textTransform: 'uppercase' }}>
+                                  Müşteri Talepleri
+                                </div>
+                                {matchedLeads.map(l => (
+                                  <button
+                                    key={l.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setActivePortalTab('dashboard');
+                                      setRecentQuotesTab('leads');
+                                      setShowGlobalSearchDropdown(false);
+                                      setGlobalSearchQuery('');
+                                    }}
+                                    style={{
+                                      width: '100%',
+                                      textAlign: 'left',
+                                      background: 'transparent',
+                                      border: 'none',
+                                      padding: '8px 10px',
+                                      borderRadius: '8px',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between'
+                                    }}
+                                  >
+                                    <div>
+                                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a' }}>{l.clientName}</div>
+                                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{l.product?.name || 'Seramik Talebi'}</div>
+                                    </div>
+                                    <StatusBadge status={l.status} />
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right: Notifications, Showroom Link, & Dealer Profile Dropdown */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                  <NotificationBell userType="DEALER" userId={dealerInfo?.id} />
+
+                  {dealerInfo && (
+                    <a
+                      href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '7px',
+                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                        border: '1.5px solid #d4af37',
+                        padding: '8px 14px',
+                        borderRadius: '10px',
+                        fontSize: '0.76rem',
+                        color: '#fde68a',
+                        fontWeight: '800',
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.1)',
+                        transition: 'all 0.2s ease'
+                      }}
+                      title="Canlı Showroom Sayfanızı Yeni Sekmede Açın"
+                    >
+                      <ExternalLink size={13} style={{ color: '#d4af37' }} />
+                      <span>Showroom Sayfamı Gör</span>
+                    </a>
+                  )}
+
+                  {/* Dealer Profile Avatar & Dropdown Menu */}
+                  {dealerInfo && (
+                    <div style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          background: '#f8fafc',
+                          border: '1.5px solid #e2e8f0',
+                          borderRadius: '12px',
+                          padding: '5px 10px 5px 6px',
+                          cursor: 'pointer',
+                          transition: 'all 0.18s ease'
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '9px',
+                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                            color: '#090d16',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 900,
+                            fontSize: '0.82rem',
+                            overflow: 'hidden',
+                            flexShrink: 0
+                          }}
+                        >
+                          {profileLogoUrl || dealerInfo.logoUrl ? (
+                            <img
+                              src={profileLogoUrl || dealerInfo.logoUrl}
+                              alt={dealerInfo.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            (dealerInfo.name || 'SB').substring(0, 2).toUpperCase()
+                          )}
+                        </div>
+                        <div style={{ textAlign: 'left', maxWidth: '130px' }}>
+                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+                            {dealerInfo.name}
+                          </div>
+                          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#b38e47', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {saasInfo?.plan || 'Yetkili Bayi'}
+                          </div>
+                        </div>
+                        <ChevronDown size={14} style={{ color: '#64748b' }} />
+                      </button>
+
+                      {showProfileDropdown && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '48px',
+                            right: 0,
+                            width: '230px',
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '14px',
+                            boxShadow: '0 16px 36px rgba(15, 23, 42, 0.14)',
+                            padding: '8px',
+                            zIndex: 250,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px'
+                          }}
+                        >
+                          <div style={{ padding: '8px 10px', borderBottom: '1px solid #f1f5f9', marginBottom: '4px' }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a' }}>{dealerInfo.name}</div>
+                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{dealerInfo.district}, {dealerInfo.city}</div>
+                            {saasInfo?.expiresAt && (
+                              <div style={{ fontSize: '0.66rem', color: '#b38e47', fontWeight: 700, marginTop: '4px' }}>
+                                Paket Bitiş: {new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </div>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActivePortalTab('settings');
+                              setShowSettings(true);
+                              setShowProfileDropdown(false);
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              width: '100%',
+                              padding: '8px 10px',
+                              background: 'transparent',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              color: '#334155',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <Settings size={15} style={{ color: '#b38e47' }} />
+                            <span>Şube & Hesap Ayarları</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActivePortalTab('subscription');
+                              setShowProfileDropdown(false);
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              width: '100%',
+                              padding: '8px 10px',
+                              background: 'transparent',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              color: '#334155',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <CreditCard size={15} style={{ color: '#b38e47' }} />
+                            <span>Abonelik Yönetimi</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActivePortalTab('catalog');
+                              setShowProfileDropdown(false);
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              width: '100%',
+                              padding: '8px 10px',
+                              background: 'transparent',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              color: '#334155',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <Grid size={15} style={{ color: '#b38e47' }} />
+                            <span>Ürün Kataloğu</span>
+                          </button>
+
+                          <div style={{ borderTop: '1px solid #f1f5f9', marginTop: '4px', paddingTop: '4px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProfileDropdown(false);
+                                handleLogout();
+                              }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                width: '100%',
+                                padding: '8px 10px',
+                                background: 'rgba(239, 68, 68, 0.06)',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                color: '#dc2626',
+                                cursor: 'pointer',
+                                textAlign: 'left'
+                              }}
+                            >
+                              <LogOut size={15} />
+                              <span>Güvenli Çıkış Yap</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </header>
+            )}
+          </header>
 
         {/* PORTAL MAIN CONTENT */}
         <div className="dealer-main-content" style={{ padding: isMobile ? '12px 10px 84px 10px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
@@ -7801,808 +8305,1175 @@ Yetkili Satış & Showroom Departmanı`;
               </div>
             )}
           </div>
-        ) : (
-          /* ===== DASHBOARD VIEW ===== */
+        ) : activePortalTab === 'catalog' ? (
+          /* ===== DEALER PRODUCT & COLLECTION CATALOG TAB ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* EXECUTIVE HERO SHOWROOM BANNER */}
-            <div className="dealer-hero-banner" style={{
-              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #172554 100%)',
-              border: '1.5px solid rgba(212, 175, 55, 0.45)',
-              borderRadius: isMobile ? '16px' : '20px',
-              padding: isMobile ? '20px 16px' : '28px 32px',
-              color: '#ffffff',
-              boxShadow: '0 16px 36px -8px rgba(15, 23, 42, 0.25), 0 0 20px rgba(212, 175, 55, 0.15)',
-              display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
-              alignItems: isMobile ? 'flex-start' : 'center',
-              justifyContent: 'space-between',
-              gap: '20px',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Subtle Ambient Gold Flare */}
-              <div style={{
-                position: 'absolute',
-                top: '-50px',
-                right: '-50px',
-                width: '180px',
-                height: '180px',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(212,175,55,0.25) 0%, transparent 70%)',
-                pointerEvents: 'none'
-              }} />
-
-              <div style={{ position: 'relative', zIndex: 1, maxWidth: '640px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                  <span style={{
-                    background: 'rgba(212, 175, 55, 0.18)',
-                    border: '1px solid rgba(212, 175, 55, 0.4)',
-                    color: '#fde68a',
-                    padding: '3px 10px',
-                    borderRadius: '20px',
-                    fontSize: '0.68rem',
-                    fontWeight: '800',
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '5px'
-                  }}>
-                    <Crown size={12} style={{ color: '#d4af37' }} />
-                    {dealerInfo?.brandName ? `${dealerInfo.brandName} Yetkili Satış Noktası` : 'Yetkili Showroom'}
-                  </span>
-                  <span style={{
-                    background: 'rgba(16, 185, 129, 0.18)',
-                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                    color: '#34d399',
-                    padding: '3px 10px',
-                    borderRadius: '20px',
-                    fontSize: '0.68rem',
-                    fontWeight: '800',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-                    Showroom Canlıda Aktif
-                  </span>
-                </div>
-
-                <h1 style={{
-                  fontSize: isMobile ? '1.35rem' : '1.75rem',
-                  fontWeight: '900',
-                  color: '#ffffff',
-                  margin: '0 0 6px 0',
-                  fontFamily: 'var(--font-title, "Outfit", sans-serif)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.2
-                }}>
-                  {dealerInfo?.name ? `${dealerInfo.name} Yönetim Merkezi` : 'Bayi Yönetim Merkezi'}
-                </h1>
-                <p style={{
-                  fontSize: isMobile ? '0.78rem' : '0.86rem',
-                  color: '#cbd5e1',
-                  margin: 0,
-                  lineHeight: 1.5
-                }}>
-                  {dealerInfo?.district ? `${dealerInfo.district}, ${dealerInfo.city} bölgesindeki müşterileriniz için 3D stüdyo entegrasyonu, hızlı teklifler ve mağaza stant etiketlerini buradan yönetebilirsiniz.` : 'Showroomunuz için dijital satış ve envanter yönetim araçları.'}
-                </p>
-              </div>
-
-              {/* Quick Hero Actions */}
-              <div style={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'flex',
-                gap: '10px',
-                flexWrap: 'wrap',
-                width: isMobile ? '100%' : 'auto'
-              }}>
-                <button
-                  onClick={() => setActivePortalTab('showroom-qr')}
-                  style={{
-                    flex: isMobile ? 1 : 'none',
-                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                    color: '#090d16',
-                    border: 'none',
-                    padding: '10px 16px',
-                    borderRadius: '10px',
-                    fontWeight: '800',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(212, 175, 55, 0.35)',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <QrCode size={15} />
-                  <span>Stant QR Bas</span>
-                </button>
-                <button
-                  onClick={() => setActivePortalTab('quick-quote')}
-                  style={{
-                    flex: isMobile ? 1 : 'none',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#ffffff',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    padding: '10px 16px',
-                    borderRadius: '10px',
-                    fontWeight: '700',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    cursor: 'pointer',
-                    backdropFilter: 'blur(8px)',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <Calculator size={15} style={{ color: '#d4af37' }} />
-                  <span>Hızlı Teklif Yaz</span>
-                </button>
-              </div>
-            </div>
-
-            {/* No Subscription Warning Banner */}
-            {!saasInfo && (
-              <div 
-                className="no-subscription-banner"
-                style={{
-                  background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                  border: '1.5px solid #f59e0b',
-                  borderRadius: '16px',
-                  padding: '20px 24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
-                  color: '#78350f',
-                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.15)'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <AlertCircle size={24} style={{ color: '#b45309', flexShrink: 0 }} />
-                  <div>
-                    <h4 style={{ margin: '0 0 2px 0', fontSize: '0.92rem', fontWeight: '900', color: '#78350f' }}>Aktif Aboneliğiniz Bulunmuyor</h4>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#92400e', fontWeight: '600' }}>Müşteri bilgilerine tam erişim için bir yıllık paket seçin.</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setActivePortalTab('subscription')}
-                  style={{
-                    background: '#0f172a',
-                    color: '#fbbf24',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '10px 20px',
-                    fontWeight: '800',
-                    fontSize: '0.82rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <CreditCard size={15} />
-                  <span>Paketleri İncele</span>
-                </button>
-              </div>
-            )}
-
-            {/* STATS COUNT GRID */}
-            <div className="dealer-stats-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: isMobile ? '8px' : '20px',
-              marginBottom: isMobile ? '14px' : '20px'
-            }}>
-              <div className="glass-panel" style={{
-                background: '#f8f9fb',
-                border: '1.5px solid #cbd5e1',
-                borderRadius: isMobile ? '12px' : '16px',
-                padding: isMobile ? '12px 6px' : '20px 24px',
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                alignItems: 'center',
-                textAlign: isMobile ? 'center' : 'left',
-                gap: isMobile ? '6px' : '16px',
-                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
-              }}>
-                <div style={{
-                  width: isMobile ? '34px' : '46px',
-                  height: isMobile ? '34px' : '46px',
-                  borderRadius: isMobile ? '10px' : '12px',
-                  background: 'rgba(37, 99, 235, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#2563eb',
-                  flexShrink: 0
-                }}>
-                  <FileText size={isMobile ? 17 : 22} />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <h4 style={{ fontSize: isMobile ? '0.64rem' : '0.78rem', fontWeight: '700', color: '#64748b', margin: '0 0 2px 0', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>
-                    {isMobile ? 'Toplam' : 'Toplam Teklif Talebi'}
-                  </h4>
-                  <span style={{ fontSize: isMobile ? '1.15rem' : '1.55rem', fontWeight: '900', color: '#0f172a', display: 'block', lineHeight: 1.1 }}>
-                    {stats.totalLeads} <span style={{ fontSize: isMobile ? '0.6rem' : '0.78rem', fontWeight: '600', color: '#64748b' }}>Adet</span>
-                  </span>
-                </div>
-              </div>
-
-              <div className="glass-panel" style={{
-                background: '#f8f9fb',
-                border: '1.5px solid rgba(217, 119, 6, 0.35)',
-                borderRadius: isMobile ? '12px' : '16px',
-                padding: isMobile ? '12px 6px' : '20px 24px',
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                alignItems: 'center',
-                textAlign: isMobile ? 'center' : 'left',
-                gap: isMobile ? '6px' : '16px',
-                boxShadow: '0 4px 16px rgba(217, 119, 6, 0.06)'
-              }}>
-                <div style={{
-                  width: isMobile ? '34px' : '46px',
-                  height: isMobile ? '34px' : '46px',
-                  borderRadius: isMobile ? '10px' : '12px',
-                  background: 'rgba(217, 119, 6, 0.12)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#d97706',
-                  flexShrink: 0
-                }}>
-                  <Activity size={isMobile ? 17 : 22} className="animate-pulse" />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <h4 style={{ fontSize: isMobile ? '0.64rem' : '0.78rem', fontWeight: '700', color: '#b45309', margin: '0 0 2px 0', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>
-                    {isMobile ? 'Bekleyen' : 'Bekleyen Talepler'}
-                  </h4>
-                  <span style={{ fontSize: isMobile ? '1.15rem' : '1.55rem', fontWeight: '900', color: '#b45309', display: 'block', lineHeight: 1.1 }}>
-                    {stats.pendingLeads} <span style={{ fontSize: isMobile ? '0.6rem' : '0.78rem', fontWeight: '600', color: '#b45309' }}>Adet</span>
-                  </span>
-                </div>
-              </div>
-
-              <div className="glass-panel" style={{
-                background: '#f8f9fb',
-                border: '1.5px solid rgba(5, 150, 105, 0.35)',
-                borderRadius: isMobile ? '12px' : '16px',
-                padding: isMobile ? '12px 6px' : '20px 24px',
-                display: 'flex',
-                flexDirection: isMobile ? 'column' : 'row',
-                alignItems: 'center',
-                textAlign: isMobile ? 'center' : 'left',
-                gap: isMobile ? '6px' : '16px',
-                boxShadow: '0 4px 16px rgba(5, 150, 105, 0.06)'
-              }}>
-                <div style={{
-                  width: isMobile ? '34px' : '46px',
-                  height: isMobile ? '34px' : '46px',
-                  borderRadius: isMobile ? '10px' : '12px',
-                  background: 'rgba(5, 150, 105, 0.12)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#059669',
-                  flexShrink: 0
-                }}>
-                  <CheckCircle size={isMobile ? 17 : 22} />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <h4 style={{ fontSize: isMobile ? '0.64rem' : '0.78rem', fontWeight: '700', color: '#047857', margin: '0 0 2px 0', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>
-                    {isMobile ? 'Cevaplanan' : 'Cevaplanan Talepler'}
-                  </h4>
-                  <span style={{ fontSize: isMobile ? '1.15rem' : '1.55rem', fontWeight: '900', color: '#047857', display: 'block', lineHeight: 1.1 }}>
-                    {stats.respondedLeads} <span style={{ fontSize: isMobile ? '0.6rem' : '0.78rem', fontWeight: '600', color: '#047857' }}>Adet</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* QUICK B2B TOOLS GRID */}
-            <div className="dealer-tools-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: isMobile ? '12px' : '20px',
-              marginBottom: isMobile ? '16px' : '24px'
-            }}>
-              {/* Kiosk Mode tool */}
-              <div className="glass-panel" style={{
-                background: '#f8f9fb',
-                border: hasActiveSaaS ? '1.5px solid rgba(212, 175, 55, 0.4)' : '1.5px solid #cbd5e1',
-                borderRadius: isMobile ? '14px' : '16px',
-                padding: isMobile ? '16px' : '24px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: isMobile ? '12px' : '16px',
-                boxShadow: hasActiveSaaS ? '0 4px 16px rgba(212, 175, 55, 0.08)' : '0 4px 12px rgba(15, 23, 42, 0.04)'
-              }}>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                  <div style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    background: hasActiveSaaS ? 'rgba(212,175,55,0.15)' : 'rgba(15,23,42,0.06)',
-                    color: hasActiveSaaS ? '#b38e47' : '#64748b',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <Activity size={18} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
-                      <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Kiosk Teşhir Modu</h4>
-                      {hasActiveSaaS ? (
-                        <span style={{
-                          background: 'rgba(16, 185, 129, 0.15)',
-                          color: '#059669',
-                          border: '1px solid rgba(16, 185, 129, 0.3)',
-                          padding: '2px 8px',
-                          borderRadius: '6px',
-                          fontSize: '0.65rem',
-                          fontWeight: '800',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}>
-                          <Check size={10} /> {saasInfo?.plan} Paketi Aktif
-                        </span>
-                      ) : (
-                        <span style={{
-                          background: 'rgba(245, 158, 11, 0.15)',
-                          color: '#b45309',
-                          border: '1px solid rgba(245, 158, 11, 0.3)',
-                          padding: '2px 8px',
-                          borderRadius: '6px',
-                          fontSize: '0.65rem',
-                          fontWeight: '800',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}>
-                          <Lock size={10} /> Paket Aboneliği Gerekir
-                        </span>
-                      )}
-                    </div>
-                    <p style={{ fontSize: '0.76rem', color: '#475569', margin: 0, lineHeight: 1.45 }}>
-                      {hasActiveSaaS 
-                        ? 'Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.' 
-                        : 'Mağaza içi tabletlerde dijital seramik teşhir deneyimi sunun. Bu özellik yalnızca aktif paket aboneliği olan bayilere açıktır.'}
-                    </p>
-                  </div>
-                </div>
-
-                {hasActiveSaaS ? (
-                  <button
-                    type="button"
-                    onClick={() => window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank')}
-                    style={{
-                      width: '100%',
-                      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                      color: '#fde68a',
-                      border: '1.5px solid #d4af37',
-                      borderRadius: '10px',
-                      padding: '10px 14px',
-                      fontSize: '0.8rem',
-                      fontWeight: '800',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      boxSizing: 'border-box',
-                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)',
-                      transition: 'all 0.2s'
-                    }}
+            <PageHeader
+              title={`${dealerInfo?.brandName || 'Showroom'} Ürün & Koleksiyon Kataloğu`}
+              subtitle="Bayisi olduğunuz markanın tüm seramik koleksiyonlarını inceleyin, tek tıkla 3D stüdyoda açın, QR etiket basın veya hızlı teklif hazırlayın."
+              icon={<Grid size={24} />}
+              isMobile={isMobile}
+              actions={
+                <>
+                  <PremiumButton
+                    variant="outline"
+                    size="sm"
+                    icon={<RefreshCw size={14} />}
+                    onClick={() => loadBrandProducts()}
+                    disabled={brandProductsLoading}
                   >
-                    <ExternalLink size={13} style={{ color: '#d4af37' }} />
-                    <span>Kiosk Teşhir Modunu Aç</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActivePortalTab('subscription');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    style={{
-                      width: '100%',
-                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)',
-                      color: '#b45309',
-                      border: '1px solid rgba(245, 158, 11, 0.4)',
-                      borderRadius: '10px',
-                      padding: '10px 14px',
-                      fontSize: '0.8rem',
-                      fontWeight: '800',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      boxSizing: 'border-box',
-                      transition: 'all 0.2s'
-                    }}
+                    {brandProductsLoading ? 'Yükleniyor...' : 'Kataloğu Yenile'}
+                  </PremiumButton>
+                  <PremiumButton
+                    variant="gold"
+                    size="sm"
+                    icon={<QrCode size={14} />}
+                    onClick={() => setActivePortalTab('showroom-qr')}
                   >
-                    <Lock size={13} />
-                    <span>Paket Aboneliği Başlat 🔒</span>
-                  </button>
-                )}
+                    Toplu QR Etiket Bas
+                  </PremiumButton>
+                </>
+              }
+            />
+
+            {/* Search & Dimension Filter Bar */}
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: isMobile ? '14px' : '18px 22px',
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'stretch' : 'center',
+                justifyContent: 'space-between',
+                gap: '14px',
+                boxShadow: '0 4px 14px -4px rgba(15, 23, 42, 0.04)'
+              }}
+            >
+              <div style={{ flex: '1 1 320px', maxWidth: isMobile ? '100%' : '420px' }}>
+                <SearchInput
+                  value={catalogSearchQuery}
+                  onChange={setCatalogSearchQuery}
+                  placeholder="Koleksiyon adı, stok kodu (SKU) veya yüzey tipi ara..."
+                />
               </div>
 
-              {/* Analytics tool */}
-              <div className="glass-panel" style={{
-                background: '#f8f9fb',
-                border: '1.5px solid #cbd5e1',
-                borderRadius: isMobile ? '14px' : '16px',
-                padding: isMobile ? '16px' : '24px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: isMobile ? '12px' : '16px',
-                boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
-              }}>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(2,132,199,0.1)', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <TrendingUp size={18} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: '0 0 2px 0', color: '#0f172a' }}>Bölgesel Arama Analizleri</h4>
-                    <p style={{ fontSize: '0.76rem', color: '#475569', margin: 0, lineHeight: 1.45 }}>{dealerInfo?.city} şehrindeki tüketicilerin en çok aradığı seramik modellerini analiz edin.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActivePortalTab('analytics')}
-                  style={{
-                    width: '100%',
-                    background: '#ffffff',
-                    color: '#0f172a',
-                    border: '1.5px solid #cbd5e1',
-                    borderRadius: '10px',
-                    padding: '10px 14px',
-                    fontSize: '0.8rem',
-                    fontWeight: '800',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    boxSizing: 'border-box',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <TrendingUp size={13} style={{ color: '#2563eb' }} />
-                  <span>Detaylı Bölge Analitiğini Gör</span>
-                </button>
-              </div>
+              <FilterPanel
+                icon={<SlidersHorizontal size={14} />}
+                activeId={catalogDimensionFilter}
+                onChange={setCatalogDimensionFilter}
+                options={[
+                  { id: 'ALL', label: `Tümü (${brandProducts.length})` },
+                  { id: '60x120', label: '60x120 cm' },
+                  { id: '60x60', label: '60x60 cm' },
+                  { id: '80x160', label: '80x160 cm' },
+                  { id: '120x240', label: '120x240 Slab' }
+                ]}
+              />
             </div>
 
-            {/* LEADS LIST PANEL */}
-            <div className="glass-panel" style={{
-              background: '#f8f9fb',
-              border: '1.5px solid #cbd5e1',
-              borderRadius: '18px',
-              padding: isMobile ? '18px 14px' : '28px',
-              boxShadow: '0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-                <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>Bana Yönlendirilen Müşteri Teklifleri</h3>
-                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>Ziyaretçilerin size en yakın showroom olmanız sebebiyle gönderdiği palet/metraj bazlı seramik talepleri.</p>
-                </div>
-                <button 
-                  onClick={loadDealerLeads} 
-                  disabled={leadsLoading} 
+            {/* Catalog Products Grid */}
+            {brandProductsLoading ? (
+              <LoadingSkeleton rows={4} height="220px" />
+            ) : (() => {
+              const filteredCatalog = brandProducts.filter(p => {
+                const q = catalogSearchQuery.trim().toLowerCase();
+                const dimStr = p.dimensions || (p.width && p.height ? `${p.width}x${p.height}` : '');
+                const matchesQuery = !q ||
+                  (p.name || '').toLowerCase().includes(q) ||
+                  (p.code || '').toLowerCase().includes(q) ||
+                  (p.finish || '').toLowerCase().includes(q) ||
+                  dimStr.toLowerCase().includes(q);
+                const matchesDim = catalogDimensionFilter === 'ALL' || dimStr.includes(catalogDimensionFilter);
+                return matchesQuery && matchesDim;
+              });
+
+              if (filteredCatalog.length === 0) {
+                return (
+                  <EmptyState
+                    icon={<Grid size={26} />}
+                    title="Eşleşen Koleksiyon Bulunamadı"
+                    description="Arama kriterlerinize uygun seramik modeli bulunamadı. Filtreyi sıfırlayabilir veya marka modellerini yeniden yükleyebilirsiniz."
+                    actionLabel="Tüm Modelleri Göster"
+                    onAction={() => {
+                      setCatalogSearchQuery('');
+                      setCatalogDimensionFilter('ALL');
+                      if (brandProducts.length === 0) loadBrandProducts();
+                    }}
+                  />
+                );
+              }
+
+              const dealerSlug = dealerInfo?.slug || (dealerInfo?.name ? slugify(dealerInfo.name) : '');
+
+              return (
+                <div
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #cbd5e1',
-                    borderRadius: '8px',
-                    padding: '8px 14px',
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    color: '#0f172a',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
-                    transition: 'all 0.2s'
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(270px, 1fr))',
+                    gap: '18px'
                   }}
                 >
-                  {leadsLoading ? <Loader2 size={13} className="animate-spin" /> : <TrendingUp size={13} style={{ color: '#2563eb' }} />}
-                  <span>Listeyi Yenile</span>
-                </button>
-              </div>
-
-              {leadsLoading ? (
-                <div style={{ textAlign: 'center', padding: '48px 0', color: '#cbd5e1' }}>
-                  <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
-                  <span>Talepler yükleniyor...</span>
+                  {filteredCatalog.slice(0, 48).map(prod => (
+                    <ProductCard
+                      key={prod.id}
+                      product={prod}
+                      brandName={dealerInfo?.brandName}
+                      onInspect={(p) => {
+                        const studioUrl = `/?code=${encodeURIComponent(p.code || '')}&tab=studio&dealer=${dealerSlug}`;
+                        window.open(studioUrl, '_blank');
+                      }}
+                      onCreateQuote={(p) => {
+                        setQuoteProductName(p.name || 'Seramik Modeli');
+                        setQuoteProductCode(p.code || 'SB-KARO');
+                        if (p.imageUrl) setQuoteProductImageUrl(p.imageUrl);
+                        if (p.price) setQuoteUnitPriceM2(Number(p.price));
+                        setActivePortalTab('quick-quote');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      onCreateQr={(p) => {
+                        setQrSelectedProductIds(prev => (prev.includes(p.id) ? prev : [...prev, p.id]));
+                        setQrSearchQuery(p.name || p.code || '');
+                        setActivePortalTab('showroom-qr');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    />
+                  ))}
                 </div>
-              ) : isMobile ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
-                  {leads.map(lead => (
-                    <div key={lead.id} style={{
-                      background: '#ffffff',
-                      border: '1.5px solid #cbd5e1',
+              );
+            })()}
+          </div>
+        ) : (
+          /* ===== DASHBOARD VIEW (ANA GÖSTERGE PANELİ) ===== */
+          (() => {
+            // Filter leads & savedQuotesList by selected date filter ('today' | 'week' | 'month' | 'all')
+            const now = new Date();
+            const isWithinSelectedRange = (dateVal) => {
+              if (dashboardDateFilter === 'all' || !dateVal) return true;
+              const dt = new Date(dateVal);
+              if (isNaN(dt.getTime())) return true;
+              const diffMs = now.getTime() - dt.getTime();
+              const diffDays = diffMs / (1000 * 60 * 60 * 24);
+              if (dashboardDateFilter === 'today') {
+                return dt.getDate() === now.getDate() && dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
+              }
+              if (dashboardDateFilter === 'week') return diffDays <= 7;
+              if (dashboardDateFilter === 'month') return diffDays <= 31;
+              return true;
+            };
+
+            const filteredLeads = leads.filter(l => isWithinSelectedRange(l.createdAt));
+            const filteredSavedQuotes = savedQuotesList.filter(q => isWithinSelectedRange(q.createdAt || q.date));
+
+            const totalQuotesCount = filteredLeads.length + filteredSavedQuotes.length;
+            const customerRequestsCount = filteredLeads.length;
+            const completedOrdersCount =
+              filteredLeads.filter(l => l.status === 'RESPONDED' || l.status === 'COMPLETED').length +
+              filteredSavedQuotes.filter(q => q.status === 'WON').length;
+
+            // Real calculated sales/quote volume from savedQuotesList + priced leads
+            const quotesVolumeTL = filteredSavedQuotes.reduce(
+              (sum, q) => sum + Number(q?.calculations?.grandTotal || q?.grandTotal || 0),
+              0
+            );
+            const leadsEstimatedTL = filteredLeads.reduce((sum, l) => {
+              const p = Number(l?.product?.price || 0);
+              return sum + (p > 0 ? p * 35 : 0);
+            }, 0);
+            const monthlySalesVolumeTL = quotesVolumeTL + leadsEstimatedTL;
+
+            const dealerSlug = dealerInfo?.slug || (dealerInfo?.name ? slugify(dealerInfo.name) : '');
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '18px' : '26px' }}>
+                {/* A. HOŞ GELDİNİZ ALANI + TARİH FİLTRESİ */}
+                <PageHeader
+                  title={`Hoş Geldiniz, ${dealerInfo?.name || 'Değerli Bayimiz'}!`}
+                  subtitle="SeramikBak bayi panelinizden tüm işlemlerinizi kolayca yönetebilirsiniz."
+                  isMobile={isMobile}
+                  actions={
+                    <FilterPanel
+                      icon={<Calendar size={14} />}
+                      activeId={dashboardDateFilter}
+                      onChange={setDashboardDateFilter}
+                      options={[
+                        { id: 'today', label: 'Bugün' },
+                        { id: 'week', label: 'Bu Hafta' },
+                        { id: 'month', label: 'Bu Ay' },
+                        { id: 'all', label: 'Tüm Zamanlar' }
+                      ]}
+                    />
+                  }
+                />
+
+                {/* No Subscription Warning Banner */}
+                {!saasInfo && (
+                  <div 
+                    className="no-subscription-banner"
+                    style={{
+                      background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                      border: '1.5px solid #f59e0b',
                       borderRadius: '16px',
-                      padding: '16px',
+                      padding: '18px 22px',
                       display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px',
-                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <strong style={{ fontSize: '0.92rem', color: '#0f172a', display: 'block', fontWeight: '800' }}>{lead.clientName}</strong>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '4px', fontSize: '0.75rem', color: '#475569' }}>
-                            <a href={`tel:${lead.clientPhone}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#b45309', fontWeight: '700' }}>
-                              <Phone size={11} /> {lead.clientPhone}
-                            </a>
-                            <a href={`mailto:${lead.clientEmail}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#475569', fontWeight: '500' }}>
-                              <Mail size={11} /> {lead.clientEmail}
-                            </a>
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                      flexWrap: 'wrap',
+                      color: '#78350f',
+                      boxShadow: '0 4px 14px rgba(245, 158, 11, 0.12)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <AlertCircle size={22} style={{ color: '#b45309', flexShrink: 0 }} />
+                      <div>
+                        <h4 style={{ margin: '0 0 2px 0', fontSize: '0.9rem', fontWeight: '900', color: '#78350f' }}>Aktif Aboneliğiniz Bulunmuyor</h4>
+                        <p style={{ margin: 0, fontSize: '0.78rem', color: '#92400e', fontWeight: '600' }}>Müşteri bilgilerine ve VIP modüllere tam erişim için bir yıllık paket seçin.</p>
+                      </div>
+                    </div>
+                    <PremiumButton
+                      variant="dark"
+                      size="sm"
+                      icon={<CreditCard size={14} />}
+                      onClick={() => setActivePortalTab('subscription')}
+                    >
+                      Paketleri İncele
+                    </PremiumButton>
+                  </div>
+                )}
+
+                {/* B. PREMIUM KOLEKSİYON BANNERI */}
+                <div
+                  className="dealer-hero-banner"
+                  style={{
+                    position: 'relative',
+                    borderRadius: isMobile ? '18px' : '22px',
+                    overflow: 'hidden',
+                    minHeight: isMobile ? '220px' : '240px',
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    justifyContent: 'space-between',
+                    padding: isMobile ? '22px 18px' : '34px 38px',
+                    gap: '24px',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    boxShadow: '0 16px 36px -10px rgba(15, 23, 42, 0.22)'
+                  }}
+                >
+                  {/* Architectural Ceramic / Bathroom Background Image */}
+                  <img
+                    src={profileBannerUrl || '/hero/wide_luxury_bathroom.jpg'}
+                    alt="Yeni Koleksiyonları Keşfedin"
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      zIndex: 0
+                    }}
+                  />
+                  {/* Luxury Dark Anthracite + Warm Bronze Architectural Gradient Overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: isMobile
+                        ? 'linear-gradient(180deg, rgba(11, 17, 30, 0.88) 0%, rgba(11, 17, 30, 0.94) 100%)'
+                        : 'linear-gradient(90deg, rgba(11, 17, 30, 0.94) 0%, rgba(15, 23, 42, 0.84) 55%, rgba(15, 23, 42, 0.45) 100%)',
+                      zIndex: 1
+                    }}
+                  />
+
+                  <div style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                      <span
+                        style={{
+                          background: 'rgba(212, 175, 55, 0.22)',
+                          border: '1px solid rgba(212, 175, 55, 0.45)',
+                          color: '#fde68a',
+                          padding: '4px 11px',
+                          borderRadius: '999px',
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <Crown size={12} style={{ color: '#d4af37' }} />
+                        {dealerInfo?.brandName ? `${dealerInfo.brandName} Yetkili Satış Noktası` : 'Yetkili Showroom'}
+                      </span>
+                      <span
+                        style={{
+                          background: 'rgba(16, 185, 129, 0.2)',
+                          border: '1px solid rgba(16, 185, 129, 0.4)',
+                          color: '#34d399',
+                          padding: '4px 11px',
+                          borderRadius: '999px',
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+                        Showroom Canlıda Aktif
+                      </span>
+                    </div>
+
+                    <h2
+                      style={{
+                        fontSize: isMobile ? '1.38rem' : '1.85rem',
+                        fontWeight: 900,
+                        color: '#ffffff',
+                        margin: '0 0 8px 0',
+                        fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.2
+                      }}
+                    >
+                      Yeni Koleksiyonları Keşfedin
+                    </h2>
+                    <p
+                      style={{
+                        fontSize: isMobile ? '0.8rem' : '0.9rem',
+                        color: '#e2e8f0',
+                        margin: '0 0 18px 0',
+                        lineHeight: 1.55
+                      }}
+                    >
+                      Mekânlarınıza değer katan en yeni seramik koleksiyonlarını keşfedin. {dealerInfo?.district ? `${dealerInfo.district}, ${dealerInfo.city}` : 'Showroom'} müşterileriniz için 3D stüdyo, QR etiket ve hızlı teklif araçlarını hemen kullanın.
+                    </p>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <PremiumButton
+                        variant="gold"
+                        size="md"
+                        icon={<Grid size={15} />}
+                        onClick={() => setActivePortalTab('catalog')}
+                      >
+                        Koleksiyonları İncele
+                      </PremiumButton>
+                      <PremiumButton
+                        variant="dark"
+                        size="md"
+                        icon={<QrCode size={15} />}
+                        onClick={() => setActivePortalTab('showroom-qr')}
+                      >
+                        Stant QR Bas
+                      </PremiumButton>
+                      <PremiumButton
+                        variant="ghost"
+                        size="md"
+                        icon={<Calculator size={15} style={{ color: '#d4af37' }} />}
+                        onClick={() => setActivePortalTab('quick-quote')}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.12)',
+                          color: '#ffffff',
+                          border: '1px solid rgba(255, 255, 255, 0.22)',
+                          backdropFilter: 'blur(8px)'
+                        }}
+                      >
+                        Hızlı Teklif Yaz
+                      </PremiumButton>
+                    </div>
+                  </div>
+                </div>
+
+                {/* C. 4 ADET MODERN İSTATİSTİK KARTI (GERÇEK BACKEND VERİLERİ) */}
+                <div
+                  className="dealer-stats-grid"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
+                    gap: isMobile ? '10px' : '18px'
+                  }}
+                >
+                  <StatCard
+                    title="Toplam Teklif"
+                    value={totalQuotesCount}
+                    unit="Adet"
+                    changeText={savedQuotesList.length > 0 ? `${savedQuotesList.length} PDF Teklif` : 'Aktif Dönem'}
+                    changeType="positive"
+                    icon={<FileText size={20} />}
+                    accentColor="#b38e47"
+                    sparklinePoints={[12, 18, 16, 25, 24, 32, Math.max(totalQuotesCount * 10, 28)]}
+                    isMobile={isMobile}
+                    onClick={() => setActivePortalTab('quick-quote')}
+                  />
+
+                  <StatCard
+                    title="Müşteri Talepleri"
+                    value={customerRequestsCount}
+                    unit="Talep"
+                    changeText={stats.pendingLeads > 0 ? `${stats.pendingLeads} Bekleyen` : 'Tümü Yanıtlandı'}
+                    changeType={stats.pendingLeads > 0 ? 'warning' : 'positive'}
+                    icon={<Activity size={20} />}
+                    accentColor="#d97706"
+                    sparklinePoints={[10, 15, 22, 19, 28, 25, Math.max(customerRequestsCount * 12, 24)]}
+                    isMobile={isMobile}
+                    onClick={() => {
+                      const el = document.getElementById('dealer-recent-quotes-section');
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  />
+
+                  <StatCard
+                    title="Toplam Sipariş"
+                    value={completedOrdersCount}
+                    unit="Onaylı"
+                    changeText={
+                      totalQuotesCount > 0
+                        ? `%${Math.round((completedOrdersCount / Math.max(totalQuotesCount, 1)) * 100)} Dönüşüm`
+                        : 'Cevaplanan'
+                    }
+                    changeType="positive"
+                    icon={<CheckCircle size={20} />}
+                    accentColor="#059669"
+                    sparklinePoints={[8, 14, 16, 22, 26, 30, Math.max(completedOrdersCount * 15, 26)]}
+                    isMobile={isMobile}
+                  />
+
+                  <StatCard
+                    title="Aylık Satış Tutarı"
+                    value={
+                      monthlySalesVolumeTL > 0
+                        ? `₺${monthlySalesVolumeTL.toLocaleString('tr-TR')}`
+                        : '₺0'
+                    }
+                    changeText={savedQuotesList.length > 0 ? `${savedQuotesList.length} Tekliften` : 'Canlı Ciro'}
+                    changeType="info"
+                    icon={<TrendingUp size={20} />}
+                    accentColor="#2563eb"
+                    sparklinePoints={[18, 24, 21, 35, 42, 48, Math.max(Math.round(monthlySalesVolumeTL / 1000), 30)]}
+                    isMobile={isMobile}
+                    onClick={() => setActivePortalTab('quick-quote')}
+                  />
+                </div>
+
+                {/* D. SATIŞ PERFORMANSI GRAFİĞİ + SHOWROOM & BÖLGE KARTI */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? '1fr' : '1.65fr 1fr',
+                    gap: isMobile ? '16px' : '20px',
+                    alignItems: 'stretch'
+                  }}
+                >
+                  <SalesPerformanceChart
+                    leads={filteredLeads}
+                    savedQuotesList={filteredSavedQuotes}
+                    isMobile={isMobile}
+                    onCreateQuote={() => setActivePortalTab('quick-quote')}
+                  />
+
+                  {/* Right Column: Showroom Kiosk & Regional Demand Summary */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'space-between' }}>
+                    {/* Kiosk Mode Card */}
+                    <div
+                      style={{
+                        background: '#ffffff',
+                        border: hasActiveSaaS ? '1.5px solid rgba(179, 142, 71, 0.45)' : '1px solid #e2e8f0',
+                        borderRadius: '18px',
+                        padding: '20px 22px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '14px',
+                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                        flex: 1
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '11px',
+                              background: 'rgba(179, 142, 71, 0.14)',
+                              color: '#b38e47',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}
+                          >
+                            <Eye size={19} />
+                          </div>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>
+                              Kiosk Teşhir Modu
+                            </h4>
+                            <span style={{ fontSize: '0.73rem', color: '#64748b' }}>
+                              Mağaza içi dijital seramik ekranı
+                            </span>
                           </div>
                         </div>
-                        
-                        <select 
-                          value={lead.status} 
-                          onChange={(e) => handleUpdateLeadStatus(lead.id, e.target.value)}
+                        <StatusBadge
+                          status={hasActiveSaaS ? 'ACTIVE' : 'PENDING'}
+                          label={hasActiveSaaS ? `${saasInfo?.plan} Aktif` : 'Paket Gerekli'}
+                        />
+                      </div>
+
+                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#475569', lineHeight: 1.48 }}>
+                        Bu cihazı veya mağazadaki bir tableti tam ekran 3D dijital seramik teşhir kioskuna dönüştürün.
+                      </p>
+
+                      {hasActiveSaaS ? (
+                        <PremiumButton
+                          variant="dark"
+                          size="md"
+                          fullWidth
+                          icon={<ExternalLink size={14} style={{ color: '#d4af37' }} />}
+                          onClick={() => window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank')}
+                        >
+                          Kiosk Teşhir Modunu Aç
+                        </PremiumButton>
+                      ) : (
+                        <PremiumButton
+                          variant="gold"
+                          size="md"
+                          fullWidth
+                          icon={<Lock size={14} />}
+                          onClick={() => setActivePortalTab('subscription')}
+                        >
+                          Paket Aboneliği Başlat
+                        </PremiumButton>
+                      )}
+                    </div>
+
+                    {/* Regional Search Analytics Summary Card */}
+                    <div
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '18px',
+                        padding: '20px 22px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                        boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                        flex: 1
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div
                           style={{
-                            padding: '6px 10px',
-                            fontSize: '0.75rem',
-                            borderRadius: '8px',
-                            border: '1.5px solid #cbd5e1',
-                            background: '#f8fafc',
-                            color: '#0f172a',
-                            cursor: 'pointer',
-                            fontWeight: '700'
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '11px',
+                            background: 'rgba(37, 99, 235, 0.1)',
+                            color: '#2563eb',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
                           }}
                         >
-                          <option value="PENDING">⏱️ Bekliyor</option>
-                          <option value="RESPONDED">Fiyat İletildi</option>
-                          <option value="COMPLETED">Satış Tamamlandı</option>
-                        </select>
-                      </div>
-
-                      {(lead.requestedUsta || lead.requestedArchitect) && (
-                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                          {lead.requestedUsta && (
-                            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(234, 88, 12, 0.15)', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(234, 88, 12, 0.25)' }}>
-                              🛠️ Usta Talebi
-                            </span>
-                          )}
-                          {lead.requestedArchitect && (
-                            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
-                              📐 Mimar Talebi
-                            </span>
-                          )}
+                          <TrendingUp size={19} />
                         </div>
-                      )}
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        {lead.product?.imageUrl && (
-                          <img 
-                            src={lead.product.imageUrl} 
-                            alt={lead.product.name} 
-                            style={{ width: '44px', height: '44px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #cbd5e1' }} 
-                          />
-                        )}
                         <div>
-                          <strong style={{ fontSize: '0.86rem', color: '#0f172a', display: 'block', fontWeight: '800' }}>{lead.product?.name}</strong>
-                          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>SKU: {lead.product?.code}</span>
+                          <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>
+                            Bölgesel Arama Analizleri
+                          </h4>
+                          <span style={{ fontSize: '0.73rem', color: '#64748b' }}>
+                            {dealerInfo?.city || 'Bölgeniz'} seramik talep trendleri
+                          </span>
                         </div>
                       </div>
 
-                      {lead.notes && (
-                        <div style={{ fontSize: '0.8rem', color: '#334155', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', lineHeight: '1.4' }}>
-                          {lead.notes}
-                        </div>
-                      )}
+                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#475569', lineHeight: 1.48 }}>
+                        {dealerInfo?.city || 'Şehriniz'} bölgesindeki müşterilerin en çok aradığı ebat, doku ve modelleri inceleyin.
+                      </p>
 
-                      {lead.projectDimensions && (
-                        <div style={{ fontSize: '0.78rem', background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', color: '#0f172a' }}>
-                          <strong style={{ color: '#334155' }}>Ölçüler:</strong> <span style={{ fontWeight: '700' }}>{lead.projectDimensions}</span>
-                        </div>
-                      )}
-
-                      {lead.projectPhotoUrl && (
-                        <div>
-                          <a 
-                            href={lead.projectPhotoUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--accent-gold)', fontWeight: 'bold', textDecoration: 'underline' }}
-                          >
-                            🖼️ Fotoğraf / Kroki Gör ↗
-                          </a>
-                        </div>
-                      )}
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '10px', marginTop: '4px', fontSize: '0.74rem', color: '#64748b', fontWeight: '600' }}>
-                        <span>{new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                        <button 
-                          onClick={() => handleDeleteLead(lead.id)}
-                          style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}
-                        >
-                          <Trash2 size={13} /> Sil
-                        </button>
-                      </div>
+                      <PremiumButton
+                        variant="outline"
+                        size="md"
+                        fullWidth
+                        icon={<TrendingUp size={14} style={{ color: '#2563eb' }} />}
+                        onClick={() => setActivePortalTab('analytics')}
+                      >
+                        Detaylı Bölge Analitiğini Gör
+                      </PremiumButton>
                     </div>
-                  ))}
-                  {leads.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                      Henüz size yönlendirilmiş bir müşteri teklif talebi bulunmamaktadır.
+                  </div>
+                </div>
+
+                {/* E. HIZLI İŞLEMLER (4 HIZLI İŞLEM KARTI) */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                      Hızlı İşlemler
+                    </h3>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
+                      Sık kullanılan mağaza araçları
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, minmax(0, 1fr))',
+                      gap: isMobile ? '10px' : '16px'
+                    }}
+                  >
+                    <QuickActionCard
+                      title="Ürün Kataloğu"
+                      description={`${dealerInfo?.brandName || 'Marka'} koleksiyonlarını ve stok kodlarını inceleyin.`}
+                      icon={<Grid size={20} />}
+                      badge={brandProducts.length > 0 ? `${brandProducts.length} Model` : 'Katalog'}
+                      accentColor="#b38e47"
+                      onClick={() => setActivePortalTab('catalog')}
+                    />
+
+                    <QuickActionCard
+                      title="AI Görselleştirici"
+                      description="Seramikleri müşterinizin mekanında 3D olarak canlı uygulayın."
+                      icon={<Sparkles size={20} />}
+                      badge="3D Stüdyo"
+                      accentColor="#2563eb"
+                      href="/mekanimda-gor"
+                    />
+
+                    <QuickActionCard
+                      title="Teklif Oluştur"
+                      description="Saniyeler içinde fire, yapıştırıcı ve derz dahil PDF teklif üretin."
+                      icon={<Calculator size={20} />}
+                      badge="WhatsApp & PDF"
+                      accentColor="#059669"
+                      onClick={() => setActivePortalTab('quick-quote')}
+                    />
+
+                    <QuickActionCard
+                      title="Destek Al"
+                      description="Şube ayarlarınızı düzenleyin veya teknik destek ekibine ulaşın."
+                      icon={<HelpCircle size={20} />}
+                      badge="7/24 Bayi Hattı"
+                      accentColor="#d97706"
+                      onClick={() => setActivePortalTab('settings')}
+                    />
+                  </div>
+                </div>
+
+                {/* F. SON TEKLİFLER & MÜŞTERİ TALEPLERİ */}
+                <div
+                  id="dealer-recent-quotes-section"
+                  style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '18px',
+                    padding: isMobile ? '18px 14px' : '24px 26px',
+                    boxShadow: '0 4px 18px -4px rgba(15, 23, 42, 0.04)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '18px'
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: isMobile ? 'column' : 'row',
+                      alignItems: isMobile ? 'flex-start' : 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px'
+                    }}
+                  >
+                    <div>
+                      <h3 style={{ fontSize: '1.08rem', fontWeight: 800, margin: '0 0 4px 0', color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                        Son Teklifler & Müşteri Talepleri
+                      </h3>
+                      <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>
+                        Showroomunuza yönlendirilen müşteri taleplerini ve hazırladığınız fiyat tekliflerini buradan yönetin.
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <FilterPanel
+                        activeId={recentQuotesTab}
+                        onChange={setRecentQuotesTab}
+                        options={[
+                          { id: 'all', label: `Tümü (${filteredLeads.length + filteredSavedQuotes.length})` },
+                          { id: 'leads', label: `Müşteri Talepleri (${filteredLeads.length})` },
+                          { id: 'quotes', label: `Hazırlanan Teklifler (${filteredSavedQuotes.length})` }
+                        ]}
+                      />
+                      <PremiumButton
+                        variant="outline"
+                        size="sm"
+                        icon={leadsLoading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                        onClick={loadDealerLeads}
+                        disabled={leadsLoading}
+                      >
+                        Yenile
+                      </PremiumButton>
+                    </div>
+                  </div>
+
+                  {leadsLoading ? (
+                    <LoadingSkeleton rows={3} height="64px" />
+                  ) : (() => {
+                    // Build unified rows for Son Teklifler table
+                    const unifiedRows = [];
+
+                    if (recentQuotesTab === 'all' || recentQuotesTab === 'leads') {
+                      filteredLeads.forEach(lead => {
+                        const prodPrice = Number(lead?.product?.price || 0);
+                        unifiedRows.push({
+                          rowType: 'LEAD',
+                          id: `lead-${lead.id}`,
+                          rawId: lead.id,
+                          customerName: lead.clientName || 'Müşteri',
+                          customerPhone: lead.clientPhone || '',
+                          customerEmail: lead.clientEmail || '',
+                          projectName: lead.product?.name || 'Seramik Teklif Talebi',
+                          productCode: lead.product?.code || '',
+                          productImage: lead.product?.imageUrl || '',
+                          notes: lead.notes || '',
+                          dimensions: lead.projectDimensions || '',
+                          photoUrl: lead.projectPhotoUrl || '',
+                          requestedUsta: lead.requestedUsta,
+                          requestedArchitect: lead.requestedArchitect,
+                          createdAt: lead.createdAt,
+                          amountText: prodPrice > 0 ? `₺${prodPrice.toLocaleString('tr-TR')} /m²` : (lead.projectDimensions || 'Metraj Talebi'),
+                          status: lead.status || 'PENDING',
+                          rawObj: lead
+                        });
+                      });
+                    }
+
+                    if (recentQuotesTab === 'all' || recentQuotesTab === 'quotes') {
+                      filteredSavedQuotes.forEach(q => {
+                        const grandTotal = Number(q?.calculations?.grandTotal || q?.grandTotal || 0);
+                        unifiedRows.push({
+                          rowType: 'QUOTE',
+                          id: `quote-${q.id}`,
+                          rawId: q.id,
+                          customerName: q.customerName || 'Müşteri',
+                          customerPhone: q.customerPhone || '',
+                          customerEmail: q.customerEmail || '',
+                          projectName: q.projectName || q.productName || 'Banyo & Zemin Teklifi',
+                          productCode: q.productCode || '',
+                          productImage: q.productImageUrl || '',
+                          notes: `${q.areaM2 || 0} m² (${q.productName || 'Seramik'})`,
+                          dimensions: `${q.areaM2 || 0} m²`,
+                          createdAt: q.createdAt || new Date().toISOString(),
+                          amountText: `₺${grandTotal.toLocaleString('tr-TR')}`,
+                          status: q.status || 'PENDING',
+                          rawObj: q
+                        });
+                      });
+                    }
+
+                    if (unifiedRows.length === 0) {
+                      return (
+                        <EmptyState
+                          icon={<FileText size={24} />}
+                          title="Henüz Teklif veya Müşteri Talebi Bulunmuyor"
+                          description="Müşterilerinize saniyeler içinde profesyonel WhatsApp ve PDF teklifi oluşturmak için aşağıdaki butonu kullanabilirsiniz."
+                          actionLabel="Yeni Teklif Oluştur"
+                          onAction={() => setActivePortalTab('quick-quote')}
+                        />
+                      );
+                    }
+
+                    return (
+                      <DataTable
+                        isMobile={isMobile}
+                        data={unifiedRows}
+                        columns={[
+                          {
+                            key: 'customer',
+                            header: 'Müşteri Adı',
+                            render: (row) => (
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <strong style={{ color: '#0f172a', fontWeight: 800, fontSize: '0.86rem' }}>
+                                    {row.customerName}
+                                  </strong>
+                                  <span
+                                    style={{
+                                      fontSize: '0.62rem',
+                                      fontWeight: 800,
+                                      padding: '1px 6px',
+                                      borderRadius: '4px',
+                                      background: row.rowType === 'QUOTE' ? 'rgba(179,142,71,0.14)' : 'rgba(37,99,235,0.1)',
+                                      color: row.rowType === 'QUOTE' ? '#926f28' : '#2563eb'
+                                    }}
+                                  >
+                                    {row.rowType === 'QUOTE' ? 'PDF Teklif' : 'Müşteri Talebi'}
+                                  </span>
+                                </div>
+                                {row.customerPhone && (
+                                  <a
+                                    href={`tel:${row.customerPhone}`}
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '4px',
+                                      fontSize: '0.74rem',
+                                      color: '#b45309',
+                                      fontWeight: 700,
+                                      textDecoration: 'none',
+                                      marginTop: '2px'
+                                    }}
+                                  >
+                                    <Phone size={11} /> {row.customerPhone}
+                                  </a>
+                                )}
+                                {(row.requestedUsta || row.requestedArchitect) && (
+                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                                    {row.requestedUsta && (
+                                      <span style={{ padding: '1px 6px', borderRadius: '4px', background: 'rgba(234, 88, 12, 0.12)', color: '#ea580c', fontSize: '0.62rem', fontWeight: 800 }}>
+                                        🛠️ Usta Talebi
+                                      </span>
+                                    )}
+                                    {row.requestedArchitect && (
+                                      <span style={{ padding: '1px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', fontSize: '0.62rem', fontWeight: 800 }}>
+                                        📐 Mimar Talebi
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          },
+                          {
+                            key: 'project',
+                            header: 'Proje / Ürün Adı',
+                            render: (row) => (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '280px' }}>
+                                {row.productImage && (
+                                  <img
+                                    src={row.productImage}
+                                    alt={row.projectName}
+                                    style={{ width: '38px', height: '38px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }}
+                                  />
+                                )}
+                                <div style={{ minWidth: 0 }}>
+                                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {row.projectName}
+                                  </div>
+                                  <div style={{ fontSize: '0.72rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {row.productCode ? `SKU: ${row.productCode}` : ''} {row.notes ? `• ${row.notes}` : ''}
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          },
+                          {
+                            key: 'date',
+                            header: 'Tarih',
+                            render: (row) => (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', color: '#475569', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                                <Calendar size={13} style={{ color: '#b38e47' }} />
+                                {row.createdAt
+                                  ? new Date(row.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                                  : 'Bugün'}
+                              </div>
+                            )
+                          },
+                          {
+                            key: 'amount',
+                            header: 'Teklif Tutarı / Metraj',
+                            render: (row) => (
+                              <span style={{ fontWeight: 900, color: '#b38e47', fontSize: '0.88rem', whiteSpace: 'nowrap' }}>
+                                {row.amountText}
+                              </span>
+                            )
+                          },
+                          {
+                            key: 'status',
+                            header: 'Durum',
+                            render: (row) => <StatusBadge status={row.status} />
+                          },
+                          {
+                            key: 'actions',
+                            header: 'Detay & İşlem',
+                            render: (row) => (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                {row.rowType === 'LEAD' ? (
+                                  <>
+                                    <select
+                                      value={row.status}
+                                      onChange={(e) => handleUpdateLeadStatus(row.rawId, e.target.value)}
+                                      style={{
+                                        padding: '5px 8px',
+                                        fontSize: '0.73rem',
+                                        borderRadius: '8px',
+                                        border: '1px solid #cbd5e1',
+                                        background: '#f8fafc',
+                                        color: '#0f172a',
+                                        cursor: 'pointer',
+                                        fontWeight: 700
+                                      }}
+                                    >
+                                      <option value="PENDING">Bekliyor</option>
+                                      <option value="RESPONDED">Teklif Verildi</option>
+                                      <option value="COMPLETED">Satış Yapıldı</option>
+                                    </select>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setQuoteCustomerName(row.customerName || '');
+                                        setQuoteCustomerPhone(row.customerPhone || '');
+                                        setQuoteCustomerEmail(row.customerEmail || '');
+                                        setQuoteProductName(row.projectName || '');
+                                        setQuoteProductCode(row.productCode || 'SB-KARO');
+                                        setActivePortalTab('quick-quote');
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                      }}
+                                      title="Bu Talep İçin Teklif Hazırla"
+                                      style={{
+                                        background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                        color: '#090d16',
+                                        border: 'none',
+                                        padding: '5px 10px',
+                                        borderRadius: '7px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 800,
+                                        cursor: 'pointer',
+                                        whiteSpace: 'nowrap'
+                                      }}
+                                    >
+                                      Teklif Yaz
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteLead(row.rawId)}
+                                      style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#ef4444',
+                                        cursor: 'pointer',
+                                        padding: '4px',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                      }}
+                                      title="Talebi Sil"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSendWhatsAppQuote(row.rawObj)}
+                                      style={{
+                                        background: '#10b981',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        padding: '5px 9px',
+                                        borderRadius: '7px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 800,
+                                        cursor: 'pointer',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                      }}
+                                    >
+                                      <MessageSquare size={12} />
+                                      <span>WhatsApp</span>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setGeneratedQuote(row.rawObj)}
+                                      style={{
+                                        background: '#0f172a',
+                                        color: '#fde68a',
+                                        border: '1px solid #d4af37',
+                                        padding: '5px 10px',
+                                        borderRadius: '7px',
+                                        fontSize: '0.72rem',
+                                        fontWeight: 800,
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      Detay / PDF
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            )
+                          }
+                        ]}
+                        renderMobileCard={(row) => (
+                          <div
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '14px',
+                              padding: '14px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '10px',
+                              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: '#0f172a', display: 'block', fontWeight: 800 }}>
+                                  {row.customerName}
+                                </strong>
+                                {row.customerPhone && (
+                                  <a
+                                    href={`tel:${row.customerPhone}`}
+                                    style={{ fontSize: '0.74rem', color: '#b45309', fontWeight: 700, textDecoration: 'none' }}
+                                  >
+                                    {row.customerPhone}
+                                  </a>
+                                )}
+                              </div>
+                              <StatusBadge status={row.status} />
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a' }}>{row.projectName}</div>
+                                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{row.notes}</div>
+                              </div>
+                              <div style={{ fontWeight: 900, color: '#b38e47', fontSize: '0.88rem', flexShrink: 0, marginLeft: '8px' }}>
+                                {row.amountText}
+                              </div>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingTop: '4px' }}>
+                              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
+                                {row.createdAt ? new Date(row.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : 'Bugün'}
+                              </span>
+
+                              {row.rowType === 'LEAD' ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <select
+                                    value={row.status}
+                                    onChange={(e) => handleUpdateLeadStatus(row.rawId, e.target.value)}
+                                    style={{
+                                      padding: '5px 8px',
+                                      fontSize: '0.72rem',
+                                      borderRadius: '7px',
+                                      border: '1px solid #cbd5e1',
+                                      background: '#f8fafc',
+                                      fontWeight: 700
+                                    }}
+                                  >
+                                    <option value="PENDING">Bekliyor</option>
+                                    <option value="RESPONDED">Teklif Verildi</option>
+                                    <option value="COMPLETED">Satış Yapıldı</option>
+                                  </select>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteLead(row.rawId)}
+                                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSendWhatsAppQuote(row.rawObj)}
+                                    style={{ background: '#10b981', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}
+                                  >
+                                    WhatsApp
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setGeneratedQuote(row.rawObj)}
+                                    style={{ background: '#0f172a', color: '#fde68a', border: 'none', padding: '5px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}
+                                  >
+                                    PDF
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      />
+                    );
+                  })()}
+                </div>
+
+                {/* G. POPÜLER KOLEKSİYONLAR */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <h3 style={{ margin: '0 0 2px 0', fontSize: '1.08rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                        Popüler Koleksiyonlar
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>
+                        {dealerInfo?.brandName ? `${dealerInfo.brandName} showroomunuzda öne çıkan seramik koleksiyonları` : 'Showroomunuzda öne çıkan seramik serileri'}
+                      </p>
+                    </div>
+                    <PremiumButton
+                      variant="outline"
+                      size="sm"
+                      icon={<ArrowRight size={14} />}
+                      onClick={() => setActivePortalTab('catalog')}
+                    >
+                      Tüm Kataloğu Gör ({brandProducts.length})
+                    </PremiumButton>
+                  </div>
+
+                  {brandProductsLoading ? (
+                    <LoadingSkeleton rows={1} height="220px" />
+                  ) : brandProducts.length === 0 ? (
+                    <EmptyState
+                      icon={<Layers size={24} />}
+                      title="Koleksiyon Modelleri Yükleniyor"
+                      description="Bayisi olduğunuz markanın popüler koleksiyonlarını görüntülemek için modelleri yükleyin."
+                      actionLabel="Koleksiyonları Yükle"
+                      onAction={() => loadBrandProducts()}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, minmax(0, 1fr))',
+                        gap: '16px'
+                      }}
+                    >
+                      {brandProducts.slice(0, 4).map(prod => (
+                        <ProductCard
+                          key={prod.id}
+                          product={prod}
+                          brandName={dealerInfo?.brandName}
+                          compact={true}
+                          onInspect={(p) => {
+                            const studioUrl = `/?code=${encodeURIComponent(p.code || '')}&tab=studio&dealer=${dealerSlug}`;
+                            window.open(studioUrl, '_blank');
+                          }}
+                          onCreateQuote={(p) => {
+                            setQuoteProductName(p.name || 'Seramik Modeli');
+                            setQuoteProductCode(p.code || 'SB-KARO');
+                            if (p.imageUrl) setQuoteProductImageUrl(p.imageUrl);
+                            if (p.price) setQuoteUnitPriceM2(Number(p.price));
+                            setActivePortalTab('quick-quote');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          onCreateQr={(p) => {
+                            setQrSelectedProductIds(prev => (prev.includes(p.id) ? prev : [...prev, p.id]));
+                            setQrSearchQuery(p.name || p.code || '');
+                            setActivePortalTab('showroom-qr');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', color: '#334155', fontWeight: '800', background: '#f8fafc' }}>
-                        <th style={{ padding: '12px 16px', borderRadius: '8px 0 0 8px' }}>Müşteri Bilgileri</th>
-                        <th style={{ padding: '12px 16px' }}>Ürün Detayı</th>
-                        <th style={{ padding: '12px 16px' }}>Müşteri Notu</th>
-                        <th style={{ padding: '12px 16px' }}>Tarih</th>
-                        <th style={{ padding: '12px 16px' }}>Durum</th>
-                        <th style={{ padding: '12px 16px', borderRadius: '0 8px 8px 0' }}>İşlem</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leads.map(lead => (
-                        <tr key={lead.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }}>
-                          <td style={{ padding: '16px' }}>
-                            <strong style={{ display: 'block', color: '#0f172a', fontWeight: '800' }}>{lead.clientName}</strong>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#b45309', fontWeight: '700', marginTop: '3px' }}>
-                              <Phone size={11} /> {lead.clientPhone}
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem', color: '#475569', fontWeight: '500', marginTop: '2px' }}>
-                              <Mail size={11} /> {lead.clientEmail}
-                            </div>
-                            
-                            {/* Badges for requested services */}
-                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '6px' }}>
-                              {lead.requestedUsta && (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(234, 88, 12, 0.15)', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(234, 88, 12, 0.25)' }}>
-                                  🛠️ Usta Talebi
-                                </span>
-                              )}
-                              {lead.requestedArchitect && (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
-                                  📐 Mimar Talebi
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td style={{ padding: '16px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              {lead.product?.imageUrl && (
-                                <img 
-                                  src={lead.product.imageUrl} 
-                                  alt={lead.product.name} 
-                                  style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: '1px solid rgba(255, 255, 255, 0.08)' }} 
-                                />
-                              )}
-                              <div>
-                                <strong style={{ color: '#0f172a', fontWeight: '800' }}>{lead.product?.name}</strong>
-                                <span style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>SKU: {lead.product?.code}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td style={{ padding: '16px', maxWidth: '240px', color: '#334155', lineHeight: '1.5', fontWeight: '500' }}>
-                            {lead.notes || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Not bırakılmadı</span>}
-                            
-                            {lead.projectDimensions && (
-                              <div style={{ marginTop: '6px', fontSize: '0.75rem', background: '#f8fafc', padding: '5px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', color: '#0f172a' }}>
-                                <strong style={{ color: '#334155' }}>Ölçüler:</strong> <span style={{ fontWeight: '700' }}>{lead.projectDimensions}</span>
-                              </div>
-                            )}
-                            
-                            {lead.projectPhotoUrl && (
-                              <div style={{ marginTop: '6px' }}>
-                                <a 
-                                  href={lead.projectPhotoUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--accent-gold)', fontWeight: 'bold', textDecoration: 'underline' }}
-                                >
-                                  🖼️ Fotoğraf / Kroki Gör ↗
-                                </a>
-                              </div>
-                            )}
-                          </td>
-                          <td style={{ padding: '16px', color: '#475569', fontSize: '0.78rem', fontWeight: '600' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <Calendar size={13} style={{ color: '#b38e47' }} />
-                              {new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                          </td>
-                          <td style={{ padding: '16px' }}>
-                            {lead.status === 'PENDING' && (
-                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', fontSize: '0.7rem', fontWeight: '700', border: '1px solid rgba(217, 119, 6, 0.25)' }}>
-                                Bekliyor
-                              </span>
-                            )}
-                            {lead.status === 'RESPONDED' && (
-                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontSize: '0.7rem', fontWeight: '700', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
-                                Teklif Verildi
-                              </span>
-                            )}
-                            {lead.status === 'COMPLETED' && (
-                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontSize: '0.7rem', fontWeight: '700', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
-                                Satış Yapıldı
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ padding: '16px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <select 
-                                value={lead.status} 
-                                onChange={(e) => handleUpdateLeadStatus(lead.id, e.target.value)}
-                                style={{
-                                  padding: '5px 10px',
-                                  fontSize: '0.75rem',
-                                  borderRadius: '8px',
-                                  border: '1.5px solid #cbd5e1',
-                                  background: '#f8fafc',
-                                  color: '#0f172a',
-                                  cursor: 'pointer',
-                                  fontWeight: '700',
-                                  outline: 'none'
-                                }}
-                              >
-                                <option value="PENDING">Bekliyor</option>
-                                <option value="RESPONDED">Fiyat İletildi</option>
-                                <option value="COMPLETED">Satış Tamamlandı</option>
-                              </select>
-                              <button 
-                                onClick={() => handleDeleteLead(lead.id)} 
-                                style={{
-                                  background: 'transparent',
-                                  border: 'none',
-                                  color: '#ef4444',
-                                  cursor: 'pointer',
-                                  padding: '4px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
-                                title="Müşteri Talebini Sil"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {leads.length === 0 && (
-                        <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#64748b', fontWeight: '600' }}>
-                            Henüz size yönlendirilmiş bir müşteri teklif talebi bulunmamaktadır.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
+              </div>
+            );
+          })()
         )}
       </div>
 
@@ -8633,12 +9504,27 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         /* ===== PORTAL ARCHITECTURAL WARM STONE LUXURY THEME ===== */
+        :global(.dealer-stat-card:hover),
+        :global(.dealer-quick-action-card:hover),
+        :global(.dealer-collection-card:hover) {
+          transform: translateY(-2px);
+          border-color: rgba(179, 142, 71, 0.45) !important;
+          box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(179, 142, 71, 0.08) !important;
+        }
+        :global(.dealer-collection-card:hover img) {
+          transform: scale(1.04);
+        }
+        :global(.dealer-premium-btn:hover:not(:disabled)) {
+          transform: translateY(-1px);
+          filter: brightness(1.03);
+        }
+
         .glass-panel {
-          background: #f8f9fb !important;
+          background: #ffffff !important;
           backdrop-filter: blur(20px) !important;
-          border: 1.5px solid #cbd5e1 !important;
+          border: 1px solid #e2e8f0 !important;
           color: #0f172a !important;
-          box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+          box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
           border-radius: 18px !important;
         }
 
@@ -10031,9 +10917,9 @@ Yetkili Satış & Showroom Departmanı`;
           boxShadow: '0 -6px 25px rgba(0, 0, 0, 0.4)'
         }}>
           {[
-            { id: 'dashboard', label: 'Panel', icon: <Activity size={18} /> },
-            { id: 'stock-exchange', label: 'Takas Borsa', icon: <RefreshCw size={18} /> },
-            { id: 'b2b-projects', label: 'Talepler', icon: <Building2 size={18} /> },
+            { id: 'dashboard', label: 'Ana Panel', icon: <Activity size={18} /> },
+            { id: 'catalog', label: 'Katalog', icon: <Grid size={18} /> },
+            { id: 'quick-quote', label: 'Teklif Yaz', icon: <Calculator size={18} /> },
             { id: 'inventory', label: 'Stok', icon: <Package size={18} /> },
             { id: 'more', label: 'Menü', icon: <Menu size={18} /> }
           ].map(tab => {
@@ -10143,16 +11029,17 @@ Yetkili Satış & Showroom Departmanı`;
               boxSizing: 'border-box'
             }}>
               {[
-                { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={16} /> },
-                { id: 'kiosk-mode', label: 'Kiosk Teşhir', icon: <Eye size={16} />, isSaaSFeature: true },
-                { id: 'stock-exchange', label: 'Stok Borsası', icon: <RefreshCw size={16} /> },
-                { id: 'quick-quote', label: 'WhatsApp Teklif', icon: <Calculator size={16} />, isPremiumFeature: true },
-                { id: 'showroom-qr', label: 'Showroom QR', icon: <QrCode size={16} />, isPremiumFeature: true },
-                { id: 'b2b-projects', label: 'Proje Talepleri', icon: <Building2 size={16} /> },
-                { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={16} /> },
+                { id: 'dashboard', label: 'Ana Panel', icon: <Activity size={16} /> },
+                { id: 'catalog', label: 'Ürün Kataloğu', icon: <Grid size={16} /> },
+                { id: 'quick-quote', label: 'Teklif Yönetimi', icon: <Calculator size={16} />, isPremiumFeature: true },
+                { id: 'showroom-qr', label: 'QR Etiket & Stant', icon: <QrCode size={16} />, isPremiumFeature: true },
+                { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={16} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={16} /> },
-                { id: 'outlet-exchange', label: 'Outlet Borsası', icon: <Sparkles size={16} /> },
-                { id: 'subscription', label: 'Abonelik & Plan', icon: <CreditCard size={16} /> },
+                { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={16} /> },
+                { id: 'stock-exchange', label: 'Stok Borsası', icon: <RefreshCw size={16} /> },
+                { id: 'kiosk-mode', label: 'Kiosk Teşhir', icon: <Eye size={16} />, isSaaSFeature: true },
+                { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={16} /> },
+                { id: 'subscription', label: 'Abonelik Yönetimi', icon: <CreditCard size={16} /> },
                 { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={16} /> }
               ].map(item => {
                 const isActive = activePortalTab === item.id;
