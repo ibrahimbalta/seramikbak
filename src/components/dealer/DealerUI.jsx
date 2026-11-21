@@ -47,23 +47,23 @@ export function PremiumButton({
 
   const variantStyles = {
     gold: {
-      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+      background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
       color: '#090d16',
       border: '1px solid rgba(212, 175, 55, 0.5)',
       boxShadow: '0 4px 14px rgba(179, 142, 71, 0.25)',
       fontWeight: 800
     },
     dark: {
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      background: 'linear-gradient(135deg, var(--dp-text-primary, #202938) 0%, #1e293b 100%)',
       color: '#fde68a',
-      border: '1.5px solid #d4af37',
+      border: '1.5px solid #C5A04B',
       boxShadow: '0 4px 12px rgba(15, 23, 42, 0.14)',
       fontWeight: 800
     },
     outline: {
       background: '#ffffff',
-      color: '#0f172a',
-      border: '1.5px solid #cbd5e1',
+      color: 'var(--dp-text-primary, #202938)',
+      border: '1.5px solid var(--dp-border, #E4E8EF)',
       boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
       fontWeight: 700
     },
@@ -75,7 +75,7 @@ export function PremiumButton({
       fontWeight: 700
     },
     success: {
-      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      background: 'linear-gradient(135deg, #10A37F 0%, #10A37F 100%)',
       color: '#ffffff',
       border: 'none',
       boxShadow: '0 4px 12px rgba(16, 185, 129, 0.22)',
@@ -83,7 +83,7 @@ export function PremiumButton({
     },
     danger: {
       background: 'rgba(239, 68, 68, 0.08)',
-      color: '#dc2626',
+      color: '#DC5353',
       border: '1px solid rgba(239, 68, 68, 0.25)',
       boxShadow: 'none',
       fontWeight: 700
@@ -137,15 +137,15 @@ export function StatusBadge({ status, label, size = 'sm' }) {
   if (['ACTIVE', 'COMPLETED', 'WON', 'IN_STOCK', 'APPROVED', 'SUCCESS'].includes(normalized)) {
     config = {
       bg: 'rgba(16, 185, 129, 0.12)',
-      color: '#059669',
+      color: '#10A37F',
       border: 'rgba(16, 185, 129, 0.28)',
-      dot: '#10b981',
+      dot: '#10A37F',
       text: label || (normalized === 'COMPLETED' || normalized === 'WON' ? 'Tamamlandı' : normalized === 'IN_STOCK' ? 'Stokta' : 'Aktif')
     };
   } else if (['PENDING', 'WAITING', 'PENDING_APPROVAL', 'LOW_STOCK'].includes(normalized)) {
     config = {
       bg: 'rgba(217, 119, 6, 0.12)',
-      color: '#d97706',
+      color: '#E9A23B',
       border: 'rgba(217, 119, 6, 0.28)',
       dot: '#f59e0b',
       text: label || 'Bekliyor'
@@ -161,9 +161,9 @@ export function StatusBadge({ status, label, size = 'sm' }) {
   } else if (['LOST', 'REJECTED', 'OUT_OF_STOCK', 'SOLD', 'ERROR', 'EXPIRED'].includes(normalized)) {
     config = {
       bg: 'rgba(220, 38, 38, 0.1)',
-      color: '#dc2626',
+      color: '#DC5353',
       border: 'rgba(220, 38, 38, 0.25)',
-      dot: '#ef4444',
+      dot: '#DC5353',
       text: label || (normalized === 'LOST' ? 'İptal / Kayıp' : normalized === 'SOLD' ? 'Satıldı' : 'Kritik')
     };
   } else if (['PREMIUM', 'PRO', 'VIP'].includes(normalized)) {
@@ -171,7 +171,7 @@ export function StatusBadge({ status, label, size = 'sm' }) {
       bg: 'linear-gradient(135deg, rgba(179, 142, 71, 0.18) 0%, rgba(212, 175, 55, 0.12) 100%)',
       color: '#926f28',
       border: 'rgba(179, 142, 71, 0.4)',
-      dot: '#b38e47',
+      dot: '#C5A04B',
       text: label || 'PREMIUM'
     };
   }
@@ -218,7 +218,7 @@ export function StatCard({
   changeText = '',
   changeType = 'neutral', // 'positive' | 'warning' | 'info' | 'neutral'
   icon,
-  accentColor = '#b38e47',
+  accentColor = '#C5A04B',
   sparklinePoints = [15, 28, 22, 38, 34, 48, 55],
   onClick,
   isMobile = false
@@ -244,8 +244,8 @@ export function StatCard({
   }, [sparklinePoints]);
 
   const badgeColors = {
-    positive: { bg: 'rgba(16, 185, 129, 0.1)', color: '#059669' },
-    warning: { bg: 'rgba(217, 119, 6, 0.12)', color: '#d97706' },
+    positive: { bg: 'rgba(16, 185, 129, 0.1)', color: '#10A37F' },
+    warning: { bg: 'rgba(217, 119, 6, 0.12)', color: '#E9A23B' },
     info: { bg: 'rgba(37, 99, 235, 0.1)', color: '#2563eb' },
     neutral: { bg: 'rgba(100, 116, 139, 0.1)', color: '#475569' }
   }[changeType] || { bg: 'rgba(100, 116, 139, 0.1)', color: '#475569' };
@@ -255,7 +255,7 @@ export function StatCard({
       onClick={onClick}
       style={{
         background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--dp-border, #E4E8EF)',
         borderRadius: '16px',
         padding: isMobile ? '16px 14px' : '20px 22px',
         display: 'flex',
@@ -293,7 +293,7 @@ export function StatCard({
             style={{
               fontSize: isMobile ? '0.76rem' : '0.82rem',
               fontWeight: 700,
-              color: '#64748b',
+              color: 'var(--dp-text-secondary, #758195)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis'
@@ -332,7 +332,7 @@ export function StatCard({
             style={{
               fontSize: isMobile ? '1.45rem' : '1.75rem',
               fontWeight: 900,
-              color: '#0f172a',
+              color: 'var(--dp-text-primary, #202938)',
               lineHeight: 1.1,
               letterSpacing: '-0.025em',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)'
@@ -344,7 +344,7 @@ export function StatCard({
                 style={{
                   fontSize: '0.8rem',
                   fontWeight: 700,
-                  color: '#64748b',
+                  color: 'var(--dp-text-secondary, #758195)',
                   marginLeft: '5px'
                 }}
               >
@@ -381,25 +381,49 @@ export function StatCard({
  * 4. PageHeader
  * Standardized page/section header with title, subtitle, and right-aligned action slot or date filter.
  */
-export function PageHeader({ title, subtitle, icon, actions, isMobile = false }) {
+export function Breadcrumb({ items = [] }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', fontSize: '0.7rem', fontWeight: 600, color: 'var(--dp-text-secondary, #758195)', marginBottom: '4px' }}>
+      {items.map((item, idx) => {
+        const isLast = idx === items.length - 1;
+        return (
+          <React.Fragment key={idx}>
+            {idx > 0 && <ChevronRight size={11} style={{ opacity: 0.55 }} />}
+            <span style={{ color: isLast ? '#C5A04B' : 'var(--dp-text-secondary, #758195)', fontWeight: isLast ? 700 : 600 }}>
+              {item}
+            </span>
+          </React.Fragment>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function PageHeader({ title, subtitle, icon, actions, breadcrumb, isMobile = false }) {
   return (
     <div
       style={{
+        background: 'var(--dp-surface, #FFFFFF)',
+        border: '1px solid var(--dp-border, #E4E8EF)',
+        borderRadius: '16px',
+        padding: isMobile ? '14px 16px' : '18px 22px',
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         alignItems: isMobile ? 'flex-start' : 'center',
         justifyContent: 'space-between',
         gap: '14px',
-        paddingBottom: '4px'
+        boxShadow: '0 1px 3px rgba(32, 41, 56, 0.03)'
       }}
     >
       <div>
+        {breadcrumb && <Breadcrumb items={breadcrumb} />}
         <h1
           style={{
-            fontSize: isMobile ? '1.28rem' : '1.55rem',
-            fontWeight: 900,
-            color: '#0f172a',
-            margin: '0 0 4px 0',
+            fontSize: isMobile ? '1.22rem' : '1.42rem',
+            fontWeight: 800,
+            color: 'var(--dp-text-primary, #202938)',
+            margin: '0 0 3px 0',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
@@ -407,11 +431,11 @@ export function PageHeader({ title, subtitle, icon, actions, isMobile = false })
             fontFamily: 'var(--font-title, "Outfit", sans-serif)'
           }}
         >
-          {icon && <span style={{ color: '#b38e47', display: 'inline-flex' }}>{icon}</span>}
+          {icon && <span style={{ color: '#C5A04B', display: 'inline-flex' }}>{icon}</span>}
           <span>{title}</span>
         </h1>
         {subtitle && (
-          <p style={{ fontSize: '0.84rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--dp-text-secondary, #758195)', margin: 0, fontWeight: 500 }}>
             {subtitle}
           </p>
         )}
@@ -421,6 +445,56 @@ export function PageHeader({ title, subtitle, icon, actions, isMobile = false })
           {actions}
         </div>
       )}
+    </div>
+  );
+}
+
+export function FormField({ label, error, hint, required = false, children }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+      {label && (
+        <label style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--dp-text-primary, #202938)' }}>
+          {label} {required && <span style={{ color: '#DC5353' }}>*</span>}
+        </label>
+      )}
+      {children}
+      {hint && !error && (
+        <span style={{ fontSize: '0.7rem', color: 'var(--dp-text-secondary, #758195)' }}>{hint}</span>
+      )}
+      {error && (
+        <span style={{ fontSize: '0.7rem', color: '#DC5353', fontWeight: 600 }}>{error}</span>
+      )}
+    </div>
+  );
+}
+
+export function UpgradePlanCard({ title, description, onUpgrade, onBack }) {
+  return (
+    <div
+      style={{
+        background: 'var(--dp-surface, #FFFFFF)',
+        border: '1px solid var(--dp-border, #E4E8EF)',
+        borderRadius: '18px',
+        padding: '44px 28px',
+        textAlign: 'center',
+        boxShadow: '0 8px 28px rgba(32, 41, 56, 0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '16px',
+        maxWidth: '600px',
+        margin: '24px auto'
+      }}
+    >
+      <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: '#111827', border: '1.5px solid #C5A04B', color: '#C5A04B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Crown size={26} />
+      </div>
+      <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--dp-text-primary, #202938)' }}>{title}</h3>
+      <p style={{ margin: 0, fontSize: '0.84rem', color: 'var(--dp-text-secondary, #758195)', maxWidth: '460px', lineHeight: 1.6 }}>{description}</p>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {onUpgrade && <PremiumButton variant="gold" icon={<Crown size={15} />} onClick={onUpgrade}>Premium Pakete Yükselt</PremiumButton>}
+        {onBack && <PremiumButton variant="outline" onClick={onBack}>Panoya Dön</PremiumButton>}
+      </div>
     </div>
   );
 }
@@ -452,7 +526,7 @@ export function SearchInput({
         style={{
           position: 'absolute',
           left: '12px',
-          color: dark ? '#94a3b8' : '#64748b',
+          color: dark ? '#94a3b8' : 'var(--dp-text-secondary, #758195)',
           pointerEvents: 'none'
         }}
       />
@@ -466,9 +540,9 @@ export function SearchInput({
           height: '38px',
           padding: '0 34px 0 36px',
           borderRadius: '10px',
-          border: dark ? '1px solid rgba(255,255,255,0.14)' : '1.5px solid #e2e8f0',
-          background: dark ? 'rgba(255,255,255,0.06)' : '#f8fafc',
-          color: dark ? '#f8fafc' : '#0f172a',
+          border: dark ? '1px solid rgba(255,255,255,0.14)' : '1.5px solid var(--dp-border, #E4E8EF)',
+          background: dark ? 'rgba(255,255,255,0.06)' : 'var(--dp-bg, #F5F6F8)',
+          color: dark ? 'var(--dp-bg, #F5F6F8)' : 'var(--dp-text-primary, #202938)',
           fontSize: '0.82rem',
           fontWeight: 600,
           outline: 'none',
@@ -513,7 +587,7 @@ export function FilterPanel({ options = [], activeId, onChange, icon }) {
         alignItems: 'center',
         gap: '4px',
         background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--dp-border, #E4E8EF)',
         borderRadius: '11px',
         padding: '4px',
         boxShadow: '0 1px 3px rgba(15, 23, 42, 0.03)',
@@ -521,7 +595,7 @@ export function FilterPanel({ options = [], activeId, onChange, icon }) {
       }}
     >
       {icon && (
-        <span style={{ padding: '0 6px 0 8px', color: '#b38e47', display: 'inline-flex', alignItems: 'center' }}>
+        <span style={{ padding: '0 6px 0 8px', color: '#C5A04B', display: 'inline-flex', alignItems: 'center' }}>
           {icon}
         </span>
       )}
@@ -533,8 +607,8 @@ export function FilterPanel({ options = [], activeId, onChange, icon }) {
             type="button"
             onClick={() => onChange(opt.id)}
             style={{
-              background: isActive ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : 'transparent',
-              color: isActive ? '#fde68a' : '#64748b',
+              background: isActive ? 'linear-gradient(135deg, var(--dp-text-primary, #202938) 0%, #1e293b 100%)' : 'transparent',
+              color: isActive ? '#fde68a' : 'var(--dp-text-secondary, #758195)',
               border: isActive ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
               padding: '6px 12px',
               borderRadius: '8px',
@@ -557,12 +631,12 @@ export function FilterPanel({ options = [], activeId, onChange, icon }) {
  * 7. QuickActionCard
  * Four-card grid item for quick dealer workflows (Ürün Kataloğu, AI Görselleştirici, Teklif Oluştur, Destek Al)
  */
-export function QuickActionCard({ title, description, icon, badge, onClick, href, accentColor = '#b38e47' }) {
+export function QuickActionCard({ title, description, icon, badge, onClick, href, accentColor = '#C5A04B' }) {
   const content = (
     <div
       style={{
         background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--dp-border, #E4E8EF)',
         borderRadius: '16px',
         padding: '18px 20px',
         display: 'flex',
@@ -601,7 +675,7 @@ export function QuickActionCard({ title, description, icon, badge, onClick, href
                 margin: 0,
                 fontSize: '0.9rem',
                 fontWeight: 800,
-                color: '#0f172a',
+                color: 'var(--dp-text-primary, #202938)',
                 fontFamily: 'var(--font-title, "Outfit", sans-serif)'
               }}
             >
@@ -626,7 +700,7 @@ export function QuickActionCard({ title, description, icon, badge, onClick, href
             style={{
               margin: '3px 0 0 0',
               fontSize: '0.76rem',
-              color: '#64748b',
+              color: 'var(--dp-text-secondary, #758195)',
               lineHeight: 1.35
             }}
           >
@@ -640,8 +714,8 @@ export function QuickActionCard({ title, description, icon, badge, onClick, href
           width: '30px',
           height: '30px',
           borderRadius: '8px',
-          background: '#f8fafc',
-          border: '1px solid #e2e8f0',
+          background: 'var(--dp-bg, #F5F6F8)',
+          border: '1px solid var(--dp-border, #E4E8EF)',
           color: '#475569',
           display: 'flex',
           alignItems: 'center',
@@ -807,7 +881,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
     <div
       style={{
         background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--dp-border, #E4E8EF)',
         borderRadius: '18px',
         padding: isMobile ? '18px 14px' : '24px 26px',
         boxShadow: '0 4px 18px -4px rgba(15, 23, 42, 0.04)',
@@ -833,7 +907,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                 margin: 0,
                 fontSize: '1.05rem',
                 fontWeight: 800,
-                color: '#0f172a',
+                color: 'var(--dp-text-primary, #202938)',
                 fontFamily: 'var(--font-title, "Outfit", sans-serif)'
               }}
             >
@@ -841,7 +915,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
             </h3>
             <StatusBadge status="ACTIVE" label="Canlı Veri" />
           </div>
-          <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: 'var(--dp-text-secondary, #758195)' }}>
             {totalVolume > 0
               ? `Seçili dönemde toplam ₺${totalVolume.toLocaleString('tr-TR')} teklif hacmi (${totalCount} işlem)`
               : `Seçili dönemde toplam ${totalCount} müşteri talebi ve teklif hareketi`}
@@ -867,8 +941,8 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
         >
           <defs>
             <linearGradient id="dealerGoldArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#b38e47" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#b38e47" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#C5A04B" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="#C5A04B" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
@@ -883,7 +957,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                   y1={y}
                   x2={width - padRight}
                   y2={y}
-                  stroke="#f1f5f9"
+                  stroke="var(--dp-bg, #F5F6F8)"
                   strokeWidth="1.5"
                   strokeDasharray="4 4"
                 />
@@ -910,7 +984,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
           <path
             d={linePath}
             fill="none"
-            stroke="#b38e47"
+            stroke="#C5A04B"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -936,7 +1010,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                     y1={padTop}
                     x2={pt.x}
                     y2={padTop + plotH}
-                    stroke="#d4af37"
+                    stroke="#C5A04B"
                     strokeWidth="1.5"
                     strokeDasharray="3 3"
                   />
@@ -947,7 +1021,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                   cy={pt.y}
                   r={isHovered ? 6 : 4.5}
                   fill="#ffffff"
-                  stroke="#b38e47"
+                  stroke="#C5A04B"
                   strokeWidth={isHovered ? 3 : 2.5}
                 />
 
@@ -958,7 +1032,7 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                   textAnchor="middle"
                   fontSize="11"
                   fontWeight={isHovered ? '800' : '600'}
-                  fill={isHovered ? '#0f172a' : '#64748b'}
+                  fill={isHovered ? 'var(--dp-text-primary, #202938)' : 'var(--dp-text-secondary, #758195)'}
                 >
                   {pt.label}
                 </text>
@@ -970,8 +1044,8 @@ export function SalesPerformanceChart({ leads = [], savedQuotesList = [], isMobi
                       width="130"
                       height="42"
                       rx="8"
-                      fill="#0f172a"
-                      stroke="#d4af37"
+                      fill="var(--dp-text-primary, #202938)"
+                      stroke="#C5A04B"
                       strokeWidth="1"
                     />
                     <text x="65" y="16" textAnchor="middle" fontSize="10" fontWeight="700" fill="#fde68a">
@@ -1016,7 +1090,7 @@ export function ProductCard({
     <div
       style={{
         background: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--dp-border, #E4E8EF)',
         borderRadius: '16px',
         overflow: 'hidden',
         display: 'flex',
@@ -1033,7 +1107,7 @@ export function ProductCard({
           position: 'relative',
           height: compact ? '145px' : '180px',
           width: '100%',
-          background: '#f1f5f9',
+          background: 'var(--dp-bg, #F5F6F8)',
           overflow: 'hidden'
         }}
       >
@@ -1081,7 +1155,7 @@ export function ProductCard({
             bottom: '10px',
             right: '10px',
             background: 'rgba(255, 255, 255, 0.92)',
-            color: '#0f172a',
+            color: 'var(--dp-text-primary, #202938)',
             padding: '2px 8px',
             borderRadius: '6px',
             fontSize: '0.68rem',
@@ -1103,7 +1177,7 @@ export function ProductCard({
               margin: '3px 0 0 0',
               fontSize: '0.94rem',
               fontWeight: 800,
-              color: '#0f172a',
+              color: 'var(--dp-text-primary, #202938)',
               lineHeight: 1.3,
               display: '-webkit-box',
               WebkitLineClamp: 1,
@@ -1122,16 +1196,16 @@ export function ProductCard({
             justifyContent: 'space-between',
             gap: '8px',
             paddingTop: '8px',
-            borderTop: '1px solid #f1f5f9',
+            borderTop: '1px solid var(--dp-bg, #F5F6F8)',
             marginTop: 'auto'
           }}
         >
           {price ? (
-            <span style={{ fontSize: '0.92rem', fontWeight: 900, color: '#b38e47' }}>
-              ₺{Number(price).toLocaleString('tr-TR')} <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>/m²</span>
+            <span style={{ fontSize: '0.92rem', fontWeight: 900, color: '#C5A04B' }}>
+              ₺{Number(price).toLocaleString('tr-TR')} <span style={{ fontSize: '0.68rem', color: 'var(--dp-text-secondary, #758195)', fontWeight: 600 }}>/m²</span>
             </span>
           ) : (
-            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#64748b' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--dp-text-secondary, #758195)' }}>
               3D Stüdyo Uyumlu
             </span>
           )}
@@ -1143,9 +1217,9 @@ export function ProductCard({
                 onClick={() => onCreateQuote(product)}
                 title="Bu Model İçin Hızlı Teklif Oluştur"
                 style={{
-                  background: '#f8fafc',
-                  border: '1px solid #cbd5e1',
-                  color: '#0f172a',
+                  background: 'var(--dp-bg, #F5F6F8)',
+                  border: '1px solid var(--dp-border, #E4E8EF)',
+                  color: 'var(--dp-text-primary, #202938)',
                   padding: '5px 9px',
                   borderRadius: '8px',
                   fontSize: '0.72rem',
@@ -1156,7 +1230,7 @@ export function ProductCard({
                   gap: '4px'
                 }}
               >
-                <Calculator size={12} style={{ color: '#b38e47' }} />
+                <Calculator size={12} style={{ color: '#C5A04B' }} />
                 <span>Teklif</span>
               </button>
             )}
@@ -1166,9 +1240,9 @@ export function ProductCard({
                 onClick={() => onCreateQr(product)}
                 title="QR Etiket Bas"
                 style={{
-                  background: '#f8fafc',
-                  border: '1px solid #cbd5e1',
-                  color: '#0f172a',
+                  background: 'var(--dp-bg, #F5F6F8)',
+                  border: '1px solid var(--dp-border, #E4E8EF)',
+                  color: 'var(--dp-text-primary, #202938)',
                   padding: '5px 8px',
                   borderRadius: '8px',
                   fontSize: '0.72rem',
@@ -1178,14 +1252,14 @@ export function ProductCard({
                   alignItems: 'center'
                 }}
               >
-                <QrCode size={13} style={{ color: '#0f172a' }} />
+                <QrCode size={13} style={{ color: 'var(--dp-text-primary, #202938)' }} />
               </button>
             )}
             <button
               type="button"
               onClick={() => onInspect?.(product)}
               style={{
-                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                 border: 'none',
                 color: '#090d16',
                 padding: '5px 11px',
@@ -1217,7 +1291,7 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }) 
     <div
       style={{
         background: '#ffffff',
-        border: '1.5px dashed #cbd5e1',
+        border: '1.5px dashed var(--dp-border, #E4E8EF)',
         borderRadius: '16px',
         padding: '40px 24px',
         textAlign: 'center',
@@ -1234,7 +1308,7 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }) 
           height: '52px',
           borderRadius: '14px',
           background: 'rgba(179, 142, 71, 0.12)',
-          color: '#b38e47',
+          color: '#C5A04B',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
@@ -1243,11 +1317,11 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }) 
         {icon || <Layers size={24} />}
       </div>
       <div>
-        <h4 style={{ margin: '0 0 4px 0', fontSize: '0.98rem', fontWeight: 800, color: '#0f172a' }}>
+        <h4 style={{ margin: '0 0 4px 0', fontSize: '0.98rem', fontWeight: 800, color: 'var(--dp-text-primary, #202938)' }}>
           {title}
         </h4>
         {description && (
-          <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b', maxWidth: '420px', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--dp-text-secondary, #758195)', maxWidth: '420px', lineHeight: 1.5 }}>
             {description}
           </p>
         )}
@@ -1275,7 +1349,7 @@ export function LoadingSkeleton({ rows = 3, height = '56px' }) {
             height,
             width: '100%',
             borderRadius: '12px',
-            background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+            background: 'linear-gradient(90deg, var(--dp-bg, #F5F6F8) 25%, var(--dp-border, #E4E8EF) 50%, var(--dp-bg, #F5F6F8) 75%)',
             backgroundSize: '200% 100%',
             animation: 'pulse 1.5s ease-in-out infinite'
           }}
@@ -1317,13 +1391,13 @@ export function DataTable({
         width: '100%',
         overflowX: 'auto',
         borderRadius: '14px',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--dp-border, #E4E8EF)',
         background: '#ffffff'
       }}
     >
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
         <thead>
-          <tr style={{ background: '#f8fafc', borderBottom: '1.5px solid #e2e8f0', textAlign: 'left' }}>
+          <tr style={{ background: 'var(--dp-bg, #F5F6F8)', borderBottom: '1.5px solid var(--dp-border, #E4E8EF)', textAlign: 'left' }}>
             {columns.map((col) => (
               <th
                 key={col.key}
@@ -1347,7 +1421,7 @@ export function DataTable({
             <tr
               key={row.id || rIdx}
               style={{
-                borderBottom: rIdx === data.length - 1 ? 'none' : '1px solid #f1f5f9',
+                borderBottom: rIdx === data.length - 1 ? 'none' : '1px solid var(--dp-bg, #F5F6F8)',
                 transition: 'background 0.15s ease'
               }}
             >
@@ -1398,7 +1472,7 @@ export function ConfirmDialog({
         style={{
           background: '#ffffff',
           borderRadius: '18px',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--dp-border, #E4E8EF)',
           padding: '24px',
           maxWidth: '420px',
           width: '100%',
@@ -1406,8 +1480,8 @@ export function ConfirmDialog({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>{title}</h3>
-        <p style={{ margin: '0 0 20px 0', fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5 }}>{description}</p>
+        <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 800, color: 'var(--dp-text-primary, #202938)' }}>{title}</h3>
+        <p style={{ margin: '0 0 20px 0', fontSize: '0.85rem', color: 'var(--dp-text-secondary, #758195)', lineHeight: 1.5 }}>{description}</p>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <PremiumButton variant="outline" size="sm" onClick={onCancel}>
             {cancelLabel}

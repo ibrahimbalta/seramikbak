@@ -77,7 +77,8 @@ import {
   ConfirmDialog,
   QuickActionCard,
   ProductCard,
-  SalesPerformanceChart
+  SalesPerformanceChart,
+  UpgradePlanCard
 } from '@/components/dealer/DealerUI';
 
 export default function DealerPortalPage() {
@@ -457,7 +458,7 @@ Yetkili Satış & Showroom Departmanı`;
   const [profilePdfCatalogUrl, setProfilePdfCatalogUrl] = useState('');
   const [profilePdfCatalogName, setProfilePdfCatalogName] = useState('');
   const [profileThemePreset, setProfileThemePreset] = useState('GOLD');
-  const [profileThemePrimary, setProfileThemePrimary] = useState('#d4af37');
+  const [profileThemePrimary, setProfileThemePrimary] = useState('#C5A04B');
   const [profileThemeBgColor, setProfileThemeBgColor] = useState('#f8f9fc');
   const [actionStats, setActionStats] = useState({ views: 0, whatsapp: 0, phone: 0, directions: 0, pdfDownload: 0, totalInteractions: 0 });
   const [profileSuccess, setProfileSuccess] = useState('');
@@ -678,7 +679,7 @@ Yetkili Satış & Showroom Departmanı`;
           const themeSessionParts = rawThemeSession.split('|');
           setProfileThemePreset(themeSessionParts[0] || 'GOLD');
           setProfileThemeBgColor(themeSessionParts[1] || '#f8f9fc');
-          setProfileThemePrimary(session.themePrimary || '#d4af37');
+          setProfileThemePrimary(session.themePrimary || '#C5A04B');
           setProfileSocialInstagram(session.socialInstagram || '');
           setProfileSocialFacebook(session.socialFacebook || '');
           setProfileSocialLinkedin(session.socialLinkedin || '');
@@ -1310,7 +1311,7 @@ Yetkili Satış & Showroom Departmanı`;
         const themeFetchParts = rawThemeFetch.split('|');
         setProfileThemePreset(themeFetchParts[0] || 'GOLD');
         setProfileThemeBgColor(themeFetchParts[1] || '#f8f9fc');
-        setProfileThemePrimary(data.dealer.themePrimary || '#d4af37');
+        setProfileThemePrimary(data.dealer.themePrimary || '#C5A04B');
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
       }
@@ -1756,7 +1757,7 @@ Yetkili Satış & Showroom Departmanı`;
             height: '46px',
             borderRadius: '12px',
             background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
-            border: '1.5px solid #d4af37',
+            border: '1.5px solid #C5A04B',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1765,8 +1766,8 @@ Yetkili Satış & Showroom Departmanı`;
             fontSize: '1.2rem',
             boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)'
           }}>SB</div>
-          <Loader2 className="animate-spin" size={24} style={{ color: '#b38e47' }} />
-          <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Bayi Portalı Yükleniyor...</span>
+          <Loader2 className="animate-spin" size={24} style={{ color: '#C5A04B' }} />
+          <span style={{ fontSize: '0.85rem', color: '#758195', fontWeight: '600' }}>Bayi Portalı Yükleniyor...</span>
         </div>
       </main>
     );
@@ -1802,7 +1803,7 @@ Yetkili Satış & Showroom Departmanı`;
             position: 'relative',
             zIndex: 2,
             background: '#f8f9fb',
-            border: '1.5px solid #cbd5e1',
+            border: '1.5px solid #E4E8EF',
             borderRadius: isMobile ? '20px' : '24px',
             padding: isMobile ? '24px 16px' : '40px',
             width: '100%',
@@ -1819,9 +1820,9 @@ Yetkili Satış & Showroom Departmanı`;
               width: '50px',
               height: '50px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+              background: 'linear-gradient(135deg, #1e293b 0%, #202938 100%)',
               color: '#ffffff',
-              border: '1.5px solid #d4af37',
+              border: '1.5px solid #C5A04B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1833,12 +1834,12 @@ Yetkili Satış & Showroom Departmanı`;
             <h3 style={{ 
               fontSize: '1.5rem', 
               fontWeight: '800', 
-              color: '#0f172a', 
+              color: '#202938', 
               margin: '0 0 8px 0',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               letterSpacing: '-0.02em'
             }}>Bayi İş Ortaklığı Portalı</h3>
-            <p style={{ fontSize: '0.84rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: '0.84rem', color: '#758195', margin: 0, lineHeight: 1.5 }}>
               Yetkili satıcılar için stok, teklif ve müşteri talepleri yönetim merkezi.
             </p>
           </div>
@@ -1851,18 +1852,18 @@ Yetkili Satış & Showroom Departmanı`;
             padding: '4px',
             borderRadius: '12px',
             marginBottom: '24px',
-            border: '1px solid #cbd5e1'
+            border: '1px solid #E4E8EF'
           }}>
             <button
               type="button"
               onClick={() => { setRegisterTab('login'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
                 background: registerTab === 'login' ? '#f8f9fb' : 'transparent',
-                border: registerTab === 'login' ? '1px solid #cbd5e1' : '1px solid transparent',
+                border: registerTab === 'login' ? '1px solid #E4E8EF' : '1px solid transparent',
                 padding: '10px',
                 fontSize: '0.84rem',
                 fontWeight: '700',
-                color: registerTab === 'login' ? '#0f172a' : '#64748b',
+                color: registerTab === 'login' ? '#202938' : '#758195',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 boxShadow: registerTab === 'login' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
@@ -1876,11 +1877,11 @@ Yetkili Satış & Showroom Departmanı`;
               onClick={() => { setRegisterTab('register'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
                 background: registerTab === 'register' ? '#f8f9fb' : 'transparent',
-                border: registerTab === 'register' ? '1px solid #cbd5e1' : '1px solid transparent',
+                border: registerTab === 'register' ? '1px solid #E4E8EF' : '1px solid transparent',
                 padding: '10px',
                 fontSize: '0.84rem',
                 fontWeight: '700',
-                color: registerTab === 'register' ? '#0f172a' : '#64748b',
+                color: registerTab === 'register' ? '#202938' : '#758195',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 boxShadow: registerTab === 'register' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
@@ -1946,16 +1947,16 @@ Yetkili Satış & Showroom Departmanı`;
                         width: '100%',
                         padding: '12px 16px 12px 42px',
                         borderRadius: '10px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.86rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
                       className="login-input"
                     />
-                    <User size={16} style={{ position: 'absolute', left: '15px', top: '14px', color: '#64748b' }} />
+                    <User size={16} style={{ position: 'absolute', left: '15px', top: '14px', color: '#758195' }} />
                   </div>
                 </div>
 
@@ -1972,16 +1973,16 @@ Yetkili Satış & Showroom Departmanı`;
                         width: '100%',
                         padding: '12px 16px 12px 42px',
                         borderRadius: '10px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.86rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none',
                         boxSizing: 'border-box'
                       }}
                       className="login-input"
                     />
-                    <Lock size={16} style={{ position: 'absolute', left: '15px', top: '14px', color: '#64748b' }} />
+                    <Lock size={16} style={{ position: 'absolute', left: '15px', top: '14px', color: '#758195' }} />
                   </div>
                 </div>
 
@@ -1989,9 +1990,9 @@ Yetkili Satış & Showroom Departmanı`;
                   type="submit"
                   disabled={isLoading}
                   style={{
-                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #2a374f 100%)',
+                    background: 'linear-gradient(135deg, #202938 0%, #1e293b 60%, #2a374f 100%)',
                     color: '#fde68a',
-                    border: '1.5px solid #d4af37',
+                    border: '1.5px solid #C5A04B',
                     borderRadius: '10px',
                     padding: '13px',
                     fontWeight: '800',
@@ -2074,10 +2075,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.82rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2092,10 +2093,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.82rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2120,10 +2121,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.82rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2140,10 +2141,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.82rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2162,10 +2163,10 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      border: '1px solid #E4E8EF',
                       fontSize: '0.82rem',
                       background: '#ffffff',
-                      color: '#0f172a',
+                      color: '#202938',
                       outline: 'none'
                     }}
                     className="login-input"
@@ -2184,10 +2185,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.82rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2204,10 +2205,10 @@ Yetkili Satış & Showroom Departmanı`;
                       style={{
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         fontSize: '0.82rem',
                         background: '#ffffff',
-                        color: '#0f172a',
+                        color: '#202938',
                         outline: 'none'
                       }}
                       className="login-input"
@@ -2226,10 +2227,10 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      border: '1px solid #E4E8EF',
                       fontSize: '0.82rem',
                       background: '#ffffff',
-                      color: '#0f172a',
+                      color: '#202938',
                       outline: 'none',
                       fontFamily: 'inherit',
                       resize: 'none'
@@ -2240,10 +2241,10 @@ Yetkili Satış & Showroom Departmanı`;
 
                 {/* Lat Lng Geocoding helper */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: '#F5F6F8',
                   padding: '14px',
                   borderRadius: '12px',
-                  border: '1px dashed #cbd5e1',
+                  border: '1px dashed #E4E8EF',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px'
@@ -2282,7 +2283,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                   <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#64748b' }}>Enlem (Lat)</label>
+                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#758195' }}>Enlem (Lat)</label>
                       <input
                         type="text"
                         value={regLat}
@@ -2292,17 +2293,17 @@ Yetkili Satış & Showroom Departmanı`;
                         style={{
                           padding: '6px 8px',
                           borderRadius: '6px',
-                          border: '1px solid #cbd5e1',
+                          border: '1px solid #E4E8EF',
                           fontSize: '0.75rem',
                           background: '#ffffff',
-                          color: '#0f172a',
+                          color: '#202938',
                           outline: 'none',
                           fontFamily: 'monospace'
                         }}
                       />
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#64748b' }}>Boylam (Lng)</label>
+                      <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#758195' }}>Boylam (Lng)</label>
                       <input
                         type="text"
                         value={regLng}
@@ -2312,10 +2313,10 @@ Yetkili Satış & Showroom Departmanı`;
                         style={{
                           padding: '6px 8px',
                           borderRadius: '6px',
-                          border: '1px solid #cbd5e1',
+                          border: '1px solid #E4E8EF',
                           fontSize: '0.75rem',
                           background: '#ffffff',
-                          color: '#0f172a',
+                          color: '#202938',
                           outline: 'none',
                           fontFamily: 'monospace'
                         }}
@@ -2331,10 +2332,10 @@ Yetkili Satış & Showroom Departmanı`;
                     checked={kvkkAccepted} 
                     onChange={(e) => setKvkkAccepted(e.target.checked)} 
                     required
-                    style={{ marginTop: '3px', cursor: 'pointer', accentColor: '#b38e47' }}
+                    style={{ marginTop: '3px', cursor: 'pointer', accentColor: '#C5A04B' }}
                   />
-                  <label htmlFor="kvkk-check" style={{ fontSize: '0.75rem', color: '#64748b', lineHeight: '1.45', cursor: 'pointer', userSelect: 'none' }}>
-                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> ve <Link href="/yasal?tab=bayi-sozlesme" target="_blank" style={{ color: '#b38e47', fontWeight: '700', textDecoration: 'underline' }}>Bayi Üyelik Sözleşmesi'ni</Link> okudum, kabul ediyorum.
+                  <label htmlFor="kvkk-check" style={{ fontSize: '0.75rem', color: '#758195', lineHeight: '1.45', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#C5A04B', fontWeight: '700', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> ve <Link href="/yasal?tab=bayi-sozlesme" target="_blank" style={{ color: '#C5A04B', fontWeight: '700', textDecoration: 'underline' }}>Bayi Üyelik Sözleşmesi'ni</Link> okudum, kabul ediyorum.
                   </label>
                 </div>
 
@@ -2342,7 +2343,7 @@ Yetkili Satış & Showroom Departmanı`;
                   type="submit"
                   disabled={isRegistering}
                   style={{
-                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '10px',
@@ -2381,7 +2382,7 @@ Yetkili Satış & Showroom Departmanı`;
             textAlign: 'center',
             marginTop: '28px',
             fontSize: '0.75rem',
-            color: '#64748b',
+            color: '#758195',
             borderTop: '1px solid #f1f5f9',
             paddingTop: '16px'
           }}>
@@ -2395,13 +2396,13 @@ Yetkili Satış & Showroom Departmanı`;
       <style jsx>{`
         .login-input {
           background: #f1f4f8 !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           font-weight: 600 !important;
         }
         .login-input:focus {
           background: #f8f9fb !important;
-          border-color: #d4af37 !important;
+          border-color: #C5A04B !important;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
         }
         .login-btn:hover {
@@ -2412,8 +2413,8 @@ Yetkili Satış & Showroom Departmanı`;
           box-shadow: 0 8px 24px rgba(197, 143, 39, 0.42) !important;
         }
         .hover-gold-text:hover {
-          color: #b38e47 !important;
-          border-color: #cbd5e1 !important;
+          color: #C5A04B !important;
+          border-color: #E4E8EF !important;
         }
         @media (max-width: 768px) {
           .login-card {
@@ -2434,9 +2435,9 @@ Yetkili Satış & Showroom Departmanı`;
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: 'var(--bp-bg, #F6F7F9)',
+      backgroundColor: 'var(--dp-bg, #F5F6F8)',
       backgroundImage: 'none',
-      color: 'var(--bp-text-primary, #202633)',
+      color: 'var(--dp-text-primary, #202938)',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
@@ -2460,7 +2461,7 @@ Yetkili Satış & Showroom Departmanı`;
       {!isMobile && (
         <aside className="no-print dealer-sidebar" style={{
           width: isSidebarCollapsed ? '74px' : '268px',
-          background: 'var(--bp-sidebar-bg, #171B24)',
+          background: 'var(--dp-sidebar-bg, #111827)',
           borderRight: '1px solid var(--bp-sidebar-border, rgba(255, 255, 255, 0.08))',
           display: 'flex',
           flexDirection: 'column',
@@ -2490,7 +2491,7 @@ Yetkili Satış & Showroom Departmanı`;
                     borderRadius: '9px',
                     background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
                     color: '#ffffff',
-                    border: '1.5px solid #d4af37',
+                    border: '1.5px solid #C5A04B',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2500,7 +2501,7 @@ Yetkili Satış & Showroom Departmanı`;
                   }}>SB</div>
                   <div>
                     <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fff', margin: 0, letterSpacing: '-0.01em' }}>SeramikBak</h4>
-                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Bayi Portalı</span>
+                    <span style={{ fontSize: '0.62rem', color: '#C5A04B', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Bayi Portalı</span>
                   </div>
                 </div>
               )}
@@ -2535,7 +2536,7 @@ Yetkili Satış & Showroom Departmanı`;
                 gap: '7px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                  <div style={{ fontSize: '0.84rem', fontWeight: '800', color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontSize: '0.84rem', fontWeight: '800', color: '#F5F6F8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {dealerInfo.name}
                   </div>
                   <span style={{
@@ -2551,16 +2552,16 @@ Yetkili Satış & Showroom Departmanı`;
                     borderRadius: '999px',
                     flexShrink: 0
                   }}>
-                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981' }} />
+                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10A37F' }} />
                     Aktif Bayi
                   </span>
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <MapPin size={11} style={{ color: '#d4af37', flexShrink: 0 }} />
+                  <MapPin size={11} style={{ color: '#C5A04B', flexShrink: 0 }} />
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dealerInfo.district}, {dealerInfo.city}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
-                  <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: '5px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontWeight: '700' }}>
+                  <span style={{ fontSize: '0.62rem', padding: '2px 7px', borderRadius: '5px', background: 'rgba(212, 175, 55, 0.15)', color: '#C5A04B', fontWeight: '700' }}>
                     {dealerInfo.brandName} Bayisi
                   </span>
                   {saasInfo && (
@@ -2568,8 +2569,8 @@ Yetkili Satış & Showroom Departmanı`;
                       fontSize: '0.62rem', 
                       padding: '2px 7px', 
                       borderRadius: '5px', 
-                      background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'rgba(255,255,255,0.12)', 
-                      color: saasInfo.plan === 'PREMIUM' ? '#090d16' : '#f8fafc', 
+                      background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)' : 'rgba(255,255,255,0.12)', 
+                      color: saasInfo.plan === 'PREMIUM' ? '#090d16' : '#F5F6F8', 
                       fontWeight: '800' 
                     }}>
                       {saasInfo.plan}
@@ -2590,7 +2591,7 @@ Yetkili Satış & Showroom Departmanı`;
                     width: '100%',
                     padding: '7px 10px',
                     borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                     color: '#090d16',
                     fontSize: '0.74rem',
                     fontWeight: '800',
@@ -2681,7 +2682,7 @@ Yetkili Satış & Showroom Departmanı`;
                         background: 'transparent',
                         border: 'none',
                         padding: '4px 10px',
-                        color: '#64748b',
+                        color: '#758195',
                         fontSize: '0.64rem',
                         fontWeight: '800',
                         letterSpacing: '0.08em',
@@ -2737,9 +2738,9 @@ Yetkili Satış & Showroom Departmanı`;
                           gap: '10px',
                           width: '100%',
                           padding: isSidebarCollapsed ? '10px 8px' : '9px 12px',
-                          background: isActive ? 'rgba(198, 160, 74, 0.16)' : 'transparent',
+                          background: isActive ? 'rgba(197, 160, 75, 0.16)' : 'transparent',
                           border: 'none',
-                          borderLeft: isActive && !isSidebarCollapsed ? '3px solid #C6A04A' : '3px solid transparent',
+                          borderLeft: isActive && !isSidebarCollapsed ? '3px solid #C5A04B' : '3px solid transparent',
                           borderRadius: '9px',
                           color: isActive ? '#F3DFAA' : '#B4BCC8',
                           cursor: 'pointer',
@@ -2753,7 +2754,7 @@ Yetkili Satış & Showroom Departmanı`;
                         title={link.label}
                         className={isActive ? '' : 'hover-gold-text'}
                       >
-                        <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, color: isActive ? '#C6A04A' : '#8A94A6' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0, color: isActive ? '#C5A04B' : '#8A94A6' }}>
                           {link.icon}
                         </span>
                         {!isSidebarCollapsed && (
@@ -2796,7 +2797,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 padding: '2px 5px',
                                 borderRadius: '4px',
                                 background: isLocked ? 'rgba(212, 175, 55, 0.15)' : (isActive ? 'rgba(9,13,22,0.85)' : 'linear-gradient(135deg, #111 0%, #333 100%)'),
-                                color: '#d4af37',
+                                color: '#C5A04B',
                                 border: '1px solid rgba(212, 175, 55, 0.3)',
                                 fontWeight: '800',
                                 display: 'flex',
@@ -2836,7 +2837,7 @@ Yetkili Satış & Showroom Departmanı`;
                 background: 'rgba(239, 68, 68, 0.08)',
                 border: '1px solid rgba(239, 68, 68, 0.2)',
                 borderRadius: '9px',
-                color: '#ef4444',
+                color: '#DC5353',
                 cursor: 'pointer',
                 fontSize: '0.8rem',
                 fontWeight: '700',
@@ -2868,8 +2869,8 @@ Yetkili Satış & Showroom Departmanı`;
           <header className="no-print dealer-header" style={{
             height: isMobile ? '58px' : '72px',
             minHeight: isMobile ? '58px' : '72px',
-            borderBottom: isMobile ? '1.5px solid rgba(198, 160, 74, 0.35)' : '1px solid var(--bp-border, #E5E8EE)',
-            background: isMobile ? '#171B24' : 'var(--bp-surface, #FFFFFF)',
+            borderBottom: isMobile ? '1.5px solid rgba(197, 160, 75, 0.35)' : '1px solid var(--dp-border, #E4E8EF)',
+            background: isMobile ? '#111827' : 'var(--dp-surface, #FFFFFF)',
             backdropFilter: 'blur(20px)',
             display: 'flex',
             alignItems: 'center',
@@ -2888,7 +2889,7 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       background: 'rgba(212, 175, 55, 0.15)',
                       border: '1px solid rgba(212, 175, 55, 0.35)',
-                      color: '#d4af37',
+                      color: '#C5A04B',
                       width: '34px',
                       height: '34px',
                       borderRadius: '8px',
@@ -2908,7 +2909,7 @@ Yetkili Satış & Showroom Departmanı`;
                     borderRadius: '8px',
                     background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
                     color: '#ffffff',
-                    border: '1.5px solid #d4af37',
+                    border: '1.5px solid #C5A04B',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2920,7 +2921,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <h4 style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {dealerInfo ? dealerInfo.name : 'SeramikBak'}
                     </h4>
-                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700', whiteSpace: 'nowrap', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <span style={{ fontSize: '0.62rem', color: '#C5A04B', fontWeight: '700', whiteSpace: 'nowrap', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {activePortalTab === 'dashboard' && 'Ana Gösterge Paneli'}
                       {activePortalTab === 'catalog' && 'Ürün Kataloğu'}
                       {activePortalTab === 'quick-quote' && 'Teklif Yönetimi'}
@@ -2952,7 +2953,7 @@ Yetkili Satış & Showroom Departmanı`;
                         height: '34px',
                         borderRadius: '8px',
                         fontSize: '0.68rem',
-                        color: '#d4af37',
+                        color: '#C5A04B',
                         fontWeight: '800',
                         textDecoration: 'none',
                         boxSizing: 'border-box'
@@ -2969,7 +2970,7 @@ Yetkili Satış & Showroom Departmanı`;
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', width: '100%' }}>
                 {/* Left: Active Module Title & Store Breadcrumb */}
                 <div style={{ minWidth: 0 }}>
-                  <h2 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a', margin: 0, fontFamily: 'var(--font-title, "Outfit", sans-serif)', whiteSpace: 'nowrap' }}>
+                  <h2 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#202938', margin: 0, fontFamily: 'var(--font-title, "Outfit", sans-serif)', whiteSpace: 'nowrap' }}>
                     {activePortalTab === 'dashboard' && 'Ana Gösterge Paneli'}
                     {activePortalTab === 'catalog' && 'Ürün & Koleksiyon Kataloğu'}
                     {activePortalTab === 'quick-quote' && 'Teklif Yönetimi & WhatsApp CRM'}
@@ -2982,11 +2983,11 @@ Yetkili Satış & Showroom Departmanı`;
                     {activePortalTab === 'settings' && 'Şube & Hesap Ayarları'}
                   </h2>
                   {dealerInfo && (
-                    <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <MapPin size={12} style={{ color: '#b38e47' }} />
+                    <p style={{ fontSize: '0.75rem', color: '#758195', margin: '2px 0 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MapPin size={12} style={{ color: '#C5A04B' }} />
                       <span style={{ fontWeight: '600', color: '#334155' }}>{dealerInfo.district}, {dealerInfo.city}</span>
-                      <span style={{ color: '#cbd5e1' }}>•</span>
-                      <span style={{ color: '#b38e47', fontWeight: '800' }}>{dealerInfo.brandName} Yetkili Bayisi</span>
+                      <span style={{ color: '#E4E8EF' }}>•</span>
+                      <span style={{ color: '#C5A04B', fontWeight: '800' }}>{dealerInfo.brandName} Yetkili Bayisi</span>
                     </p>
                   )}
                 </div>
@@ -3015,7 +3016,7 @@ Yetkili Satış & Showroom Departmanı`;
                         left: 0,
                         right: 0,
                         background: '#ffffff',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E4E8EF',
                         borderRadius: '14px',
                         boxShadow: '0 16px 40px rgba(15, 23, 42, 0.14)',
                         padding: '10px',
@@ -3051,7 +3052,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                         if (matchedModules.length === 0 && matchedProducts.length === 0 && matchedLeads.length === 0) {
                           return (
-                            <div style={{ padding: '14px', textAlign: 'center', fontSize: '0.8rem', color: '#64748b' }}>
+                            <div style={{ padding: '14px', textAlign: 'center', fontSize: '0.8rem', color: '#758195' }}>
                               &ldquo;{globalSearchQuery}&rdquo; için eşleşen ürün, koleksiyon veya modül bulunamadı.
                             </div>
                           );
@@ -3087,8 +3088,8 @@ Yetkili Satış & Showroom Departmanı`;
                                     }}
                                   >
                                     <div>
-                                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a' }}>{m.label}</div>
-                                      <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{m.desc}</div>
+                                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#202938' }}>{m.label}</div>
+                                      <div style={{ fontSize: '0.72rem', color: '#758195' }}>{m.desc}</div>
                                     </div>
                                     <ChevronRight size={14} style={{ color: '#94a3b8' }} />
                                   </button>
@@ -3130,10 +3131,10 @@ Yetkili Satış & Showroom Departmanı`;
                                       style={{ width: '32px', height: '32px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }}
                                     />
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#202938', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                         {prod.name}
                                       </div>
-                                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                                      <div style={{ fontSize: '0.7rem', color: '#758195' }}>
                                         Kod: {prod.code} • {prod.dimensions || '60x120 cm'}
                                       </div>
                                     </div>
@@ -3171,8 +3172,8 @@ Yetkili Satış & Showroom Departmanı`;
                                     }}
                                   >
                                     <div>
-                                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a' }}>{l.clientName}</div>
-                                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{l.product?.name || 'Seramik Talebi'}</div>
+                                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#202938' }}>{l.clientName}</div>
+                                      <div style={{ fontSize: '0.7rem', color: '#758195' }}>{l.product?.name || 'Seramik Talebi'}</div>
                                     </div>
                                     <StatusBadge status={l.status} />
                                   </button>
@@ -3199,8 +3200,8 @@ Yetkili Satış & Showroom Departmanı`;
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '7px',
-                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                        border: '1.5px solid #d4af37',
+                        background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)',
+                        border: '1.5px solid #C5A04B',
                         padding: '8px 14px',
                         borderRadius: '10px',
                         fontSize: '0.76rem',
@@ -3212,7 +3213,7 @@ Yetkili Satış & Showroom Departmanı`;
                       }}
                       title="Canlı Showroom Sayfanızı Yeni Sekmede Açın"
                     >
-                      <ExternalLink size={13} style={{ color: '#d4af37' }} />
+                      <ExternalLink size={13} style={{ color: '#C5A04B' }} />
                       <span>Showroom Sayfamı Gör</span>
                     </a>
                   )}
@@ -3227,8 +3228,8 @@ Yetkili Satış & Showroom Departmanı`;
                           display: 'flex',
                           alignItems: 'center',
                           gap: '10px',
-                          background: '#f8fafc',
-                          border: '1.5px solid #e2e8f0',
+                          background: '#F5F6F8',
+                          border: '1.5px solid #E4E8EF',
                           borderRadius: '12px',
                           padding: '5px 10px 5px 6px',
                           cursor: 'pointer',
@@ -3240,7 +3241,7 @@ Yetkili Satış & Showroom Departmanı`;
                             width: '32px',
                             height: '32px',
                             borderRadius: '9px',
-                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                            background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                             color: '#090d16',
                             display: 'flex',
                             alignItems: 'center',
@@ -3262,14 +3263,14 @@ Yetkili Satış & Showroom Departmanı`;
                           )}
                         </div>
                         <div style={{ textAlign: 'left', maxWidth: '130px' }}>
-                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#202938', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
                             {dealerInfo.name}
                           </div>
-                          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#b38e47', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#C5A04B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {saasInfo?.plan || 'Yetkili Bayi'}
                           </div>
                         </div>
-                        <ChevronDown size={14} style={{ color: '#64748b' }} />
+                        <ChevronDown size={14} style={{ color: '#758195' }} />
                       </button>
 
                       {showProfileDropdown && (
@@ -3280,7 +3281,7 @@ Yetkili Satış & Showroom Departmanı`;
                             right: 0,
                             width: '230px',
                             background: '#ffffff',
-                            border: '1px solid #e2e8f0',
+                            border: '1px solid #E4E8EF',
                             borderRadius: '14px',
                             boxShadow: '0 16px 36px rgba(15, 23, 42, 0.14)',
                             padding: '8px',
@@ -3291,10 +3292,10 @@ Yetkili Satış & Showroom Departmanı`;
                           }}
                         >
                           <div style={{ padding: '8px 10px', borderBottom: '1px solid #f1f5f9', marginBottom: '4px' }}>
-                            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a' }}>{dealerInfo.name}</div>
-                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{dealerInfo.district}, {dealerInfo.city}</div>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#202938' }}>{dealerInfo.name}</div>
+                            <div style={{ fontSize: '0.7rem', color: '#758195' }}>{dealerInfo.district}, {dealerInfo.city}</div>
                             {saasInfo?.expiresAt && (
-                              <div style={{ fontSize: '0.66rem', color: '#b38e47', fontWeight: 700, marginTop: '4px' }}>
+                              <div style={{ fontSize: '0.66rem', color: '#C5A04B', fontWeight: 700, marginTop: '4px' }}>
                                 Paket Bitiş: {new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </div>
                             )}
@@ -3323,7 +3324,7 @@ Yetkili Satış & Showroom Departmanı`;
                               textAlign: 'left'
                             }}
                           >
-                            <Settings size={15} style={{ color: '#b38e47' }} />
+                            <Settings size={15} style={{ color: '#C5A04B' }} />
                             <span>Şube & Hesap Ayarları</span>
                           </button>
 
@@ -3349,7 +3350,7 @@ Yetkili Satış & Showroom Departmanı`;
                               textAlign: 'left'
                             }}
                           >
-                            <CreditCard size={15} style={{ color: '#b38e47' }} />
+                            <CreditCard size={15} style={{ color: '#C5A04B' }} />
                             <span>Abonelik Yönetimi</span>
                           </button>
 
@@ -3375,7 +3376,7 @@ Yetkili Satış & Showroom Departmanı`;
                               textAlign: 'left'
                             }}
                           >
-                            <Grid size={15} style={{ color: '#b38e47' }} />
+                            <Grid size={15} style={{ color: '#C5A04B' }} />
                             <span>Ürün Kataloğu</span>
                           </button>
 
@@ -3397,7 +3398,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 borderRadius: '8px',
                                 fontSize: '0.78rem',
                                 fontWeight: 800,
-                                color: '#dc2626',
+                                color: '#DC5353',
                                 cursor: 'pointer',
                                 textAlign: 'left'
                               }}
@@ -3422,7 +3423,7 @@ Yetkili Satış & Showroom Departmanı`;
             saasInfo?.plan !== 'PREMIUM' ? (
               <div style={{
                 background: '#ffffff',
-                border: '1.5px solid #cbd5e1',
+                border: '1.5px solid #E4E8EF',
                 borderRadius: '24px',
                 padding: isMobile ? '36px 20px' : '56px 32px',
                 textAlign: 'center',
@@ -3439,9 +3440,9 @@ Yetkili Satış & Showroom Departmanı`;
                   width: '64px',
                   height: '64px',
                   borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                  border: '1.5px solid #d4af37',
-                  color: '#d4af37',
+                  background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)',
+                  border: '1.5px solid #C5A04B',
+                  color: '#C5A04B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -3453,7 +3454,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', background: 'rgba(212, 175, 55, 0.15)', color: '#b45309', fontSize: '0.72rem', fontWeight: '800', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     <Lock size={12} /> Premium VIP Özelliği
                   </div>
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                     WhatsApp Hızlı Teklif Motoru & Mini CRM
                   </h3>
                   <p style={{ fontSize: '0.85rem', color: '#475569', maxWidth: '480px', margin: '0 auto', lineHeight: '1.6' }}>
@@ -3464,7 +3465,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <button
                     onClick={() => setActivePortalTab('subscription')}
                     style={{
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                       color: '#090d16',
                       border: 'none',
                       borderRadius: '10px',
@@ -3487,7 +3488,7 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       background: '#f1f5f9',
                       color: '#334155',
-                      border: '1.5px solid #cbd5e1',
+                      border: '1.5px solid #E4E8EF',
                       borderRadius: '10px',
                       padding: '12px 20px',
                       fontSize: '0.85rem',
@@ -3501,24 +3502,20 @@ Yetkili Satış & Showroom Departmanı`;
               </div>
             ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                <div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Calculator size={24} style={{ color: '#d4af37' }} />
-                    Kurumsal PDF Teklif Hazırlayıcı
-                  </h2>
-                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
-                    Müşterilerinize kendi logonuz, otomatik fire/derz hesabı ve WhatsApp paylaşım linkiyle profesyonel teklif hazırlayın.
-                  </p>
-                </div>
-              </div>
+              <PageHeader
+                breadcrumb={['Bayi Portalı', 'Satış ve Müşteri', 'Teklif Yönetimi']}
+                title="Kurumsal PDF Teklif Hazırlayıcı"
+                subtitle="Müşterilerinize kendi logonuz, otomatik fire/derz hesabı ve WhatsApp paylaşım linkiyle profesyonel teklif hazırlayın."
+                icon={<Calculator size={22} />}
+                isMobile={isMobile}
+              />
 
               {/* Live Calculation Preview & Interactive Form Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 0.85fr', gap: isMobile ? '16px' : '24px', alignItems: 'start', width: '100%', boxSizing: 'border-box' }}>
                 {/* Quick Quote Form Card */}
-                <div className="quote-form-card" style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+                <div className="quote-form-card" style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '24px', borderRadius: '16px', border: '1px solid #E4E8EF', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileText size={18} style={{ color: '#d4af37' }} />
+                    <FileText size={18} style={{ color: '#C5A04B' }} />
                     Teklif ve Müşteri Parametreleri
                   </h3>
 
@@ -3532,7 +3529,7 @@ Yetkili Satış & Showroom Departmanı`;
                           onChange={(e) => setQuoteCustomerName(e.target.value)} 
                           placeholder="Örn: Ahmet Yılmaz" 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
@@ -3543,7 +3540,7 @@ Yetkili Satış & Showroom Departmanı`;
                           onChange={(e) => setQuoteCustomerPhone(e.target.value)} 
                           placeholder="Örn: 0532 123 45 67" 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
@@ -3556,7 +3553,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={quoteProjectName} 
                           onChange={(e) => setQuoteProjectName(e.target.value)} 
                           placeholder="Örn: Vadi Konutları Banyo Yenileme" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
@@ -3566,7 +3563,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={quoteCustomerEmail} 
                           onChange={(e) => setQuoteCustomerEmail(e.target.value)} 
                           placeholder="Örn: ahmet@mail.com" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
@@ -3579,7 +3576,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={quoteProductName} 
                           onChange={(e) => setQuoteProductName(e.target.value)} 
                           placeholder="Örn: 60x120 Calacatta Mermer Porselen" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
@@ -3589,7 +3586,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={quoteProductCode} 
                           onChange={(e) => setQuoteProductCode(e.target.value)} 
                           placeholder="Örn: QUA-CAL-60120" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
@@ -3603,7 +3600,7 @@ Yetkili Satış & Showroom Departmanı`;
                           onChange={(e) => setQuoteAreaM2(e.target.value)} 
                           min={1} 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
@@ -3611,7 +3608,7 @@ Yetkili Satış & Showroom Departmanı`;
                         <select 
                           value={quoteWastePercent} 
                           onChange={(e) => setQuoteWastePercent(e.target.value)} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
                         >
                           <option value={5}>%5 Fire (Düz / Standart Döşeme)</option>
                           <option value={10}>%10 Fire (Diyagonal / Balıksırtı)</option>
@@ -3629,7 +3626,7 @@ Yetkili Satış & Showroom Departmanı`;
                           onChange={(e) => setQuoteUnitPriceM2(e.target.value)} 
                           min={0} 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
@@ -3640,13 +3637,13 @@ Yetkili Satış & Showroom Departmanı`;
                           onChange={(e) => setQuoteDiscountPercent(e.target.value)} 
                           min={0} 
                           max={100} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
 
                     {/* Consumables Toggle & Manual Input Section */}
-                    <div style={{ background: '#f8fafc', padding: isMobile ? '12px 10px' : '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
+                    <div style={{ background: '#F5F6F8', padding: isMobile ? '12px 10px' : '16px', borderRadius: '12px', border: '1px solid #E4E8EF', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#475569' }}>Yapıştırıcı Harç & Derz Sarfiyat</div>
 
                       {/* Adhesive Row */}
@@ -3669,7 +3666,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 onChange={(e) => setQuoteAdhesiveManualBags(e.target.value)} 
                                 placeholder="Otomatik" 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', boxSizing: 'border-box' }}>
@@ -3679,7 +3676,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={quoteAdhesiveUnitPriceBag} 
                                 onChange={(e) => setQuoteAdhesiveUnitPriceBag(e.target.value)} 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
                           </div>
@@ -3706,7 +3703,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 onChange={(e) => setQuoteGroutManualKg(e.target.value)} 
                                 placeholder="Otomatik" 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', boxSizing: 'border-box' }}>
@@ -3716,7 +3713,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={quoteGroutUnitPriceKg} 
                                 onChange={(e) => setQuoteGroutUnitPriceKg(e.target.value)} 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
                           </div>
@@ -3732,7 +3729,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={quoteLaborCostTotal} 
                           onChange={(e) => setQuoteLaborCostTotal(e.target.value)} 
                           min={0} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
@@ -3742,7 +3739,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={quoteShippingCostTotal} 
                           onChange={(e) => setQuoteShippingCostTotal(e.target.value)} 
                           min={0} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
@@ -3753,7 +3750,7 @@ Yetkili Satış & Showroom Departmanı`;
                         onClick={() => handleSendWhatsAppQuote()}
                         style={{
                           flex: 1,
-                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          background: 'linear-gradient(135deg, #10A37F 0%, #10A37F 100%)',
                           color: '#ffffff',
                           border: 'none',
                           padding: '14px 18px',
@@ -3778,7 +3775,7 @@ Yetkili Satış & Showroom Departmanı`;
                         disabled={quoteCreating} 
                         style={{
                           flex: 1,
-                          background: '#0f172a',
+                          background: '#202938',
                           color: '#ffffff',
                           border: 'none',
                           padding: '14px 18px',
@@ -3801,7 +3798,7 @@ Yetkili Satış & Showroom Departmanı`;
                           </>
                         ) : (
                           <>
-                            <FileCheck size={18} style={{ color: '#d4af37' }} />
+                            <FileCheck size={18} style={{ color: '#C5A04B' }} />
                             <span>PDF Teklif Üret</span>
                           </>
                         )}
@@ -3829,10 +3826,10 @@ Yetkili Satış & Showroom Departmanı`;
                     });
 
                     return (
-                      <div className="quote-calc-card" style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '24px', borderRadius: '16px', border: '1px solid #d4af37', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+                      <div className="quote-calc-card" style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '24px', borderRadius: '16px', border: '1px solid #C5A04B', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px', flexWrap: 'wrap', gap: '6px' }}>
-                          <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CANLI HESAPLAMA ÖNİZLEME</span>
-                          <span style={{ fontSize: '0.7rem', background: 'rgba(5,150,105,0.1)', color: '#059669', padding: '3px 10px', borderRadius: '12px', fontWeight: '800' }}>Canlı Metraj</span>
+                          <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#C5A04B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CANLI HESAPLAMA ÖNİZLEME</span>
+                          <span style={{ fontSize: '0.7rem', background: 'rgba(5,150,105,0.1)', color: '#10A37F', padding: '3px 10px', borderRadius: '12px', fontWeight: '800' }}>Canlı Metraj</span>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.83rem', color: '#475569' }}>
@@ -3844,9 +3841,9 @@ Yetkili Satış & Showroom Departmanı`;
                             <span>Kesim Firesi (+%{calc.wastePercent}):</span>
                             <strong>+{calc.wasteM2} m²</strong>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', color: '#0f172a', fontWeight: '800', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', color: '#202938', fontWeight: '800', background: '#F5F6F8', padding: '8px 12px', borderRadius: '8px' }}>
                             <span>Sipariş Seramik Miktarı:</span>
-                            <strong style={{ color: '#d4af37' }}>{calc.totalTileM2} m²</strong>
+                            <strong style={{ color: '#C5A04B' }}>{calc.totalTileM2} m²</strong>
                           </div>
 
                           {calc.includeAdhesive && (
@@ -3864,13 +3861,13 @@ Yetkili Satış & Showroom Departmanı`;
                           )}
                         </div>
 
-                        <div style={{ borderTop: '2px dashed #e2e8f0', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ borderTop: '2px dashed #E4E8EF', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.83rem' }}>
                             <span>Ara Toplam (KDV Hariç):</span>
                             <span>₺{calc.subtotalBeforeVat.toLocaleString('tr-TR')}</span>
                           </div>
                           {calc.tileDiscountAmount > 0 && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.83rem', color: '#dc2626' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.83rem', color: '#DC5353' }}>
                               <span>İskonto İndirimi (%{calc.discountPercent}):</span>
                               <span>-₺{calc.tileDiscountAmount.toLocaleString('tr-TR')}</span>
                             </div>
@@ -3879,9 +3876,9 @@ Yetkili Satış & Showroom Departmanı`;
                             <span>KDV Tutarı (%20):</span>
                             <span>₺{calc.vatAmount.toLocaleString('tr-TR')}</span>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', fontSize: isMobile ? '1.05rem' : '1.25rem', fontWeight: '900', color: '#0f172a', marginTop: '6px', background: 'rgba(212,175,55,0.08)', padding: '12px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)', width: '100%', boxSizing: 'border-box' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', fontSize: isMobile ? '1.05rem' : '1.25rem', fontWeight: '900', color: '#202938', marginTop: '6px', background: 'rgba(212,175,55,0.08)', padding: '12px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)', width: '100%', boxSizing: 'border-box' }}>
                             <span>GENEL TOPLAM:</span>
-                            <span style={{ color: '#b38e47' }}>₺{calc.grandTotal.toLocaleString('tr-TR')}</span>
+                            <span style={{ color: '#C5A04B' }}>₺{calc.grandTotal.toLocaleString('tr-TR')}</span>
                           </div>
                         </div>
 
@@ -3890,7 +3887,7 @@ Yetkili Satış & Showroom Departmanı`;
                           type="button"
                           onClick={() => handleSendWhatsAppQuote()}
                           style={{
-                            background: '#10b981',
+                            background: '#10A37F',
                             color: '#fff',
                             border: 'none',
                             padding: '10px 14px',
@@ -3914,13 +3911,13 @@ Yetkili Satış & Showroom Departmanı`;
 
                   {/* List of Recent Quotes (Mini CRM) */}
                   {savedQuotesList.length > 0 && (
-                    <div style={{ background: '#ffffff', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ background: '#ffffff', padding: '20px', borderRadius: '16px', border: '1px solid #E4E8EF', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Activity size={16} style={{ color: '#d4af37' }} />
+                        <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', color: '#202938', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Activity size={16} style={{ color: '#C5A04B' }} />
                           <span>Teklif Takip Paneli (Mini CRM)</span>
                         </h4>
-                        <span style={{ fontSize: '0.72rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '6px', fontWeight: '700', color: '#64748b' }}>
+                        <span style={{ fontSize: '0.72rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '6px', fontWeight: '700', color: '#758195' }}>
                           {savedQuotesList.length} Teklif
                         </span>
                       </div>
@@ -3930,25 +3927,25 @@ Yetkili Satış & Showroom Departmanı`;
                           const currentStatus = q.status || 'PENDING';
                           const grandTotal = q?.calculations?.grandTotal || q?.grandTotal || 0;
                           return (
-                            <div key={q.id} style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div key={q.id} style={{ background: '#F5F6F8', padding: '14px', borderRadius: '12px', border: '1px solid #E4E8EF', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                                 <div>
-                                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#0f172a' }}>{q.customerName}</div>
-                                  <div style={{ fontSize: '0.74rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#202938' }}>{q.customerName}</div>
+                                  <div style={{ fontSize: '0.74rem', color: '#758195', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <span>{q.customerPhone}</span>
                                     <span>•</span>
                                     <span>{q.projectName}</span>
                                   </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                  <div style={{ fontSize: '0.95rem', fontWeight: '900', color: '#b38e47' }}>₺{grandTotal.toLocaleString('tr-TR')}</div>
+                                  <div style={{ fontSize: '0.95rem', fontWeight: '900', color: '#C5A04B' }}>₺{grandTotal.toLocaleString('tr-TR')}</div>
                                 </div>
                               </div>
 
                               {/* Status Badges & Quick Action Row */}
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', borderTop: '1px solid #e2e8f0', paddingTop: '8px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', borderTop: '1px solid #E4E8EF', paddingTop: '8px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: '600' }}>Durum:</span>
+                                  <span style={{ fontSize: '0.68rem', color: '#758195', fontWeight: '600' }}>Durum:</span>
                                   <select 
                                     value={currentStatus} 
                                     onChange={(e) => updateQuoteStatus(q.id, e.target.value)}
@@ -3957,7 +3954,7 @@ Yetkili Satış & Showroom Departmanı`;
                                       fontWeight: '700',
                                       padding: '3px 8px',
                                       borderRadius: '6px',
-                                      border: '1px solid #cbd5e1',
+                                      border: '1px solid #E4E8EF',
                                       background: currentStatus === 'WON' ? '#dcfce7' : currentStatus === 'VIEWED' ? '#dbeafe' : currentStatus === 'LOST' ? '#fee2e2' : '#fef9c3',
                                       color: currentStatus === 'WON' ? '#15803d' : currentStatus === 'VIEWED' ? '#1d4ed8' : currentStatus === 'LOST' ? '#b91c1c' : '#854d0e',
                                       cursor: 'pointer'
@@ -3975,7 +3972,7 @@ Yetkili Satış & Showroom Departmanı`;
                                     type="button"
                                     onClick={() => handleSendWhatsAppQuote(q)}
                                     title="WhatsApp ile Teklifi Gönder"
-                                    style={{ background: '#10b981', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                    style={{ background: '#10A37F', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                                   >
                                     <MessageSquare size={12} />
                                     <span>WhatsApp</span>
@@ -3984,7 +3981,7 @@ Yetkili Satış & Showroom Departmanı`;
                                     type="button"
                                     onClick={() => handleSendWhatsAppReminder(q)}
                                     title="Müşteriye Takip / Hatırlatma Mesajı Gönder"
-                                    style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '5px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                    style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #E4E8EF', padding: '5px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                                   >
                                     <Clock size={12} />
                                     <span>Hatırlat</span>
@@ -3992,7 +3989,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <button 
                                     type="button"
                                     onClick={() => setGeneratedQuote(q)}
-                                    style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer' }}
+                                    style={{ background: '#202938', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer' }}
                                   >
                                     PDF
                                   </button>
@@ -4014,7 +4011,7 @@ Yetkili Satış & Showroom Departmanı`;
             saasInfo?.plan !== 'PREMIUM' ? (
               <div style={{
                 background: '#ffffff',
-                border: '1.5px solid #cbd5e1',
+                border: '1.5px solid #E4E8EF',
                 borderRadius: '24px',
                 padding: isMobile ? '36px 20px' : '56px 32px',
                 textAlign: 'center',
@@ -4031,9 +4028,9 @@ Yetkili Satış & Showroom Departmanı`;
                   width: '64px',
                   height: '64px',
                   borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                  border: '1.5px solid #d4af37',
-                  color: '#d4af37',
+                  background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)',
+                  border: '1.5px solid #C5A04B',
+                  color: '#C5A04B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -4045,7 +4042,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', background: 'rgba(212, 175, 55, 0.15)', color: '#b45309', fontSize: '0.72rem', fontWeight: '800', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     <Lock size={12} /> Premium VIP Özelliği
                   </div>
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                     Showroom Akıllı QR Etiket Üretici
                   </h3>
                   <p style={{ fontSize: '0.85rem', color: '#475569', maxWidth: '480px', margin: '0 auto', lineHeight: '1.6' }}>
@@ -4056,7 +4053,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <button
                     onClick={() => setActivePortalTab('subscription')}
                     style={{
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                       color: '#090d16',
                       border: 'none',
                       borderRadius: '10px',
@@ -4078,7 +4075,7 @@ Yetkili Satış & Showroom Departmanı`;
                     onClick={() => setActivePortalTab('dashboard')}
                     style={{
                       background: 'rgba(255, 255, 255, 0.05)',
-                      color: '#cbd5e1',
+                      color: '#E4E8EF',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '10px',
                       padding: '12px 20px',
@@ -4094,53 +4091,38 @@ Yetkili Satış & Showroom Departmanı`;
             ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Header & Control Bar */}
-              <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-                <div>
-                  <h2 style={{ fontSize: '1.3rem', fontWeight: '900', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
-                    <QrCode size={24} style={{ color: '#b38e47' }} />
-                    Showroom Akıllı QR Etiket Üretici
-                  </h2>
-                  <p style={{ fontSize: '0.84rem', color: '#475569', margin: 0, fontWeight: '500' }}>
-                    Mağazanızdaki seramik stantları ve kayar panolar için müşterilerinizi anında 3D Sanal Stüdyoya bağlayan lüks QR etiketler oluşturun ve yazdırın.
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button 
-                    onClick={() => {
-                      if (brandProducts.length === 0) loadBrandProducts();
-                      setShowMobileMoreMenu(false);
-                      if (typeof window !== 'undefined') {
-                        setTimeout(() => {
-                          window.print();
-                        }, 50);
-                      }
-                    }}
-                    style={{
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#090d16',
-                      border: 'none',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: '800',
-                      fontSize: '0.82rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      boxShadow: '0 4px 14px rgba(212,175,55,0.3)'
-                    }}
-                  >
-                    <Printer size={16} />
-                    <span>{qrSelectedProductIds.length > 0 ? `Seçilen ${qrSelectedProductIds.length} Modeli A4 Yazdır` : 'Tüm Modelleri A4 Yazdır'}</span>
-                  </button>
-                </div>
+              <div className="no-print">
+                <PageHeader
+                  breadcrumb={['Bayi Portalı', 'Ürün ve Mağaza', 'QR Etiket ve Stant']}
+                  title="Showroom Akıllı QR Etiket Üretici"
+                  subtitle="Mağazanızdaki seramik stantları ve kayar panolar için müşterilerinizi anında 3D Sanal Stüdyoya bağlayan QR etiketler oluşturun ve yazdırın."
+                  icon={<QrCode size={22} />}
+                  isMobile={isMobile}
+                  actions={
+                    <PremiumButton
+                      variant="gold"
+                      size="sm"
+                      icon={<Printer size={15} />}
+                      onClick={() => {
+                        if (brandProducts.length === 0) loadBrandProducts();
+                        setShowMobileMoreMenu(false);
+                        if (typeof window !== 'undefined') {
+                          setTimeout(() => {
+                            window.print();
+                          }, 50);
+                        }
+                      }}
+                    >
+                      {qrSelectedProductIds.length > 0 ? `Seçilen ${qrSelectedProductIds.length} Modeli A4 Yazdır` : 'Tüm Modelleri A4 Yazdır'}
+                    </PremiumButton>
+                  }
+                />
               </div>
 
               {/* Instructions Banner */}
               <div className="no-print" style={{
                 background: '#ffffff',
-                border: '1.5px solid #d4af37',
+                border: '1.5px solid #C5A04B',
                 borderRadius: '16px',
                 padding: '16px 20px',
                 display: 'flex',
@@ -4153,23 +4135,23 @@ Yetkili Satış & Showroom Departmanı`;
                   width: '42px',
                   height: '42px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                  border: '1px solid #d4af37',
+                  background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)',
+                  border: '1px solid #C5A04B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#d4af37',
+                  color: '#C5A04B',
                   flexShrink: 0,
                   boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12)'
                 }}>
                   <Sparkles size={20} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', marginBottom: '3px' }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#202938', marginBottom: '3px' }}>
                     Mağazanızdaki Müşterilere 3D Deneyim Yaşatın
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#475569', lineHeight: '1.5' }}>
-                    1. Teşhirinizdeki modelleri aşağıdan seçin. &bull; 2. İsterseniz mağaza liste fiyatınızı girin. &bull; 3. <strong style={{ color: '#0f172a' }}>"Yazdır"</strong> butonuna basıp A4 etiket çıktısı alın ve panolara yapıştırın. Müşteri telefon kamerasını tuttuğu an odayı 3D görür!
+                    1. Teşhirinizdeki modelleri aşağıdan seçin. &bull; 2. İsterseniz mağaza liste fiyatınızı girin. &bull; 3. <strong style={{ color: '#202938' }}>"Yazdır"</strong> butonuna basıp A4 etiket çıktısı alın ve panolara yapıştırın. Müşteri telefon kamerasını tuttuğu an odayı 3D görür!
                   </div>
                 </div>
               </div>
@@ -4177,7 +4159,7 @@ Yetkili Satış & Showroom Departmanı`;
               {/* Style & Layout Toolbar */}
               <div className="no-print" style={{
                 background: '#ffffff',
-                border: '1.5px solid #cbd5e1',
+                border: '1.5px solid #E4E8EF',
                 borderRadius: '16px',
                 padding: '16px 20px',
                 display: 'flex',
@@ -4200,9 +4182,9 @@ Yetkili Satış & Showroom Departmanı`;
                           key={t.id}
                           onClick={() => setQrTagStyle(t.id)}
                           style={{
-                            background: qrTagStyle === t.id ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : '#f1f5f9',
+                            background: qrTagStyle === t.id ? 'linear-gradient(135deg, #202938 0%, #1e293b 100%)' : '#f1f5f9',
                             color: qrTagStyle === t.id ? '#fde68a' : '#475569',
-                            border: qrTagStyle === t.id ? '1.5px solid #d4af37' : '1px solid #cbd5e1',
+                            border: qrTagStyle === t.id ? '1.5px solid #C5A04B' : '1px solid #E4E8EF',
                             padding: '6px 12px',
                             borderRadius: '8px',
                             fontSize: '0.74rem',
@@ -4232,7 +4214,7 @@ Yetkili Satış & Showroom Departmanı`;
                           style={{
                             background: qrTagLayout === l.id ? '#fef3c7' : '#f1f5f9',
                             color: qrTagLayout === l.id ? '#854d0e' : '#475569',
-                            border: qrTagLayout === l.id ? '1.5px solid #d4af37' : '1px solid #cbd5e1',
+                            border: qrTagLayout === l.id ? '1.5px solid #C5A04B' : '1px solid #E4E8EF',
                             padding: '6px 10px',
                             borderRadius: '8px',
                             fontSize: '0.72rem',
@@ -4247,7 +4229,7 @@ Yetkili Satış & Showroom Departmanı`;
                     </div>
                   </div>
 
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#0f172a', fontWeight: '700', cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#202938', fontWeight: '700', cursor: 'pointer' }}>
                     <input 
                       type="checkbox" 
                       checked={qrIncludePrice} 
@@ -4259,11 +4241,11 @@ Yetkili Satış & Showroom Departmanı`;
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   {/* Selection Filter Tabs */}
-                  <div style={{ display: 'flex', gap: '4px', background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '3px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', gap: '4px', background: '#f1f5f9', border: '1px solid #E4E8EF', padding: '3px', borderRadius: '8px' }}>
                     <button
                       onClick={() => setQrFilterMode('all')}
                       style={{
-                        background: qrFilterMode === 'all' ? '#d4af37' : 'transparent',
+                        background: qrFilterMode === 'all' ? '#C5A04B' : 'transparent',
                         color: qrFilterMode === 'all' ? '#090d16' : '#475569',
                         border: 'none',
                         padding: '5px 12px',
@@ -4278,7 +4260,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <button
                       onClick={() => setQrFilterMode('selected')}
                       style={{
-                        background: qrFilterMode === 'selected' ? '#d4af37' : 'transparent',
+                        background: qrFilterMode === 'selected' ? '#C5A04B' : 'transparent',
                         color: qrFilterMode === 'selected' ? '#090d16' : '#475569',
                         border: 'none',
                         padding: '5px 12px',
@@ -4298,11 +4280,11 @@ Yetkili Satış & Showroom Departmanı`;
                     value={qrSearchQuery}
                     onChange={e => setQrSearchQuery(e.target.value)}
                     style={{
-                      background: '#f8fafc',
-                      border: '1.5px solid #cbd5e1',
+                      background: '#F5F6F8',
+                      border: '1.5px solid #E4E8EF',
                       padding: '8px 12px',
                       borderRadius: '8px',
-                      color: '#0f172a',
+                      color: '#202938',
                       fontSize: '0.8rem',
                       fontWeight: '600',
                       outline: 'none',
@@ -4321,8 +4303,8 @@ Yetkili Satış & Showroom Departmanı`;
                     }}
                     style={{
                       background: '#f1f5f9',
-                      border: '1.5px solid #cbd5e1',
-                      color: '#0f172a',
+                      border: '1.5px solid #E4E8EF',
+                      color: '#202938',
                       padding: '8px 12px',
                       borderRadius: '8px',
                       fontSize: '0.75rem',
@@ -4356,7 +4338,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <div className={`printable-showroom-qr-area print-layout-${qrTagLayout} ${qrSelectedProductIds.length > 0 ? 'has-selection' : 'print-all'}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a' }}>
+                        <span style={{ fontSize: '0.92rem', fontWeight: '800', color: '#202938' }}>
                           {qrFilterMode === 'selected' 
                             ? `Baskı İçin Seçilen Modeller (${displayList.length} Model)`
                             : `Showroom Seramik Modelleri (${displayList.length} Model Listeleniyor)`}
@@ -4367,7 +4349,7 @@ Yetkili Satış & Showroom Departmanı`;
                             padding: '2px 8px',
                             borderRadius: '6px',
                             background: 'rgba(212, 175, 55, 0.15)',
-                            color: '#d4af37',
+                            color: '#C5A04B',
                             border: '1px solid rgba(212, 175, 55, 0.3)',
                             fontWeight: '800'
                           }}>
@@ -4380,14 +4362,14 @@ Yetkili Satış & Showroom Departmanı`;
                           {qrFilterMode === 'selected' ? (
                             <button 
                               onClick={() => setQrFilterMode('all')}
-                              style={{ background: 'transparent', border: 'none', color: '#d4af37', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                              style={{ background: 'transparent', border: 'none', color: '#C5A04B', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
                             >
                               Tüm Modelleri Göster
                             </button>
                           ) : (
                             <button 
                               onClick={() => loadBrandProducts()}
-                              style={{ background: 'transparent', border: 'none', color: '#d4af37', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                              style={{ background: 'transparent', border: 'none', color: '#C5A04B', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
                             >
                               Modelleri Yeniden Yükle
                             </button>
@@ -4399,7 +4381,7 @@ Yetkili Satış & Showroom Departmanı`;
                     {displayList.length === 0 ? (
                       <div className="no-print" style={{
                         background: '#ffffff',
-                        border: '1.5px dashed #d4af37',
+                        border: '1.5px dashed #C5A04B',
                         borderRadius: '16px',
                         padding: '48px 24px',
                         textAlign: 'center',
@@ -4419,12 +4401,12 @@ Yetkili Satış & Showroom Departmanı`;
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#b38e47'
+                          color: '#C5A04B'
                         }}>
                           <QrCode size={28} />
                         </div>
                         <div>
-                          <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#0f172a' }}>
+                          <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#202938' }}>
                             {qrFilterMode === 'selected' ? 'Baskı İçin Henüz Ürün Seçilmedi' : (brandProductsLoading ? 'Modeller Yükleniyor...' : 'Model Bulunamadı')}
                           </h4>
                           <p style={{ margin: 0, fontSize: '0.84rem', color: '#475569', maxWidth: '440px', lineHeight: 1.5, fontWeight: '500' }}>
@@ -4437,7 +4419,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <button
                             onClick={() => setQrFilterMode('all')}
                             style={{
-                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                               color: '#090d16',
                               border: 'none',
                               padding: '10px 22px',
@@ -4454,7 +4436,7 @@ Yetkili Satış & Showroom Departmanı`;
                             onClick={() => loadBrandProducts()}
                             disabled={brandProductsLoading}
                             style={{
-                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                               color: '#090d16',
                               border: 'none',
                               padding: '10px 22px',
@@ -4488,14 +4470,14 @@ Yetkili Satış & Showroom Departmanı`;
                             className={`showroom-qr-card tag-theme-${qrTagStyle} ${isSelected ? 'is-selected-for-print' : 'not-selected-for-print'}`}
                             style={{
                               background: qrTagStyle === 'minimal-dark' ? '#0b0f19' : '#ffffff',
-                              color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                              color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#202938',
                               border: isSelected
-                                ? '2px solid #b38e47'
+                                ? '2px solid #C5A04B'
                                 : (qrTagStyle === 'luxury-gold' 
-                                    ? '1.5px solid #d4af37' 
+                                    ? '1.5px solid #C5A04B' 
                                     : qrTagStyle === 'minimal-dark' 
                                     ? '1.5px solid rgba(255, 255, 255, 0.15)' 
-                                    : '1.5px solid #cbd5e1'),
+                                    : '1.5px solid #E4E8EF'),
                               borderRadius: '20px',
                               overflow: 'hidden',
                               display: 'flex',
@@ -4514,10 +4496,10 @@ Yetkili Satış & Showroom Departmanı`;
                                 height: '5px', 
                                 width: '100%', 
                                 background: qrTagStyle === 'minimal-dark' 
-                                  ? 'linear-gradient(90deg, #b38e47 0%, #fef08a 50%, #b38e47 100%)' 
+                                  ? 'linear-gradient(90deg, #C5A04B 0%, #fef08a 50%, #C5A04B 100%)' 
                                   : (isSelected 
-                                      ? 'linear-gradient(90deg, #b38e47 0%, #fde68a 50%, #d4af37 100%)' 
-                                      : 'linear-gradient(90deg, #d4af37 0%, #fde68a 50%, #d4af37 100%)')
+                                      ? 'linear-gradient(90deg, #C5A04B 0%, #fde68a 50%, #C5A04B 100%)' 
+                                      : 'linear-gradient(90deg, #C5A04B 0%, #fde68a 50%, #C5A04B 100%)')
                               }} 
                             />
 
@@ -4528,8 +4510,8 @@ Yetkili Satış & Showroom Departmanı`;
                                 display: 'flex', 
                                 justifyContent: 'space-between', 
                                 alignItems: 'center', 
-                                background: qrTagStyle === 'minimal-dark' ? '#111827' : '#f8fafc',
-                                borderBottom: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0', 
+                                background: qrTagStyle === 'minimal-dark' ? '#111827' : '#F5F6F8',
+                                borderBottom: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid #E4E8EF', 
                                 padding: '10px 16px',
                                 gap: '8px',
                                 flexWrap: 'wrap'
@@ -4546,10 +4528,10 @@ Yetkili Satış & Showroom Departmanı`;
                                   background: isSelected 
                                     ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' 
                                     : (qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.08)' : '#ffffff'),
-                                  color: isSelected ? '#854d0e' : (qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155'),
+                                  color: isSelected ? '#854d0e' : (qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#334155'),
                                   border: isSelected 
-                                    ? '1.5px solid #d4af37' 
-                                    : (qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1'),
+                                    ? '1.5px solid #C5A04B' 
+                                    : (qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.15)' : '1px solid #E4E8EF'),
                                   padding: '5px 12px',
                                   borderRadius: '8px',
                                   fontSize: '0.74rem',
@@ -4586,8 +4568,8 @@ Yetkili Satış & Showroom Departmanı`;
                                   title="3D Showroom Linkini Kopyala"
                                   style={{
                                     background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.06)' : '#ffffff',
-                                    border: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1',
-                                    color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155',
+                                    border: qrTagStyle === 'minimal-dark' ? '1px solid rgba(255,255,255,0.15)' : '1px solid #E4E8EF',
+                                    color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#334155',
                                     padding: '5px 10px',
                                     borderRadius: '8px',
                                     fontSize: '0.72rem',
@@ -4599,7 +4581,7 @@ Yetkili Satış & Showroom Departmanı`;
                                     boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
                                   }}
                                 >
-                                  {qrCopiedId === prod.id ? <CheckCheck size={13} style={{ color: '#10b981' }} /> : <Copy size={13} />}
+                                  {qrCopiedId === prod.id ? <CheckCheck size={13} style={{ color: '#10A37F' }} /> : <Copy size={13} />}
                                   <span>{qrCopiedId === prod.id ? 'Kopyalandı' : 'Linki Al'}</span>
                                 </button>
                                 <a 
@@ -4609,7 +4591,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   title="3D Stüdyoda Müşteri Gibi Canlı Aç"
                                   style={{
                                     background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                                    border: '1px solid #d4af37',
+                                    border: '1px solid #C5A04B',
                                     color: '#854d0e',
                                     padding: '5px 12px',
                                     borderRadius: '8px',
@@ -4637,7 +4619,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <div className="print-brand-badge" style={{
                                     fontSize: '0.66rem',
                                     fontWeight: '900',
-                                    color: '#b38e47',
+                                    color: '#C5A04B',
                                     letterSpacing: '0.1em',
                                     textTransform: 'uppercase',
                                     display: 'flex',
@@ -4651,7 +4633,7 @@ Yetkili Satış & Showroom Departmanı`;
                                     margin: '5px 0 6px 0',
                                     fontSize: '1.22rem',
                                     fontWeight: '900',
-                                    color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                    color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#202938',
                                     lineHeight: '1.25',
                                     letterSpacing: '-0.02em',
                                     fontFamily: 'var(--font-title, "Outfit", sans-serif)'
@@ -4663,7 +4645,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <div className="print-prod-sub" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
                                     <span style={{
                                       background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.08)' : '#f1f5f9',
-                                      color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155',
+                                      color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#334155',
                                       padding: '2px 8px',
                                       borderRadius: '6px',
                                       fontSize: '0.72rem',
@@ -4673,7 +4655,7 @@ Yetkili Satış & Showroom Departmanı`;
                                     </span>
                                     <span style={{
                                       background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.08)' : '#f1f5f9',
-                                      color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155',
+                                      color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#334155',
                                       padding: '2px 8px',
                                       borderRadius: '6px',
                                       fontSize: '0.72rem',
@@ -4699,7 +4681,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   padding: '4px 10px',
                                   borderRadius: '8px',
                                   background: qrTagStyle === 'minimal-dark' ? 'rgba(212,175,55,0.15)' : '#fef3c7',
-                                  border: '1.5px solid #d4af37',
+                                  border: '1.5px solid #C5A04B',
                                   color: qrTagStyle === 'minimal-dark' ? '#fde68a' : '#854d0e',
                                   fontSize: '0.68rem',
                                   fontWeight: '800',
@@ -4719,12 +4701,12 @@ Yetkili Satış & Showroom Departmanı`;
                                 gap: '16px',
                                 background: qrTagStyle === 'minimal-dark' 
                                   ? 'linear-gradient(135deg, #111827 0%, #1e293b 100%)' 
-                                  : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                                  : 'linear-gradient(135deg, #F5F6F8 0%, #ffffff 100%)',
                                 padding: '16px',
                                 borderRadius: '16px',
                                 border: qrTagStyle === 'minimal-dark' 
                                   ? '1px solid rgba(212,175,55,0.35)' 
-                                  : '1.5px solid #e2e8f0',
+                                  : '1.5px solid #E4E8EF',
                                 position: 'relative',
                                 boxShadow: '0 4px 12px rgba(15,23,42,0.03)'
                               }}>
@@ -4741,13 +4723,13 @@ Yetkili Satış & Showroom Departmanı`;
                                     justifyContent: 'center',
                                     position: 'relative',
                                     boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
-                                    border: '2px solid #d4af37'
+                                    border: '2px solid #C5A04B'
                                   }}>
                                     {/* Architectural Viewfinder Corner Accents */}
-                                    <div style={{ position: 'absolute', top: '-4px', left: '-4px', width: '10px', height: '10px', borderTop: '3px solid #b38e47', borderLeft: '3px solid #b38e47', borderTopLeftRadius: '3px' }} />
-                                    <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '10px', height: '10px', borderTop: '3px solid #b38e47', borderRight: '3px solid #b38e47', borderTopRightRadius: '3px' }} />
-                                    <div style={{ position: 'absolute', bottom: '-4px', left: '-4px', width: '10px', height: '10px', borderBottom: '3px solid #b38e47', borderLeft: '3px solid #b38e47', borderBottomLeftRadius: '3px' }} />
-                                    <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', width: '10px', height: '10px', borderBottom: '3px solid #b38e47', borderRight: '3px solid #b38e47', borderBottomRightRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', top: '-4px', left: '-4px', width: '10px', height: '10px', borderTop: '3px solid #C5A04B', borderLeft: '3px solid #C5A04B', borderTopLeftRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '10px', height: '10px', borderTop: '3px solid #C5A04B', borderRight: '3px solid #C5A04B', borderTopRightRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', bottom: '-4px', left: '-4px', width: '10px', height: '10px', borderBottom: '3px solid #C5A04B', borderLeft: '3px solid #C5A04B', borderBottomLeftRadius: '3px' }} />
+                                    <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', width: '10px', height: '10px', borderBottom: '3px solid #C5A04B', borderRight: '3px solid #C5A04B', borderBottomRightRadius: '3px' }} />
 
                                     <img 
                                       src={qrImgUrl} 
@@ -4758,7 +4740,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <span style={{ 
                                     fontSize: '0.62rem', 
                                     fontWeight: '900', 
-                                    color: '#b38e47', 
+                                    color: '#C5A04B', 
                                     letterSpacing: '0.08em',
                                     textTransform: 'uppercase'
                                   }}>
@@ -4768,15 +4750,15 @@ Yetkili Satış & Showroom Departmanı`;
 
                                 {/* Viewfinder Experience Pitch */}
                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', alignSelf: 'flex-start', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fde68a', padding: '3px 8px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: '800', border: '1px solid #d4af37' }}>
-                                    <Sparkles size={11} style={{ color: '#d4af37' }} />
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', alignSelf: 'flex-start', background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', color: '#fde68a', padding: '3px 8px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: '800', border: '1px solid #C5A04B' }}>
+                                    <Sparkles size={11} style={{ color: '#C5A04B' }} />
                                     <span>3D SANAL ODA STÜDYOSU</span>
                                   </div>
                                   
                                   <div className="print-qr-title" style={{
                                     fontSize: '0.94rem',
                                     fontWeight: '900',
-                                    color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                    color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#202938',
                                     lineHeight: '1.25',
                                     margin: '2px 0 0 0'
                                   }}>
@@ -4785,7 +4767,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   
                                   <div className="print-qr-desc" style={{
                                     fontSize: '0.72rem',
-                                    color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#475569',
+                                    color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#475569',
                                     lineHeight: '1.38',
                                     fontWeight: '500'
                                   }}>
@@ -4795,7 +4777,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <div className="print-qr-badge" style={{
                                     fontSize: '0.68rem',
                                     fontWeight: '800',
-                                    color: '#059669',
+                                    color: '#10A37F',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '5px',
@@ -4809,9 +4791,9 @@ Yetkili Satış & Showroom Departmanı`;
 
                               {/* Ornamental Geometric Divider */}
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '2px 0' }}>
-                                <div style={{ flex: 1, height: '1px', background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0' }} />
-                                <span style={{ color: '#d4af37', fontSize: '0.72rem' }}>❖</span>
-                                <div style={{ flex: 1, height: '1px', background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0' }} />
+                                <div style={{ flex: 1, height: '1px', background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.1)' : '#E4E8EF' }} />
+                                <span style={{ color: '#C5A04B', fontSize: '0.72rem' }}>❖</span>
+                                <div style={{ flex: 1, height: '1px', background: qrTagStyle === 'minimal-dark' ? 'rgba(255,255,255,0.1)' : '#E4E8EF' }} />
                               </div>
 
                               {/* Tag Footer & Showroom Information */}
@@ -4824,7 +4806,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                   <span className="print-dealer-sub" style={{ 
                                     fontSize: '0.62rem', 
-                                    color: '#b38e47', 
+                                    color: '#C5A04B', 
                                     fontWeight: '800', 
                                     textTransform: 'uppercase', 
                                     letterSpacing: '0.1em' 
@@ -4834,13 +4816,13 @@ Yetkili Satış & Showroom Departmanı`;
                                   <span className="print-dealer-title" style={{ 
                                     fontSize: '0.92rem', 
                                     fontWeight: '900', 
-                                    color: qrTagStyle === 'minimal-dark' ? '#fde68a' : '#0f172a' 
+                                    color: qrTagStyle === 'minimal-dark' ? '#fde68a' : '#202938' 
                                   }}>
                                     {displayDealerName}
                                   </span>
                                   <span className="print-dealer-contact" style={{ 
                                     fontSize: '0.7rem', 
-                                    color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#64748b', 
+                                    color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#758195', 
                                     fontWeight: '600' 
                                   }}>
                                     📍 {dealerCity} {dealerInfo?.phone ? `• 📞 ${dealerInfo.phone}` : ''}
@@ -4851,7 +4833,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <div style={{ textAlign: 'right' }}>
                                     <span className="print-price-label" style={{ 
                                       fontSize: '0.62rem', 
-                                      color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#64748b', 
+                                      color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#758195', 
                                       fontWeight: '800', 
                                       textTransform: 'uppercase',
                                       letterSpacing: '0.06em'
@@ -4861,12 +4843,12 @@ Yetkili Satış & Showroom Departmanı`;
                                     <div className="print-price-val" style={{
                                       fontSize: '1.25rem',
                                       fontWeight: '900',
-                                      color: '#059669',
+                                      color: '#10A37F',
                                       lineHeight: '1.1',
                                       letterSpacing: '-0.02em'
                                     }}>
                                       ₺{customPrice || prod.price || '650'}
-                                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#64748b' }}> / m²</span>
+                                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#758195' }}> / m²</span>
                                     </div>
                                   </div>
                                 )}
@@ -4880,21 +4862,21 @@ Yetkili Satış & Showroom Departmanı`;
                                 display: 'flex', 
                                 alignItems: 'center', 
                                 justifyContent: 'space-between',
-                                background: qrTagStyle === 'minimal-dark' ? '#111827' : '#f8fafc',
-                                borderTop: qrTagStyle === 'minimal-dark' ? '1px dashed rgba(255,255,255,0.15)' : '1px dashed #cbd5e1',
+                                background: qrTagStyle === 'minimal-dark' ? '#111827' : '#F5F6F8',
+                                borderTop: qrTagStyle === 'minimal-dark' ? '1px dashed rgba(255,255,255,0.15)' : '1px dashed #E4E8EF',
                                 padding: '10px 18px',
                                 gap: '8px'
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <span style={{ fontSize: '0.85rem' }}>🏷️</span>
-                                <label style={{ fontSize: '0.74rem', color: qrTagStyle === 'minimal-dark' ? '#cbd5e1' : '#334155', fontWeight: '700', whiteSpace: 'nowrap' }}>
+                                <label style={{ fontSize: '0.74rem', color: qrTagStyle === 'minimal-dark' ? '#E4E8EF' : '#334155', fontWeight: '700', whiteSpace: 'nowrap' }}>
                                   Özel Mağaza Fiyatı:
                                 </label>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                                  <span style={{ position: 'absolute', left: '8px', fontSize: '0.76rem', fontWeight: '800', color: '#b38e47' }}>₺</span>
+                                  <span style={{ position: 'absolute', left: '8px', fontSize: '0.76rem', fontWeight: '800', color: '#C5A04B' }}>₺</span>
                                   <input 
                                     type="number" 
                                     placeholder={prod.price || '650'}
@@ -4906,18 +4888,18 @@ Yetkili Satış & Showroom Departmanı`;
                                     style={{
                                       width: '94px',
                                       background: qrTagStyle === 'minimal-dark' ? '#0b0f19' : '#ffffff',
-                                      border: customPrice ? '1.5px solid #10b981' : '1.5px solid #cbd5e1',
+                                      border: customPrice ? '1.5px solid #10A37F' : '1.5px solid #E4E8EF',
                                       borderRadius: '8px',
                                       padding: '5px 8px 5px 22px',
                                       fontSize: '0.8rem',
                                       fontWeight: '800',
-                                      color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#0f172a',
+                                      color: qrTagStyle === 'minimal-dark' ? '#ffffff' : '#202938',
                                       outline: 'none',
                                       boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
                                     }}
                                   />
                                 </div>
-                                <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>/ m²</span>
+                                <span style={{ fontSize: '0.72rem', color: '#758195', fontWeight: '600' }}>/ m²</span>
                                 {customPrice && (
                                   <button
                                     type="button"
@@ -4932,7 +4914,7 @@ Yetkili Satış & Showroom Departmanı`;
                                     style={{
                                       background: 'transparent',
                                       border: 'none',
-                                      color: '#ef4444',
+                                      color: '#DC5353',
                                       fontSize: '0.68rem',
                                       fontWeight: '700',
                                       cursor: 'pointer',
@@ -4960,7 +4942,7 @@ Yetkili Satış & Showroom Departmanı`;
                         zIndex: 999,
                         background: 'rgba(15, 23, 42, 0.95)',
                         backdropFilter: 'blur(16px)',
-                        border: '1.5px solid #d4af37',
+                        border: '1.5px solid #C5A04B',
                         borderRadius: '16px',
                         padding: '10px 18px',
                         display: 'flex',
@@ -4971,11 +4953,11 @@ Yetkili Satış & Showroom Departmanı`;
                         flexWrap: 'wrap'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10A37F' }}></span>
                           <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fff' }}>
                             {qrSelectedProductIds.length} Model Baskı İçin Seçildi
                           </span>
-                          <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '500' }}>
+                          <span style={{ fontSize: '0.72rem', color: '#E4E8EF', fontWeight: '500' }}>
                             (A4 kağıdına {qrTagLayout === 'grid-4' ? "4'lü (2x2)" : qrTagLayout === 'grid-6' ? "6'lı (2x3)" : "2'li"} yerleşecek)
                           </span>
                         </div>
@@ -4985,7 +4967,7 @@ Yetkili Satış & Showroom Departmanı`;
                               setTimeout(() => window.print(), 50);
                             }}
                             style={{
-                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                               color: '#090d16',
                               border: 'none',
                               padding: '8px 16px',
@@ -5006,7 +4988,7 @@ Yetkili Satış & Showroom Departmanı`;
                             onClick={() => setQrFilterMode(prev => prev === 'selected' ? 'all' : 'selected')}
                             style={{
                               background: qrFilterMode === 'selected' ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.08)',
-                              color: qrFilterMode === 'selected' ? '#d4af37' : '#cbd5e1',
+                              color: qrFilterMode === 'selected' ? '#C5A04B' : '#E4E8EF',
                               border: '1px solid rgba(255,255,255,0.15)',
                               padding: '8px 12px',
                               borderRadius: '8px',
@@ -5025,7 +5007,7 @@ Yetkili Satış & Showroom Departmanı`;
                             style={{
                               background: 'transparent',
                               border: 'none',
-                              color: '#ef4444',
+                              color: '#DC5353',
                               fontSize: '0.75rem',
                               fontWeight: '700',
                               cursor: 'pointer',
@@ -5045,29 +5027,19 @@ Yetkili Satış & Showroom Departmanı`;
           ) : activePortalTab === 'b2b-projects' ? (
           /* B2B PROJECTS TAB */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div className="b2b-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Building2 size={22} style={{ color: '#d4af37' }} />
-                  B2B Proje & Toplu Seramik İhaleleri
-                </h2>
-                <p style={{ fontSize: '0.82rem', color: '#6c757d', margin: 0 }}>
-                  İnşaat firmaları, mimarlar ve müteahhitler tarafından oluşturulmuş güncel toplu seramik ihtiyaç havuzu.
-                </p>
-              </div>
-              
-              <div style={{
-                background: saasInfo?.plan === 'PREMIUM' ? 'rgba(212, 175, 55, 0.1)' : saasInfo?.plan === 'STANDART' ? '#e9ecef' : '#fee2e2',
-                color: saasInfo?.plan === 'PREMIUM' ? '#d4af37' : saasInfo?.plan === 'STANDART' ? '#495057' : '#dc3545',
-                border: '1px solid ' + (saasInfo?.plan === 'PREMIUM' ? 'rgba(212,175,55,0.2)' : saasInfo?.plan === 'STANDART' ? '#ced4da' : '#fca5a5'),
-                padding: '6px 12px',
-                borderRadius: '20px',
-                fontSize: '0.75rem',
-                fontWeight: '700'
-              }}>
-                Mevcut Planınız: {saasInfo?.plan || 'LITE / YOK'}
-              </div>
-            </div>
+            <PageHeader
+              breadcrumb={['Bayi Portalı', 'Satış ve Müşteri', 'B2B Proje Talepleri']}
+              title="B2B Proje & Toplu Seramik İhaleleri"
+              subtitle="İnşaat firmaları, mimarlar ve müteahhitler tarafından oluşturulmuş güncel toplu seramik ihtiyaç havuzu."
+              icon={<Building2 size={22} />}
+              isMobile={isMobile}
+              actions={
+                <StatusBadge
+                  status={saasInfo?.plan === 'PREMIUM' ? 'ACTIVE' : 'PENDING'}
+                  label={`Mevcut Plan: ${saasInfo?.plan || 'LITE'}`}
+                />
+              }
+            />
 
             {/* List of project requests */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -5108,7 +5080,7 @@ Yetkili Satış & Showroom Departmanı`;
                               fontWeight: '700'
                             }}>{proj.projectType}</span>
                             <span style={{ fontSize: '0.72rem', color: '#6c757d' }}>{proj.city} / {proj.district}</span>
-                            <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>•</span>
+                            <span style={{ fontSize: '0.72rem', color: '#E4E8EF' }}>•</span>
                             <span style={{ fontSize: '0.72rem', color: '#6c757d' }}>Aşama: {proj.constructionStep}</span>
                           </div>
                           <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#111', margin: '8px 0 0 0' }}>
@@ -5149,7 +5121,7 @@ Yetkili Satış & Showroom Departmanı`;
                         <div>
                           <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Miktar ve Bütçe</h5>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem' }}>
-                            <div>Toplam Metraj: <strong style={{ color: '#0f172a', fontSize: '1rem' }}>{(proj?.quantityM2 || 0).toLocaleString('tr-TR')} m²</strong></div>
+                            <div>Toplam Metraj: <strong style={{ color: '#202938', fontSize: '1rem' }}>{(proj?.quantityM2 || 0).toLocaleString('tr-TR')} m²</strong></div>
                             <div>Hedef Bütçe: <strong style={{ color: '#0284c7' }}>{proj.budgetM2}</strong></div>
                             <div>Teslim Süresi: <strong>{proj.deliveryTimeline}</strong></div>
                           </div>
@@ -5178,7 +5150,7 @@ Yetkili Satış & Showroom Departmanı`;
                               <div>Firma: <strong style={{ color: '#111' }}>{proj.companyName}</strong></div>
                               <div>Yetkili: <strong>{proj.contactName}</strong></div>
                               <div>Telefon: <a href={`tel:${proj.contactPhone}`} style={{ color: '#0284c7', textDecoration: 'none', fontWeight: '600' }}>{proj.contactPhone}</a></div>
-                              <div>E-posta: <a href={`mailto:${proj.contactEmail}`} style={{ color: '#64748b' }}>{proj.contactEmail}</a></div>
+                              <div>E-posta: <a href={`mailto:${proj.contactEmail}`} style={{ color: '#758195' }}>{proj.contactEmail}</a></div>
                             </div>
                           )}
                         </div>
@@ -5186,7 +5158,7 @@ Yetkili Satış & Showroom Departmanı`;
 
                       {/* Notes Section */}
                       {!isLocked && proj.notes && (
-                        <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', borderLeft: '3px solid #cbd5e1' }}>
+                        <div style={{ background: '#F5F6F8', padding: '12px 16px', borderRadius: '8px', fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', borderLeft: '3px solid #E4E8EF' }}>
                           Proje Notu: "{proj.notes}"
                         </div>
                       )}
@@ -5249,7 +5221,7 @@ Yetkili Satış & Showroom Departmanı`;
                             onClick={() => setActivePortalTab('subscription')}
                             style={{
                               background: 'linear-gradient(135deg, #111 0%, #333 100%)',
-                              color: '#d4af37',
+                              color: '#C5A04B',
                               border: 'none',
                               borderRadius: '8px',
                               padding: '8px 16px',
@@ -5261,7 +5233,7 @@ Yetkili Satış & Showroom Departmanı`;
                               gap: '6px'
                             }}
                           >
-                            <Crown size={14} style={{ color: '#d4af37' }} />
+                            <Crown size={14} style={{ color: '#C5A04B' }} />
                             <span>İletişimi Açmak İçin Premium'a Geç</span>
                           </button>
                         </div>
@@ -5274,18 +5246,21 @@ Yetkili Satış & Showroom Departmanı`;
           </div>
         ) : activePortalTab === 'settings' ? (
           /* SETTINGS TAB */
-          <div className="settings-container">
+          <div className="settings-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <PageHeader
+              breadcrumb={['Bayi Portalı', 'Yönetim', 'Şube & Hesap Ayarları']}
+              title="Şube Profil & Hesap Ayarları"
+              subtitle="Aşağıdaki alanları güncelleyerek müşterilere gösterilen şube kartınızı ve çalışma ayarlarınızı güncel tutun."
+              icon={<Settings size={22} />}
+              isMobile={isMobile}
+            />
             <div className="settings-card">
-              <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '20px', marginBottom: '28px' }}>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', fontFamily: 'var(--font-title)' }}>Bayi Profil Bilgileri Güncelleme</h2>
-                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>Aşağıdaki alanları güncelleyerek müşterilere gösterilen şube kartınızı güncel tutun.</p>
-              </div>
 
               <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
                 {profileSuccess && (
                   <div style={{
                     background: '#ecfdf5',
-                    color: '#059669',
+                    color: '#10A37F',
                     border: '1px solid #a7f3d0',
                     borderRadius: '12px',
                     padding: '14px 18px',
@@ -5302,7 +5277,7 @@ Yetkili Satış & Showroom Departmanı`;
                 {profileError && (
                   <div style={{
                     background: '#fef2f2',
-                    color: '#ef4444',
+                    color: '#DC5353',
                     border: '1px solid #fca5a5',
                     borderRadius: '12px',
                     padding: '14px 18px',
@@ -5332,7 +5307,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profilePhone} 
                         onChange={(e) => setProfilePhone(e.target.value)} 
                         required 
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
                         className="portal-input"
                       />
                     </div>
@@ -5343,7 +5318,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profilePassword} 
                         onChange={(e) => setProfilePassword(e.target.value)} 
                         required 
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
                         className="portal-input"
                       />
                     </div>
@@ -5365,7 +5340,7 @@ Yetkili Satış & Showroom Departmanı`;
                         onChange={(e) => setProfileAddress(e.target.value)} 
                         required 
                         rows={4}
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical', transition: 'all 0.2s' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical', transition: 'all 0.2s' }}
                         className="portal-input"
                       />
                     </div>
@@ -5378,7 +5353,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={profileLat} 
                           onChange={(e) => setProfileLat(e.target.value)} 
                           required 
-                          style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                          style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
                           className="portal-input"
                         />
                       </div>
@@ -5389,7 +5364,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={profileLng} 
                           onChange={(e) => setProfileLng(e.target.value)} 
                           required 
-                          style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                          style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
                           className="portal-input"
                         />
                       </div>
@@ -5398,13 +5373,13 @@ Yetkili Satış & Showroom Departmanı`;
                 </div>
 
                 {/* SECTION: ŞUBE TEMA & RENK AYARLARI */}
-                <div className="settings-section" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="settings-section" style={{ background: '#ffffff', border: '1px solid #E4E8EF', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#202938', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ width: '4px', height: '14px', background: profileThemePrimary || 'var(--accent-gold)', borderRadius: '2px' }}></span>
                     🎨 Şube Sayfası Tema & Vurgu Rengi Ayarları
                   </h3>
 
-                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 20px 0' }}>
+                  <p style={{ fontSize: '0.78rem', color: '#758195', margin: '0 0 20px 0' }}>
                     Showroom sayfanızın genel tema konseptini ve buton/vurgu renklerini kurumsal kimliğinize göre seçin.
                   </p>
 
@@ -5413,9 +5388,9 @@ Yetkili Satış & Showroom Departmanı`;
                     <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Hazır Tema Paletleri</label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '12px' }}>
                       {[
-                        { id: 'GOLD', name: 'Gold Luxury', color: '#d4af37', icon: '👑' },
+                        { id: 'GOLD', name: 'Gold Luxury', color: '#C5A04B', icon: '👑' },
                         { id: 'SAPPHIRE', name: 'Royal Sapphire', color: '#3b82f6', icon: '💎' },
-                        { id: 'EMERALD', name: 'Emerald Premium', color: '#10b981', icon: '🌿' },
+                        { id: 'EMERALD', name: 'Emerald Premium', color: '#10A37F', icon: '🌿' },
                         { id: 'RUBY', name: 'Ruby Elegance', color: '#f43f5e', icon: '🍷' },
                         { id: 'VIOLET', name: 'Amethyst Violet', color: '#8b5cf6', icon: '⚡' }
                       ].map((preset) => {
@@ -5428,7 +5403,7 @@ Yetkili Satış & Showroom Departmanı`;
                               setProfileThemePrimary(preset.color);
                             }}
                             style={{
-                              border: isSelected ? `2px solid ${preset.color}` : '1px solid #cbd5e1',
+                              border: isSelected ? `2px solid ${preset.color}` : '1px solid #E4E8EF',
                               background: isSelected ? 'rgba(248, 250, 252, 0.9)' : '#ffffff',
                               borderRadius: '12px',
                               padding: '14px',
@@ -5455,7 +5430,7 @@ Yetkili Satış & Showroom Departmanı`;
                               {preset.icon}
                             </div>
                             <div>
-                              <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a', display: 'block', lineHeight: 1.2 }}>{preset.name}</span>
+                              <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#202938', display: 'block', lineHeight: 1.2 }}>{preset.name}</span>
                               <span style={{ fontSize: '0.68rem', color: preset.color, fontWeight: '700' }}>{preset.color}</span>
                             </div>
                           </div>
@@ -5473,7 +5448,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
                       <input 
                         type="color" 
-                        value={profileThemePrimary || '#d4af37'} 
+                        value={profileThemePrimary || '#C5A04B'} 
                         onChange={(e) => {
                           setProfileThemePrimary(e.target.value);
                           setProfileThemePreset('CUSTOM');
@@ -5482,13 +5457,13 @@ Yetkili Satış & Showroom Departmanı`;
                       />
                       <input 
                         type="text" 
-                        value={profileThemePrimary || '#d4af37'} 
+                        value={profileThemePrimary || '#C5A04B'} 
                         onChange={(e) => {
                           setProfileThemePrimary(e.target.value);
                           setProfileThemePreset('CUSTOM');
                         }}
-                        placeholder="#d4af37"
-                        style={{ width: '100px', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase' }}
+                        placeholder="#C5A04B"
+                        style={{ width: '100px', padding: '10px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase' }}
                       />
                     </div>
                   </div>
@@ -5499,14 +5474,14 @@ Yetkili Satış & Showroom Departmanı`;
                       <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
                         🖼️ Showroom Sayfası Arka Plan Rengi
                       </label>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#758195' }}>
                         Showroom profili sayfanızın genel zemin temasını belirleyin (Açık, Gece Siyahı, Beton Gri vb.)
                       </span>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '10px' }}>
                       {[
-                        { id: '#f8f9fc', name: '🥛 İncili Açık (Varsayılan)', previewBg: '#f8f9fc', border: '#cbd5e1', isDark: false },
+                        { id: '#f8f9fc', name: '🥛 İncili Açık (Varsayılan)', previewBg: '#f8f9fc', border: '#E4E8EF', isDark: false },
                         { id: '#0b0f17', name: '🌑 Cyber Obsidian Dark', previewBg: '#0b0f17', border: '#1e293b', isDark: true },
                         { id: '#1e293b', name: '🏛️ Loft Beton Gri', previewBg: '#1e293b', border: '#334155', isDark: true },
                         { id: '#fcf8f2', name: '🌾 Sıcak Traverten & Bej', previewBg: '#fcf8f2', border: '#e2d9cd', isDark: false },
@@ -5520,7 +5495,7 @@ Yetkili Satış & Showroom Departmanı`;
                             style={{
                               border: isSelected ? '2px solid var(--accent-gold)' : `1px solid ${bgItem.border}`,
                               background: bgItem.previewBg,
-                              color: bgItem.isDark ? '#f8fafc' : '#0f172a',
+                              color: bgItem.isDark ? '#F5F6F8' : '#202938',
                               borderRadius: '12px',
                               padding: '12px 14px',
                               cursor: 'pointer',
@@ -5562,7 +5537,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={profileThemeBgColor || '#f8f9fc'} 
                           onChange={(e) => setProfileThemeBgColor(e.target.value)}
                           placeholder="#f8f9fc"
-                          style={{ width: '100px', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', fontWeight: '700', textTransform: 'uppercase' }}
+                          style={{ width: '100px', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', fontWeight: '700', textTransform: 'uppercase' }}
                         />
                       </div>
                     </div>
@@ -5581,7 +5556,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Bayi Logo URL</label>
                     <div className="settings-upload-row">
                       {profileLogoUrl && (
-                        <div style={{ width: '50px', height: '50px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                        <div style={{ width: '50px', height: '50px', borderRadius: '8px', border: '1px solid #E4E8EF', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                           <img src={profileLogoUrl} style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain' }} />
                         </div>
                       )}
@@ -5590,7 +5565,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profileLogoUrl} 
                         onChange={(e) => setProfileLogoUrl(e.target.value)} 
                         placeholder="/logos/kutahya.png veya görsel url'i"
-                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                         className="portal-input"
                       />
                       <label style={{
@@ -5625,7 +5600,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>Sayfa Hero Banner Arka Plan Görseli</label>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '500' }}>Showroom başlık kartı arka plan fotoğrafı</span>
+                      <span style={{ fontSize: '0.7rem', color: '#758195', fontWeight: '500' }}>Showroom başlık kartı arka plan fotoğrafı</span>
                     </div>
                     <div className="settings-upload-row">
                       {profileBannerUrl && (
@@ -5638,7 +5613,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profileBannerUrl} 
                         onChange={(e) => setProfileBannerUrl(e.target.value)} 
                         placeholder="/hero/hero_ceramics.jpg veya Cihazınızdan Banner Yükleyin"
-                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                         className="portal-input"
                       />
                       <label style={{
@@ -5673,7 +5648,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155' }}>İndirilebilir Ürün Kataloğu & Broşür Linki (PDF)</label>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '500' }}>Müşterilerinizin indirebileceği PDF kataloğunuzun internet adresi</span>
+                      <span style={{ fontSize: '0.7rem', color: '#758195', fontWeight: '500' }}>Müşterilerinizin indirebileceği PDF kataloğunuzun internet adresi</span>
                     </div>
 
                     <div className="catalog-inputs-grid" style={{ display: 'grid', gap: '10px', alignItems: 'center' }}>
@@ -5682,7 +5657,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profilePdfCatalogName} 
                         onChange={(e) => setProfilePdfCatalogName(e.target.value)} 
                         placeholder="Katalog Başlığı (Örn: 2026 Seramik Kataloğu)"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', width: '100%', boxSizing: 'border-box' }}
                         className="portal-input"
                       />
                       <input 
@@ -5690,7 +5665,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profilePdfCatalogUrl} 
                         onChange={(e) => setProfilePdfCatalogUrl(e.target.value)} 
                         placeholder="Katalog PDF Linki (Örn: https://site.com/katalog.pdf)"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', width: '100%', boxSizing: 'border-box' }}
                         className="portal-input"
                       />
                     </div>
@@ -5701,7 +5676,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                       <div>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Showroom Fotoğrafları</label>
-                        <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', marginTop: '2px' }}>Cihazınızdan fotoğraf yükleyin veya aşağıdaki kutuya linkleri virgülle ayırarak girin.</span>
+                        <span style={{ fontSize: '0.68rem', color: '#758195', display: 'block', marginTop: '2px' }}>Cihazınızdan fotoğraf yükleyin veya aşağıdaki kutuya linkleri virgülle ayırarak girin.</span>
                       </div>
                       
                       <label style={{
@@ -5731,9 +5706,9 @@ Yetkili Satış & Showroom Departmanı`;
 
                     {/* Interactive Showroom Image Previews */}
                     {profileShowroomImages && profileShowroomImages.split(',').map(s => s.trim()).filter(Boolean).length > 0 && (
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', background: '#ffffff', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '4px' }}>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', background: '#ffffff', padding: '12px', borderRadius: '12px', border: '1px solid #E4E8EF', marginTop: '4px' }}>
                         {profileShowroomImages.split(',').map(s => s.trim()).filter(Boolean).map((url, idx) => (
-                          <div key={idx} style={{ position: 'relative', width: '80px', height: '60px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }} className="showroom-thumb-wrapper">
+                          <div key={idx} style={{ position: 'relative', width: '80px', height: '60px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #E4E8EF' }} className="showroom-thumb-wrapper">
                             <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             <button 
                               type="button" 
@@ -5774,7 +5749,7 @@ Yetkili Satış & Showroom Departmanı`;
                       onChange={(e) => setProfileShowroomImages(e.target.value)} 
                       placeholder="https://gorsel1.jpg, https://gorsel2.jpg"
                       rows={2}
-                      style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
+                      style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
                       className="portal-input"
                     />
                   </div>
@@ -5790,10 +5765,10 @@ Yetkili Satış & Showroom Departmanı`;
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#fdf2f4', color: '#6b1d2f', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '6px' }}>
                         ★ AMİRAL GEMİSİ SHOWROOM SAYFASI
                       </div>
-                      <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#202938', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         🏛️ Canlı Showroom Sayfası İçerik & Vitrin Yönetimi
                       </h3>
-                      <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                      <p style={{ fontSize: '0.78rem', color: '#758195', margin: '4px 0 0 0' }}>
                         Müşterilerinize gösterilen kurumsal showroom sayfanızdaki (Hero, 4 Değer Kartı, AI Paneli, Çalışma Saatleri ve WhatsApp mesajları) tüm içerikleri buradan anında güncelleyebilirsiniz.
                       </p>
                     </div>
@@ -5843,7 +5818,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.heroBadge || ''}
                                 onChange={(e) => updateShowroomConfigField('heroBadge', e.target.value)}
                                 placeholder="Örn: YETKİLİ SHOWROOM & PROJE MERKEZİ"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -5854,7 +5829,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.heroTitle || ''}
                                 onChange={(e) => updateShowroomConfigField('heroTitle', e.target.value)}
                                 placeholder={dealerInfo?.name || 'Showroom Başlığı'}
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
@@ -5866,7 +5841,7 @@ Yetkili Satış & Showroom Departmanı`;
                               value={sc.heroDescription || ''}
                               onChange={(e) => updateShowroomConfigField('heroDescription', e.target.value)}
                               placeholder="En seçkin porselen ve seramik karo koleksiyonları, mimari projelendirme desteği..."
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
                             />
                           </div>
 
@@ -5878,7 +5853,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.heroPrimaryBtnText || ''}
                                 onChange={(e) => updateShowroomConfigField('heroPrimaryBtnText', e.target.value)}
                                 placeholder="Showroomu İncele"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -5889,7 +5864,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.heroSecondaryBtnText || ''}
                                 onChange={(e) => updateShowroomConfigField('heroSecondaryBtnText', e.target.value)}
                                 placeholder="Teklif Al"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
@@ -5902,7 +5877,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.heroCursiveQuote || ''}
                                 onChange={(e) => updateShowroomConfigField('heroCursiveQuote', e.target.value)}
                                 placeholder="“Hayalinizdeki mekan burada başlıyor...”"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -5913,7 +5888,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.heroCursiveSub || ''}
                                 onChange={(e) => updateShowroomConfigField('heroCursiveSub', e.target.value)}
                                 placeholder={dealerInfo?.name ? `${dealerInfo.name} Koleksiyonu` : 'Showroom Koleksiyonu'}
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
@@ -5926,7 +5901,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.workingDays || ''}
                                 onChange={(e) => updateShowroomConfigField('workingDays', e.target.value)}
                                 placeholder="Pazartesi - Cumartesi"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -5937,35 +5912,35 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.workingHours || ''}
                                 onChange={(e) => updateShowroomConfigField('workingHours', e.target.value)}
                                 placeholder="09:00 - 19:00"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
                         </div>
 
                         {/* 2. DÖRTLÜ DEĞER ÖNERİSİ BARI */}
-                        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px' }}>
-                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ background: '#F5F6F8', border: '1px solid #E4E8EF', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#202938', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span>2.</span> Dörtlü Değer Önerisi Barı (Hero Altı Kartlar)
                           </h4>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px' }}>
                             {pillars.map((pil, idx) => (
-                              <div key={idx} style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <div key={idx} style={{ background: '#ffffff', border: '1px solid #E4E8EF', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#6b1d2f' }}>KART #{idx + 1}</span>
                                 <input 
                                   type="text"
                                   value={pil.title}
                                   onChange={(e) => updatePillarField(idx, 'title', e.target.value)}
                                   placeholder="Kart Başlığı"
-                                  style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontWeight: '700' }}
+                                  style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #E4E8EF', fontSize: '0.8rem', fontWeight: '700' }}
                                 />
                                 <input 
                                   type="text"
                                   value={pil.desc}
                                   onChange={(e) => updatePillarField(idx, 'desc', e.target.value)}
                                   placeholder="Kart Açıklaması"
-                                  style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.76rem', color: '#64748b' }}
+                                  style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #E4E8EF', fontSize: '0.76rem', color: '#758195' }}
                                 />
                               </div>
                             ))}
@@ -5973,8 +5948,8 @@ Yetkili Satış & Showroom Departmanı`;
                         </div>
 
                         {/* 3. KATALOG & DANIŞMANLIK KARTI */}
-                        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px' }}>
-                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ background: '#F5F6F8', border: '1px solid #E4E8EF', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#202938', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span>3.</span> Showroom Kataloğu & Mimari Danışmanlık Kartı
                           </h4>
 
@@ -5986,7 +5961,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.catalogTitle || ''}
                                 onChange={(e) => updateShowroomConfigField('catalogTitle', e.target.value)}
                                 placeholder="Showroom Ürünleri"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -5997,7 +5972,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.consultationTitle || ''}
                                 onChange={(e) => updateShowroomConfigField('consultationTitle', e.target.value)}
                                 placeholder="Banyonuz İçin Birlikte Çizelim"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
@@ -6009,7 +5984,7 @@ Yetkili Satış & Showroom Departmanı`;
                               value={sc.consultationDesc || ''}
                               onChange={(e) => updateShowroomConfigField('consultationDesc', e.target.value)}
                               placeholder="Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın."
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                             />
                           </div>
                         </div>
@@ -6020,7 +5995,7 @@ Yetkili Satış & Showroom Departmanı`;
                             <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#6b1d2f', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <span>4.</span> Dijital Mimari Katalog & Showroom Prestij Vitrini
                             </h4>
-                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Showroom sayfanızdaki PDF katalog ve başarı metrikleri alanını yönetin</span>
+                            <span style={{ fontSize: '0.72rem', color: '#758195' }}>Showroom sayfanızdaki PDF katalog ve başarı metrikleri alanını yönetin</span>
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '14px' }}>
@@ -6031,7 +6006,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.pdfCatalogBadge || ''}
                                 onChange={(e) => updateShowroomConfigField('pdfCatalogBadge', e.target.value)}
                                 placeholder="DİJİTAL MİMARİ KATALOG"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -6042,7 +6017,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={profilePdfCatalogName || ''}
                                 onChange={(e) => setProfilePdfCatalogName(e.target.value)}
                                 placeholder={dealerInfo?.name ? `${dealerInfo.name} 2026 Mimari Seramik Kataloğu` : '2026 Mimari Seramik Kataloğu'}
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -6053,7 +6028,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={profilePdfCatalogUrl || ''}
                                 onChange={(e) => setProfilePdfCatalogUrl(e.target.value)}
                                 placeholder="https://site.com/katalog.pdf"
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
@@ -6065,7 +6040,7 @@ Yetkili Satış & Showroom Departmanı`;
                               value={sc.pdfCatalogDesc || ''}
                               onChange={(e) => updateShowroomConfigField('pdfCatalogDesc', e.target.value)}
                               placeholder="En seçkin seramik ve porselen karo serilerimizi, yüzey dokularını, teknik ebat ve metraj detaylarını içeren dijital kataloğumuzu inceleyin."
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
                             />
                           </div>
                         </div>
@@ -6086,7 +6061,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.whatsappGreeting || ''}
                                 onChange={(e) => updateShowroomConfigField('whatsappGreeting', e.target.value)}
                                 placeholder={`Merhaba, ${dealerInfo?.name || 'Showroom'} sayfanızdan ulaşıyorum. Ürünler ve fiyatlar hakkında bilgi alabilir miyim?`}
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
@@ -6099,7 +6074,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 value={sc.customMapsUrl || ''}
                                 onChange={(e) => updateShowroomConfigField('customMapsUrl', e.target.value)}
                                 placeholder="https://maps.google.com/?q=..."
-                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
@@ -6125,7 +6100,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profileDealerStats.experience || ''} 
                         onChange={(e) => setProfileDealerStats({ ...profileDealerStats, experience: e.target.value })} 
                         placeholder="Örn: 10+ Yıl veya 15 Yıl"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                         className="portal-input"
                       />
                     </div>
@@ -6136,7 +6111,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profileDealerStats.happyClients || ''} 
                         onChange={(e) => setProfileDealerStats({ ...profileDealerStats, happyClients: e.target.value })} 
                         placeholder="Örn: 500+ veya 1000+"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                         className="portal-input"
                       />
                     </div>
@@ -6147,7 +6122,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profileDealerStats.showroomArea || ''} 
                         onChange={(e) => setProfileDealerStats({ ...profileDealerStats, showroomArea: e.target.value })} 
                         placeholder="Örn: 200 m² veya 350 m²"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                         className="portal-input"
                       />
                     </div>
@@ -6169,7 +6144,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={profileVirtualTourUrl} 
                         onChange={(e) => setProfileVirtualTourUrl(e.target.value)} 
                         placeholder="https://my.matterport.com/show/?m=... veya 360° görsel linki"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                         className="portal-input"
                       />
                     </div>
@@ -6177,7 +6152,7 @@ Yetkili Satış & Showroom Departmanı`;
                     {/* Elegant 360 Panorama Upload Box */}
                     <div style={{
                       background: '#ffffff',
-                      border: '1px dashed #cbd5e1',
+                      border: '1px dashed #E4E8EF',
                       borderRadius: '12px',
                       padding: '20px',
                       display: 'flex',
@@ -6191,7 +6166,7 @@ Yetkili Satış & Showroom Departmanı`;
                           </div>
                           <div>
                             <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e293b', display: 'block' }}>Kendi 360° Panoramik Görselinizi Yükleyin</span>
-                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Matterport üyeliğiniz yoksa cep telefonunuzun panoramik moduyla çektiğiniz 360 resmi yükleyin!</span>
+                            <span style={{ fontSize: '0.68rem', color: '#758195' }}>Matterport üyeliğiniz yoksa cep telefonunuzun panoramik moduyla çektiğiniz 360 resmi yükleyin!</span>
                           </div>
                         </div>
 
@@ -6221,12 +6196,12 @@ Yetkili Satış & Showroom Departmanı`;
                       </div>
 
                       {upload360Success && (
-                        <div style={{ fontSize: '0.72rem', color: '#059669', background: '#ecfdf5', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a7f3d0', fontWeight: '600' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#10A37F', background: '#ecfdf5', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a7f3d0', fontWeight: '600' }}>
                           ✓ {upload360Success}
                         </div>
                       )}
                       {upload360Error && (
-                        <div style={{ fontSize: '0.72rem', color: '#ef4444', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', border: '1px solid #fca5a5', fontWeight: '600' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#DC5353', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', border: '1px solid #fca5a5', fontWeight: '600' }}>
                           ⚠️ {upload360Error}
                         </div>
                       )}
@@ -6240,7 +6215,7 @@ Yetkili Satış & Showroom Departmanı`;
                       value={profileSpecialConcepts} 
                       onChange={(e) => setProfileSpecialConcepts(e.target.value)} 
                       placeholder="Mermer Serisi Alanı, Banyo Tasarımları vb."
-                      style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                      style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none' }}
                       className="portal-input"
                     />
                   </div>
@@ -6262,7 +6237,7 @@ Yetkili Satış & Showroom Departmanı`;
                         onChange={(e) => setProfileAboutText(e.target.value)} 
                         placeholder="Şubenizin geçmişi, showroom büyüklüğü ve müşterilerinize sunduğunuz hizmetler hakkında kısa bir bilgi yazın..."
                         rows={4}
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #E4E8EF', fontSize: '0.88rem', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
                         className="portal-input"
                       />
                     </div>
@@ -6272,7 +6247,7 @@ Yetkili Satış & Showroom Departmanı`;
                       <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
                         Sosyal Medya & Web Bağlantıları
                       </label>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-6px' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#758195', marginTop: '-6px' }}>
                         Müşterilerinizin şubenize ait sosyal medya hesaplarına ve web sitenize ulaşabilmesi için bağlantıları girin.
                       </span>
 
@@ -6284,7 +6259,7 @@ Yetkili Satış & Showroom Departmanı`;
                             value={profileSocialInstagram}
                             onChange={(e) => setProfileSocialInstagram(e.target.value)}
                             placeholder="https://instagram.com/sube_adi"
-                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #E4E8EF', fontSize: '0.82rem', outline: 'none' }}
                             className="portal-input"
                           />
                         </div>
@@ -6296,7 +6271,7 @@ Yetkili Satış & Showroom Departmanı`;
                             value={profileSocialFacebook}
                             onChange={(e) => setProfileSocialFacebook(e.target.value)}
                             placeholder="https://facebook.com/sube_sayfasi"
-                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #E4E8EF', fontSize: '0.82rem', outline: 'none' }}
                             className="portal-input"
                           />
                         </div>
@@ -6308,7 +6283,7 @@ Yetkili Satış & Showroom Departmanı`;
                             value={profileSocialLinkedin}
                             onChange={(e) => setProfileSocialLinkedin(e.target.value)}
                             placeholder="https://linkedin.com/company/sube_adi"
-                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #E4E8EF', fontSize: '0.82rem', outline: 'none' }}
                             className="portal-input"
                           />
                         </div>
@@ -6320,7 +6295,7 @@ Yetkili Satış & Showroom Departmanı`;
                             value={profileSocialYoutube}
                             onChange={(e) => setProfileSocialYoutube(e.target.value)}
                             placeholder="https://youtube.com/@sube_kanali"
-                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #E4E8EF', fontSize: '0.82rem', outline: 'none' }}
                             className="portal-input"
                           />
                         </div>
@@ -6332,7 +6307,7 @@ Yetkili Satış & Showroom Departmanı`;
                             value={profileSocialWebsite}
                             onChange={(e) => setProfileSocialWebsite(e.target.value)}
                             placeholder="https://www.subewebsitesi.com"
-                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #E4E8EF', fontSize: '0.82rem', outline: 'none' }}
                             className="portal-input"
                           />
                         </div>
@@ -6346,7 +6321,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
                             Showroom Hizmetleri & Müşteri Ayrıcalıkları Kartları
                           </label>
-                          <p style={{ fontSize: '0.7rem', color: '#64748b', margin: '2px 0 0 0' }}>
+                          <p style={{ fontSize: '0.7rem', color: '#758195', margin: '2px 0 0 0' }}>
                             Showroom sayfanızda sergilenmesini istediğiniz müşteri ayrıcalıklarını işaretleyin / kaldırın.
                           </p>
                         </div>
@@ -6361,7 +6336,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <button 
                             type="button" 
                             onClick={() => setProfileLogisticsServices('')}
-                            style={{ padding: '4px 10px', fontSize: '0.7rem', background: '#f1f5f9', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                            style={{ padding: '4px 10px', fontSize: '0.7rem', background: '#f1f5f9', color: '#758195', border: '1px solid #E4E8EF', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
                           >
                             Temizle
                           </button>
@@ -6390,8 +6365,8 @@ Yetkili Satış & Showroom Departmanı`;
                               cursor: 'pointer',
                               padding: '8px 12px',
                               borderRadius: '8px',
-                              background: isChecked ? '#f8fafc' : 'transparent',
-                              border: isChecked ? '1px solid #cbd5e1' : '1px solid transparent',
+                              background: isChecked ? '#F5F6F8' : 'transparent',
+                              border: isChecked ? '1px solid #E4E8EF' : '1px solid transparent',
                               transition: 'all 0.15s ease'
                             }}>
                               <input 
@@ -6414,7 +6389,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
                             Öne Çıkan Ürünler ({profileFeaturedProducts.length} Ürün Seçildi)
                           </label>
-                          <p style={{ fontSize: '0.7rem', color: '#64748b', margin: '2px 0 0 0' }}>
+                          <p style={{ fontSize: '0.7rem', color: '#758195', margin: '2px 0 0 0' }}>
                             Showroom sayfanızda sergilenmesini istediğiniz ürünleri sınırsız olarak seçebilirsiniz.
                           </p>
                         </div>
@@ -6429,7 +6404,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <button 
                             type="button" 
                             onClick={() => setProfileFeaturedProducts([])}
-                            style={{ padding: '5px 10px', fontSize: '0.7rem', background: '#f1f5f9', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                            style={{ padding: '5px 10px', fontSize: '0.7rem', background: '#f1f5f9', color: '#758195', border: '1px solid #E4E8EF', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
                           >
                             Temizle
                           </button>
@@ -6443,12 +6418,12 @@ Yetkili Satış & Showroom Departmanı`;
                           value={featuredSearchTerm}
                           onChange={(e) => setFeaturedSearchTerm(e.target.value)}
                           placeholder="Ürün adı veya koduna göre hızlı filtrele..."
-                          style={{ padding: '8px 12px', fontSize: '0.8rem', borderRadius: '8px', border: '1.5px solid #cbd5e1', outline: 'none', background: '#ffffff', color: '#0f172a', fontWeight: '600' }}
+                          style={{ padding: '8px 12px', fontSize: '0.8rem', borderRadius: '8px', border: '1.5px solid #E4E8EF', outline: 'none', background: '#ffffff', color: '#202938', fontWeight: '600' }}
                         />
                       )}
 
                       {/* Product Checkboxes Container */}
-                      <div style={{ maxHeight: '280px', overflowY: 'auto', border: '1.5px solid #cbd5e1', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#ffffff' }}>
+                      <div style={{ maxHeight: '280px', overflowY: 'auto', border: '1.5px solid #E4E8EF', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#ffffff' }}>
                         {brandProducts.length > 0 ? (
                           brandProducts
                             .filter(prod => {
@@ -6464,9 +6439,9 @@ Yetkili Satış & Showroom Departmanı`;
                                     type="checkbox" 
                                     checked={isChecked}
                                     onChange={() => toggleFeaturedProduct(prod.id)}
-                                    style={{ width: '16px', height: '16px', accentColor: '#d97706', cursor: 'pointer' }}
+                                    style={{ width: '16px', height: '16px', accentColor: '#E9A23B', cursor: 'pointer' }}
                                   />
-                                  <span>{prod.name} <span style={{ fontSize: '0.72rem', color: '#64748b' }}>({prod.code})</span></span>
+                                  <span>{prod.name} <span style={{ fontSize: '0.72rem', color: '#758195' }}>({prod.code})</span></span>
                                 </label>
                               );
                             })
@@ -6480,12 +6455,12 @@ Yetkili Satış & Showroom Departmanı`;
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Aktif Şube Kampanyaları</label>
-                        <button type="button" onClick={addCampaign} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Kampanya Ekle</button>
+                        <button type="button" onClick={addCampaign} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #E4E8EF', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Kampanya Ekle</button>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {profileDealerCampaigns.map((camp, idx) => (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1.5px solid #cbd5e1', position: 'relative' }}>
-                            <button type="button" onClick={() => removeCampaign(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#dc2626', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Kampanyayı Sil ✕</button>
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#F5F6F8', padding: '16px', borderRadius: '12px', border: '1.5px solid #E4E8EF', position: 'relative' }}>
+                            <button type="button" onClick={() => removeCampaign(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#DC5353', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Kampanyayı Sil ✕</button>
                             
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                               <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Kampanya Başlığı</label>
@@ -6531,12 +6506,12 @@ Yetkili Satış & Showroom Departmanı`;
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Referans Projeler (Portföy)</label>
-                        <button type="button" onClick={addReferenceProject} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Proje Ekle</button>
+                        <button type="button" onClick={addReferenceProject} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #E4E8EF', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Proje Ekle</button>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {profileReferenceProjects.map((proj, idx) => (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1.5px solid #cbd5e1', position: 'relative' }}>
-                            <button type="button" onClick={() => removeReferenceProject(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#dc2626', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Projeyi Sil ✕</button>
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#F5F6F8', padding: '16px', borderRadius: '12px', border: '1.5px solid #E4E8EF', position: 'relative' }}>
+                            <button type="button" onClick={() => removeReferenceProject(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#DC5353', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Projeyi Sil ✕</button>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                               <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Proje Adı / Başlığı</label>
@@ -6582,12 +6557,12 @@ Yetkili Satış & Showroom Departmanı`;
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Sıkça Sorulan Sorular (FAQ)</label>
-                        <button type="button" onClick={addFaq} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Soru Ekle</button>
+                        <button type="button" onClick={addFaq} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #E4E8EF', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Soru Ekle</button>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {profileDealerFaqs.map((faq, idx) => (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1.5px solid #cbd5e1', position: 'relative' }}>
-                            <button type="button" onClick={() => removeFaq(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#dc2626', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Soruyu Sil ✕</button>
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#F5F6F8', padding: '16px', borderRadius: '12px', border: '1.5px solid #E4E8EF', position: 'relative' }}>
+                            <button type="button" onClick={() => removeFaq(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#DC5353', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Soruyu Sil ✕</button>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                               <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Soru</label>
@@ -6657,17 +6632,13 @@ Yetkili Satış & Showroom Departmanı`;
         ) : activePortalTab === 'analytics' ? (
           /* ===== REGIONAL ANALYTICS TAB ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div className="analytics-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a' }}>
-                  <TrendingUp size={22} style={{ color: '#b38e47' }} />
-                  Bölgesel Arama & Seramik Analitiği
-                </h2>
-                <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, fontWeight: '500' }}>
-                  {dealerInfo?.city} şehrindeki tüketicilerin seramik arama, marka ve ebat/tarz tercihlerini canlı analiz edin.
-                </p>
-              </div>
-            </div>
+            <PageHeader
+              breadcrumb={['Bayi Portalı', 'Analiz', 'Bölge Analitiği & Raporlar']}
+              title="Bölgesel Arama & Seramik Analitiği"
+              subtitle={`${dealerInfo?.city || 'Bölge'} şehrindeki tüketicilerin seramik arama, marka ve ebat/tarz tercihlerini canlı analiz edin.`}
+              icon={<TrendingUp size={22} />}
+              isMobile={isMobile}
+            />
 
             {/* Check Subscription Tier: must be STANDART or PREMIUM */}
             {(!saasInfo || (saasInfo.plan !== 'STANDART' && saasInfo.plan !== 'PREMIUM')) ? (
@@ -6689,14 +6660,14 @@ Yetkili Satış & Showroom Departmanı`;
                   height: '56px',
                   borderRadius: '50%',
                   background: '#fef3c7',
-                  color: '#d97706',
+                  color: '#E9A23B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
                   <Lock size={24} />
                 </div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Detaylı Analiz Kilitli</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: '#202938' }}>Detaylı Analiz Kilitli</h3>
                 <p style={{ fontSize: '0.82rem', color: '#475569', maxWidth: '450px', margin: 0 }}>
                   Şehrinizdeki popüler seramik modellerini, arama terimlerini ve ebat taleplerini görebilmek için Standart veya Premium pakete yükseltin.
                 </p>
@@ -6704,7 +6675,7 @@ Yetkili Satış & Showroom Departmanı`;
                   onClick={() => setActivePortalTab('subscription')}
                   style={{
                     background: 'linear-gradient(135deg, #111 0%, #333 100%)',
-                    color: '#d4af37',
+                    color: '#C5A04B',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '10px 20px',
@@ -6723,23 +6694,23 @@ Yetkili Satış & Showroom Departmanı`;
                 {/* ACTION & CONTACT ANALYTICS DASHBOARD CARD */}
                 <div style={{
                   background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
+                  border: '1.5px solid #E4E8EF',
                   borderRadius: '20px',
                   padding: '24px',
                   boxShadow: '0 8px 24px rgba(15, 23, 42, 0.05)',
-                  color: '#0f172a'
+                  color: '#202938'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Activity size={20} style={{ color: '#b38e47' }} />
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#202938', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Activity size={20} style={{ color: '#C5A04B' }} />
                         Müşteri İletişim & Aksiyon Analitiği
                       </h3>
                       <p style={{ fontSize: '0.78rem', color: '#475569', margin: '4px 0 0 0' }}>
                         Canlı showroom sayfanızdan gerçekleşen doğrudan müşteri iletişim tıklamaları ve aksiyonları.
                       </p>
                     </div>
-                    <div style={{ background: '#fef3c7', border: '1.5px solid #d4af37', padding: '6px 14px', borderRadius: '12px', fontSize: '0.78rem', color: '#854d0e', fontWeight: '800' }}>
+                    <div style={{ background: '#fef3c7', border: '1.5px solid #C5A04B', padding: '6px 14px', borderRadius: '12px', fontSize: '0.78rem', color: '#854d0e', fontWeight: '800' }}>
                       Toplam Aksiyon: {actionStats.totalInteractions}
                     </div>
                   </div>
@@ -6795,24 +6766,24 @@ Yetkili Satış & Showroom Departmanı`;
                   
                   {/* Card 1: Popular Search Queries */}
                   <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#202938' }}>
                     🔍 En Sık Aranan Kelimeler
                   </h4>
                   {regionalAnalytics.popularQueries.length === 0 ? (
-                    <div style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli arama kaydı yok.</div>
+                    <div style={{ fontSize: '0.82rem', color: '#758195', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli arama kaydı yok.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {regionalAnalytics.popularQueries.map((item, i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                            <span style={{ fontWeight: '700', color: '#0f172a' }}>"{item.query}"</span>
+                            <span style={{ fontWeight: '700', color: '#202938' }}>"{item.query}"</span>
                             <span style={{ color: '#475569', fontWeight: '600' }}>{item.count} arama</span>
                           </div>
                           <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
                             <div style={{
                               width: `${Math.min(100, (item.count / regionalAnalytics.popularQueries[0].count) * 100)}%`,
                               height: '100%',
-                              background: '#b38e47',
+                              background: '#C5A04B',
                               borderRadius: '3px'
                             }} />
                           </div>
@@ -6824,17 +6795,17 @@ Yetkili Satış & Showroom Departmanı`;
 
                 {/* Card 2: Popular Ceramic Brands */}
                 <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#202938' }}>
                     🏢 Popüler Marka İncelemeleri
                   </h4>
                   {regionalAnalytics.popularBrands.length === 0 ? (
-                    <div style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli marka verisi yok.</div>
+                    <div style={{ fontSize: '0.82rem', color: '#758195', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli marka verisi yok.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {regionalAnalytics.popularBrands.map((item, i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                            <span style={{ fontWeight: '700', color: '#0f172a' }}>{item.name}</span>
+                            <span style={{ fontWeight: '700', color: '#202938' }}>{item.name}</span>
                             <span style={{ color: '#475569', fontWeight: '600' }}>{item.count} görüntülenme</span>
                           </div>
                           <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
@@ -6853,17 +6824,17 @@ Yetkili Satış & Showroom Departmanı`;
 
                 {/* Card 3: Popular Sizes and Styles */}
                 <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#202938' }}>
                     📐 Boyut & Tarz Tercihleri
                   </h4>
                   {regionalAnalytics.popularStyles.length === 0 ? (
-                    <div style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli ebat verisi yok.</div>
+                    <div style={{ fontSize: '0.82rem', color: '#758195', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli ebat verisi yok.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {regionalAnalytics.popularStyles.map((item, i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                            <span style={{ fontWeight: '700', color: '#0f172a' }}>{item.style}</span>
+                            <span style={{ fontWeight: '700', color: '#202938' }}>{item.style}</span>
                             <span style={{ color: '#475569', fontWeight: '600' }}>{item.count} kez incelendi</span>
                           </div>
                           <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
@@ -6885,7 +6856,14 @@ Yetkili Satış & Showroom Departmanı`;
         </div>
         ) : activePortalTab === 'subscription' ? (
           /* ===== SUBSCRIPTION TAB ===== */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <PageHeader
+              breadcrumb={['Bayi Portalı', 'Yönetim', 'Abonelik Yönetimi']}
+              title="SaaS Abonelik & Lisans Yönetimi"
+              subtitle="Aktif paketinizi, lisans yenileme tarihinizi, ödeme geçmişinizi ve paket yükseltme seçeneklerini yönetin."
+              icon={<CreditCard size={22} />}
+              isMobile={isMobile}
+            />
             {/* Current Subscription Status Banner */}
             <div style={{
               background: saasInfo ? 'linear-gradient(135deg, #111 0%, #1a1a2e 50%, #16213e 100%)' : 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
@@ -6901,14 +6879,14 @@ Yetkili Satış & Showroom Departmanı`;
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                    {saasInfo ? <Crown size={22} style={{ color: '#d4af37' }} /> : <AlertCircle size={22} />}
+                    {saasInfo ? <Crown size={22} style={{ color: '#C5A04B' }} /> : <AlertCircle size={22} />}
                     <h2 style={{ fontSize: '1.3rem', fontWeight: '800', margin: 0 }}>
                       {saasInfo ? `${saasInfo.plan} Yıllık Paket` : 'Aktif Aboneliğiniz Bulunmuyor'}
                     </h2>
                     {saasInfo && (
                       <span style={{
                         background: saasInfo.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : (saasInfo.status === 'PENDING_APPROVAL' ? 'rgba(245,158,11,0.2)' : (saasInfo.status === 'REJECTED' ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.1)')),
-                        color: saasInfo.status === 'ACTIVE' ? '#34d399' : (saasInfo.status === 'PENDING_APPROVAL' ? '#f59e0b' : (saasInfo.status === 'REJECTED' ? '#ef4444' : '#fca5a5')),
+                        color: saasInfo.status === 'ACTIVE' ? '#34d399' : (saasInfo.status === 'PENDING_APPROVAL' ? '#f59e0b' : (saasInfo.status === 'REJECTED' ? '#DC5353' : '#fca5a5')),
                         padding: '3px 10px',
                         borderRadius: '20px',
                         fontSize: '0.7rem',
@@ -6949,7 +6927,7 @@ Yetkili Satış & Showroom Departmanı`;
                     border: '1px solid rgba(255,255,255,0.1)'
                   }}>
                     <span style={{ fontSize: '0.68rem', fontWeight: '600', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kalan Süre</span>
-                    <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#d4af37' }}>
+                    <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#C5A04B' }}>
                       {Math.max(0, Math.ceil((new Date(saasInfo.expiresAt) - new Date()) / (1000 * 60 * 60 * 24)))} Gün
                     </span>
                   </div>
@@ -6978,7 +6956,7 @@ Yetkili Satış & Showroom Departmanı`;
                   fontSize: '0.85rem',
                   fontWeight: '600'
                 }}>
-                  <Loader2 size={18} className="animate-spin" style={{ color: '#d97706', flexShrink: 0 }} />
+                  <Loader2 size={18} className="animate-spin" style={{ color: '#E9A23B', flexShrink: 0 }} />
                   <div>
                     <strong>⏱️ Abonelik Talebi Onay Bekliyor:</strong> {requestedPlan} paket talebiniz alındı. Banka transferiniz (Gönderen: {saasInfo?.paymentSender || 'Belirtilmedi'}, Dekont: {saasInfo?.paymentNote || '-'}) doğrulandıktan sonra admin onayıyla en kısa sürede aktifleşecektir.
                   </div>
@@ -7015,7 +6993,7 @@ Yetkili Satış & Showroom Departmanı`;
                 {/* LITE Plan */}
                 <div style={{
                   background: '#fff',
-                  border: saasInfo?.plan === 'LITE' ? '2px solid #d4af37' : '1px solid #e9ecef',
+                  border: saasInfo?.plan === 'LITE' ? '2px solid #C5A04B' : '1px solid #e9ecef',
                   borderRadius: '20px',
                   padding: '32px 28px',
                   display: 'flex',
@@ -7025,13 +7003,13 @@ Yetkili Satış & Showroom Departmanı`;
                   transition: 'all 0.3s',
                 }}>
                   {saasInfo?.plan === 'LITE' && (
-                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#d4af37', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#C5A04B', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <BadgeCheck size={13} /> Mevcut Paketiniz
                     </div>
                   )}
                   <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                    <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
-                      <Zap size={24} color="#64748b" />
+                    <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #E4E8EF 0%, #E4E8EF 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
+                      <Zap size={24} color="#758195" />
                     </div>
                     <h4 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#334155' }}>LITE</h4>
                     <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Küçük bayiler için temel paket</p>
@@ -7054,8 +7032,8 @@ Yetkili Satış & Showroom Departmanı`;
                       { text: 'Outlet & Proje Fazlası Borsası', included: false },
                       { text: '3D QR Etiket & WhatsApp Teklif Motoru', included: false },
                     ].map((f, i) => (
-                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#cbd5e1' }}>
-                        {f.included ? <Check size={15} style={{ color: '#10b981', flexShrink: 0 }} /> : <X size={15} style={{ color: '#e2e8f0', flexShrink: 0 }} />}
+                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#E4E8EF' }}>
+                        {f.included ? <Check size={15} style={{ color: '#10A37F', flexShrink: 0 }} /> : <X size={15} style={{ color: '#E4E8EF', flexShrink: 0 }} />}
                         <span>{f.text}</span>
                       </li>
                     ))}
@@ -7066,7 +7044,7 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       marginTop: '28px',
                       background: saasInfo?.plan === 'LITE' ? '#e9ecef' : (requestedPlan === 'LITE' ? '#fffbeb' : '#f1f3f5'),
-                      color: saasInfo?.plan === 'LITE' ? '#adb5bd' : (requestedPlan === 'LITE' ? '#d97706' : '#111'),
+                      color: saasInfo?.plan === 'LITE' ? '#adb5bd' : (requestedPlan === 'LITE' ? '#E9A23B' : '#111'),
                       border: requestedPlan === 'LITE' ? '1px solid #fde047' : '1px solid #dee2e6',
                       borderRadius: '12px',
                       padding: '13px',
@@ -7088,7 +7066,7 @@ Yetkili Satış & Showroom Departmanı`;
                 {/* STANDART Plan - Highlighted */}
                 <div style={{
                   background: 'linear-gradient(180deg, #fffbeb 0%, #fff 30%)',
-                  border: saasInfo?.plan === 'STANDART' ? '2px solid #d4af37' : '2px solid #f59e0b',
+                  border: saasInfo?.plan === 'STANDART' ? '2px solid #C5A04B' : '2px solid #f59e0b',
                   borderRadius: '20px',
                   padding: '32px 28px',
                   display: 'flex',
@@ -7099,11 +7077,11 @@ Yetkili Satış & Showroom Departmanı`;
                   transition: 'all 0.3s'
                 }}>
                   {saasInfo?.plan === 'STANDART' ? (
-                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#d4af37', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#C5A04B', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <BadgeCheck size={13} /> Mevcut Paketiniz
                     </div>
                   ) : (
-                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#fff', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b 0%, #E9A23B 100%)', color: '#fff', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Star size={13} /> En Popüler
                     </div>
                   )}
@@ -7132,8 +7110,8 @@ Yetkili Satış & Showroom Departmanı`;
                       { text: 'Öncelikli telefon + e-posta destek', included: true },
                       { text: '3D QR Etiket & WhatsApp Teklif Motoru', included: false },
                     ].map((f, i) => (
-                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#cbd5e1' }}>
-                        {f.included ? <Check size={15} style={{ color: '#f59e0b', flexShrink: 0 }} /> : <X size={15} style={{ color: '#e2e8f0', flexShrink: 0 }} />}
+                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#E4E8EF' }}>
+                        {f.included ? <Check size={15} style={{ color: '#f59e0b', flexShrink: 0 }} /> : <X size={15} style={{ color: '#E4E8EF', flexShrink: 0 }} />}
                         <span>{f.text}</span>
                       </li>
                     ))}
@@ -7143,8 +7121,8 @@ Yetkili Satış & Showroom Departmanı`;
                     disabled={saasInfo?.plan === 'STANDART' || hasPending}
                     style={{
                       marginTop: '28px',
-                      background: saasInfo?.plan === 'STANDART' ? '#fef3c7' : (requestedPlan === 'STANDART' ? '#fffbeb' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'),
-                      color: saasInfo?.plan === 'STANDART' ? '#b45309' : (requestedPlan === 'STANDART' ? '#d97706' : '#fff'),
+                      background: saasInfo?.plan === 'STANDART' ? '#fef3c7' : (requestedPlan === 'STANDART' ? '#fffbeb' : 'linear-gradient(135deg, #f59e0b 0%, #E9A23B 100%)'),
+                      color: saasInfo?.plan === 'STANDART' ? '#b45309' : (requestedPlan === 'STANDART' ? '#E9A23B' : '#fff'),
                       border: requestedPlan === 'STANDART' ? '1px solid #fde047' : 'none',
                       borderRadius: '12px',
                       padding: '13px',
@@ -7167,7 +7145,7 @@ Yetkili Satış & Showroom Departmanı`;
                 {/* PREMIUM Plan */}
                 <div style={{
                   background: 'linear-gradient(180deg, #f5f3ff 0%, #fff 30%)',
-                  border: saasInfo?.plan === 'PREMIUM' ? '2px solid #d4af37' : '1px solid #e9ecef',
+                  border: saasInfo?.plan === 'PREMIUM' ? '2px solid #C5A04B' : '1px solid #e9ecef',
                   borderRadius: '20px',
                   padding: '32px 28px',
                   display: 'flex',
@@ -7177,13 +7155,13 @@ Yetkili Satış & Showroom Departmanı`;
                   transition: 'all 0.3s'
                 }}>
                   {saasInfo?.plan === 'PREMIUM' && (
-                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#d4af37', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#C5A04B', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <BadgeCheck size={13} /> Mevcut Paketiniz
                     </div>
                   )}
                   <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                     <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #111 0%, #333 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
-                      <Crown size={24} color="#d4af37" />
+                      <Crown size={24} color="#C5A04B" />
                     </div>
                     <h4 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#111' }}>PREMIUM</h4>
                     <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: 0 }}>Kurumsal bayiler için tam donanım</p>
@@ -7218,7 +7196,7 @@ Yetkili Satış & Showroom Departmanı`;
                     style={{
                       marginTop: '28px',
                       background: saasInfo?.plan === 'PREMIUM' ? '#f3f4f6' : (requestedPlan === 'PREMIUM' ? '#fffbeb' : 'linear-gradient(135deg, #111 0%, #333 100%)'),
-                      color: saasInfo?.plan === 'PREMIUM' ? '#6b7280' : (requestedPlan === 'PREMIUM' ? '#d97706' : '#d4af37'),
+                      color: saasInfo?.plan === 'PREMIUM' ? '#6b7280' : (requestedPlan === 'PREMIUM' ? '#E9A23B' : '#C5A04B'),
                       border: requestedPlan === 'PREMIUM' ? '1px solid #fde047' : 'none',
                       borderRadius: '12px',
                       padding: '13px',
@@ -7245,21 +7223,21 @@ Yetkili Satış & Showroom Departmanı`;
             {/* Feature Comparison Table */}
             <div style={{
               background: '#ffffff',
-              border: '1.5px solid #cbd5e1',
+              border: '1.5px solid #E4E8EF',
               borderRadius: '20px',
               padding: '32px',
               boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
             }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a' }}>Paket Karşılaştırma Tablosu</h3>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 6px 0', color: '#202938' }}>Paket Karşılaştırma Tablosu</h3>
               <p style={{ fontSize: '0.84rem', color: '#475569', margin: '0 0 20px 0', fontWeight: '500' }}>Tüm paketlerin detaylı özellik karşılaştırması</p>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', background: '#f8fafc' }}>
+                    <tr style={{ borderBottom: '2px solid #E4E8EF', textAlign: 'left', background: '#F5F6F8' }}>
                       <th style={{ padding: '12px 16px', fontWeight: '800', color: '#334155', borderRadius: '8px 0 0 8px' }}>Özellik</th>
                       <th style={{ padding: '12px 16px', fontWeight: '800', color: '#475569', textAlign: 'center' }}>LITE</th>
                       <th style={{ padding: '12px 16px', fontWeight: '800', color: '#b45309', textAlign: 'center', background: '#fef3c7' }}>STANDART</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '800', color: '#0f172a', textAlign: 'center', borderRadius: '0 8px 8px 0' }}>PREMIUM</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '800', color: '#202938', textAlign: 'center', borderRadius: '0 8px 8px 0' }}>PREMIUM</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -7275,11 +7253,11 @@ Yetkili Satış & Showroom Departmanı`;
                       { feature: 'WhatsApp Hızlı Teklif Motoru', lite: false, standart: false, premium: true },
                       { feature: 'Destek Kanalı', lite: 'E-posta', standart: 'Telefon + E-posta', premium: '7/24 VIP Destek' },
                     ].map((row, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                        <td style={{ padding: '13px 16px', fontWeight: '700', color: '#0f172a' }}>{row.feature}</td>
+                      <tr key={i} style={{ borderBottom: '1px solid #E4E8EF' }}>
+                        <td style={{ padding: '13px 16px', fontWeight: '700', color: '#202938' }}>{row.feature}</td>
                         {[row.lite, row.standart, row.premium].map((val, ci) => (
                           <td key={ci} style={{ padding: '13px 16px', textAlign: 'center', background: ci === 1 ? '#fffbeb' : 'transparent' }}>
-                            {val === true ? <Check size={16} style={{ color: '#059669', margin: '0 auto', strokeWidth: 3 }} /> 
+                            {val === true ? <Check size={16} style={{ color: '#10A37F', margin: '0 auto', strokeWidth: 3 }} /> 
                               : val === false ? <X size={16} style={{ color: '#94a3b8', margin: '0 auto' }} /> 
                               : <span style={{ fontWeight: '700', color: ci === 2 ? '#b45309' : '#334155' }}>{val}</span>}
                           </td>
@@ -7294,12 +7272,12 @@ Yetkili Satış & Showroom Departmanı`;
             {/* FAQ Section */}
             <div style={{
               background: '#ffffff',
-              border: '1.5px solid #cbd5e1',
+              border: '1.5px solid #E4E8EF',
               borderRadius: '20px',
               padding: '32px',
               boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)'
             }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 20px 0', color: '#0f172a' }}>Sık Sorulan Sorular</h3>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 20px 0', color: '#202938' }}>Sık Sorulan Sorular</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {[
                   { q: 'Abonelik süresi dolunca ne olur?', a: 'Aboneliğiniz sona erdiğinde gelen müşteri talepleri görünmeye devam eder ancak müşteri iletişim bilgileri maskelenir. Yenileme yaparak erişiminizi geri kazanabilirsiniz.' },
@@ -7307,8 +7285,8 @@ Yetkili Satış & Showroom Departmanı`;
                   { q: 'Ödeme nasıl yapılır?', a: 'Kredi kartı, banka havalesi/EFT ve sanal POS ile güvenli ödeme yapabilirsiniz. Fatura otomatik olarak e-posta adresinize gönderilir.' },
                   { q: 'İptal/iade politikası nedir?', a: 'İlk 14 gün içinde koşulsuz iade garantisi sunulmaktadır. 14 gün sonrası için kalan süre üzerinden orantılı iade yapılır.' },
                 ].map((faq, i) => (
-                  <div key={i} style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a' }}>{faq.q}</h4>
+                  <div key={i} style={{ padding: '16px 20px', background: '#F5F6F8', borderRadius: '12px', border: '1px solid #E4E8EF' }}>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: '0 0 6px 0', color: '#202938' }}>{faq.q}</h4>
                     <p style={{ fontSize: '0.82rem', color: '#475569', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>{faq.a}</p>
                   </div>
                 ))}
@@ -7318,52 +7296,36 @@ Yetkili Satış & Showroom Departmanı`;
         ) : activePortalTab === 'inventory' ? (
           /* ===== INVENTORY & STOCK MANAGEMENT TAB ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Package size={22} style={{ color: 'var(--accent-gold)' }} />
-                  Bayi Envanter & Stok Yönetimi
-                </h2>
-                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                  Showroomunuzda sergilenen veya deponuzda bulunan hazır ürünlerin stok ve fiyat bilgilerini güncelleyin.
-                </p>
-              </div>
-              <button 
-                onClick={() => {
-                  if (brandProducts.length === 0) {
-                    loadBrandProducts();
-                  }
-                  setShowAddInventoryModal(true);
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '10px 18px',
-                  fontWeight: '700',
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 4px 12px rgba(179, 142, 71, 0.2)'
-                }}
-              >
-                <Plus size={14} />
-                <span>Manuel Ürün Ekle</span>
-              </button>
-            </div>
+            <PageHeader
+              breadcrumb={['Bayi Portalı', 'Ürün ve Mağaza', 'Envanter ve Stok']}
+              title="Envanter & Stok Yönetimi"
+              subtitle="Mağazanızdaki seramik ürünlerini, stok miktarlarını ve fiyat bilgilerini yönetin."
+              icon={<Package size={22} />}
+              isMobile={isMobile}
+              actions={
+                <PremiumButton
+                  variant="gold"
+                  size="sm"
+                  icon={<Plus size={14} />}
+                  onClick={() => {
+                    if (brandProducts.length === 0) loadBrandProducts();
+                    setShowAddInventoryModal(true);
+                  }}
+                >
+                  Yeni Ürün Ekle
+                </PremiumButton>
+              }
+            />
 
             {inventorySuccess && (
-              <div style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '12px 16px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ background: '#ecfdf5', color: '#10A37F', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '12px 16px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <CheckCircle size={16} />
                 <span>{inventorySuccess}</span>
               </div>
             )}
 
             {inventoryError && (
-              <div style={{ background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: '12px', padding: '12px 16px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ background: '#fef2f2', color: '#DC5353', border: '1px solid #fca5a5', borderRadius: '12px', padding: '12px 16px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <AlertCircle size={16} />
                 <span>{inventoryError}</span>
               </div>
@@ -7375,9 +7337,9 @@ Yetkili Satış & Showroom Departmanı`;
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
                 {/* Excel/CSV Card */}
-                <div style={{ background: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '20px', padding: '24px', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)' }}>
-                  <h3 style={{ fontSize: '0.98rem', fontWeight: '800', margin: '0 0 8px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileSpreadsheet size={18} style={{ color: '#b38e47' }} />
+                <div style={{ background: '#ffffff', border: '1.5px solid #E4E8EF', borderRadius: '20px', padding: '24px', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)' }}>
+                  <h3 style={{ fontSize: '0.98rem', fontWeight: '800', margin: '0 0 8px 0', color: '#202938', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FileSpreadsheet size={18} style={{ color: '#C5A04B' }} />
                     Excel & CSV Toplu Stok Yükleme
                   </h3>
                   <p style={{ fontSize: '0.78rem', color: '#475569', margin: '0 0 16px 0', lineHeight: '1.5' }}>
@@ -7438,7 +7400,7 @@ Yetkili Satış & Showroom Departmanı`;
                       gap: '8px',
                       padding: '14px',
                       borderRadius: '12px',
-                      border: '2px dashed #d4af37',
+                      border: '2px dashed #C5A04B',
                       background: '#fefce8',
                       color: '#854d0e',
                       cursor: 'pointer',
@@ -7475,7 +7437,7 @@ Yetkili Satış & Showroom Departmanı`;
                         }}
                         placeholder={"UrunKodu,StokMiktari,Fiyat,Durum\nVITRA-MARBLE-60X120,250,450,IN_STOCK\nKUTAHYA-TRAVERTEN-80X80,180,380,IN_STOCK\nBIEN-WOOD-20X120,90,320,IN_STOCK"}
                         rows={5}
-                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1.5px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical', boxSizing: 'border-box' }}
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1.5px solid #E4E8EF', background: '#F5F6F8', color: '#202938', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical', boxSizing: 'border-box' }}
                       />
                     </div>
 
@@ -7483,8 +7445,8 @@ Yetkili Satış & Showroom Departmanı`;
                       type="submit" 
                       disabled={csvLoading || !csvContentInput.trim()}
                       style={{
-                        background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                        color: '#0f172a',
+                        background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
+                        color: '#202938',
                         border: 'none',
                         borderRadius: '10px',
                         padding: '12px',
@@ -7505,9 +7467,9 @@ Yetkili Satış & Showroom Departmanı`;
                 </div>
 
                 {/* XML Feed Card */}
-                <div style={{ background: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '20px', padding: '24px', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <RefreshCw size={16} style={{ color: '#b38e47' }} />
+                <div style={{ background: '#ffffff', border: '1.5px solid #E4E8EF', borderRadius: '20px', padding: '24px', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#202938', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <RefreshCw size={16} style={{ color: '#C5A04B' }} />
                     XML Feed Canlı Entegrasyon
                   </h3>
                   <p style={{ fontSize: '0.78rem', color: '#475569', margin: '0 0 16px 0', lineHeight: '1.5' }}>
@@ -7520,14 +7482,14 @@ Yetkili Satış & Showroom Departmanı`;
                       value={xmlFeedUrlInput}
                       onChange={(e) => setXmlFeedUrlInput(e.target.value)}
                       placeholder="https://firmamiz.com/xml/stok-feed"
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1.5px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: '0.8rem', fontWeight: '600' }}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1.5px solid #E4E8EF', background: '#F5F6F8', color: '#202938', fontSize: '0.8rem', fontWeight: '600' }}
                     />
                     <button 
                       type="submit"
                       style={{
-                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                        background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)',
                         color: '#fde68a',
-                        border: '1.5px solid #d4af37',
+                        border: '1.5px solid #C5A04B',
                         borderRadius: '8px',
                         padding: '10px',
                         fontSize: '0.8rem',
@@ -7544,8 +7506,8 @@ Yetkili Satış & Showroom Departmanı`;
                     disabled={xmlSyncLoading || !xmlFeedUrlInput}
                     style={{
                       width: '100%',
-                      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                      color: '#d4af37',
+                      background: 'linear-gradient(135deg, #1e293b 0%, #202938 100%)',
+                      color: '#C5A04B',
                       border: 'none',
                       borderRadius: '8px',
                       padding: '12px',
@@ -7566,21 +7528,21 @@ Yetkili Satış & Showroom Departmanı`;
               </div>
 
               {/* RIGHT SIDE: CURRENT INVENTORY TABLE */}
-              <div style={{ background: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '20px', padding: '24px', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ background: '#ffffff', border: '1.5px solid #E4E8EF', borderRadius: '20px', padding: '24px', boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Aktif Showroom Envanteri</h3>
-                  <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '3px 10px', borderRadius: '20px', fontWeight: '700' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#202938' }}>Aktif Showroom Envanteri</h3>
+                  <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', border: '1px solid #E4E8EF', padding: '3px 10px', borderRadius: '20px', fontWeight: '700' }}>
                     {inventoryList.length} Ürün Listeleniyor
                   </span>
                 </div>
 
                 {inventoryLoading ? (
-                  <div style={{ textAlign: 'center', padding: '48px', color: '#cbd5e1' }}>
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#E4E8EF' }}>
                     <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
                     <span>Envanter yükleniyor...</span>
                   </div>
                 ) : inventoryList.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '48px', color: '#cbd5e1', border: '1px dashed rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}>
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#E4E8EF', border: '1px dashed rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}>
                     <Package size={32} style={{ margin: '0 auto 10px auto', color: 'var(--accent-gold)' }} />
                     <span style={{ fontSize: '0.85rem', display: 'block', marginBottom: '8px', fontWeight: '700' }}>Envanterinizde henüz ürün bulunmuyor.</span>
                     <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Sol taraftaki panelden CSV yükleyebilir veya üstteki butondan manuel ekleyebilirsiniz.</span>
@@ -7602,11 +7564,11 @@ Yetkili Satış & Showroom Departmanı`;
                           <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', background: 'rgba(255, 255, 255, 0.05)' }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <span style={{ fontWeight: '700', color: '#ffffff', display: 'block', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</span>
-                            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {item.product?.code}</span>
+                            <span style={{ fontSize: '0.7rem', color: '#758195' }}>Kod: {item.product?.code}</span>
                           </div>
                           <button 
                             onClick={() => handleDeleteInventoryItem(item.productId)}
-                            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                            style={{ background: 'transparent', border: 'none', color: '#DC5353', cursor: 'pointer', padding: '4px' }}
                           >
                             <Trash2 size={16} />
                           </button>
@@ -7614,12 +7576,12 @@ Yetkili Satış & Showroom Departmanı`;
                         
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '0.8rem' }}>
                           <div>
-                            <span style={{ display: 'block', color: '#64748b', fontSize: '0.7rem', marginBottom: '4px' }}>Stok (m²)</span>
+                            <span style={{ display: 'block', color: '#758195', fontSize: '0.7rem', marginBottom: '4px' }}>Stok (m²)</span>
                             <input 
                               type="number"
                               defaultValue={item.stock}
                               onBlur={(e) => handleUpdateInventoryItem(item.productId, e.target.value, item.price, item.status)}
-                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1.5px solid #cbd5e1', background: '#ffffff', color: '#0f172a', fontWeight: '600', boxSizing: 'border-box' }}
+                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1.5px solid #E4E8EF', background: '#ffffff', color: '#202938', fontWeight: '600', boxSizing: 'border-box' }}
                             />
                           </div>
                           <div>
@@ -7629,7 +7591,7 @@ Yetkili Satış & Showroom Departmanı`;
                               defaultValue={item.price || ''}
                               placeholder="Liste"
                               onBlur={(e) => handleUpdateInventoryItem(item.productId, item.stock, e.target.value, item.status)}
-                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1.5px solid #cbd5e1', background: '#ffffff', color: '#0f172a', fontWeight: '600', boxSizing: 'border-box' }}
+                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1.5px solid #E4E8EF', background: '#ffffff', color: '#202938', fontWeight: '600', boxSizing: 'border-box' }}
                             />
                           </div>
                         </div>
@@ -7639,7 +7601,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <select
                             value={item.status}
                             onChange={(e) => handleUpdateInventoryItem(item.productId, item.stock, item.price, e.target.value)}
-                            style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.75rem', background: '#ffffff', color: '#0f172a', fontWeight: '600', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1.5px solid #E4E8EF', fontSize: '0.75rem', background: '#ffffff', color: '#202938', fontWeight: '600', boxSizing: 'border-box' }}
                           >
                             <option value="IN_STOCK">🟢 Stokta Var</option>
                             <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
@@ -7667,8 +7629,8 @@ Yetkili Satış & Showroom Departmanı`;
                             <td style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover', background: 'rgba(255, 255, 255, 0.05)' }} />
                               <div>
-                                <span style={{ fontWeight: '700', color: '#0f172a', display: 'block' }}>{item.product?.name}</span>
-                                <span style={{ fontSize: '0.65rem', color: '#64748b' }}>Kod: {item.product?.code}</span>
+                                <span style={{ fontWeight: '700', color: '#202938', display: 'block' }}>{item.product?.name}</span>
+                                <span style={{ fontSize: '0.65rem', color: '#758195' }}>Kod: {item.product?.code}</span>
                               </div>
                             </td>
                             <td style={{ padding: '10px' }}>
@@ -7676,7 +7638,7 @@ Yetkili Satış & Showroom Departmanı`;
                                 type="number"
                                 defaultValue={item.stock}
                                 onBlur={(e) => handleUpdateInventoryItem(item.productId, e.target.value, item.price, item.status)}
-                                style={{ width: '60px', padding: '4px 6px', borderRadius: '6px', border: '1.5px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontWeight: '600', textAlign: 'center' }}
+                                style={{ width: '60px', padding: '4px 6px', borderRadius: '6px', border: '1.5px solid #E4E8EF', background: '#F5F6F8', color: '#202938', fontWeight: '600', textAlign: 'center' }}
                               />
                             </td>
                             <td style={{ padding: '10px' }}>
@@ -7685,14 +7647,14 @@ Yetkili Satış & Showroom Departmanı`;
                                 defaultValue={item.price || ''}
                                 placeholder="Liste"
                                 onBlur={(e) => handleUpdateInventoryItem(item.productId, item.stock, e.target.value, item.status)}
-                                style={{ width: '70px', padding: '4px 6px', borderRadius: '6px', border: '1.5px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontWeight: '600', textAlign: 'center' }}
+                                style={{ width: '70px', padding: '4px 6px', borderRadius: '6px', border: '1.5px solid #E4E8EF', background: '#F5F6F8', color: '#202938', fontWeight: '600', textAlign: 'center' }}
                               />
                             </td>
                             <td style={{ padding: '10px' }}>
                               <select
                                 value={item.status}
                                 onChange={(e) => handleUpdateInventoryItem(item.productId, item.stock, item.price, e.target.value)}
-                                style={{ padding: '4px 8px', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.75rem', background: '#f8fafc', color: '#0f172a', fontWeight: '600' }}
+                                style={{ padding: '4px 8px', borderRadius: '6px', border: '1.5px solid #E4E8EF', fontSize: '0.75rem', background: '#F5F6F8', color: '#202938', fontWeight: '600' }}
                               >
                                 <option value="IN_STOCK">🟢 Stokta Var</option>
                                 <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
@@ -7702,7 +7664,7 @@ Yetkili Satış & Showroom Departmanı`;
                             <td style={{ padding: '10px', textAlign: 'right' }}>
                               <button 
                                 onClick={() => handleDeleteInventoryItem(item.productId)}
-                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                                style={{ background: 'transparent', border: 'none', color: '#DC5353', cursor: 'pointer', padding: '4px' }}
                               >
                                 <Trash2 size={14} />
                               </button>
@@ -7720,80 +7682,66 @@ Yetkili Satış & Showroom Departmanı`;
         ) : activePortalTab === 'outlet-exchange' ? (
           /* ===== OUTLET & PROJE FAZLASI BORSASI TAB ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={22} style={{ color: '#ef4444' }} />
-                  Bayiden Outlet & Proje Fazlası Borsası
-                </h2>
-                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                  Deponuzda kalan son 30-50 m² şantiye fazlası, seri sonu veya 2. kalite paletlerinizi ilan vererek nakde çevirin.
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  if (brandProducts.length === 0) loadBrandProducts();
-                  setShowAddOutletModal(true);
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '10px 18px',
-                  fontWeight: '700',
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                }}
-              >
-                <Plus size={14} />
-                <span>Yeni Outlet / Proje Fazlası İlanı Ekle</span>
-              </button>
-            </div>
+            <PageHeader
+              breadcrumb={['Bayi Portalı', 'Ürün ve Mağaza', 'Outlet ve Proje Fazlası']}
+              title="Outlet & Proje Fazlası Borsası"
+              subtitle="Deponuzda kalan şantiye fazlası, seri sonu veya kampanyalı paletlerinizi ilan vererek nakde çevirin."
+              icon={<Sparkles size={22} />}
+              isMobile={isMobile}
+              actions={
+                <PremiumButton
+                  variant="gold"
+                  size="sm"
+                  icon={<Plus size={14} />}
+                  onClick={() => {
+                    if (brandProducts.length === 0) loadBrandProducts();
+                    setShowAddOutletModal(true);
+                  }}
+                >
+                  Yeni İlan Ekle
+                </PremiumButton>
+              }
+            />
 
             {outletSuccess && (
-              <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#047857', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem' }}>
+              <div style={{ background: '#ecfdf5', border: '1px solid #10A37F', color: '#047857', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem' }}>
                 ✅ {outletSuccess}
               </div>
             )}
 
             {/* Quick Stats Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Aktif İlan Sayısı</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#0f172a' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #E4E8EF', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#758195', display: 'block', marginBottom: '4px' }}>Aktif İlan Sayısı</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#202938' }}>
                   {outletListings.filter(i => i.status === 'ACTIVE').length} Adet İlan
                 </span>
               </div>
 
-              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Toplam Fırsat Stok</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#ef4444' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #E4E8EF', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#758195', display: 'block', marginBottom: '4px' }}>Toplam Fırsat Stok</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#DC5353' }}>
                   {outletListings.reduce((acc, curr) => acc + (curr.quantityM2 || 0), 0).toLocaleString('tr-TR')} m²
                 </span>
               </div>
 
-              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Tahmini Stok Değeri</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#10b981' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #E4E8EF', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#758195', display: 'block', marginBottom: '4px' }}>Tahmini Stok Değeri</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#10A37F' }}>
                   ₺{outletListings.reduce((acc, curr) => acc + ((curr.unitPrice || 0) * (curr.quantityM2 || 0)), 0).toLocaleString('tr-TR')}
                 </span>
               </div>
 
               <div style={{ background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)', border: '1px solid #a7f3d0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#047857', display: 'block', marginBottom: '4px' }}>📲 Bölgesel WhatsApp Alıcıları</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#059669' }}>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#10A37F' }}>
                   {outletSubscribers.length} Bildirim Takipçisi
                 </span>
               </div>
             </div>
 
             {/* Regional WhatsApp Outlet Subscribers Section */}
-            <div className="dark-card" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1px solid rgba(37, 211, 102, 0.3)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', color: '#ffffff' }}>
+            <div className="dark-card" style={{ background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', border: '1px solid rgba(37, 211, 102, 0.3)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', color: '#ffffff' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                 <div>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff' }}>
@@ -7803,7 +7751,7 @@ Yetkili Satış & Showroom Departmanı`;
                       {dealerInfo?.city || 'Tüm İller'} ({outletSubscribers.length} Alıcı)
                     </span>
                   </h3>
-                  <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
+                  <p style={{ fontSize: '0.8rem', color: '#E4E8EF', margin: 0 }}>
                     {dealerInfo?.city || 'Şehriniz'} için WhatsApp kelepir seramik alarmı kurmuş olan müşterilerin canlı listesi. Tek tıkla stok fırsatınızı gönderin!
                   </p>
                 </div>
@@ -7840,7 +7788,7 @@ Yetkili Satış & Showroom Departmanı`;
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                             <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff' }}>{sub.name}</span>
-                            <span style={{ fontSize: '0.68rem', background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37', padding: '2px 8px', borderRadius: '8px', fontWeight: '700' }}>
+                            <span style={{ fontSize: '0.68rem', background: 'rgba(212, 175, 55, 0.2)', color: '#C5A04B', padding: '2px 8px', borderRadius: '8px', fontWeight: '700' }}>
                               {sub.city === 'ALL' ? 'Tüm Türkiye' : sub.city}
                             </span>
                           </div>
@@ -7856,7 +7804,7 @@ Yetkili Satış & Showroom Departmanı`;
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
-                            background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                            background: 'linear-gradient(135deg, #25d366 0%, #10A37F 100%)',
                             color: '#ffffff',
                             textDecoration: 'none',
                             padding: '9px 12px',
@@ -7882,26 +7830,26 @@ Yetkili Satış & Showroom Departmanı`;
             </div>
 
             {/* Outlet Listings Grid */}
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #E4E8EF', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#202938' }}>
                   Yayınlanan Outlet & Proje Fazlası İlanlarınız
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                <span style={{ fontSize: '0.75rem', color: '#758195' }}>
                   {outletListings.length} kayıt gösteriliyor
                 </span>
               </div>
 
               {outletLoading ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#758195' }}>
                   <Loader2 size={24} className="animate-spin" style={{ margin: '0 auto 10px auto' }} />
                   <span>Outlet ilanları yükleniyor...</span>
                 </div>
               ) : outletListings.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '48px 20px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                  <Sparkles size={36} style={{ color: '#ef4444', margin: '0 auto 12px auto' }} />
-                  <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>Deponuzda Henüz İlan Verilmiş Stok Bulunmuyor</h4>
-                  <p style={{ fontSize: '0.8rem', color: '#64748b', maxWidth: '440px', margin: '0 auto 16px auto' }}>
+                <div style={{ textAlign: 'center', padding: '48px 20px', background: '#F5F6F8', borderRadius: '12px', border: '1px dashed #E4E8EF' }}>
+                  <Sparkles size={36} style={{ color: '#DC5353', margin: '0 auto 12px auto' }} />
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#202938', margin: '0 0 6px 0' }}>Deponuzda Henüz İlan Verilmiş Stok Bulunmuyor</h4>
+                  <p style={{ fontSize: '0.8rem', color: '#758195', maxWidth: '440px', margin: '0 auto 16px auto' }}>
                     Deponuzdaki 30-50 m² şantiye fazlası veya 2. kalite paletleri ekleyerek hemen showroom sayfanızda fırsat etiketiyle sergileyin.
                   </p>
                   <button
@@ -7910,7 +7858,7 @@ Yetkili Satış & Showroom Departmanı`;
                       setShowAddOutletModal(true);
                     }}
                     style={{
-                      background: '#ef4444',
+                      background: '#DC5353',
                       color: '#fff',
                       border: 'none',
                       padding: '8px 16px',
@@ -7932,10 +7880,10 @@ Yetkili Satış & Showroom Departmanı`;
 
                     return (
                       <div key={item.id} style={{
-                        border: item.status === 'ACTIVE' ? '1px solid #e2e8f0' : '1px solid #f1f5f9',
+                        border: item.status === 'ACTIVE' ? '1px solid #E4E8EF' : '1px solid #f1f5f9',
                         borderRadius: '16px',
                         overflow: 'hidden',
-                        background: item.status === 'ACTIVE' ? '#ffffff' : '#f8fafc',
+                        background: item.status === 'ACTIVE' ? '#ffffff' : '#F5F6F8',
                         opacity: item.status === 'ACTIVE' ? 1 : 0.65,
                         display: 'flex',
                         flexDirection: 'column'
@@ -7950,7 +7898,7 @@ Yetkili Satış & Showroom Departmanı`;
                             position: 'absolute',
                             top: '10px',
                             left: '10px',
-                            background: '#ef4444',
+                            background: '#DC5353',
                             color: '#fff',
                             fontSize: '0.65rem',
                             fontWeight: '800',
@@ -7980,12 +7928,12 @@ Yetkili Satış & Showroom Departmanı`;
 
                         <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: 0, lineHeight: '1.3' }}>
+                            <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#202938', margin: 0, lineHeight: '1.3' }}>
                               {item.title}
                             </h4>
                           </div>
 
-                          <div style={{ fontSize: '0.74rem', color: '#64748b', display: 'flex', gap: '10px' }}>
+                          <div style={{ fontSize: '0.74rem', color: '#758195', display: 'flex', gap: '10px' }}>
                             {item.dimensions && <span>📏 {item.dimensions}</span>}
                             {item.colorFinish && <span>🎨 {item.colorFinish}</span>}
                           </div>
@@ -7998,15 +7946,15 @@ Yetkili Satış & Showroom Departmanı`;
 
                           <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                             <div>
-                              <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>Kalan Stok</span>
-                              <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a' }}>📦 {item.quantityM2} m²</span>
+                              <span style={{ fontSize: '0.65rem', color: '#758195', display: 'block' }}>Kalan Stok</span>
+                              <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#202938' }}>📦 {item.quantityM2} m²</span>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                               {discountPercent && (
-                                <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: '800', display: 'block' }}>%{discountPercent} İndirimli</span>
+                                <span style={{ fontSize: '0.65rem', color: '#10A37F', fontWeight: '800', display: 'block' }}>%{discountPercent} İndirimli</span>
                               )}
-                              <span style={{ fontSize: '1rem', fontWeight: '900', color: '#ef4444' }}>
-                                ₺{item.unitPrice.toLocaleString('tr-TR')} <span style={{ fontSize: '0.65rem', color: '#64748b' }}>/m²</span>
+                              <span style={{ fontSize: '1rem', fontWeight: '900', color: '#DC5353' }}>
+                                ₺{item.unitPrice.toLocaleString('tr-TR')} <span style={{ fontSize: '0.65rem', color: '#758195' }}>/m²</span>
                               </span>
                             </div>
                           </div>
@@ -8018,7 +7966,7 @@ Yetkili Satış & Showroom Departmanı`;
                               style={{
                                 background: item.status === 'ACTIVE' ? '#f1f5f9' : '#ecfdf5',
                                 color: item.status === 'ACTIVE' ? '#475569' : '#047857',
-                                border: '1px solid #cbd5e1',
+                                border: '1px solid #E4E8EF',
                                 padding: '6px 10px',
                                 borderRadius: '8px',
                                 fontSize: '0.72rem',
@@ -8032,7 +7980,7 @@ Yetkili Satış & Showroom Departmanı`;
                               onClick={() => handleDeleteOutletListing(item.id)}
                               style={{
                                 background: '#fef2f2',
-                                color: '#ef4444',
+                                color: '#DC5353',
                                 border: '1px solid #fecaca',
                                 padding: '6px 10px',
                                 borderRadius: '8px',
@@ -8078,18 +8026,18 @@ Yetkili Satış & Showroom Departmanı`;
                   flexDirection: 'column',
                   gap: '16px'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', pb: '12px' }}>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Sparkles size={18} style={{ color: '#ef4444' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E4E8EF', pb: '12px' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#202938', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sparkles size={18} style={{ color: '#DC5353' }} />
                       Yeni Outlet / Proje Fazlası İlanı
                     </h3>
-                    <button onClick={() => setShowAddOutletModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                    <button onClick={() => setShowAddOutletModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#758195' }}>
                       <X size={20} />
                     </button>
                   </div>
 
                   {outletError && (
-                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem' }}>
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#DC5353', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem' }}>
                       ⚠️ {outletError}
                     </div>
                   )}
@@ -8129,11 +8077,11 @@ Yetkili Satış & Showroom Departmanı`;
                             if (found.imageUrl) setOutletImageUrl(found.imageUrl);
                           }
                         }}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', color: '#202938', backgroundColor: '#ffffff' }}
                       >
-                        <option value="" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>-- Kataloğunuzdan ürün seçin veya aşağıya yazın --</option>
+                        <option value="" style={{ color: '#202938', backgroundColor: '#ffffff' }}>-- Kataloğunuzdan ürün seçin veya aşağıya yazın --</option>
                         {brandProducts.map(p => (
-                          <option key={p.id} value={p.id} style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>{p.name} ({p.code}) - {p.width}x{p.height} cm</option>
+                          <option key={p.id} value={p.id} style={{ color: '#202938', backgroundColor: '#ffffff' }}>{p.name} ({p.code}) - {p.width}x{p.height} cm</option>
                         ))}
                       </select>
                     </div>
@@ -8148,7 +8096,7 @@ Yetkili Satış & Showroom Departmanı`;
                         value={outletTitle}
                         onChange={(e) => setOutletTitle(e.target.value)}
                         required
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                       />
                     </div>
 
@@ -8160,12 +8108,12 @@ Yetkili Satış & Showroom Departmanı`;
                         <select
                           value={outletCategory}
                           onChange={(e) => setOutletCategory(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', color: '#202938', backgroundColor: '#ffffff' }}
                         >
-                          <option value="PROJE_FAZLASI" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Proje Fazlası (Şantiye Artığı)</option>
-                          <option value="SERI_SONU" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Seri Sonu (Kapatıyoruz)</option>
-                          <option value="IKINCI_KALITE" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>2. Kalite Palet</option>
-                          <option value="OUTLET" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Depo Outlet</option>
+                          <option value="PROJE_FAZLASI" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Proje Fazlası (Şantiye Artığı)</option>
+                          <option value="SERI_SONU" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Seri Sonu (Kapatıyoruz)</option>
+                          <option value="IKINCI_KALITE" style={{ color: '#202938', backgroundColor: '#ffffff' }}>2. Kalite Palet</option>
+                          <option value="OUTLET" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Depo Outlet</option>
                         </select>
                       </div>
 
@@ -8176,13 +8124,13 @@ Yetkili Satış & Showroom Departmanı`;
                         <select
                           value={outletBadgeTag}
                           onChange={(e) => setOutletBadgeTag(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', color: '#202938', backgroundColor: '#ffffff' }}
                         >
-                          <option value="Kapatıyoruz / Proje Fazlası" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Kapatıyoruz / Proje Fazlası</option>
-                          <option value="2. Kalite Fırsat Palet" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>2. Kalite Fırsat Palet</option>
-                          <option value="Seri Sonu Kapatıyoruz" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Seri Sonu Kapatıyoruz</option>
-                          <option value="Son Paletler Şok Fiyat" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Son Paletler Şok Fiyat</option>
-                          <option value="Şantiye Artığı Kelepir" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Şantiye Artığı Kelepir</option>
+                          <option value="Kapatıyoruz / Proje Fazlası" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Kapatıyoruz / Proje Fazlası</option>
+                          <option value="2. Kalite Fırsat Palet" style={{ color: '#202938', backgroundColor: '#ffffff' }}>2. Kalite Fırsat Palet</option>
+                          <option value="Seri Sonu Kapatıyoruz" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Seri Sonu Kapatıyoruz</option>
+                          <option value="Son Paletler Şok Fiyat" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Son Paletler Şok Fiyat</option>
+                          <option value="Şantiye Artığı Kelepir" style={{ color: '#202938', backgroundColor: '#ffffff' }}>Şantiye Artığı Kelepir</option>
                         </select>
                       </div>
                     </div>
@@ -8199,7 +8147,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={outletQuantityM2}
                           onChange={(e) => setOutletQuantityM2(e.target.value)}
                           required
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                         />
                       </div>
 
@@ -8213,7 +8161,7 @@ Yetkili Satış & Showroom Departmanı`;
                           value={outletUnitPrice}
                           onChange={(e) => setOutletUnitPrice(e.target.value)}
                           required
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                         />
                       </div>
 
@@ -8226,7 +8174,7 @@ Yetkili Satış & Showroom Departmanı`;
                           placeholder="Örn: 580"
                           value={outletOriginalPrice}
                           onChange={(e) => setOutletOriginalPrice(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                         />
                       </div>
                     </div>
@@ -8241,7 +8189,7 @@ Yetkili Satış & Showroom Departmanı`;
                           placeholder="Örn: 60x120 cm"
                           value={outletDimensions}
                           onChange={(e) => setOutletDimensions(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                         />
                       </div>
 
@@ -8254,7 +8202,7 @@ Yetkili Satış & Showroom Departmanı`;
                           placeholder="Örn: Parlak Beyaz Mermer"
                           value={outletColorFinish}
                           onChange={(e) => setOutletColorFinish(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                         />
                       </div>
                     </div>
@@ -8268,7 +8216,7 @@ Yetkili Satış & Showroom Departmanı`;
                         placeholder="https://... veya /textures/calacatta_gold.jpg"
                         value={outletImageUrl}
                         onChange={(e) => setOutletImageUrl(e.target.value)}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.85rem', color: '#202938', backgroundColor: '#ffffff' }}
                       />
                     </div>
 
@@ -8281,7 +8229,7 @@ Yetkili Satış & Showroom Departmanı`;
                         placeholder="Örn: Kadıköy lüks konut projesinden kalan paketli sıfır ürünler. Banyo yenilemek için ideal."
                         value={outletNotes}
                         onChange={(e) => setOutletNotes(e.target.value)}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', color: '#202938', backgroundColor: '#ffffff' }}
                       />
                     </div>
 
@@ -8295,7 +8243,7 @@ Yetkili Satış & Showroom Departmanı`;
                       </button>
                       <button
                         type="submit"
-                        style={{ background: '#ef4444', color: '#ffffff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}
+                        style={{ background: '#DC5353', color: '#ffffff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}
                       >
                         İlanı Yayınla
                       </button>
@@ -8309,6 +8257,7 @@ Yetkili Satış & Showroom Departmanı`;
           /* ===== DEALER PRODUCT & COLLECTION CATALOG TAB ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <PageHeader
+              breadcrumb={['Bayi Portalı', 'Ürün ve Mağaza', 'Ürün Kataloğu']}
               title={`${dealerInfo?.brandName || 'Showroom'} Ürün & Koleksiyon Kataloğu`}
               subtitle="Bayisi olduğunuz markanın tüm seramik koleksiyonlarını inceleyin, tek tıkla 3D stüdyoda açın, QR etiket basın veya hızlı teklif hazırlayın."
               icon={<Grid size={24} />}
@@ -8340,7 +8289,7 @@ Yetkili Satış & Showroom Departmanı`;
             <div
               style={{
                 background: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #E4E8EF',
                 borderRadius: '16px',
                 padding: isMobile ? '14px' : '18px 22px',
                 display: 'flex',
@@ -8605,7 +8554,7 @@ Yetkili Satış & Showroom Departmanı`;
                           gap: '5px'
                         }}
                       >
-                        <Crown size={12} style={{ color: '#d4af37' }} />
+                        <Crown size={12} style={{ color: '#C5A04B' }} />
                         {dealerInfo?.brandName ? `${dealerInfo.brandName} Yetkili Satış Noktası` : 'Yetkili Showroom'}
                       </span>
                       <span
@@ -8622,7 +8571,7 @@ Yetkili Satış & Showroom Departmanı`;
                           gap: '5px'
                         }}
                       >
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10A37F' }} />
                         Showroom Canlıda Aktif
                       </span>
                     </div>
@@ -8643,7 +8592,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <p
                       style={{
                         fontSize: isMobile ? '0.8rem' : '0.9rem',
-                        color: '#e2e8f0',
+                        color: '#E4E8EF',
                         margin: '0 0 18px 0',
                         lineHeight: 1.55
                       }}
@@ -8671,7 +8620,7 @@ Yetkili Satış & Showroom Departmanı`;
                       <PremiumButton
                         variant="ghost"
                         size="md"
-                        icon={<Calculator size={15} style={{ color: '#d4af37' }} />}
+                        icon={<Calculator size={15} style={{ color: '#C5A04B' }} />}
                         onClick={() => setActivePortalTab('quick-quote')}
                         style={{
                           background: 'rgba(255, 255, 255, 0.12)',
@@ -8798,7 +8747,7 @@ Yetkili Satış & Showroom Departmanı`;
                               height: '40px',
                               borderRadius: '11px',
                               background: 'rgba(179, 142, 71, 0.14)',
-                              color: '#b38e47',
+                              color: '#C5A04B',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -8831,7 +8780,7 @@ Yetkili Satış & Showroom Departmanı`;
                           variant="dark"
                           size="md"
                           fullWidth
-                          icon={<ExternalLink size={14} style={{ color: '#d4af37' }} />}
+                          icon={<ExternalLink size={14} style={{ color: '#C5A04B' }} />}
                           onClick={() => window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank')}
                         >
                           Kiosk Teşhir Modunu Aç
@@ -8853,7 +8802,7 @@ Yetkili Satış & Showroom Departmanı`;
                     <div
                       style={{
                         background: '#ffffff',
-                        border: '1px solid #e2e8f0',
+                        border: '1px solid #E4E8EF',
                         borderRadius: '18px',
                         padding: '20px 22px',
                         display: 'flex',
@@ -8881,10 +8830,10 @@ Yetkili Satış & Showroom Departmanı`;
                           <TrendingUp size={19} />
                         </div>
                         <div>
-                          <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>
+                          <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#202938' }}>
                             Bölgesel Arama Analizleri
                           </h4>
-                          <span style={{ fontSize: '0.73rem', color: '#64748b' }}>
+                          <span style={{ fontSize: '0.73rem', color: '#758195' }}>
                             {dealerInfo?.city || 'Bölgeniz'} seramik talep trendleri
                           </span>
                         </div>
@@ -8910,10 +8859,10 @@ Yetkili Satış & Showroom Departmanı`;
                 {/* E. HIZLI İŞLEMLER (4 HIZLI İŞLEM KARTI) */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                       Hızlı İşlemler
                     </h3>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.75rem', color: '#758195', fontWeight: 600 }}>
                       Sık kullanılan mağaza araçları
                     </span>
                   </div>
@@ -8930,7 +8879,7 @@ Yetkili Satış & Showroom Departmanı`;
                       description={`${dealerInfo?.brandName || 'Marka'} koleksiyonlarını ve stok kodlarını inceleyin.`}
                       icon={<Grid size={20} />}
                       badge={brandProducts.length > 0 ? `${brandProducts.length} Model` : 'Katalog'}
-                      accentColor="#b38e47"
+                      accentColor="#C5A04B"
                       onClick={() => setActivePortalTab('catalog')}
                     />
 
@@ -8948,7 +8897,7 @@ Yetkili Satış & Showroom Departmanı`;
                       description="Saniyeler içinde fire, yapıştırıcı ve derz dahil PDF teklif üretin."
                       icon={<Calculator size={20} />}
                       badge="WhatsApp & PDF"
-                      accentColor="#059669"
+                      accentColor="#10A37F"
                       onClick={() => setActivePortalTab('quick-quote')}
                     />
 
@@ -8957,7 +8906,7 @@ Yetkili Satış & Showroom Departmanı`;
                       description="Şube ayarlarınızı düzenleyin veya teknik destek ekibine ulaşın."
                       icon={<HelpCircle size={20} />}
                       badge="7/24 Bayi Hattı"
-                      accentColor="#d97706"
+                      accentColor="#E9A23B"
                       onClick={() => setActivePortalTab('settings')}
                     />
                   </div>
@@ -8968,7 +8917,7 @@ Yetkili Satış & Showroom Departmanı`;
                   id="dealer-recent-quotes-section"
                   style={{
                     background: '#ffffff',
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid #E4E8EF',
                     borderRadius: '18px',
                     padding: isMobile ? '18px 14px' : '24px 26px',
                     boxShadow: '0 4px 18px -4px rgba(15, 23, 42, 0.04)',
@@ -8987,10 +8936,10 @@ Yetkili Satış & Showroom Departmanı`;
                     }}
                   >
                     <div>
-                      <h3 style={{ fontSize: '1.08rem', fontWeight: 800, margin: '0 0 4px 0', color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                      <h3 style={{ fontSize: '1.08rem', fontWeight: 800, margin: '0 0 4px 0', color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                         Son Teklifler & Müşteri Talepleri
                       </h3>
-                      <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>
+                      <p style={{ fontSize: '0.78rem', color: '#758195', margin: 0 }}>
                         Showroomunuza yönlendirilen müşteri taleplerini ve hazırladığınız fiyat tekliflerini buradan yönetin.
                       </p>
                     </div>
@@ -9095,7 +9044,7 @@ Yetkili Satış & Showroom Departmanı`;
                             render: (row) => (
                               <div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <strong style={{ color: '#0f172a', fontWeight: 800, fontSize: '0.86rem' }}>
+                                  <strong style={{ color: '#202938', fontWeight: 800, fontSize: '0.86rem' }}>
                                     {row.customerName}
                                   </strong>
                                   <span
@@ -9154,14 +9103,14 @@ Yetkili Satış & Showroom Departmanı`;
                                   <img
                                     src={row.productImage}
                                     alt={row.projectName}
-                                    style={{ width: '38px', height: '38px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }}
+                                    style={{ width: '38px', height: '38px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #E4E8EF', flexShrink: 0 }}
                                   />
                                 )}
                                 <div style={{ minWidth: 0 }}>
-                                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  <div style={{ fontWeight: 800, color: '#202938', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {row.projectName}
                                   </div>
-                                  <div style={{ fontSize: '0.72rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  <div style={{ fontSize: '0.72rem', color: '#758195', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                     {row.productCode ? `SKU: ${row.productCode}` : ''} {row.notes ? `• ${row.notes}` : ''}
                                   </div>
                                 </div>
@@ -9173,7 +9122,7 @@ Yetkili Satış & Showroom Departmanı`;
                             header: 'Tarih',
                             render: (row) => (
                               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', color: '#475569', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                                <Calendar size={13} style={{ color: '#b38e47' }} />
+                                <Calendar size={13} style={{ color: '#C5A04B' }} />
                                 {row.createdAt
                                   ? new Date(row.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
                                   : 'Bugün'}
@@ -9184,7 +9133,7 @@ Yetkili Satış & Showroom Departmanı`;
                             key: 'amount',
                             header: 'Teklif Tutarı / Metraj',
                             render: (row) => (
-                              <span style={{ fontWeight: 900, color: '#b38e47', fontSize: '0.88rem', whiteSpace: 'nowrap' }}>
+                              <span style={{ fontWeight: 900, color: '#C5A04B', fontSize: '0.88rem', whiteSpace: 'nowrap' }}>
                                 {row.amountText}
                               </span>
                             )
@@ -9208,9 +9157,9 @@ Yetkili Satış & Showroom Departmanı`;
                                         padding: '5px 8px',
                                         fontSize: '0.73rem',
                                         borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
-                                        background: '#f8fafc',
-                                        color: '#0f172a',
+                                        border: '1px solid #E4E8EF',
+                                        background: '#F5F6F8',
+                                        color: '#202938',
                                         cursor: 'pointer',
                                         fontWeight: 700
                                       }}
@@ -9232,7 +9181,7 @@ Yetkili Satış & Showroom Departmanı`;
                                       }}
                                       title="Bu Talep İçin Teklif Hazırla"
                                       style={{
-                                        background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                        background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                                         color: '#090d16',
                                         border: 'none',
                                         padding: '5px 10px',
@@ -9251,7 +9200,7 @@ Yetkili Satış & Showroom Departmanı`;
                                       style={{
                                         background: 'transparent',
                                         border: 'none',
-                                        color: '#ef4444',
+                                        color: '#DC5353',
                                         cursor: 'pointer',
                                         padding: '4px',
                                         display: 'flex',
@@ -9268,7 +9217,7 @@ Yetkili Satış & Showroom Departmanı`;
                                       type="button"
                                       onClick={() => handleSendWhatsAppQuote(row.rawObj)}
                                       style={{
-                                        background: '#10b981',
+                                        background: '#10A37F',
                                         color: '#ffffff',
                                         border: 'none',
                                         padding: '5px 9px',
@@ -9288,9 +9237,9 @@ Yetkili Satış & Showroom Departmanı`;
                                       type="button"
                                       onClick={() => setGeneratedQuote(row.rawObj)}
                                       style={{
-                                        background: '#0f172a',
+                                        background: '#202938',
                                         color: '#fde68a',
-                                        border: '1px solid #d4af37',
+                                        border: '1px solid #C5A04B',
                                         padding: '5px 10px',
                                         borderRadius: '7px',
                                         fontSize: '0.72rem',
@@ -9310,7 +9259,7 @@ Yetkili Satış & Showroom Departmanı`;
                           <div
                             style={{
                               background: '#ffffff',
-                              border: '1px solid #e2e8f0',
+                              border: '1px solid #E4E8EF',
                               borderRadius: '14px',
                               padding: '14px',
                               display: 'flex',
@@ -9321,7 +9270,7 @@ Yetkili Satış & Showroom Departmanı`;
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                               <div>
-                                <strong style={{ fontSize: '0.9rem', color: '#0f172a', display: 'block', fontWeight: 800 }}>
+                                <strong style={{ fontSize: '0.9rem', color: '#202938', display: 'block', fontWeight: 800 }}>
                                   {row.customerName}
                                 </strong>
                                 {row.customerPhone && (
@@ -9336,18 +9285,18 @@ Yetkili Satış & Showroom Departmanı`;
                               <StatusBadge status={row.status} />
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F5F6F8', padding: '10px', borderRadius: '10px', border: '1px solid #E4E8EF' }}>
                               <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a' }}>{row.projectName}</div>
-                                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{row.notes}</div>
+                                <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#202938' }}>{row.projectName}</div>
+                                <div style={{ fontSize: '0.72rem', color: '#758195' }}>{row.notes}</div>
                               </div>
-                              <div style={{ fontWeight: 900, color: '#b38e47', fontSize: '0.88rem', flexShrink: 0, marginLeft: '8px' }}>
+                              <div style={{ fontWeight: 900, color: '#C5A04B', fontSize: '0.88rem', flexShrink: 0, marginLeft: '8px' }}>
                                 {row.amountText}
                               </div>
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingTop: '4px' }}>
-                              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
+                              <span style={{ fontSize: '0.7rem', color: '#758195', fontWeight: 600 }}>
                                 {row.createdAt ? new Date(row.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : 'Bugün'}
                               </span>
 
@@ -9360,8 +9309,8 @@ Yetkili Satış & Showroom Departmanı`;
                                       padding: '5px 8px',
                                       fontSize: '0.72rem',
                                       borderRadius: '7px',
-                                      border: '1px solid #cbd5e1',
-                                      background: '#f8fafc',
+                                      border: '1px solid #E4E8EF',
+                                      background: '#F5F6F8',
                                       fontWeight: 700
                                     }}
                                   >
@@ -9372,7 +9321,7 @@ Yetkili Satış & Showroom Departmanı`;
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteLead(row.rawId)}
-                                    style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                                    style={{ background: 'transparent', border: 'none', color: '#DC5353', cursor: 'pointer' }}
                                   >
                                     <Trash2 size={14} />
                                   </button>
@@ -9382,14 +9331,14 @@ Yetkili Satış & Showroom Departmanı`;
                                   <button
                                     type="button"
                                     onClick={() => handleSendWhatsAppQuote(row.rawObj)}
-                                    style={{ background: '#10b981', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}
+                                    style={{ background: '#10A37F', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}
                                   >
                                     WhatsApp
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => setGeneratedQuote(row.rawObj)}
-                                    style={{ background: '#0f172a', color: '#fde68a', border: 'none', padding: '5px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}
+                                    style={{ background: '#202938', color: '#fde68a', border: 'none', padding: '5px 10px', borderRadius: '7px', fontSize: '0.72rem', fontWeight: 800 }}
                                   >
                                     PDF
                                   </button>
@@ -9407,10 +9356,10 @@ Yetkili Satış & Showroom Departmanı`;
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
                     <div>
-                      <h3 style={{ margin: '0 0 2px 0', fontSize: '1.08rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                      <h3 style={{ margin: '0 0 2px 0', fontSize: '1.08rem', fontWeight: 800, color: '#202938', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                         Popüler Koleksiyonlar
                       </h3>
-                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}>
+                      <p style={{ margin: 0, fontSize: '0.78rem', color: '#758195' }}>
                         {dealerInfo?.brandName ? `${dealerInfo.brandName} showroomunuzda öne çıkan seramik koleksiyonları` : 'Showroomunuzda öne çıkan seramik serileri'}
                       </p>
                     </div>
@@ -9522,21 +9471,21 @@ Yetkili Satış & Showroom Departmanı`;
         .glass-panel {
           background: #ffffff !important;
           backdrop-filter: blur(20px) !important;
-          border: 1px solid #e2e8f0 !important;
-          color: #0f172a !important;
+          border: 1px solid #E4E8EF !important;
+          color: #202938 !important;
           box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
           border-radius: 18px !important;
         }
 
         .project-card {
           background: #f8f9fb !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
           border-radius: 16px !important;
         }
         .project-card h4 {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
         .project-card strong {
           color: #b45309 !important;
@@ -9547,7 +9496,7 @@ Yetkili Satış & Showroom Departmanı`;
         .dealer-main-content h3, 
         .dealer-main-content h4, 
         .dealer-main-content h5 {
-          color: #0f172a;
+          color: #202938;
           font-family: var(--font-title, "Outfit", sans-serif);
         }
 
@@ -9556,7 +9505,7 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .dealer-main-content strong {
-          color: #0f172a;
+          color: #202938;
         }
 
         /* Explicit Protection for Dark Cards & Banners */
@@ -9579,7 +9528,7 @@ Yetkili Satış & Showroom Departmanı`;
 
         .dealer-hero-banner p,
         .dark-card p {
-          color: #cbd5e1 !important;
+          color: #E4E8EF !important;
         }
 
         .dealer-hero-banner strong,
@@ -9612,14 +9561,14 @@ Yetkili Satış & Showroom Departmanı`;
           background: #f1f5f9 !important;
           color: #475569 !important;
           font-weight: 700 !important;
-          border-bottom: 2px solid #e2e8f0 !important;
+          border-bottom: 2px solid #E4E8EF !important;
           padding: 14px 16px !important;
           font-size: 0.8rem;
         }
 
         .dealer-main-content table td {
           padding: 14px 16px !important;
-          border-bottom: 1px solid #e2e8f0 !important;
+          border-bottom: 1px solid #E4E8EF !important;
           color: #1e293b !important;
           font-size: 0.82rem;
         }
@@ -9633,8 +9582,8 @@ Yetkili Satış & Showroom Departmanı`;
         .dealer-main-content select,
         .dealer-main-content textarea {
           background: #ffffff !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           border-radius: 10px !important;
           outline: none;
           transition: all 0.2s ease-in-out;
@@ -9644,9 +9593,9 @@ Yetkili Satış & Showroom Departmanı`;
         .dealer-main-content select:focus,
         .dealer-main-content textarea:focus {
           background: #ffffff !important;
-          border-color: #d4af37 !important;
+          border-color: #C5A04B !important;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .dealer-main-content label {
@@ -9658,14 +9607,14 @@ Yetkili Satış & Showroom Departmanı`;
         .showroom-qr-card.tag-theme-luxury-gold h3,
         .showroom-qr-card.tag-theme-clean-white h3,
         .showroom-qr-card .print-prod-title {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
         .showroom-qr-card.tag-theme-minimal-dark h3 {
           color: #ffffff !important;
         }
 
         .dealer-main-content label {
-          color: #cbd5e1;
+          color: #E4E8EF;
           font-weight: 700;
         }
 
@@ -9679,7 +9628,7 @@ Yetkili Satış & Showroom Departmanı`;
 
         .settings-card {
           background: #f8f9fb !important;
-          border: 1.5px solid #cbd5e1 !important;
+          border: 1.5px solid #E4E8EF !important;
           border-radius: 24px;
           padding: 36px 28px;
           box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22) !important;
@@ -9687,11 +9636,11 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .settings-card h2 {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .settings-card h3 {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .settings-card p {
@@ -9709,7 +9658,7 @@ Yetkili Satış & Showroom Departmanı`;
 
         .settings-section {
           background: #f1f4f8 !important;
-          border: 1px solid #cbd5e1 !important;
+          border: 1px solid #E4E8EF !important;
           border-radius: 16px;
           padding: 22px 18px;
           display: flex;
@@ -9720,24 +9669,24 @@ Yetkili Satış & Showroom Departmanı`;
 
         .analytics-white-card {
           background: #ffffff !important;
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .analytics-white-card h4 {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         /* ===== QUOTE FORM CARD — Soft Architectural Pearl Card ===== */
         .quote-form-card {
           background: #f8f9fb !important;
-          border: 1.5px solid #cbd5e1 !important;
+          border: 1.5px solid #E4E8EF !important;
           color: #1e293b !important;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
         }
 
         .quote-form-card h3,
         .quote-form-card h4 {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .quote-form-card label {
@@ -9753,12 +9702,12 @@ Yetkili Satış & Showroom Departmanı`;
         .quote-form-card select,
         .quote-form-card textarea {
           background-color: #f1f4f8 !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           font-weight: 600 !important;
           font-size: 0.85rem !important;
           opacity: 1 !important;
-          caret-color: #0f172a !important;
+          caret-color: #202938 !important;
           border-radius: 8px !important;
         }
 
@@ -9766,9 +9715,9 @@ Yetkili Satış & Showroom Departmanı`;
         .quote-form-card select:focus,
         .quote-form-card textarea:focus {
           background-color: #f8f9fb !important;
-          border-color: #d4af37 !important;
+          border-color: #C5A04B !important;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .quote-form-card input::placeholder,
@@ -9797,20 +9746,20 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .quote-calc-card strong {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         /* ===== PAYMENT MODAL CARD ===== */
         .payment-modal-card {
           background: #f8f9fb !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35) !important;
         }
 
         .payment-modal-card h3,
         .payment-modal-card h4 {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .payment-modal-card p,
@@ -9820,7 +9769,7 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .payment-modal-card strong {
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .payment-modal-card label {
@@ -9832,21 +9781,21 @@ Yetkili Satış & Showroom Departmanı`;
         .payment-modal-card select,
         .payment-modal-card textarea {
           background-color: #ffffff !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           font-weight: 600 !important;
           font-size: 0.85rem !important;
           opacity: 1 !important;
-          caret-color: #0f172a !important;
+          caret-color: #202938 !important;
         }
 
         .payment-modal-card input:focus,
         .payment-modal-card select:focus,
         .payment-modal-card textarea:focus {
           background-color: #ffffff !important;
-          border-color: #d4af37 !important;
+          border-color: #C5A04B !important;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .payment-modal-card input::placeholder,
@@ -9888,8 +9837,8 @@ Yetkili Satış & Showroom Departmanı`;
         .dealer-card-input,
         .dealer-card-textarea {
           background-color: #f1f4f8 !important;
-          border: 1.5px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #E4E8EF !important;
+          color: #202938 !important;
           font-weight: 700 !important;
           font-size: 0.88rem !important;
           opacity: 1 !important;
@@ -9905,9 +9854,9 @@ Yetkili Satış & Showroom Departmanı`;
         .dealer-card-input:focus,
         .dealer-card-textarea:focus {
           background-color: #f8f9fb !important;
-          border-color: #d4af37 !important;
+          border-color: #C5A04B !important;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.22) !important;
-          color: #0f172a !important;
+          color: #202938 !important;
         }
 
         .settings-card input::placeholder,
@@ -9915,7 +9864,7 @@ Yetkili Satış & Showroom Departmanı`;
         .portal-input::placeholder,
         .dealer-card-input::placeholder,
         .dealer-card-textarea::placeholder {
-          color: #64748b !important;
+          color: #758195 !important;
           opacity: 1 !important;
           font-weight: 500 !important;
         }
@@ -9925,9 +9874,9 @@ Yetkili Satış & Showroom Departmanı`;
         }
 
         .hover-gold-btn:hover {
-          background-color: #b38e47 !important;
+          background-color: #C5A04B !important;
           color: #090d16 !important;
-          border-color: #b38e47 !important;
+          border-color: #C5A04B !important;
         }
 
         .hover-gold-solid-btn {
@@ -9962,7 +9911,7 @@ Yetkili Satış & Showroom Departmanı`;
           transition: color 0.2s;
         }
         .hover-gold-text:hover {
-          color: #d4af37 !important;
+          color: #C5A04B !important;
         }
 
         /* ===== TABLET (max-width: 1024px) ===== */
@@ -10165,7 +10114,7 @@ Yetkili Satış & Showroom Departmanı`;
 
           html, body {
             background: #ffffff !important;
-            color: #0f172a !important;
+            color: #202938 !important;
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
@@ -10254,9 +10203,9 @@ Yetkili Satış & Showroom Departmanı`;
 
           /* Luxury stand tag card in print (Matching Screenshot 2) */
           .showroom-qr-card {
-            border: 2px solid #d4af37 !important;
+            border: 2px solid #C5A04B !important;
             background: #ffffff !important;
-            color: #0f172a !important;
+            color: #202938 !important;
             box-shadow: none !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
@@ -10376,7 +10325,7 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-brand-badge {
-            color: #b38e47 !important;
+            color: #C5A04B !important;
             font-size: 0.68rem !important;
             font-weight: 900 !important;
             letter-spacing: 0.08em !important;
@@ -10391,7 +10340,7 @@ Yetkili Satış & Showroom Departmanı`;
           .showroom-qr-card.tag-theme-luxury-gold h3,
           .showroom-qr-card.tag-theme-clean-white h3,
           .showroom-qr-card.tag-theme-minimal-dark h3 {
-            color: #0f172a !important;
+            color: #202938 !important;
             font-size: 1.15rem !important;
             font-weight: 900 !important;
             margin: 4px 0 2px 0 !important;
@@ -10408,7 +10357,7 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-prod-code {
-            border: 1.5px solid #d4af37 !important;
+            border: 1.5px solid #C5A04B !important;
             background: #fdfaf3 !important;
             color: #854d0e !important;
             font-size: 0.68rem !important;
@@ -10418,8 +10367,8 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-qr-container {
-            background: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
+            background: #F5F6F8 !important;
+            border: 1px solid #E4E8EF !important;
             padding: 12px !important;
             border-radius: 12px !important;
             display: flex !important;
@@ -10432,7 +10381,7 @@ Yetkili Satış & Showroom Departmanı`;
             height: 100px !important;
             min-width: 100px !important;
             background: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
+            border: 1px solid #E4E8EF !important;
             border-radius: 8px !important;
             padding: 4px !important;
             box-shadow: none !important;
@@ -10449,7 +10398,7 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-qr-title {
-            color: #0f172a !important;
+            color: #202938 !important;
             font-size: 0.85rem !important;
             font-weight: 900 !important;
             line-height: 1.25 !important;
@@ -10462,7 +10411,7 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-qr-badge {
-            color: #059669 !important;
+            color: #10A37F !important;
             font-size: 0.7rem !important;
             font-weight: 800 !important;
             display: flex !important;
@@ -10471,7 +10420,7 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-card-footer {
-            border-top: 1px solid #e2e8f0 !important;
+            border-top: 1px solid #E4E8EF !important;
             padding-top: 8px !important;
             display: flex !important;
             justifyContent: space-between !important;
@@ -10479,14 +10428,14 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-dealer-sub {
-            color: #64748b !important;
+            color: #758195 !important;
             font-size: 0.62rem !important;
             text-transform: uppercase !important;
             letter-spacing: 0.04em !important;
           }
 
           .print-dealer-title {
-            color: #0f172a !important;
+            color: #202938 !important;
             font-weight: 900 !important;
             font-size: 0.88rem !important;
           }
@@ -10497,13 +10446,13 @@ Yetkili Satış & Showroom Departmanı`;
           }
 
           .print-price-label {
-            color: #64748b !important;
+            color: #758195 !important;
             font-size: 0.62rem !important;
             text-transform: uppercase !important;
           }
 
           .print-price-val {
-            color: #059669 !important;
+            color: #10A37F !important;
             font-size: 1.15rem !important;
             font-weight: 900 !important;
           }
@@ -10529,7 +10478,7 @@ Yetkili Satış & Showroom Departmanı`;
           <div className="payment-modal-card" style={{
             background: '#ffffff',
             borderRadius: '20px',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #E4E8EF',
             width: '100%',
             maxWidth: '520px',
             padding: '30px',
@@ -10548,24 +10497,24 @@ Yetkili Satış & Showroom Departmanı`;
                 border: 'none',
                 fontSize: '1.25rem',
                 cursor: 'pointer',
-                color: '#64748b',
+                color: '#758195',
                 fontWeight: '700'
               }}
             >
               ×
             </button>
 
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#202938' }}>
               Banka Havalesi ile Ödeme Bildirimi
             </h3>
-            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
+            <p style={{ fontSize: '0.8rem', color: '#758195', marginBottom: '20px' }}>
               Seçtiğiniz <strong>{selectedPaymentPlan}</strong> paketini aktifleştirmek için lütfen aşağıdaki IBAN adresine havale yapın ve ödeme bildirim formunu doldurun.
             </p>
 
             {/* Bank details box */}
             <div style={{
               background: '#f1f5f9',
-              border: '1.5px solid #cbd5e1',
+              border: '1.5px solid #E4E8EF',
               borderRadius: '12px',
               padding: '16px',
               marginBottom: '24px',
@@ -10573,12 +10522,12 @@ Yetkili Satış & Showroom Departmanı`;
               display: 'flex',
               flexDirection: 'column',
               gap: '10px',
-              color: '#0f172a'
+              color: '#202938'
             }}>
-              <div><strong style={{ color: '#0f172a' }}>Banka:</strong> <span style={{ color: '#0f172a', fontWeight: '700' }}>{bankDetails.bank_name || 'Akbank'}</span></div>
-              <div><strong style={{ color: '#0f172a' }}>Alıcı:</strong> <span style={{ color: '#0f172a', fontWeight: '700' }}>{bankDetails.bank_recipient || 'SeramikBak Yazılım A.Ş.'}</span></div>
+              <div><strong style={{ color: '#202938' }}>Banka:</strong> <span style={{ color: '#202938', fontWeight: '700' }}>{bankDetails.bank_name || 'Akbank'}</span></div>
+              <div><strong style={{ color: '#202938' }}>Alıcı:</strong> <span style={{ color: '#202938', fontWeight: '700' }}>{bankDetails.bank_recipient || 'SeramikBak Yazılım A.Ş.'}</span></div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
-                <div><strong style={{ color: '#0f172a' }}>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '800', color: '#0f172a', fontSize: '0.88rem' }}>{bankDetails.bank_iban || 'TR98 0004 6001 5000 1234 5678 90'}</span></div>
+                <div><strong style={{ color: '#202938' }}>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '800', color: '#202938', fontSize: '0.88rem' }}>{bankDetails.bank_iban || 'TR98 0004 6001 5000 1234 5678 90'}</span></div>
                 <button 
                   type="button"
                   onClick={() => {
@@ -10586,7 +10535,7 @@ Yetkili Satış & Showroom Departmanı`;
                     alert('IBAN panoya kopyalandı!');
                   }}
                   style={{
-                    background: '#0f172a',
+                    background: '#202938',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '6px',
@@ -10599,22 +10548,22 @@ Yetkili Satış & Showroom Departmanı`;
                   Kopyala
                 </button>
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#475569', borderTop: '1px solid #cbd5e1', paddingTop: '8px', marginTop: '4px' }}>
-                * Açıklama alanına bayinizin adını (<strong style={{ color: '#0f172a' }}>{dealerInfo?.name}</strong>) yazmayı unutmayın.
+              <div style={{ fontSize: '0.75rem', color: '#475569', borderTop: '1px solid #E4E8EF', paddingTop: '8px', marginTop: '4px' }}>
+                * Açıklama alanına bayinizin adını (<strong style={{ color: '#202938' }}>{dealerInfo?.name}</strong>) yazmayı unutmayın.
               </div>
             </div>
 
             {/* Notification Form */}
             <form onSubmit={handleSendPaymentNotification} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {paymentSuccess && (
-                <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ background: '#ecfdf5', border: '1px solid #10A37F', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <CheckCircle size={18} />
                   <span>{paymentSuccess}</span>
                 </div>
               )}
 
               {paymentError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ background: '#fef2f2', border: '1px solid #DC5353', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <AlertCircle size={18} />
                   <span>{paymentError}</span>
                 </div>
@@ -10628,7 +10577,7 @@ Yetkili Satış & Showroom Departmanı`;
                   onChange={(e) => setPaymentSenderName(e.target.value)} 
                   placeholder="Hesap Sahibi Adı Soyadı" 
                   required
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #E4E8EF' }}
                 />
               </div>
 
@@ -10639,7 +10588,7 @@ Yetkili Satış & Showroom Departmanı`;
                   value={paymentDate} 
                   onChange={(e) => setPaymentDate(e.target.value)} 
                   required
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #E4E8EF' }}
                 />
               </div>
 
@@ -10650,7 +10599,7 @@ Yetkili Satış & Showroom Departmanı`;
                   value={paymentNote} 
                   onChange={(e) => setPaymentNote(e.target.value)} 
                   placeholder="Referans No veya Not" 
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #E4E8EF' }}
                 />
               </div>
 
@@ -10677,7 +10626,7 @@ Yetkili Satış & Showroom Departmanı`;
                   disabled={paymentLoading}
                   style={{
                     flex: 1,
-                    background: 'var(--accent-gold, #d4af37)',
+                    background: 'var(--accent-gold, #C5A04B)',
                     color: '#000',
                     border: 'none',
                     borderRadius: '8px',
@@ -10715,7 +10664,7 @@ Yetkili Satış & Showroom Departmanı`;
           <div style={{
             background: '#ffffff',
             borderRadius: '20px',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #E4E8EF',
             width: '100%',
             maxWidth: '480px',
             padding: '30px',
@@ -10724,12 +10673,12 @@ Yetkili Satış & Showroom Departmanı`;
           }}>
             <button 
               onClick={() => setShowAddInventoryModal(false)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#758195' }}
             >
               <X size={18} />
             </button>
 
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#0f172a' }}>Manüel Envanter Ekle</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#202938' }}>Manüel Envanter Ekle</h3>
 
             <form onSubmit={handleAddInventoryItem} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -10738,7 +10687,7 @@ Yetkili Satış & Showroom Departmanı`;
                   value={addInventoryProduct}
                   onChange={(e) => setAddInventoryProduct(e.target.value)}
                   required
-                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                 >
                   <option value="">Ürün Seçiniz...</option>
                   {brandProducts.map(prod => (
@@ -10756,7 +10705,7 @@ Yetkili Satış & Showroom Departmanı`;
                     onChange={(e) => setAddInventoryStock(e.target.value)}
                     required
                     min="0"
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem' }}
                   />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -10766,7 +10715,7 @@ Yetkili Satış & Showroom Departmanı`;
                     value={addInventoryPrice}
                     onChange={(e) => setAddInventoryPrice(e.target.value)}
                     placeholder="Liste Fiyatı"
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem' }}
                   />
                 </div>
               </div>
@@ -10776,7 +10725,7 @@ Yetkili Satış & Showroom Departmanı`;
                 <select 
                   value={addInventoryStatus}
                   onChange={(e) => setAddInventoryStatus(e.target.value)}
-                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #E4E8EF', fontSize: '0.82rem', background: '#fff' }}
                 >
                   <option value="IN_STOCK">🟢 Stokta Var</option>
                   <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
@@ -10794,7 +10743,7 @@ Yetkili Satış & Showroom Departmanı`;
                 </button>
                 <button 
                   type="submit"
-                  style={{ flex: 1, background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer' }}
+                  style={{ flex: 1, background: 'linear-gradient(135deg, #C5A04B 0%, #8c6b30 100%)', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer' }}
                 >
                   Envantere Ekle
                 </button>
@@ -10841,7 +10790,7 @@ Yetkili Satış & Showroom Departmanı`;
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 20px auto',
-              color: '#d4af37'
+              color: '#C5A04B'
             }}>
               <Clock size={32} />
             </div>
@@ -10851,7 +10800,7 @@ Yetkili Satış & Showroom Departmanı`;
             </h3>
 
             <p style={{ fontSize: '0.88rem', color: '#94a3b8', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-              Uzun süredir herhangi bir işlem yapmadınız. Güvenliğiniz için oturumunuz <span style={{ color: '#ef4444', fontWeight: '800', fontSize: '1.05rem' }}>{inactivityCountdown} saniye</span> içinde otomatik olarak kapatılacaktır.
+              Uzun süredir herhangi bir işlem yapmadınız. Güvenliğiniz için oturumunuz <span style={{ color: '#DC5353', fontWeight: '800', fontSize: '1.05rem' }}>{inactivityCountdown} saniye</span> içinde otomatik olarak kapatılacaktır.
             </p>
 
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -10866,7 +10815,7 @@ Yetkili Satış & Showroom Departmanı`;
                   padding: '14px',
                   borderRadius: '12px',
                   border: 'none',
-                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  background: 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)',
                   color: '#090d16',
                   fontSize: '0.9rem',
                   fontWeight: '800',
@@ -10885,7 +10834,7 @@ Yetkili Satış & Showroom Departmanı`;
                   borderRadius: '12px',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   background: 'rgba(255, 255, 255, 0.05)',
-                  color: '#cbd5e1',
+                  color: '#E4E8EF',
                   fontSize: '0.9rem',
                   fontWeight: '700',
                   cursor: 'pointer'
@@ -10959,9 +10908,9 @@ Yetkili Satış & Showroom Departmanı`;
                     top: 0,
                     width: '28px',
                     height: '3px',
-                    background: 'linear-gradient(90deg, #b38e47 0%, #d4af37 100%)',
+                    background: 'linear-gradient(90deg, #C5A04B 0%, #C5A04B 100%)',
                     borderRadius: '2px',
-                    boxShadow: '0 0 10px #d4af37'
+                    boxShadow: '0 0 10px #C5A04B'
                   }} />
                 )}
                 {tab.icon}
@@ -10994,7 +10943,7 @@ Yetkili Satış & Showroom Departmanı`;
             background: '#0b111e',
             borderTopLeftRadius: '24px',
             borderTopRightRadius: '24px',
-            borderTop: '2.5px solid #d4af37',
+            borderTop: '2.5px solid #C5A04B',
             padding: '20px 16px calc(env(safe-area-inset-bottom, 0px) + 28px) 16px',
             display: 'flex',
             flexDirection: 'column',
@@ -11009,12 +10958,12 @@ Yetkili Satış & Showroom Departmanı`;
           }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', border: '1.5px solid #d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.75rem', fontWeight: '900' }}>SB</div>
+                <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: 'linear-gradient(135deg, #1e293b 0%, #202938 100%)', border: '1.5px solid #C5A04B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.75rem', fontWeight: '900' }}>SB</div>
                 <h3 style={{ fontSize: '0.98rem', fontWeight: '800', color: '#fff', margin: 0, fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>Tüm Bayi İşlemleri</h3>
               </div>
               <button 
                 onClick={() => setShowMobileMoreMenu(false)}
-                style={{ background: 'rgba(255, 255, 255, 0.08)', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ background: 'rgba(255, 255, 255, 0.08)', border: 'none', color: '#E4E8EF', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Kapat"
               >
                 <X size={18} />
@@ -11054,10 +11003,10 @@ Yetkili Satış & Showroom Departmanı`;
                       justifyContent: 'space-between',
                       gap: '6px',
                       padding: '10px 10px',
-                      background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'rgba(255, 255, 255, 0.03)',
+                      background: isActive ? 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)' : 'rgba(255, 255, 255, 0.03)',
                       border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.06)',
                       borderRadius: '12px',
-                      color: isActive ? '#090d16' : '#cbd5e1',
+                      color: isActive ? '#090d16' : '#E4E8EF',
                       fontSize: '0.74rem',
                       fontWeight: '700',
                       cursor: 'pointer',
@@ -11094,7 +11043,7 @@ Yetkili Satış & Showroom Departmanı`;
                         padding: '1px 4px',
                         borderRadius: '4px',
                         background: isLocked ? 'rgba(212,175,55,0.2)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
-                        color: '#d4af37',
+                        color: '#C5A04B',
                         fontWeight: '800',
                         flexShrink: 0
                       }}>
@@ -11122,7 +11071,7 @@ Yetkili Satış & Showroom Departmanı`;
                   background: 'rgba(239, 68, 68, 0.12)',
                   border: '1px solid rgba(239, 68, 68, 0.25)',
                   borderRadius: '12px',
-                  color: '#ef4444',
+                  color: '#DC5353',
                   fontSize: '0.82rem',
                   fontWeight: '700',
                   cursor: 'pointer',

@@ -31,6 +31,18 @@
   --bp-error: #D94C4C;
   --bp-info: #4778E8;
 
+  /* BAYİ PORTALI — PREMIUM MODERN B2B SAAS TOKENS */
+  --dp-sidebar-bg: #111827;
+  --dp-bg: #F5F6F8;
+  --dp-surface: #FFFFFF;
+  --dp-text-primary: #202938;
+  --dp-text-secondary: #758195;
+  --dp-accent-bronze: #C5A04B;
+  --dp-success: #10A37F;
+  --dp-warning: #E9A23B;
+  --dp-error: #DC5353;
+  --dp-border: #E4E8EF;
+
   /* Global Legacy & Component Mapping */
   --bg-dark: #F6F3EE;
   --bg-canvas: #F6F3EE;

@@ -302,7 +302,7 @@ export default function DealerStockExchangePage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #090d16 0%, #0f172a 100%)',
+        background: 'linear-gradient(135deg, #090d16 0%, #202938 100%)',
         color: '#ffffff',
         display: 'flex',
         alignItems: 'center',
@@ -325,7 +325,7 @@ export default function DealerStockExchangePage() {
             borderRadius: '20px',
             background: 'rgba(212, 175, 55, 0.15)',
             border: '1px solid rgba(212, 175, 55, 0.4)',
-            color: '#d4af37',
+            color: '#C5A04B',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -337,7 +337,7 @@ export default function DealerStockExchangePage() {
           <h2 style={{ fontSize: '1.6rem', fontWeight: '900', margin: '0 0 12px 0', color: '#fff' }}>
             🔒 Sadece Yetkili Seramik Bayilerine Özeldir
           </h2>
-          <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+          <p style={{ fontSize: '0.9rem', color: '#E4E8EF', lineHeight: '1.6', margin: '0 0 24px 0' }}>
             Bayiler Arası Stok Borsa & Takas Ağı, ticari mahremiyet ve bayi güvenliği gereğince sadece doğrulanmış yetkili bayi girişine açıktır.
           </p>
 
@@ -345,7 +345,7 @@ export default function DealerStockExchangePage() {
             <Link
               href="/bayi"
               style={{
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1.5px solid #d4af37', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
+                background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', border: '1.5px solid #C5A04B', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
                 padding: '14px',
                 borderRadius: '12px',
                 fontWeight: '900',
@@ -384,7 +384,7 @@ export default function DealerStockExchangePage() {
       minHeight: '100vh',
       backgroundColor: '#e6e8ec',
       backgroundImage: 'radial-gradient(ellipse 85% 40% at 50% -6%, rgba(197, 160, 89, 0.14), transparent 70%), radial-gradient(circle at 12% 28%, rgba(15, 23, 42, 0.035), transparent 45%), radial-gradient(circle at 88% 42%, rgba(197, 160, 89, 0.05), transparent 45%)',
-      color: '#0f172a',
+      color: '#202938',
       fontFamily: 'Outfit, sans-serif',
       paddingBottom: '80px',
       position: 'relative'
@@ -403,7 +403,7 @@ export default function DealerStockExchangePage() {
       <div style={{
         position: 'relative',
         zIndex: 1,
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #172554 100%)',
+        background: 'linear-gradient(135deg, #202938 0%, #1e293b 60%, #172554 100%)',
         borderBottom: '2px solid rgba(212,175,55,0.4)',
         padding: '36px 24px',
         textAlign: 'center',
@@ -426,7 +426,7 @@ export default function DealerStockExchangePage() {
                 gap: '8px',
                 background: 'rgba(255, 255, 255, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#cbd5e1',
+                color: '#E4E8EF',
                 padding: '8px 16px',
                 borderRadius: '12px',
                 fontWeight: '700',
@@ -445,7 +445,7 @@ export default function DealerStockExchangePage() {
               gap: '8px',
               background: 'rgba(212, 175, 55, 0.15)',
               border: '1px solid rgba(212, 175, 55, 0.4)',
-              color: '#d4af37',
+              color: '#C5A04B',
               padding: '6px 16px',
               borderRadius: '20px',
               fontWeight: '800',
@@ -457,9 +457,9 @@ export default function DealerStockExchangePage() {
           </div>
 
           <h1 style={{ fontSize: '2.2rem', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
-            🤝 Bayiler Arası <span style={{ background: 'linear-gradient(135deg, #d4af37 0%, #fef08a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Stok Borsa & Takas Ağı</span>
+            🤝 Bayiler Arası <span style={{ background: 'linear-gradient(135deg, #C5A04B 0%, #fef08a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Stok Borsa & Takas Ağı</span>
           </h1>
-          <p style={{ fontSize: '0.95rem', color: '#cbd5e1', maxWidth: '750px', margin: '0 auto', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '0.95rem', color: '#E4E8EF', maxWidth: '750px', margin: '0 auto', lineHeight: '1.6' }}>
             Eksik seramik projelerinizi diğer bayilerin stoklarından tamamlayın; elinizdeki fazla stokları takas yapıp anında nakite çevirin!
           </p>
 
@@ -474,7 +474,7 @@ export default function DealerStockExchangePage() {
             <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1.5px solid rgba(239, 68, 68, 0.4)', borderRadius: '16px', padding: '16px 20px', backdropFilter: 'blur(8px)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                 <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: '800' }}>🚨 Acil Stok Aranıyor</span>
-                <Flame size={18} style={{ color: '#ef4444' }} />
+                <Flame size={18} style={{ color: '#DC5353' }} />
               </div>
               <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ffffff' }}>{needCount} İlan</div>
               <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Müşteri bekleyen acil eksik talepleri</span>
@@ -483,7 +483,7 @@ export default function DealerStockExchangePage() {
             <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1.5px solid rgba(16, 185, 129, 0.4)', borderRadius: '16px', padding: '16px 20px', backdropFilter: 'blur(8px)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                 <span style={{ fontSize: '0.8rem', color: '#34d399', fontWeight: '800' }}>📦 Fazla / Takaslık Stok</span>
-                <Package size={18} style={{ color: '#10b981' }} />
+                <Package size={18} style={{ color: '#10A37F' }} />
               </div>
               <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ffffff' }}>{haveCount} İlan</div>
               <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Depoda teslime hazır fazla stoklar</span>
@@ -491,8 +491,8 @@ export default function DealerStockExchangePage() {
 
             <div style={{ background: 'rgba(212, 175, 55, 0.15)', border: '1.5px solid rgba(212, 175, 55, 0.4)', borderRadius: '16px', padding: '16px 20px', backdropFilter: 'blur(8px)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.8rem', color: '#d4af37', fontWeight: '800' }}>⚡ Ort. Eşleşme Süresi</span>
-                <ShieldCheck size={18} style={{ color: '#d4af37' }} />
+                <span style={{ fontSize: '0.8rem', color: '#C5A04B', fontWeight: '800' }}>⚡ Ort. Eşleşme Süresi</span>
+                <ShieldCheck size={18} style={{ color: '#C5A04B' }} />
               </div>
               <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ffffff' }}>~4 Saniye</div>
               <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Çapraz bayi ile WhatsApp bağlantısı</span>
@@ -511,15 +511,15 @@ export default function DealerStockExchangePage() {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '16px',
-          background: '#f8f9fb',
-          border: '1.5px solid #cbd5e1',
+          background: '#FFFFFF',
+          border: '1.5px solid #E4E8EF',
           borderRadius: '20px',
           padding: '16px 20px',
           boxShadow: '0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 2px 6px rgba(0,0,0,0.02)',
           marginBottom: '24px'
         }}>
           {/* Type Tabs */}
-          <div style={{ display: 'flex', gap: '6px', background: '#e2e8f0', padding: '4px', borderRadius: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '6px', background: '#E4E8EF', padding: '4px', borderRadius: '12px', flexWrap: 'wrap' }}>
             {[
               { id: 'ALL', label: 'Tüm İlanlar' },
               { id: 'NEED_STOCK', label: '🚨 Stok Aranıyor' },
@@ -533,8 +533,8 @@ export default function DealerStockExchangePage() {
                   padding: '8px 16px',
                   borderRadius: '10px',
                   border: 'none',
-                  background: activeTypeTab === tab.id ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
-                  color: activeTypeTab === tab.id ? '#0f172a' : '#475569',
+                  background: activeTypeTab === tab.id ? 'linear-gradient(135deg, #C5A04B 0%, #C5A04B 100%)' : 'transparent',
+                  color: activeTypeTab === tab.id ? '#202938' : '#475569',
                   fontWeight: '800',
                   fontSize: '0.82rem',
                   cursor: 'pointer',
@@ -553,8 +553,8 @@ export default function DealerStockExchangePage() {
               onChange={(e) => setSelectedCity(e.target.value)}
               style={{
                 background: '#ffffff',
-                border: '1.5px solid #cbd5e1',
-                color: '#0f172a',
+                border: '1.5px solid #E4E8EF',
+                color: '#202938',
                 padding: '10px 14px',
                 borderRadius: '12px',
                 fontSize: '0.85rem',
@@ -569,7 +569,7 @@ export default function DealerStockExchangePage() {
             <button
               onClick={() => setShowCreateModal(true)}
               style={{
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1.5px solid #d4af37', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
+                background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', border: '1.5px solid #C5A04B', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
                 border: 'none',
                 padding: '10px 20px',
                 borderRadius: '12px',
@@ -590,8 +590,8 @@ export default function DealerStockExchangePage() {
 
         {/* Loading State */}
         {loading && (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#cbd5e1' }}>
-            <RefreshCw size={36} className="animate-spin" style={{ color: '#d4af37', marginBottom: '12px' }} />
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#E4E8EF' }}>
+            <RefreshCw size={36} className="animate-spin" style={{ color: '#C5A04B', marginBottom: '12px' }} />
             <p style={{ fontSize: '0.95rem', fontWeight: '600' }}>B2B Stok İlanları Yükleniyor...</p>
           </div>
         )}
@@ -599,7 +599,7 @@ export default function DealerStockExchangePage() {
         {/* Empty State */}
         {!loading && offers.length === 0 && (
           <div style={{
-            background: '#f8f9fb',
+            background: '#FFFFFF',
             border: '2px dashed rgba(212, 175, 55, 0.4)',
             borderRadius: '20px',
             padding: '48px 24px',
@@ -607,7 +607,7 @@ export default function DealerStockExchangePage() {
             color: '#475569',
             boxShadow: '0 10px 25px -4px rgba(15, 23, 42, 0.05)'
           }}>
-            <p style={{ fontSize: '1.15rem', fontWeight: '900', margin: '0 0 8px 0', color: '#0f172a' }}>
+            <p style={{ fontSize: '1.15rem', fontWeight: '900', margin: '0 0 8px 0', color: '#202938' }}>
               {activeTypeTab === 'MY_OFFERS' 
                 ? 'Henüz verilmiş aktif stok/takas ilanınız bulunmuyor.' 
                 : 'Bu kategoride henüz kayıtlı ilan bulunmuyor.'}
@@ -618,7 +618,7 @@ export default function DealerStockExchangePage() {
             <button
               onClick={() => setShowCreateModal(true)}
               style={{
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1.5px solid #d4af37', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
+                background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', border: '1.5px solid #C5A04B', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
                 border: 'none',
                 padding: '10px 20px',
                 borderRadius: '12px',
@@ -649,7 +649,7 @@ export default function DealerStockExchangePage() {
                   style={{
                     background: '#ffffff',
                     border: mine 
-                      ? '2px solid #d4af37' 
+                      ? '2px solid #C5A04B' 
                       : (isNeed ? '1.5px solid rgba(239, 68, 68, 0.35)' : '1.5px solid rgba(16, 185, 129, 0.35)'),
                     borderRadius: '20px',
                     padding: '22px',
@@ -708,10 +708,10 @@ export default function DealerStockExchangePage() {
                     </div>
 
                     {/* Product Name & Brand */}
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', lineHeight: '1.3' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', color: '#202938', lineHeight: '1.3' }}>
                       {offer.productName}
                     </h3>
-                    <span style={{ fontSize: '0.8rem', color: '#d4af37', fontWeight: '700', display: 'block', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#C5A04B', fontWeight: '700', display: 'block', marginBottom: '12px' }}>
                       {offer.brandName || 'Marka Belirtilmedi'}
                     </span>
 
@@ -719,7 +719,7 @@ export default function DealerStockExchangePage() {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', fontSize: '0.8rem', color: '#475569', marginBottom: '14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <Layers size={14} style={{ color: '#94a3b8' }} />
-                        <span>Miktar: <strong style={{ color: '#0f172a' }}>{offer.quantityM2} m²</strong></span>
+                        <span>Miktar: <strong style={{ color: '#202938' }}>{offer.quantityM2} m²</strong></span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <MapPin size={14} style={{ color: '#94a3b8' }} />
@@ -730,15 +730,15 @@ export default function DealerStockExchangePage() {
                     {/* Notes Box */}
                     {offer.notes && (
                       <div style={{
-                        background: '#f8fafc',
+                        background: '#F5F6F8',
                         padding: '10px 12px',
                         borderRadius: '10px',
                         fontSize: '0.78rem',
                         color: '#334155',
                         lineHeight: '1.4',
                         marginBottom: '16px',
-                        borderLeft: '3px solid #d4af37',
-                        border: '1px solid #e2e8f0'
+                        borderLeft: '3px solid #C5A04B',
+                        border: '1px solid #E4E8EF'
                       }}>
                         "{offer.notes}"
                       </div>
@@ -746,9 +746,9 @@ export default function DealerStockExchangePage() {
                   </div>
 
                   {/* Action Bar */}
-                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '14px', marginTop: '10px' }}>
+                  <div style={{ borderTop: '1px solid #E4E8EF', paddingTop: '14px', marginTop: '10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <div style={{ fontSize: '0.78rem', color: '#0f172a', fontWeight: '700' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#202938', fontWeight: '700' }}>
                         👤 {offer.contactName}
                       </div>
 
@@ -761,7 +761,7 @@ export default function DealerStockExchangePage() {
                             style={{
                               background: 'rgba(212, 175, 55, 0.2)',
                               border: '1px solid rgba(212, 175, 55, 0.4)',
-                              color: '#d4af37',
+                              color: '#C5A04B',
                               padding: '4px 8px',
                               borderRadius: '6px',
                               cursor: 'pointer',
@@ -827,7 +827,7 @@ export default function DealerStockExchangePage() {
                         target="_blank"
                         rel="noreferrer"
                         style={{
-                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          background: 'linear-gradient(135deg, #10A37F 0%, #10A37F 100%)',
                           color: '#fff',
                           padding: '10px',
                           borderRadius: '10px',
@@ -849,8 +849,8 @@ export default function DealerStockExchangePage() {
                         href={`tel:${offer.contactPhone}`}
                         style={{
                           background: '#f1f5f9',
-                          border: '1.5px solid #cbd5e1',
-                          color: '#0f172a',
+                          border: '1.5px solid #E4E8EF',
+                          color: '#202938',
                           padding: '10px',
                           borderRadius: '10px',
                           fontWeight: '700',
@@ -890,7 +890,7 @@ export default function DealerStockExchangePage() {
         }}>
           <div style={{
             background: '#ffffff',
-            border: '1.5px solid #cbd5e1',
+            border: '1.5px solid #E4E8EF',
             borderRadius: '24px',
             width: '100%',
             maxWidth: '560px',
@@ -900,22 +900,22 @@ export default function DealerStockExchangePage() {
             overflowY: 'auto'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#0f172a' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#202938' }}>
                 ➕ Yeni B2B Stok / Takas İlanı Aç
               </h3>
-              <button onClick={() => setShowCreateModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}>
+              <button onClick={() => setShowCreateModal(false)} style={{ background: 'none', border: 'none', color: '#758195', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             </div>
 
             {submitError && (
-              <div style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid #ef4444', color: '#f87171', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
+              <div style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid #DC5353', color: '#f87171', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
                 ⚠️ {submitError}
               </div>
             )}
 
             {submitSuccess && (
-              <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid #10b981', color: '#34d399', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
+              <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid #10A37F', color: '#34d399', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
                 ✅ {submitSuccess}
               </div>
             )}
@@ -931,9 +931,9 @@ export default function DealerStockExchangePage() {
                     style={{
                       padding: '12px',
                       borderRadius: '12px',
-                      border: formType === 'NEED_STOCK' ? '2px solid #ef4444' : '1.5px solid #cbd5e1',
-                      background: formType === 'NEED_STOCK' ? '#fee2e2' : '#f8fafc',
-                      color: formType === 'NEED_STOCK' ? '#b91c1c' : '#64748b',
+                      border: formType === 'NEED_STOCK' ? '2px solid #DC5353' : '1.5px solid #E4E8EF',
+                      background: formType === 'NEED_STOCK' ? '#fee2e2' : '#F5F6F8',
+                      color: formType === 'NEED_STOCK' ? '#b91c1c' : '#758195',
                       fontWeight: '800',
                       fontSize: '0.85rem',
                       cursor: 'pointer'
@@ -947,9 +947,9 @@ export default function DealerStockExchangePage() {
                     style={{
                       padding: '12px',
                       borderRadius: '12px',
-                      border: formType === 'HAVE_STOCK' ? '2px solid #10b981' : '1.5px solid #cbd5e1',
-                      background: formType === 'HAVE_STOCK' ? '#d1fae5' : '#f8fafc',
-                      color: formType === 'HAVE_STOCK' ? '#047857' : '#64748b',
+                      border: formType === 'HAVE_STOCK' ? '2px solid #10A37F' : '1.5px solid #E4E8EF',
+                      background: formType === 'HAVE_STOCK' ? '#d1fae5' : '#F5F6F8',
+                      color: formType === 'HAVE_STOCK' ? '#047857' : '#758195',
                       fontWeight: '800',
                       fontSize: '0.85rem',
                       cursor: 'pointer'
@@ -968,7 +968,7 @@ export default function DealerStockExchangePage() {
                   value={formProductName}
                   onChange={(e) => setFormProductName(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                 />
               </div>
 
@@ -980,7 +980,7 @@ export default function DealerStockExchangePage() {
                     placeholder="Örn: NG Kütahya / Vitra"
                     value={formBrandName}
                     onChange={(e) => setFormBrandName(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -990,7 +990,7 @@ export default function DealerStockExchangePage() {
                     placeholder="20"
                     value={formQuantityM2}
                     onChange={(e) => setFormQuantityM2(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1004,7 +1004,7 @@ export default function DealerStockExchangePage() {
                     value={formCity}
                     onChange={(e) => setFormCity(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -1014,7 +1014,7 @@ export default function DealerStockExchangePage() {
                     placeholder="Örn: Kadıköy"
                     value={formDistrict}
                     onChange={(e) => setFormDistrict(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1028,7 +1028,7 @@ export default function DealerStockExchangePage() {
                     value={formContactName}
                     onChange={(e) => setFormContactName(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -1039,7 +1039,7 @@ export default function DealerStockExchangePage() {
                     value={formContactPhone}
                     onChange={(e) => setFormContactPhone(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1051,7 +1051,7 @@ export default function DealerStockExchangePage() {
                   placeholder="Müşteri projesi için eksik kaldı, teslim alabiliriz veya depomuzdan verebiliriz..."
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.82rem', boxSizing: 'border-box' }}
                 />
               </div>
 
@@ -1059,7 +1059,7 @@ export default function DealerStockExchangePage() {
                 type="submit"
                 disabled={submitting}
                 style={{
-                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1.5px solid #d4af37', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
+                  background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', border: '1.5px solid #C5A04B', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
                   border: 'none',
                   padding: '12px',
                   borderRadius: '12px',
@@ -1091,7 +1091,7 @@ export default function DealerStockExchangePage() {
         }}>
           <div style={{
             background: '#ffffff',
-            border: '1.5px solid #cbd5e1',
+            border: '1.5px solid #E4E8EF',
             borderRadius: '24px',
             width: '100%',
             maxWidth: '560px',
@@ -1101,22 +1101,22 @@ export default function DealerStockExchangePage() {
             overflowY: 'auto'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#0f172a' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#202938' }}>
                 ✏️ İlanınızı Düzenleyin
               </h3>
-              <button onClick={() => setEditingOffer(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}>
+              <button onClick={() => setEditingOffer(null)} style={{ background: 'none', border: 'none', color: '#758195', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             </div>
 
             {editError && (
-              <div style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid #ef4444', color: '#f87171', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
+              <div style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid #DC5353', color: '#f87171', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
                 ⚠️ {editError}
               </div>
             )}
 
             {editSuccess && (
-              <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid #10b981', color: '#34d399', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
+              <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid #10A37F', color: '#34d399', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
                 ✅ {editSuccess}
               </div>
             )}
@@ -1132,9 +1132,9 @@ export default function DealerStockExchangePage() {
                     style={{
                       padding: '12px',
                       borderRadius: '12px',
-                      border: editFormType === 'NEED_STOCK' ? '2px solid #ef4444' : '1.5px solid #cbd5e1',
-                      background: editFormType === 'NEED_STOCK' ? '#fee2e2' : '#f8fafc',
-                      color: editFormType === 'NEED_STOCK' ? '#b91c1c' : '#64748b',
+                      border: editFormType === 'NEED_STOCK' ? '2px solid #DC5353' : '1.5px solid #E4E8EF',
+                      background: editFormType === 'NEED_STOCK' ? '#fee2e2' : '#F5F6F8',
+                      color: editFormType === 'NEED_STOCK' ? '#b91c1c' : '#758195',
                       fontWeight: '800',
                       fontSize: '0.85rem',
                       cursor: 'pointer'
@@ -1148,9 +1148,9 @@ export default function DealerStockExchangePage() {
                     style={{
                       padding: '12px',
                       borderRadius: '12px',
-                      border: editFormType === 'HAVE_STOCK' ? '2px solid #10b981' : '1.5px solid #cbd5e1',
-                      background: editFormType === 'HAVE_STOCK' ? '#d1fae5' : '#f8fafc',
-                      color: editFormType === 'HAVE_STOCK' ? '#047857' : '#64748b',
+                      border: editFormType === 'HAVE_STOCK' ? '2px solid #10A37F' : '1.5px solid #E4E8EF',
+                      background: editFormType === 'HAVE_STOCK' ? '#d1fae5' : '#F5F6F8',
+                      color: editFormType === 'HAVE_STOCK' ? '#047857' : '#758195',
                       fontWeight: '800',
                       fontSize: '0.85rem',
                       cursor: 'pointer'
@@ -1169,7 +1169,7 @@ export default function DealerStockExchangePage() {
                   value={editFormProductName}
                   onChange={(e) => setEditFormProductName(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                 />
               </div>
 
@@ -1181,7 +1181,7 @@ export default function DealerStockExchangePage() {
                     placeholder="Örn: NG Kütahya / Vitra"
                     value={editFormBrandName}
                     onChange={(e) => setEditFormBrandName(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -1191,7 +1191,7 @@ export default function DealerStockExchangePage() {
                     placeholder="20"
                     value={editFormQuantityM2}
                     onChange={(e) => setEditFormQuantityM2(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1205,7 +1205,7 @@ export default function DealerStockExchangePage() {
                     value={editFormCity}
                     onChange={(e) => setEditFormCity(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -1215,7 +1215,7 @@ export default function DealerStockExchangePage() {
                     placeholder="Örn: Kadıköy"
                     value={editFormDistrict}
                     onChange={(e) => setEditFormDistrict(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1229,7 +1229,7 @@ export default function DealerStockExchangePage() {
                     value={editFormContactName}
                     onChange={(e) => setEditFormContactName(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
@@ -1240,7 +1240,7 @@ export default function DealerStockExchangePage() {
                     value={editFormContactPhone}
                     onChange={(e) => setEditFormContactPhone(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
@@ -1250,7 +1250,7 @@ export default function DealerStockExchangePage() {
                 <select
                   value={editFormStatus}
                   onChange={(e) => setEditFormStatus(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.86rem', boxSizing: 'border-box' }}
                 >
                   <option value="OPEN">🟢 Yayında / Açık</option>
                   <option value="MATCHED">✅ Eşleşti / Tamamlandı</option>
@@ -1265,7 +1265,7 @@ export default function DealerStockExchangePage() {
                   placeholder="Müşteri projesi için eksik kaldı, teslim alabiliriz veya depomuzdan verebiliriz..."
                   value={editFormNotes}
                   onChange={(e) => setEditFormNotes(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#f8fafc', border: '1.5px solid #cbd5e1', color: '#0f172a', fontWeight: '600', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: '#F5F6F8', border: '1.5px solid #E4E8EF', color: '#202938', fontWeight: '600', fontSize: '0.82rem', boxSizing: 'border-box' }}
                 />
               </div>
 
@@ -1273,7 +1273,7 @@ export default function DealerStockExchangePage() {
                 type="submit"
                 disabled={editSubmitting}
                 style={{
-                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1.5px solid #d4af37', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
+                  background: 'linear-gradient(135deg, #202938 0%, #1e293b 100%)', border: '1.5px solid #C5A04B', color: '#fde68a', boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
                   border: 'none',
                   padding: '12px',
                   borderRadius: '12px',
