@@ -7248,7 +7248,7 @@ export default function AdminPage() {
           width: 5px;
         }
         .admin-sidebar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
+          background: rgba(212, 175, 55, 0.35);
           border-radius: 4px;
         }
 
@@ -8143,7 +8143,7 @@ export default function AdminPage() {
           width: 6px;
         }
         .table-responsive::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
+          background: rgba(212, 175, 55, 0.35);
           border-radius: 4px;
         }
 

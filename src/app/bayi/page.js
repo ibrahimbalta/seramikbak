@@ -2438,7 +2438,7 @@ Yetkili Satış & Showroom Departmanı`;
           top: 0,
           height: '100vh',
           maxHeight: '100vh',
-          overflowY: 'auto',
+          overflowY: 'hidden',
           overflowX: 'hidden',
           zIndex: 100,
           flexShrink: 0,
@@ -2563,7 +2563,9 @@ Yetkili Satış & Showroom Departmanı`;
             minHeight: 0,
             overflowY: 'auto',
             overflowX: 'hidden',
-            paddingRight: isSidebarCollapsed ? '0' : '2px'
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(212, 175, 55, 0.25) transparent',
+            paddingRight: isSidebarCollapsed ? '0' : '4px'
           }}>
             {[
               { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
