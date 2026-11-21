@@ -10006,25 +10006,14 @@ Yetkili Satış & Showroom Departmanı`;
             box-sizing: border-box !important;
           }
           .dealer-stats-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 6px !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
             margin-bottom: 14px !important;
             width: 100% !important;
             box-sizing: border-box !important;
           }
           .dealer-stats-grid > div {
-            padding: 10px 4px !important;
             min-width: 0 !important;
-            border-radius: 12px !important;
-          }
-          .dealer-stats-grid h4 {
-            font-size: 0.62rem !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-          }
-          .dealer-stats-grid span {
-            font-size: clamp(0.95rem, 4vw, 1.25rem) !important;
           }
           .settings-card {
             padding: 16px 12px !important;

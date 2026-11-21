@@ -271,12 +271,69 @@ export function StatCard({
       className="dealer-stat-card"
     >
       {/* Top Row: Icon + Title & Change Pill */}
+      {isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+            <div
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '10px',
+                background: `${accentColor}15`,
+                border: `1px solid ${accentColor}30`,
+                color: accentColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              {icon}
+            </div>
+            {changeText && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                  padding: '3px 7px',
+                  borderRadius: '999px',
+                  background: badgeColors.bg,
+                  color: badgeColors.color,
+                  fontSize: '0.62rem',
+                  fontWeight: 800,
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {changeType === 'positive' && <ArrowUpRight size={11} style={{ flexShrink: 0 }} />}
+                <span>{changeText}</span>
+              </span>
+            )}
+          </div>
+          <span
+            style={{
+              fontSize: '0.76rem',
+              fontWeight: 700,
+              color: 'var(--dp-text-secondary, #758195)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: 'block'
+            }}
+          >
+            {title}
+          </span>
+        </div>
+      ) : (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
           <div
             style={{
-              width: isMobile ? '36px' : '42px',
-              height: isMobile ? '36px' : '42px',
+              width: '42px',
+              height: '42px',
               borderRadius: '11px',
               background: `${accentColor}15`,
               border: `1px solid ${accentColor}30`,
@@ -291,7 +348,7 @@ export function StatCard({
           </div>
           <span
             style={{
-              fontSize: isMobile ? '0.76rem' : '0.82rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
               color: 'var(--dp-text-secondary, #758195)',
               whiteSpace: 'nowrap',
@@ -324,28 +381,31 @@ export function StatCard({
           </span>
         )}
       </div>
+      )}
 
       {/* Bottom Row: Big Metric Value + Mini Performance Sparkline */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: isMobile ? '6px' : '12px' }}>
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: isMobile ? '1.45rem' : '1.75rem',
+              fontSize: isMobile ? '1.3rem' : '1.75rem',
               fontWeight: 900,
               color: 'var(--dp-text-primary, #202938)',
               lineHeight: 1.1,
               letterSpacing: '-0.025em',
-              fontFamily: 'var(--font-title, "Outfit", sans-serif)'
+              fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+              whiteSpace: 'nowrap'
             }}
           >
             {value}
             {unit && (
               <span
                 style={{
-                  fontSize: '0.8rem',
+                  fontSize: isMobile ? '0.72rem' : '0.8rem',
                   fontWeight: 700,
                   color: 'var(--dp-text-secondary, #758195)',
-                  marginLeft: '5px'
+                  marginLeft: '4px',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {unit}
@@ -356,8 +416,8 @@ export function StatCard({
 
         {/* Mini SVG Sparkline */}
         <svg
-          width="92"
-          height="30"
+          width={isMobile ? '52' : '92'}
+          height={isMobile ? '22' : '30'}
           viewBox="0 0 92 30"
           style={{ flexShrink: 0, overflow: 'visible' }}
           aria-hidden="true"
