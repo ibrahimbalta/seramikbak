@@ -84,6 +84,14 @@ const HowItWorksModal = dynamic(() => import('@/components/HowItWorksModal'), { 
 const BimSpecDownloadModal = dynamic(() => import('@/components/BimSpecDownloadModal'), { ssr: false });
 const TileCalculatorWidget = dynamic(() => import('@/components/TileCalculatorWidget'), { ssr: false });
 import HomeTrustFaqSection from '@/components/HomeTrustFaqSection';
+import {
+  AiDesignShowcaseSection,
+  PopularCollectionsSection,
+  LeadingBrandsSection,
+  AuthorizedDealerNetworkSection,
+  ArchitectsProfessionalsSection,
+  InspirationGallerySection
+} from '@/components/home/ArchitecturalShowroomSections';
 
 // Dynamically import Room Renovation (Mekânımda Gör & Dene) modal
 const RoomRenovationModal = dynamic(() => import('@/components/RoomRenovationModal'), { 
@@ -354,28 +362,28 @@ function generateMoodboardFromProduct(product, index) {
 
 const heroSlides = [
   {
-    title: "Seramiği",
-    highlight: "Evinizde Görün",
-    subtitle: "Beğendiğiniz seramiği odanızda deneyin. 3D tasarlayın, bayilerden teklif alın.",
+    title: "Hayalinizdeki Mekân,",
+    highlight: "Doğru Seramikle Başlar.",
+    subtitle: "Türkiye'nin lider seramik markalarını tek platformda keşfedin. Seçtiğiniz seramikleri kendi mekânınızda deneyin, yetkili bayilerden teklif alın.",
+    bg: "/hero/wide_luxury_bathroom.jpg",
+    tag: "DİJİTAL SERAMİK SHOWROOM PLATFORMU",
+    ctaText: "Seramikleri Keşfet"
+  },
+  {
+    title: "Satın Almadan Önce",
+    highlight: "Mekânınızda Görün.",
+    subtitle: "Beğendiğiniz seramikleri kendi banyonuzda veya mutfağınızda yapay zekâ ve 3D Sanal Stüdyo ile deneyin, derz ve ışık uyumunu canlı inceleyin.",
     bg: "/hero/modern_living.png",
-    tag: "3D DİJİTAL ODA SİMÜLASYONU",
-    ctaText: "3D'de Dene"
+    tag: "AI & 3D MEKÂN SİMÜLASYONU",
+    ctaText: "Seramikleri Keşfet"
   },
   {
-    title: "Türkiye'nin",
-    highlight: "Seramik Arama Motoru",
-    subtitle: "17 seçkin üretici markanın 25.000+ seramik modelini keşfedin, yetkili bayilerden doğrudan teklif alın.",
-    bg: "/hero/luxury_bathroom.png",
-    tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
-    ctaText: "3D'de Dene"
-  },
-  {
-    title: "Kendi Odanızı",
-    highlight: "AI ile Tasarlayın",
-    subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; yapay zeka seçtiğiniz seramikleri odanıza giydirsin.",
+    title: "Lider Üreticiler,",
+    highlight: "Yetkili Bayi Ağı.",
+    subtitle: "Türkiye genelindeki yetkili satış noktalarını keşfedin. Projeniz için size en yakın yetkili bayiden ücretsiz fiyat teklifi alın.",
     bg: "/hero/scandinavian_kitchen.png",
-    tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME",
-    ctaText: "3D'de Dene"
+    tag: "TÜRKİYE GENELİ YETKİLİ BAYİ AĞI",
+    ctaText: "Seramikleri Keşfet"
   }
 ];
 
@@ -2299,9 +2307,10 @@ export default function Home() {
       }
       const res = await fetch(url);
       const data = await res.json();
+      const rawItems = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       
       // Pricing simulation
-      const simulatedData = Array.isArray(data) ? data.map(item => enrichProductData(item, userLocationName)) : [];
+      const simulatedData = rawItems.map(item => enrichProductData(item, userLocationName));
 
       let sortedData = [...simulatedData];
       if (sortBy === 'price_asc') {
@@ -2389,18 +2398,25 @@ export default function Home() {
   };
 
   const handleTagClick = (tagQuery, filterType = '', filterVal = '') => {
-    setSearchQuery(tagQuery);
     setUploadedImagePreview(null);
     setUploadedImageFile(null);
     setDetectedColorInfo(null);
     setVisualSearchMatches(null);
     
     if (filterType === 'style') {
+      setSearchQuery('');
       setSelectedStyle(filterVal);
     } else if (filterType === 'finish') {
+      setSearchQuery('');
       setSelectedFinish(filterVal);
     } else if (filterType === 'size') {
+      setSearchQuery('');
       setSelectedSize(filterVal);
+    } else if (filterType === 'area') {
+      setSearchQuery('');
+      setSelectedArea(filterVal);
+    } else {
+      setSearchQuery(tagQuery);
     }
     setTimeout(() => {
       catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3937,7 +3953,7 @@ export default function Home() {
               onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               <HomeIcon size={14} />
-              <span style={{ whiteSpace: 'nowrap' }}>Anasayfa</span>
+              <span style={{ whiteSpace: 'nowrap' }}>Ana Sayfa</span>
             </button>
 
             <button 
@@ -3945,12 +3961,21 @@ export default function Home() {
               className="luxury-nav-link"
               onClick={() => {
                 setActiveTab('search');
-                const catEl = document.querySelector('.categories-showcase-container') || document.querySelector('.clean-quick-nav-cards');
+                const catEl = document.getElementById('popular-collections-section') || document.getElementById('catalog-results-section');
                 if (catEl) catEl.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <span>Ürünler</span>
+              <span>Seramik Koleksiyonları</span>
             </button>
+
+            <Link 
+              href="/mekanimda-gor" 
+              className="luxury-nav-link"
+              style={{ textDecoration: 'none' }}
+            >
+              <Sparkles size={14} style={{ color: '#d4af37' }} />
+              <span>AI ile Tasarla</span>
+            </Link>
 
             <button 
               type="button" 
@@ -3958,7 +3983,28 @@ export default function Home() {
               onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               <Palette size={14} style={{ color: '#d4af37' }} />
-              <span>3D Mekân</span>
+              <span>3D Sanal Stüdyo</span>
+            </button>
+
+            <button 
+              type="button" 
+              className="luxury-nav-link"
+              onClick={() => {
+                setActiveTab('search');
+                const brandsEl = document.getElementById('leading-brands-section');
+                if (brandsEl) brandsEl.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <span>Markalar</span>
+            </button>
+
+            <button 
+              type="button" 
+              className={`luxury-nav-link ${activeTab === 'dealers' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('dealers'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            >
+              <MapPin size={14} style={{ color: '#d4af37' }} />
+              <span>Bayi Bul</span>
             </button>
 
             {/* Portallar Dropdown (Bayi, Marka, Mimar, B2B Proje) */}
@@ -4034,26 +4080,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* Outlet & Fırsatlar */}
-            <Link href="/outlet" className="luxury-nav-link luxury-outlet-link">
-              <Sparkles size={14} style={{ color: '#ef4444' }} />
-              <span>Outlet &amp; Fırsatlar</span>
-              <span className="luxury-firsat-badge">Fırsat</span>
-            </Link>
-
-            {/* Seramik Ustaları */}
-            <Link href="/ustalar" className="luxury-nav-link">
-              <Wrench size={14} style={{ color: '#f59e0b' }} />
-              <span>Ustalar</span>
-            </Link>
-
-            {/* İlham & Trendler */}
-            <Link href="/ilham" className="luxury-nav-link">
-              <Sparkles size={14} style={{ color: '#a855f7' }} />
-              <span>İlham</span>
-            </Link>
-
-            {/* Kurumsal Dropdown (Nasıl Çalışır, Hakkımızda, Global) */}
+            {/* Kurumsal Dropdown (Nasıl Çalışır, Hakkımızda, Outlet, Ustalar, İlham, Global) */}
             <div 
               className="utility-dropdown-wrapper luxury-dropdown-wrapper"
               onMouseEnter={() => handleUtilityDropdownOpen('kurumsal')}
@@ -4065,12 +4092,49 @@ export default function Home() {
                 onClick={() => toggleUtilityDropdown('kurumsal')}
               >
                 <Info size={14} />
-                <span>Kurumsal</span>
+                <span>Keşfet</span>
                 <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'kurumsal' ? 'rotated' : ''}`} />
               </button>
 
               {activeUtilityDropdown === 'kurumsal' && (
                 <div className="luxury-dark-dropdown-menu animate-fade-in">
+                  <Link href="/outlet" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+                      <Sparkles size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Outlet &amp; Fırsatlar</span>
+                        <span className="dropdown-item-badge amber-badge">Fırsat</span>
+                      </div>
+                      <span className="dropdown-item-desc">Proje fazlası ve kampanyalı seramik serileri</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/ilham" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7' }}>
+                      <Sparkles size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">İlham Galerisi &amp; Trendler</span>
+                      </div>
+                      <span className="dropdown-item-desc">Mekân tasarımları ve mimari trendler</span>
+                    </div>
+                  </Link>
+
+                  <Link href="/ustalar" className="luxury-dropdown-item" onClick={() => setActiveUtilityDropdown(null)}>
+                    <div className="dropdown-item-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
+                      <Wrench size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Seramik Ustaları</span>
+                      </div>
+                      <span className="dropdown-item-desc">Bölgenizdeki onaylı uygulama ustaları</span>
+                    </div>
+                  </Link>
+
                   <button 
                     type="button"
                     className="luxury-dropdown-item"
@@ -4123,6 +4187,16 @@ export default function Home() {
 
           {/* Right Action Controls */}
           <div className="luxury-header-actions">
+            {/* Location & Language */}
+            <HeaderLocationPicker 
+              userLocationName={userLocationName}
+              userCoords={userCoords}
+              onLocationChange={handleLocationChange}
+              onDetectLocation={detectUserLocation}
+              isLocating={isLocating}
+            />
+            <LanguageSelector />
+
             {/* Favorites Icon */}
             <button 
               type="button" 
@@ -4134,7 +4208,7 @@ export default function Home() {
               {userFavorites.length > 0 && <span className="luxury-badge-count">{userFavorites.length}</span>}
             </button>
 
-            {/* User Account Menu */}
+            {/* User Account / Giriş Yap */}
             {currentUser ? (
               <div className="user-menu-wrapper">
                 <button className="luxury-icon-circle-btn logged-in" onClick={() => setShowUserMenu(!showUserMenu)} title={currentUser.name}>
@@ -4169,25 +4243,67 @@ export default function Home() {
                 )}
               </div>
             ) : (
-              <button 
-                type="button" 
-                className="luxury-icon-circle-btn" 
-                onClick={() => window.location.href = '/uyelik'}
+              <Link
+                href="/uyelik"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 13px',
+                  borderRadius: '10px',
+                  background: 'rgba(250, 249, 246, 0.08)',
+                  border: '1px solid rgba(250, 249, 246, 0.18)',
+                  color: '#FAF9F6',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap'
+                }}
                 title="Giriş Yap / Üye Ol"
               >
-                <UserIcon size={16} />
-              </button>
+                <UserIcon size={14} />
+                <span>Giriş Yap</span>
+              </Link>
             )}
 
-            {/* Location & Language */}
-            <HeaderLocationPicker 
-              userLocationName={userLocationName}
-              userCoords={userCoords}
-              onLocationChange={handleLocationChange}
-              onDetectLocation={detectUserLocation}
-              isLocating={isLocating}
-            />
-            <LanguageSelector />
+            {/* Teklif Taleplerim (Quote Cart Drawer Trigger) */}
+            <button
+              type="button"
+              onClick={() => setShowQuoteCartDrawer(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '7px',
+                padding: '7px 14px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #B38E47 0%, #D4AF37 100%)',
+                border: 'none',
+                color: '#18181B',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 4px 14px rgba(179, 142, 71, 0.25)'
+              }}
+              title="Teklif Taleplerim & Numune Sepeti"
+            >
+              <ShoppingBag size={14} />
+              <span>Teklif Taleplerim</span>
+              {quoteCartItems.length > 0 && (
+                <span
+                  style={{
+                    background: '#18181B',
+                    color: '#F3E5AB',
+                    borderRadius: '999px',
+                    padding: '1px 6px',
+                    fontSize: '0.68rem',
+                    fontWeight: 900
+                  }}
+                >
+                  {quoteCartItems.length}
+                </span>
+              )}
+            </button>
 
             {/* Mobile Hamburger Menu Button */}
             <button 
@@ -4413,15 +4529,31 @@ export default function Home() {
 
               <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <HomeIcon size={16} />
-                <span style={{ fontWeight: '800' }}>{t('home')}</span>
+                <span style={{ fontWeight: '800' }}>Ana Sayfa</span>
               </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'search' ? 'active' : ''}`} 
-                onClick={() => { setActiveTab('search'); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => {
+                  setActiveTab('search');
+                  setShowMobileMenu(false);
+                  setTimeout(() => {
+                    const catEl = document.getElementById('popular-collections-section') || document.getElementById('catalog-results-section');
+                    if (catEl) catEl.scrollIntoView({ behavior: 'smooth' });
+                  }, 80);
+                }}
               >
-                <SearchIcon size={16} />
-                <span>{t('products')}</span>
+                <Layers size={16} />
+                <span>Seramik Koleksiyonları</span>
               </button>
+              <Link 
+                href="/mekanimda-gor"
+                className="mobile-nav-link"
+                style={{ textDecoration: 'none' }}
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <Sparkles size={16} style={{ color: '#d4af37' }} />
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>AI ile Tasarla</span>
+              </Link>
               <button 
                 type="button"
                 className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`}
@@ -4432,14 +4564,40 @@ export default function Home() {
                 }}
               >
                 <Palette size={16} />
-                <span>{t('studio3d')}</span>
+                <span>3D Sanal Stüdyo</span>
+              </button>
+              <button 
+                type="button"
+                className="mobile-nav-link"
+                onClick={() => {
+                  setActiveTab('search');
+                  setShowMobileMenu(false);
+                  setTimeout(() => {
+                    const brandsEl = document.getElementById('leading-brands-section');
+                    if (brandsEl) brandsEl.scrollIntoView({ behavior: 'smooth' });
+                  }, 80);
+                }}
+              >
+                <Building2 size={16} />
+                <span>Markalar</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 <MapPin size={16} />
-                <span>{t('dealers')}</span>
+                <span>Bayi Bul</span>
+              </button>
+              <button 
+                type="button"
+                className="mobile-nav-link"
+                onClick={() => {
+                  setShowMobileMenu(false);
+                  setShowQuoteCartDrawer(true);
+                }}
+              >
+                <ShoppingBag size={16} style={{ color: '#d4af37' }} />
+                <span style={{ fontWeight: '800' }}>Teklif Taleplerim ({quoteCartItems.length})</span>
               </button>
               <Link 
                 href="/global-tanitim"
@@ -4615,37 +4773,46 @@ export default function Home() {
                 </p>
 
                 <div className="luxury-hero-actions-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const catEl = document.getElementById('popular-collections-section') || document.getElementById('catalog-results-section');
+                      if (catEl) catEl.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="clean-hero-primary-btn"
+                    aria-label="Seramikleri Keşfet"
+                    style={{ border: 'none', cursor: 'pointer' }}
+                  >
+                    <Layers size={18} />
+                    <span>Seramikleri Keşfet</span>
+                    <ArrowRight size={16} />
+                  </button>
+
                   <Link
                     href="/mekanimda-gor"
                     style={{ textDecoration: 'none' }}
-                    className="clean-hero-primary-btn"
-                    aria-label="3D'de Canlı Dene"
+                    className="luxury-hero-secondary-btn"
+                    title="AI ile Mekânımı Tasarla"
                   >
-                    <Box size={18} />
-                    <span>{currentHeroSlide.ctaText || "3D'de Canlı Dene"}</span>
-                    <ArrowRight size={16} />
-                  </Link>
-
-                  <label htmlFor="clean-hero-visual-search-input" className="luxury-hero-secondary-btn" title="Fotoğraftan Bul (Yapay Zeka)">
-                    <Camera size={16} />
-                    <span>Fotoğraftan Bul</span>
+                    <Sparkles size={16} style={{ color: '#F3E5AB' }} />
+                    <span>AI ile Mekânımı Tasarla</span>
                     <span className="ai-badge-chip">AI</span>
-                  </label>
+                  </Link>
                 </div>
 
                 {/* Trust Metric Micro-Chips */}
                 <div className="luxury-hero-trust-chips">
                   <div className="hero-trust-chip">
                     <CheckCircle size={12} />
-                    <span>17 Dev Marka</span>
+                    <span>Lider Üretici Markalar</span>
                   </div>
                   <div className="hero-trust-chip">
                     <CheckCircle size={12} />
-                    <span>81 İl Yetkili Bayi</span>
+                    <span>Türkiye Geneli Yetkili Bayi Ağı</span>
                   </div>
                   <div className="hero-trust-chip">
                     <CheckCircle size={12} />
-                    <span>%100 Ücretsiz Teklif</span>
+                    <span>Ücretsiz Teklif Alma</span>
                   </div>
                 </div>
 
@@ -4704,159 +4871,368 @@ export default function Home() {
               </div>
             </div>
 
-            {/* QUICK POPULAR TRENDS STRIP */}
-            <div className="search-quick-trends-bar">
-              <span className="trends-label">
-                <Sparkles size={12} style={{ color: '#d4af37' }} />
-                <span>Popüler:</span>
-              </span>
-              <div className="trends-chips-scroll">
-                {[
-                  { label: '60x120 Mermer', query: '60x120 Mermer' },
-                  { label: 'Meşe Ahşap', query: 'Ahşap' },
-                  { label: 'Loft Beton', query: 'Beton Antrasit' },
-                  { label: 'Banyo Karosu', query: 'Banyo' },
-                  { label: 'Calacatta Gold', query: 'Calacatta' },
-                  { label: 'Mat Siyah', query: 'Siyah Mat' }
-                ].map((tag, tIdx) => (
-                  <button
-                    key={`trend-${tIdx}`}
-                    type="button"
-                    className="trend-chip-btn"
-                    onClick={() => handleTagClick(tag.query)}
+            {/* SECTION 5: AKILLI SERAMİK ARAMA MOTORU */}
+            <div
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid #E8E2D5',
+                borderRadius: '24px',
+                padding: 'clamp(20px, 3vw, 32px)',
+                marginBottom: '28px',
+                boxShadow: '0 14px 40px -12px rgba(36, 36, 36, 0.06)'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  marginBottom: '16px'
+                }}
+              >
+                <div>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 800,
+                      color: '#B38E47',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      display: 'block',
+                      marginBottom: '4px'
+                    }}
                   >
-                    {tag.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* MODERN ULTRA-SLEEK SEARCH CONTAINER */}
-            <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative' }}>
-              <div className="clean-search-pill-box">
-                <div className="modern-search-icon-circle">
-                  <SearchIcon size={20} strokeWidth={2.4} />
+                    AKILLI SERAMİK ARAMA MOTORU
+                  </span>
+                  <h2
+                    style={{
+                      fontSize: 'clamp(1.35rem, 2.2vw, 1.8rem)',
+                      fontWeight: 900,
+                      color: '#242424',
+                      margin: 0,
+                      letterSpacing: '-0.02em',
+                      fontFamily: 'var(--font-title, "Outfit", sans-serif)'
+                    }}
+                  >
+                    Aradığınız Seramik Burada.
+                  </h2>
                 </div>
-                
-                <input 
-                  type="text" 
-                  placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : "Seramik modeli, ebat (60x120), marka veya renk arayın..."}
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className="clean-search-text-input"
-                  disabled={!!uploadedImagePreview}
-                />
 
-                {/* Clear Input Button (when search text is present) */}
-                {searchQuery && !uploadedImagePreview && (
-                  <button 
-                    type="button" 
-                    onClick={() => { setSearchQuery(''); fetchProducts(''); }}
-                    className="modern-search-clear-btn"
-                    title="Aramayı Temizle"
-                  >
-                    ✕
-                  </button>
-                )}
+                {/* Hızlı Kategori Seçenekleri */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {[
+                    { label: 'Mermer', val: 'Mermer' },
+                    { label: 'Beton', val: 'Beton' },
+                    { label: 'Ahşap', val: 'Ahşap' },
+                    { label: 'Doğal Taş', val: 'Doğal Taş' },
+                    { label: 'Traverten', val: 'Traverten' },
+                    { label: 'Mozaik', val: 'Mozaik' },
+                    { label: 'Dekor', val: 'Dekor' }
+                  ].map((cat) => {
+                    const isCatActive = selectedStyle === cat.val;
+                    return (
+                      <button
+                        key={cat.val}
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSelectedStyle(isCatActive ? '' : cat.val);
+                          setTimeout(() => {
+                            catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 80);
+                        }}
+                        style={{
+                          padding: '7px 14px',
+                          borderRadius: '999px',
+                          fontSize: '0.78rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          background: isCatActive ? '#242424' : '#FAF9F6',
+                          color: isCatActive ? '#F3E5AB' : '#242424',
+                          border: isCatActive ? '1px solid #D4AF37' : '1px solid #E8E2D5'
+                        }}
+                      >
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-                {/* Image Preview Thumbnail Overlay */}
-                {uploadedImagePreview && (
-                  <div className="clean-search-thumb-badge">
-                    <img 
-                      src={uploadedImagePreview} 
-                      alt="Görsel Arama" 
-                    />
+              {/* MODERN ULTRA-SLEEK SEARCH CONTAINER */}
+              <form onSubmit={handleSearchSubmit} className="clean-search-container" style={{ position: 'relative', margin: '0 0 16px 0' }}>
+                <div className="clean-search-pill-box">
+                  <div className="modern-search-icon-circle">
+                    <SearchIcon size={20} strokeWidth={2.4} />
+                  </div>
+                  
+                  <input 
+                    type="text" 
+                    placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : "Seramik modeli, marka, ebat veya renk arayın..."}
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    className="clean-search-text-input"
+                    disabled={!!uploadedImagePreview}
+                  />
+
+                  {/* Clear Input Button (when search text is present) */}
+                  {searchQuery && !uploadedImagePreview && (
                     <button 
                       type="button" 
-                      onClick={handleClearSearch}
-                      title="Görseli Kaldır"
+                      onClick={() => { setSearchQuery(''); }}
+                      className="modern-search-clear-btn"
+                      title="Aramayı Temizle"
                     >
                       ✕
                     </button>
+                  )}
+
+                  {/* Image Preview Thumbnail Overlay */}
+                  {uploadedImagePreview && (
+                    <div className="clean-search-thumb-badge">
+                      <img 
+                        src={uploadedImagePreview} 
+                        alt="Görsel Arama" 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={handleClearSearch}
+                        title="Görseli Kaldır"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="clean-search-v-divider" />
+
+                  {/* Camera Button (Fotoğraftan Bul) */}
+                  <label htmlFor="clean-hero-visual-search-input" className="modern-camera-pill-btn" title="Fotoğraftan Bul (Seramik Shazam)">
+                    <Camera size={18} strokeWidth={2} className="modern-camera-icon" />
+                    <span className="modern-camera-text">Fotoğraftan Bul</span>
+                  </label>
+                  <input 
+                    type="file" 
+                    id="clean-hero-visual-search-input"
+                    accept="image/*" 
+                    onChange={handleVisualSearch} 
+                    style={{ display: 'none' }}
+                  />
+
+                  {/* Direct Search Submit Action Button */}
+                  <button type="submit" className="modern-search-submit-btn" disabled={visualSearchLoading}>
+                    {visualSearchLoading ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <>
+                        <span>Ara</span>
+                        <ArrowRight size={15} />
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Instant Search Suggestions Dropdown */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="search-suggestions-dropdown glass-panel" style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: '0',
+                    right: '0',
+                    background: '#ffffff',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '16px',
+                    marginTop: '8px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    zIndex: '99',
+                    maxHeight: '320px',
+                    overflowY: 'auto',
+                    padding: '8px 0'
+                  }}>
+                    {searchSuggestions.map(p => (
+                      <div 
+                        key={p.id} 
+                        className="suggestion-item"
+                        onClick={() => {
+                          setSearchQuery(p.name);
+                          setShowSuggestions(false);
+                          handleProductCardClick(p);
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '10px 16px',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s ease',
+                          borderBottom: '1px solid #f1f3f7'
+                        }}
+                      >
+                        <img 
+                          src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
+                          alt={p.name} 
+                          style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }}
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
+                          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} • {p.code} • {p.width}x{p.height} cm</span>
+                        </div>
+                        <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>↗</span>
+                      </div>
+                    ))}
                   </div>
                 )}
+              </form>
 
-                <div className="clean-search-v-divider" />
-
-                {/* Camera Button (Fotoğraftan Bul) */}
-                <label htmlFor="clean-hero-visual-search-input" className="modern-camera-pill-btn" title="Fotoğraftan Bul (Seramik Shazam)">
-                  <Camera size={18} strokeWidth={2} className="modern-camera-icon" />
-                  <span className="modern-camera-text">Fotoğraftan Bul</span>
-                </label>
-                <input 
-                  type="file" 
-                  id="clean-hero-visual-search-input"
-                  accept="image/*" 
-                  onChange={handleVisualSearch} 
-                  style={{ display: 'none' }}
-                />
-
-                {/* Direct Search Submit Action Button */}
-                <button type="submit" className="modern-search-submit-btn" disabled={visualSearchLoading}>
-                  {visualSearchLoading ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <>
-                      <span>Ara</span>
-                      <ArrowRight size={15} />
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Instant Search Suggestions Dropdown */}
-              {showSuggestions && searchSuggestions.length > 0 && (
-                <div className="search-suggestions-dropdown glass-panel" style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: '0',
-                  right: '0',
-                  background: '#ffffff',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '16px',
-                  marginTop: '8px',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                  zIndex: '99',
-                  maxHeight: '320px',
-                  overflowY: 'auto',
-                  padding: '8px 0'
-                }}>
-                  {searchSuggestions.map(p => (
-                    <div 
-                      key={p.id} 
-                      className="suggestion-item"
-                      onClick={() => {
-                        setSearchQuery(p.name);
-                        setShowSuggestions(false);
-                        handleProductCardClick(p);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px 16px',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s ease',
-                        borderBottom: '1px solid #f1f3f7'
-                      }}
-                    >
-                      <img 
-                        src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
-                        alt={p.name} 
-                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }}
-                      />
-                      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                        <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} • {p.code} • {p.width}x{p.height} cm</span>
-                      </div>
-                      <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>↗</span>
-                    </div>
+              {/* Hızlı Filtreler: Marka, Ebat, Renk, Yüzey, Mekân Tipi */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                  gap: '10px',
+                  paddingTop: '12px',
+                  borderTop: '1px solid #F3F2EE'
+                }}
+              >
+                <select
+                  aria-label="Marka Filtresi"
+                  value={selectedBrand}
+                  onChange={(e) => {
+                    setSelectedBrand(e.target.value);
+                    setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                  }}
+                  style={{
+                    height: '40px',
+                    padding: '0 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #E8E2D5',
+                    background: '#FAF9F6',
+                    color: '#242424',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Marka: Tümü</option>
+                  {brands.filter(b => b.name?.toLowerCase() !== 'kalebodur').map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
                   ))}
-                </div>
-              )}
-            </form>
+                </select>
+
+                <select
+                  aria-label="Ebat Filtresi"
+                  value={selectedSize}
+                  onChange={(e) => {
+                    setSelectedSize(e.target.value);
+                    setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                  }}
+                  style={{
+                    height: '40px',
+                    padding: '0 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #E8E2D5',
+                    background: '#FAF9F6',
+                    color: '#242424',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Ebat: Tümü</option>
+                  <option value="60x120">60×120 cm</option>
+                  <option value="60x60">60×60 cm</option>
+                  <option value="30x60">30×60 cm</option>
+                  <option value="20x120">20×120 cm</option>
+                  <option value="80x160">80×160 cm</option>
+                  <option value="120x240">120×240 cm</option>
+                </select>
+
+                <select
+                  aria-label="Renk Filtresi"
+                  value={selectedColor}
+                  onChange={(e) => {
+                    setSelectedColor(e.target.value);
+                    setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                  }}
+                  style={{
+                    height: '40px',
+                    padding: '0 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #E8E2D5',
+                    background: '#FAF9F6',
+                    color: '#242424',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Renk: Tümü</option>
+                  <option value="Beyaz">Beyaz</option>
+                  <option value="Bej">Bej / Krem</option>
+                  <option value="Gri">Gri</option>
+                  <option value="Antrasit">Antrasit</option>
+                  <option value="Siyah">Siyah</option>
+                  <option value="Kahverengi">Kahverengi / Meşe</option>
+                </select>
+
+                <select
+                  aria-label="Yüzey Filtresi"
+                  value={selectedFinish}
+                  onChange={(e) => {
+                    setSelectedFinish(e.target.value);
+                    setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                  }}
+                  style={{
+                    height: '40px',
+                    padding: '0 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #E8E2D5',
+                    background: '#FAF9F6',
+                    color: '#242424',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Yüzey: Tümü</option>
+                  <option value="Mat">Mat</option>
+                  <option value="Parlak">Parlak</option>
+                  <option value="Lappato">Lappato (Yarı Parlak)</option>
+                  <option value="Saten">Saten</option>
+                </select>
+
+                <select
+                  aria-label="Mekân Tipi Filtresi"
+                  value={selectedArea}
+                  onChange={(e) => {
+                    setSelectedArea(e.target.value);
+                    setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+                  }}
+                  style={{
+                    height: '40px',
+                    padding: '0 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #E8E2D5',
+                    background: '#FAF9F6',
+                    color: '#242424',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                >
+                  <option value="">Mekân Tipi: Tümü</option>
+                  <option value="Banyo">Banyo</option>
+                  <option value="Mutfak">Mutfak</option>
+                  <option value="Salon">Salon &amp; Yaşam Alanı</option>
+                  <option value="Teras">Dış Mekân / Teras</option>
+                </select>
+              </div>
+            </div>
 
             {/* 4 QUICK ACTION CARDS - Matching Image 1 */}
             <div className="clean-quick-nav-cards">
@@ -4964,7 +5340,7 @@ export default function Home() {
               {/* Circular Categories List */}
               <div className="circular-categories-row">
                 <button 
-                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); setSelectedSize(''); fetchProducts(); }} 
+                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); setSelectedSize(''); setSearchQuery(''); }} 
                   className={`category-circle-btn ${selectedStyle === '' && selectedColor === '' && selectedSize === '' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper flat-bg-gold">
@@ -4974,7 +5350,7 @@ export default function Home() {
                 </button>
 
                 <button 
-                  onClick={() => { setSelectedStyle('Mermer'); fetchProducts('style=Mermer'); }} 
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Mermer'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} 
                   className={`category-circle-btn ${selectedStyle === 'Mermer' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper marble-pattern-bg" />
@@ -4982,7 +5358,7 @@ export default function Home() {
                 </button>
 
                 <button 
-                  onClick={() => { setSelectedStyle('Beton'); fetchProducts('style=Beton'); }} 
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Beton'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} 
                   className={`category-circle-btn ${selectedStyle === 'Beton' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper concrete-pattern-bg" />
@@ -4990,7 +5366,7 @@ export default function Home() {
                 </button>
 
                 <button 
-                  onClick={() => { setSelectedStyle('Ahşap'); fetchProducts('style=Ahşap'); }} 
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Ahşap'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} 
                   className={`category-circle-btn ${selectedStyle === 'Ahşap' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper wood-pattern-bg" />
@@ -4998,32 +5374,41 @@ export default function Home() {
                 </button>
 
                 <button 
-                  onClick={() => { setSelectedStyle('Beton'); fetchProducts('style=Beton'); }} 
-                  className="category-circle-btn"
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Doğal Taş'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} 
+                  className={`category-circle-btn ${selectedStyle === 'Doğal Taş' || selectedStyle === 'Taş' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper stone-pattern-bg" />
-                  <span>{translateStyle('Taş') || 'Taş'}</span>
+                  <span>{translateStyle('Taş') || 'Doğal Taş'}</span>
                 </button>
 
                 <button 
-                  onClick={() => { setSelectedColor('Bej'); fetchProducts('color=Bej'); }} 
-                  className="category-circle-btn"
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Traverten'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} 
+                  className={`category-circle-btn ${selectedStyle === 'Traverten' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper travert-pattern-bg" />
                   <span>{translateStyle('Traverten') || 'Traverten'}</span>
                 </button>
 
-                <button className="category-circle-btn" onClick={() => alert('Mozaik seriler listeleniyor...')}>
+                <button 
+                  className={`category-circle-btn ${selectedStyle === 'Mozaik' ? 'active' : ''}`} 
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Mozaik'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }}
+                >
                   <div className="category-circle-icon-wrapper mosaic-pattern-bg" />
                   <span>{translateStyle('Mozaik') || 'Mozaik'}</span>
                 </button>
 
-                <button className="category-circle-btn" onClick={() => alert('Dekoratif seriler listeleniyor...')}>
+                <button 
+                  className={`category-circle-btn ${selectedStyle === 'Dekor' ? 'active' : ''}`} 
+                  onClick={() => { setSearchQuery(''); setSelectedStyle('Dekor'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }}
+                >
                   <div className="category-circle-icon-wrapper decor-pattern-bg" />
                   <span>{translateStyle('Dekoratif') || 'Dekor'}</span>
                 </button>
 
-                <button className="category-circle-btn" onClick={() => { setSelectedColor('Gri'); fetchProducts('color=Gri'); }}>
+                <button 
+                  className={`category-circle-btn ${selectedColor === 'Gri' ? 'active' : ''}`} 
+                  onClick={() => { setSearchQuery(''); setSelectedColor('Gri'); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }}
+                >
                   <div className="category-circle-icon-wrapper flat-grey-bg" />
                   <span>{translateStyle('Düz Renk') || 'Düz Renk'}</span>
                 </button>
@@ -5038,21 +5423,32 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Brand Logos Infinite Marquee */}
-            <div className="brand-marquee-section">
-              <div className="brand-marquee-container">
-                <div className="brand-marquee-track">
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG KÜTAHYA SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ fontWeight: '900', fontStyle: 'italic' }}>VitrA</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>GÜRAL SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
-                </div>
-              </div>
-            </div>
+            {/* SECTION 6: AI İLE MEKÂNINI TASARLA */}
+            <AiDesignShowcaseSection
+              onOpenStudio={() => {
+                setActiveTab('studio');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+
+            {/* SECTION 7: POPÜLER SERAMİK KOLEKSİYONLARI */}
+            <PopularCollectionsSection
+              onSelectCollection={(title, filterType, filterVal) => {
+                handleTagClick(title, filterType, filterVal);
+              }}
+            />
+
+            {/* SECTION 8: LİDER SERAMİK MARKALARI */}
+            <LeadingBrandsSection
+              brands={brands}
+              selectedBrand={selectedBrand}
+              onSelectBrand={(brandId) => {
+                setSelectedBrand(brandId);
+                setTimeout(() => {
+                  catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 80);
+              }}
+            />
 
 
 
@@ -5249,7 +5645,6 @@ export default function Home() {
                     setSearchQuery('');
                     setUploadedImagePreview(null);
                     setVisualSearchMatches(null);
-                    fetchProducts('clear=true');
                   }} className="clear-all-filters-btn">
                     Temizle
                   </button>
@@ -5904,7 +6299,6 @@ export default function Home() {
                         setSearchQuery('');
                         setUploadedImagePreview(null);
                         setVisualSearchMatches(null);
-                        fetchProducts('clear=true');
                       }} 
                       className="filter-clear-all-chip"
                     >
@@ -5973,7 +6367,33 @@ export default function Home() {
               </div>
             </div>
 
-            {/* NASIL ÇALIŞIR & SIKÇA SORULAN SORULAR (TRUST & FAQ SCHEMA) */}
+            {/* SECTION 10: YETKİLİ BAYİ AĞI */}
+            <AuthorizedDealerNetworkSection
+              brands={brands}
+              userLocationName={userLocationName}
+              onSelectCityAndOpenDealers={(cityName, brandId) => {
+                const cityObj = TURKEY_CITIES.find(c => c.name === cityName) || { name: cityName, lat: 41.0082, lng: 28.9784 };
+                handleLocationChange(cityObj.name, cityObj.lat, cityObj.lng);
+                if (brandId) {
+                  setLocatorBrandId(brandId);
+                }
+                setActiveTab('dealers');
+                fetchNearestDealers(brandId || locatorBrandId || '', cityObj.lat, cityObj.lng);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+
+            {/* SECTION 11: MİMARLAR VE PROFESYONELLER */}
+            <ArchitectsProfessionalsSection />
+
+            {/* SECTION 14: İLHAM GALERİSİ */}
+            <InspirationGallerySection
+              onSelectInspiration={(query, filterType, filterVal) => {
+                handleTagClick(query, filterType, filterVal);
+              }}
+            />
+
+            {/* SECTION 9, 13 & 15: NASIL ÇALIŞIR, GÜVEN & SIKÇA SORULAN SORULAR (TRUST & FAQ SCHEMA) */}
             <HomeTrustFaqSection onNavigateToStudio={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </div>
           );
@@ -8618,24 +9038,24 @@ export default function Home() {
 
           {/* Column 2: Seramik Kategorileri */}
           <div className="footer-col">
-            <h4>Kategoriler</h4>
+            <h4>Seramik Kategorileri</h4>
             <ul>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mermer Görünümlü', 'style', 'Mermer'); }}>Mermer Görünümlü Karolar</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Beton Görünümlü', 'style', 'Beton'); }}>Beton Görünümlü Seramikler</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Ahşap Dokulu', 'style', 'Ahşap'); }}>Ahşap Görünümlü Seramikler</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('60x120', 'size', '60x120'); }}>60x120 Geniş Ebat Porselen</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Parlak', 'finish', 'Parlak'); }}>Parlak & Full Lappato</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mat', 'finish', 'Mat'); }}>Mat & R10 Kaymaz Karolar</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mermer Görünümlü', 'style', 'Mermer'); }}>Mermer Görünümlü</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Beton Görünümlü', 'style', 'Beton'); }}>Beton Görünümlü</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Ahşap Görünümlü', 'style', 'Ahşap'); }}>Ahşap Görünümlü</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Traverten', 'style', 'Traverten'); }}>Traverten Seramikler</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('60x120', 'size', '60x120'); }}>Büyük Ebat Porselen</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Dekor', 'style', 'Dekor'); }}>Dekoratif Seramikler</a></li>
             </ul>
           </div>
 
           {/* Column 3: Popüler Seramik Markaları */}
           <div className="footer-col">
-            <h4>Lider Markalar</h4>
+            <h4>Markalar</h4>
             <ul>
               {brands.slice(0, 6).map(brand => (
                 <li key={brand.id}>
-                  <a href="#" onClick={(e) => { e.preventDefault(); setSelectedBrand(brand.id); fetchProducts(`brandId=${brand.id}`); }}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setSelectedBrand(brand.id); setTimeout(() => catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }}>
                     {brand.name}
                   </a>
                 </li>
@@ -8645,33 +9065,32 @@ export default function Home() {
 
           {/* Column 4: Portallar & Çözümler */}
           <div className="footer-col">
-            <h4>Portallar & Çözümler</h4>
+            <h4>Portallar &amp; Çözümler</h4>
             <ul>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Arama Motoru & Filtreler</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>3D Sanal Stüdyo & AR</a></li>
-              <li><Link href="/bayiler">Yetkili Bayi Bulucu</Link></li>
-              <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
-              <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
-              <li><Link href="/marka">Üretici Marka Portalı</Link></li>
+              <li><Link href="/mekanimda-gor">AI ile Mekânımı Tasarla</Link></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>3D Sanal Stüdyo</a></li>
+              <li><Link href="/bayiler">Bayi Bulucu</Link></li>
               <li>
                 <Link href="/mimar" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#d4af37', fontWeight: '700' }}>
                   <span>Mimar Portalı</span>
                   <span style={{ fontSize: '0.62rem', background: 'rgba(212,175,55,0.18)', border: '1px solid rgba(212,175,55,0.3)', padding: '1px 6px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>PRO</span>
                 </Link>
               </li>
+              <li><Link href="/bayi">Bayi Portalı</Link></li>
+              <li><Link href="/marka">Marka Portalı</Link></li>
             </ul>
           </div>
 
           {/* Column 5: Kurumsal & Destek */}
           <div className="footer-col">
-            <h4>Kurumsal & Destek</h4>
+            <h4>Kurumsal &amp; Destek</h4>
             <ul>
               <li><Link href="/hakkimizda">Hakkımızda</Link></li>
-              <li><Link href="/iletisim">İletişim & SSS</Link></li>
-              <li><Link href="/ilham">İlham Galerisi & Trendler</Link></li>
-              <li><Link href="/yasal?tab=kvkk">KVKK & Gizlilik Politikası</Link></li>
+              <li><Link href="/iletisim">İletişim</Link></li>
+              <li><Link href="/iletisim#sss">Sıkça Sorulan Sorular</Link></li>
+              <li><Link href="/yasal?tab=kvkk">KVKK</Link></li>
+              <li><Link href="/yasal?tab=gizlilik">Gizlilik</Link></li>
               <li><Link href="/yasal?tab=kullanim">Kullanım Koşulları</Link></li>
-              <li><Link href="/yasal?tab=cerez">Çerez Politikası</Link></li>
             </ul>
           </div>
 

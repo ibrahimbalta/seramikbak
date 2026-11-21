@@ -49,22 +49,22 @@ export const dictionaries = {
     // Hero Slides
     heroSlides: [
       {
-        title: "Türkiye'nin Seramik Arama Motoru",
-        highlight: "Yetkili Bayilerden Teklif Alın",
-        subtitle: "40+ seçkin üretici markanın binlerce seramik modelini keşfedin, 3D stüdyoda odanıza uygulayın ve 81 ildeki yetkili bayilerden doğrudan teklif alın.",
-        tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ"
+        title: "Hayalinizdeki Mekân,",
+        highlight: "Doğru Seramikle Başlar.",
+        subtitle: "Türkiye'nin lider seramik markalarını tek platformda keşfedin. Seçtiğiniz seramikleri kendi mekânınızda deneyin, yetkili bayilerden teklif alın.",
+        tag: "DİJİTAL SERAMİK SHOWROOM PLATFORMU"
       },
       {
-        title: "Seramikleri Evinizde Canlı Deneyin",
-        highlight: "3D Sanal Stüdyo Modu",
-        subtitle: "Seçtiğiniz fayans veya karoyu interaktif 3D Sanal Stüdyo'da döşeyin; derz genişliğini, rengini, döşeme desenini ve oda ışıklarını özelleştirin.",
-        tag: "3D DİJİTAL ODA SİMÜLASYONU"
+        title: "Satın Almadan Önce",
+        highlight: "Mekânınızda Görün.",
+        subtitle: "Beğendiğiniz seramikleri kendi banyonuzda veya mutfağınızda yapay zekâ ve 3D Sanal Stüdyo ile deneyin, derz ve ışık uyumunu canlı inceleyin.",
+        tag: "AI & 3D MEKÂN SİMÜLASYONU"
       },
       {
-        title: "Kendi Odanızı AI ile Tasarlayın",
-        highlight: "AI Tasarım Asistanı",
-        subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; Google Gemini yapay zekası zemin/duvar sınırlarını maskeleyip seçtiğiniz seramikleri giydirsin.",
-        tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME"
+        title: "Lider Üreticiler,",
+        highlight: "Yetkili Bayi Ağı.",
+        subtitle: "Türkiye genelindeki yetkili satış noktalarını keşfedin. Projeniz için size en yakın yetkili bayiden ücretsiz fiyat teklifi alın.",
+        tag: "TÜRKİYE GENELİ YETKİLİ BAYİ AĞI"
       }
     ],
 

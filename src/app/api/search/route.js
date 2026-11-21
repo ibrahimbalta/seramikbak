@@ -64,19 +64,60 @@ export async function GET(request) {
     const andConditions = [];
 
     if (brandId) {
-      andConditions.push({ brandId: brandId });
+      andConditions.push({
+        OR: [
+          { brandId: brandId },
+          { brand: { name: { contains: brandId, mode: 'insensitive' } } },
+          { brand: { slug: { contains: brandId, mode: 'insensitive' } } }
+        ]
+      });
     }
 
     if (color) {
-      andConditions.push({ color: color });
+      andConditions.push({
+        OR: [
+          { color: { contains: color, mode: 'insensitive' } },
+          { name: { contains: color, mode: 'insensitive' } }
+        ]
+      });
     }
 
     if (finish) {
-      andConditions.push({ finish: finish });
+      const finishSynonyms = finish.toLowerCase().includes('lapatto') || finish.toLowerCase().includes('lappato')
+        ? ['Lapatto', 'Lappato', 'Yarı Parlak']
+        : [finish];
+      andConditions.push({
+        OR: finishSynonyms.flatMap(f => [
+          { finish: { contains: f, mode: 'insensitive' } },
+          { name: { contains: f, mode: 'insensitive' } }
+        ])
+      });
     }
 
     if (style) {
-      andConditions.push({ style: style });
+      const sLower = style.toLowerCase();
+      let styleTerms = [style];
+      if (sLower.includes('traverten')) {
+        styleTerms = ['Traverten', 'Travertino', 'Taş', 'Bej'];
+      } else if (sLower.includes('doğal taş') || sLower === 'taş') {
+        styleTerms = ['Taş', 'Stone', 'Traverten', 'Travertino', 'Granit', 'Beton'];
+      } else if (sLower.includes('mermer')) {
+        styleTerms = ['Mermer', 'Marble', 'Calacatta', 'Carrara', 'Onyx', 'Statuario'];
+      } else if (sLower.includes('ahşap')) {
+        styleTerms = ['Ahşap', 'Wood', 'Meşe', 'Oak', 'Teak', 'Ceviz', 'Parke'];
+      } else if (sLower.includes('beton')) {
+        styleTerms = ['Beton', 'Concrete', 'Cement', 'Sement', 'Loft'];
+      } else if (sLower.includes('mozaik')) {
+        styleTerms = ['Mozaik', 'Mosaic', 'Dekor', 'Hexagon', '30x30'];
+      } else if (sLower.includes('dekor')) {
+        styleTerms = ['Dekor', 'Decor', 'Rölief', 'Relief', 'Desen', 'Patchwork'];
+      }
+      andConditions.push({
+        OR: styleTerms.flatMap(term => [
+          { style: { contains: term, mode: 'insensitive' } },
+          { name: { contains: term, mode: 'insensitive' } }
+        ])
+      });
     }
 
     if (rectified) {
@@ -113,11 +154,12 @@ export async function GET(request) {
     }
 
     if (area) {
-      // Since area is stored as "Banyo,Mutfak", we perform a contains search
+      // Since area is stored as "Banyo,Mutfak", we perform a case-insensitive contains search
       andConditions.push({
-        area: {
-          contains: area
-        }
+        OR: [
+          { area: { contains: area, mode: 'insensitive' } },
+          { name: { contains: area, mode: 'insensitive' } }
+        ]
       });
     }
 
@@ -151,13 +193,28 @@ export async function GET(request) {
 
       // Apply semantic entity filters if not already passed explicitly
       if (!color && parsedSemantic.extracted.color) {
-        andConditions.push({ color: { contains: parsedSemantic.extracted.color, mode: 'insensitive' } });
+        andConditions.push({
+          OR: [
+            { color: { contains: parsedSemantic.extracted.color, mode: 'insensitive' } },
+            { name: { contains: parsedSemantic.extracted.color, mode: 'insensitive' } }
+          ]
+        });
       }
       if (!style && parsedSemantic.extracted.style) {
-        andConditions.push({ style: { contains: parsedSemantic.extracted.style, mode: 'insensitive' } });
+        andConditions.push({
+          OR: [
+            { style: { contains: parsedSemantic.extracted.style, mode: 'insensitive' } },
+            { name: { contains: parsedSemantic.extracted.style, mode: 'insensitive' } }
+          ]
+        });
       }
       if (!finish && parsedSemantic.extracted.finish) {
-        andConditions.push({ finish: { contains: parsedSemantic.extracted.finish, mode: 'insensitive' } });
+        andConditions.push({
+          OR: [
+            { finish: { contains: parsedSemantic.extracted.finish, mode: 'insensitive' } },
+            { name: { contains: parsedSemantic.extracted.finish, mode: 'insensitive' } }
+          ]
+        });
       }
       if (!area && parsedSemantic.extracted.area) {
         andConditions.push({ area: { contains: parsedSemantic.extracted.area, mode: 'insensitive' } });
@@ -187,14 +244,14 @@ export async function GET(request) {
         tokensToSearch.forEach(token => {
           andConditions.push({
             OR: [
-              { name: { contains: token } },
-              { code: { contains: token } },
-              { slug: { contains: token } },
+              { name: { contains: token, mode: 'insensitive' } },
+              { code: { contains: token, mode: 'insensitive' } },
+              { slug: { contains: token, mode: 'insensitive' } },
               { id: token },
-              { style: { contains: token } },
-              { color: { contains: token } },
-              { finish: { contains: token } },
-              { brand: { name: { contains: token } } }
+              { style: { contains: token, mode: 'insensitive' } },
+              { color: { contains: token, mode: 'insensitive' } },
+              { finish: { contains: token, mode: 'insensitive' } },
+              { brand: { name: { contains: token, mode: 'insensitive' } } }
             ]
           });
         });
@@ -203,9 +260,9 @@ export async function GET(request) {
       if (trimmedQuery.includes('-') || trimmedQuery.includes('_')) {
         andConditions.push({
           OR: [
-            { slug: { contains: trimmedQuery } },
-            { code: { contains: trimmedQuery } },
-            { name: { contains: trimmedQuery.replace(/[-_]/g, ' ') } }
+            { slug: { contains: trimmedQuery, mode: 'insensitive' } },
+            { code: { contains: trimmedQuery, mode: 'insensitive' } },
+            { name: { contains: trimmedQuery.replace(/[-_]/g, ' '), mode: 'insensitive' } }
           ]
         });
       }
@@ -244,71 +301,77 @@ export async function GET(request) {
       const limit = take || 24;
       const offset = skip || 0;
 
-      const rawRows = await prisma.$queryRaw`
-        WITH RankedProducts AS (
-          SELECT 
-            p.id,
-            p.name,
-            p.code,
-            p."brandId",
-            p.width,
-            p.height,
-            p.color,
-            p.finish,
-            p.style,
-            p."imageUrl",
-            p."textureUrl",
-            p."isPremium",
-            p."createdAt",
-            b.name as "brandName",
-            b."logoUrl" as "brandLogoUrl",
-            b."displayOrder" as "brandDisplayOrder",
-            (
-              SELECT json_agg(json_build_object('id', c.id, 'bidAmount', c."bidAmount"))
-              FROM "AdCampaign" c 
-              WHERE c."brandId" = p."brandId" 
-                AND c.status = 'ACTIVE' 
-                AND (c."expiresAt" IS NULL OR c."expiresAt" > NOW())
-            ) as "campaignsJson",
-            ROW_NUMBER() OVER (
-              PARTITION BY p."brandId" 
-              ORDER BY p."isPremium" DESC, p."createdAt" DESC
-            ) as rn
-          FROM "Product" p
-          JOIN "Brand" b ON p."brandId" = b.id
-        )
-        SELECT *
-        FROM RankedProducts
-        ORDER BY 
-          CASE WHEN "campaignsJson" IS NOT NULL AND "isPremium" = true THEN 0 ELSE 1 END ASC,
-          rn ASC,
-          "brandDisplayOrder" ASC
-        LIMIT ${limit} OFFSET ${offset};
-      `;
+      try {
+        const rawRows = await prisma.$queryRaw`
+          WITH RankedProducts AS (
+            SELECT 
+              p.id,
+              p.name,
+              p.code,
+              p."brandId",
+              p.width,
+              p.height,
+              p.color,
+              p.finish,
+              p.style,
+              p."imageUrl",
+              p."textureUrl",
+              p."isPremium",
+              p."createdAt",
+              b.name as "brandName",
+              b."logoUrl" as "brandLogoUrl",
+              b."displayOrder" as "brandDisplayOrder",
+              (
+                SELECT json_agg(json_build_object('id', c.id, 'bidAmount', c."bidAmount"))
+                FROM "AdCampaign" c 
+                WHERE c."brandId" = p."brandId" 
+                  AND c.status = 'ACTIVE' 
+                  AND (c."expiresAt" IS NULL OR c."expiresAt" > NOW())
+              ) as "campaignsJson",
+              ROW_NUMBER() OVER (
+                PARTITION BY p."brandId" 
+                ORDER BY p."isPremium" DESC, p."createdAt" DESC
+              ) as rn
+            FROM "Product" p
+            LEFT JOIN "Brand" b ON p."brandId" = b.id
+          )
+          SELECT *
+          FROM RankedProducts
+          ORDER BY 
+            CASE WHEN "campaignsJson" IS NOT NULL AND "isPremium" = true THEN 0 ELSE 1 END ASC,
+            rn ASC,
+            COALESCE("brandDisplayOrder", 100) ASC
+          LIMIT ${limit} OFFSET ${offset};
+        `;
 
-      const formatted = rawRows.map(row => ({
-        id: row.id,
-        name: row.name,
-        code: row.code,
-        brandId: row.brandId,
-        width: row.width,
-        height: row.height,
-        color: row.color,
-        finish: row.finish,
-        style: row.style,
-        imageUrl: row.imageUrl,
-        textureUrl: row.textureUrl,
-        isPremium: row.isPremium,
-        brand: {
-          id: row.brandId,
-          name: row.brandName,
-          logoUrl: row.brandLogoUrl,
-          displayOrder: row.brandDisplayOrder
-        },
-        campaigns: row.campaignsJson || []
-      }));
+        if (Array.isArray(rawRows) && rawRows.length > 0) {
+          const formatted = rawRows.map(row => ({
+            id: row.id,
+            name: row.name,
+            code: row.code,
+            brandId: row.brandId,
+            width: row.width,
+            height: row.height,
+            color: row.color,
+            finish: row.finish,
+            style: row.style,
+            imageUrl: row.imageUrl,
+            textureUrl: row.textureUrl,
+            isPremium: row.isPremium,
+            brand: {
+              id: row.brandId,
+              name: row.brandName || 'Seramik',
+              logoUrl: row.brandLogoUrl,
+              displayOrder: row.brandDisplayOrder ?? 100
+            },
+            campaigns: row.campaignsJson || []
+          }));
 
-      return NextResponse.json(formatted);
+          return NextResponse.json(formatted);
+        }
+      } catch (rawErr) {
+        console.warn('[Search API] Raw interleaving query fallback to Prisma findMany:', rawErr?.message);
+      }
     }
 
     if (selectSimple) {
