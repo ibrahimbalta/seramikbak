@@ -4889,7 +4889,7 @@ export default function Home() {
                 position: 'relative',
                 zIndex: 3,
                 width: '100%',
-                maxWidth: '1080px',
+                maxWidth: '1160px',
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 boxSizing: 'border-box',
@@ -5027,13 +5027,16 @@ export default function Home() {
 
               {/* Tek Satır Cam Kategori & Filtre Çubuğu (Image 1 Referansı) */}
               <div
-                className="hero-dock-pills-row"
+                className="hero-dock-pills-row no-scrollbar"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexWrap: 'wrap',
-                  gap: '6px'
+                  flexWrap: 'nowrap',
+                  gap: '5px',
+                  overflowX: 'auto',
+                  scrollbarWidth: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }}
               >
                 {[
@@ -5059,9 +5062,9 @@ export default function Home() {
                       }}
                       style={{
                         height: '28px',
-                        padding: '0 11px',
+                        padding: '0 10px',
                         borderRadius: '999px',
-                        fontSize: '0.71rem',
+                        fontSize: '0.7rem',
                         fontWeight: 600,
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
@@ -5069,7 +5072,8 @@ export default function Home() {
                         color: isCatActive ? '#FFFFFF' : '#F6F3EE',
                         border: isCatActive ? '1px solid #D8C9B5' : '1px solid rgba(255, 255, 255, 0.2)',
                         backdropFilter: 'blur(8px)',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}
                     >
                       {cat.label}
@@ -5087,17 +5091,18 @@ export default function Home() {
                   }}
                   style={{
                     height: '28px',
-                    padding: '0 9px',
-                    maxWidth: '104px',
+                    padding: '0 8px',
+                    maxWidth: '92px',
                     borderRadius: '999px',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.71rem',
+                    fontSize: '0.7rem',
                     fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
-                    backdropFilter: 'blur(8px)'
+                    backdropFilter: 'blur(8px)',
+                    flexShrink: 0
                   }}
                 >
                   <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Marka</option>
@@ -5115,17 +5120,18 @@ export default function Home() {
                   }}
                   style={{
                     height: '28px',
-                    padding: '0 9px',
-                    maxWidth: '104px',
+                    padding: '0 8px',
+                    maxWidth: '92px',
                     borderRadius: '999px',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.71rem',
+                    fontSize: '0.7rem',
                     fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
-                    backdropFilter: 'blur(8px)'
+                    backdropFilter: 'blur(8px)',
+                    flexShrink: 0
                   }}
                 >
                   <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Ebat</option>
@@ -5146,17 +5152,18 @@ export default function Home() {
                   }}
                   style={{
                     height: '28px',
-                    padding: '0 9px',
-                    maxWidth: '104px',
+                    padding: '0 8px',
+                    maxWidth: '92px',
                     borderRadius: '999px',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.71rem',
+                    fontSize: '0.7rem',
                     fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
-                    backdropFilter: 'blur(8px)'
+                    backdropFilter: 'blur(8px)',
+                    flexShrink: 0
                   }}
                 >
                   <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Renk</option>
@@ -5177,17 +5184,18 @@ export default function Home() {
                   }}
                   style={{
                     height: '28px',
-                    padding: '0 9px',
-                    maxWidth: '104px',
+                    padding: '0 8px',
+                    maxWidth: '92px',
                     borderRadius: '999px',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.71rem',
+                    fontSize: '0.7rem',
                     fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
-                    backdropFilter: 'blur(8px)'
+                    backdropFilter: 'blur(8px)',
+                    flexShrink: 0
                   }}
                 >
                   <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Yüzey</option>
@@ -5206,17 +5214,18 @@ export default function Home() {
                   }}
                   style={{
                     height: '28px',
-                    padding: '0 9px',
-                    maxWidth: '104px',
+                    padding: '0 8px',
+                    maxWidth: '92px',
                     borderRadius: '999px',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     background: 'rgba(255, 255, 255, 0.15)',
                     color: '#F6F3EE',
-                    fontSize: '0.71rem',
+                    fontSize: '0.7rem',
                     fontWeight: 600,
                     outline: 'none',
                     cursor: 'pointer',
-                    backdropFilter: 'blur(8px)'
+                    backdropFilter: 'blur(8px)',
+                    flexShrink: 0
                   }}
                 >
                   <option value="" style={{ background: '#252522', color: '#F6F3EE' }}>Mekân Tipi</option>
@@ -12033,7 +12042,14 @@ export default function Home() {
           }
           :global(.smart-search-hero-dock) {
             margin: 0;
-            padding: 12px !important;
+            padding: 10px !important;
+          }
+          :global(.hero-dock-pills-row) {
+            justify-content: flex-start !important;
+            padding-bottom: 2px;
+          }
+          :global(.hero-dock-pills-row::-webkit-scrollbar) {
+            display: none;
           }
           :global(.clean-hero-overlay) {
             background: linear-gradient(135deg, rgba(37, 37, 34, 0.94) 0%, rgba(37, 37, 34, 0.86) 55%, rgba(37, 37, 34, 0.68) 100%);
