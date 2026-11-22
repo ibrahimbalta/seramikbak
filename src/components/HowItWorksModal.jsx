@@ -1252,19 +1252,19 @@ export default function HowItWorksModal({
         }
 
         .hiw-modal-shell {
-          background: #ffffff;
-          border-radius: 28px;
-          border: 1px solid rgba(212, 175, 55, 0.35);
-          box-shadow: 0 25px 70px -15px rgba(15, 23, 42, 0.22), 0 0 30px rgba(212, 175, 55, 0.08);
-          max-width: 1040px;
+          background: #FFFFFF;
+          border-radius: 26px;
+          border: 1px solid rgba(197, 160, 75, 0.38);
+          box-shadow: 0 28px 72px -16px rgba(17, 24, 39, 0.30), 0 0 32px rgba(197, 160, 75, 0.10);
+          max-width: 1060px;
           width: 96%;
           max-height: 92vh;
           overflow-y: auto;
-          color: #0f172a;
-          padding: 28px 34px;
+          color: #202938;
+          padding: 28px 32px;
           position: relative;
           scrollbar-width: thin;
-          scrollbar-color: #cbd5e1 #f8fafc;
+          scrollbar-color: #cbd5e1 #F7F5F0;
           box-sizing: border-box;
         }
 
@@ -1277,9 +1277,9 @@ export default function HowItWorksModal({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-bottom: 1px solid #f1f5f9;
+          border-bottom: 1px solid #E5DFD5;
           padding-bottom: 16px;
-          margin-bottom: 20px;
+          margin-bottom: 18px;
           gap: 16px;
         }
 
@@ -1355,10 +1355,10 @@ export default function HowItWorksModal({
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 6px;
-          background: #f1f5f9;
+          background: #F4F1EA;
           padding: 5px;
           border-radius: 16px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #E5DFD5;
           margin-bottom: 22px;
         }
 
@@ -1380,14 +1380,14 @@ export default function HowItWorksModal({
         }
 
         .hiw-tab-btn:hover {
-          color: #0f172a;
-          background: rgba(255, 255, 255, 0.6);
+          color: #111827;
+          background: rgba(255, 255, 255, 0.72);
         }
 
         .hiw-tab-btn.active {
-          background: linear-gradient(135deg, #b4823c 0%, #92641f 100%);
-          color: #ffffff;
-          box-shadow: 0 4px 14px rgba(180, 130, 60, 0.3);
+          background: linear-gradient(135deg, #111827 0%, #1E293B 100%);
+          color: #F3E5AB;
+          box-shadow: 0 6px 16px rgba(17, 24, 39, 0.22);
         }
 
         .tab-text-full {

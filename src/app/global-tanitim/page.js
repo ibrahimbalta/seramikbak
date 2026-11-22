@@ -214,18 +214,18 @@ export default function GlobalPromotionPage() {
           </div>
 
           {/* Metrics Bar */}
-          <div className="gt-metrics-grid">
+          <div className="gt-metrics-grid" style={{ position: 'relative', zIndex: 1, background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px 20px', backdropFilter: 'blur(12px)' }}>
             <div className="gt-metric-item">
-              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</strong>
-              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Otomatik SEO İndeks</span>
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#F3E5AB' }}>5 Dilde</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#CBD5E1', fontWeight: '700' }}>Otomatik SEO İndeks</span>
             </div>
-            <div className="gt-metric-item gt-metric-item-bordered">
-              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#0f172a' }}>85+</strong>
-              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>İhracat Ülkesi</span>
+            <div className="gt-metric-item gt-metric-item-bordered" style={{ borderColor: 'rgba(255, 255, 255, 0.14)' }}>
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#FFFFFF' }}>85+</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#CBD5E1', fontWeight: '700' }}>İhracat Ülkesi</span>
             </div>
-            <div className="gt-metric-item gt-metric-item-bordered">
-              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>15.000+</strong>
-              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Uluslararası Mimar</span>
+            <div className="gt-metric-item gt-metric-item-bordered" style={{ borderColor: 'rgba(255, 255, 255, 0.14)' }}>
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#F3E5AB' }}>15.000+</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#CBD5E1', fontWeight: '700' }}>Uluslararası Mimar</span>
             </div>
           </div>
 
