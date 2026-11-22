@@ -44,6 +44,11 @@ export default function HowItWorksModal({
   const [sliderPos, setSliderPos] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const sliderContainerRef = useRef(null);
+  const modalScrollRef = useRef(null);
+  const [scrollMetrics, setScrollMetrics] = useState({ thumbTop: 0, thumbHeight: 0, hasOverflow: false });
+  const [isScrollHovered, setIsScrollHovered] = useState(false);
+  const [isThumbDragging, setIsThumbDragging] = useState(false);
+  const thumbDragStartRef = useRef({ startY: 0, startScrollTop: 0 });
 
   // Sample tile choices for interactive preview
   const sampleTiles = [
@@ -119,6 +124,63 @@ export default function HowItWorksModal({
     };
   }, [isDragging]);
 
+  // Custom OverlayScrollbars-style metric sync & thumb drag
+  const updateCustomScrollbar = () => {
+    const el = modalScrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    if (scrollHeight <= clientHeight + 2) {
+      setScrollMetrics({ thumbTop: 0, thumbHeight: 0, hasOverflow: false });
+      return;
+    }
+    const trackHeight = Math.max(clientHeight - 36, 40);
+    const ratio = clientHeight / scrollHeight;
+    const thumbHeight = Math.max(Math.round(trackHeight * ratio), 40);
+    const maxScrollTop = scrollHeight - clientHeight;
+    const maxThumbTop = trackHeight - thumbHeight;
+    const thumbTop = maxScrollTop > 0 ? Math.round((scrollTop / maxScrollTop) * maxThumbTop) : 0;
+    setScrollMetrics({ thumbTop, thumbHeight, hasOverflow: true });
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const raf = requestAnimationFrame(updateCustomScrollbar);
+    const el = modalScrollRef.current;
+    if (!el) return () => cancelAnimationFrame(raf);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateCustomScrollbar) : null;
+    if (ro) {
+      ro.observe(el);
+      if (el.firstElementChild) ro.observe(el.firstElementChild);
+    }
+    window.addEventListener('resize', updateCustomScrollbar);
+    return () => {
+      cancelAnimationFrame(raf);
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', updateCustomScrollbar);
+    };
+  }, [isOpen, activeTab]);
+
+  useEffect(() => {
+    if (!isThumbDragging) return;
+    const onMove = (e) => {
+      const el = modalScrollRef.current;
+      if (!el) return;
+      const { scrollHeight, clientHeight } = el;
+      const trackHeight = Math.max(clientHeight - 36, 40);
+      const maxThumbTop = Math.max(trackHeight - scrollMetrics.thumbHeight, 1);
+      const deltaY = e.clientY - thumbDragStartRef.current.startY;
+      const scrollRatio = (scrollHeight - clientHeight) / maxThumbTop;
+      el.scrollTop = thumbDragStartRef.current.startScrollTop + deltaY * scrollRatio;
+    };
+    const onUp = () => setIsThumbDragging(false);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [isThumbDragging, scrollMetrics.thumbHeight]);
+
   if (!isOpen) return null;
 
   return (
@@ -130,7 +192,14 @@ export default function HowItWorksModal({
       <div
         className="hiw-modal-shell"
         onClick={(e) => e.stopPropagation()}
+        onMouseEnter={() => setIsScrollHovered(true)}
+        onMouseLeave={() => setIsScrollHovered(false)}
       >
+        <div
+          className="hiw-modal-scroll"
+          ref={modalScrollRef}
+          onScroll={updateCustomScrollbar}
+        >
         {/* Mobile Pull Handle */}
         <div className="hiw-pull-handle" />
 
@@ -1235,6 +1304,45 @@ export default function HowItWorksModal({
             </div>
           </div>
         )}
+        </div>
+
+        {/* Custom Floating OverlayScrollbar */}
+        {scrollMetrics.hasOverflow && (
+          <div
+            className="hiw-custom-scrollbar-track"
+            style={{ opacity: isScrollHovered || isThumbDragging ? 1 : 0.65 }}
+            onClick={(e) => {
+              if (e.target !== e.currentTarget) return;
+              const el = modalScrollRef.current;
+              if (!el) return;
+              const rect = e.currentTarget.getBoundingClientRect();
+              const clickRatio = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+              el.scrollTo({
+                top: clickRatio * (el.scrollHeight - el.clientHeight),
+                behavior: 'smooth'
+              });
+            }}
+          >
+            <div
+              className={`hiw-custom-scrollbar-thumb ${isThumbDragging ? 'dragging' : ''}`}
+              style={{
+                top: `${scrollMetrics.thumbTop}px`,
+                height: `${scrollMetrics.thumbHeight}px`
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const el = modalScrollRef.current;
+                if (!el) return;
+                thumbDragStartRef.current = {
+                  startY: e.clientY,
+                  startScrollTop: el.scrollTop
+                };
+                setIsThumbDragging(true);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Styled JSX (Clean Modern Light Luxury Theme Matching Image 2) */}
@@ -1259,13 +1367,75 @@ export default function HowItWorksModal({
           max-width: 1060px;
           width: 96%;
           max-height: 92vh;
-          overflow-y: auto;
+          overflow: hidden;
           color: #202938;
-          padding: 28px 32px;
           position: relative;
-          scrollbar-width: thin;
-          scrollbar-color: #cbd5e1 #F7F5F0;
           box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .hiw-modal-scroll {
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding: 28px 32px;
+          max-height: 92vh;
+          box-sizing: border-box;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .hiw-modal-scroll::-webkit-scrollbar {
+          display: none;
+        }
+
+        .hiw-custom-scrollbar-track {
+          position: absolute;
+          top: 18px;
+          bottom: 18px;
+          right: 7px;
+          width: 8px;
+          border-radius: 999px;
+          background: rgba(15, 23, 42, 0.04);
+          z-index: 40;
+          cursor: pointer;
+          transition: background 0.2s ease, opacity 0.2s ease;
+        }
+
+        .hiw-custom-scrollbar-track:hover {
+          background: rgba(197, 160, 75, 0.12);
+        }
+
+        .hiw-custom-scrollbar-thumb {
+          position: absolute;
+          right: 1px;
+          width: 6px;
+          border-radius: 999px;
+          background: linear-gradient(180deg, #D4AF37 0%, #B38E47 100%);
+          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.35);
+          cursor: grab;
+          transition: width 0.16s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hiw-custom-scrollbar-track:hover .hiw-custom-scrollbar-thumb,
+        .hiw-custom-scrollbar-thumb.dragging {
+          width: 8px;
+          right: 0;
+          box-shadow: 0 3px 12px rgba(179, 142, 71, 0.55);
+        }
+
+        .hiw-custom-scrollbar-thumb.dragging {
+          cursor: grabbing;
+        }
+
+        @media (max-width: 768px) {
+          .hiw-modal-scroll {
+            padding: 18px 14px 28px 14px;
+            max-height: 94vh;
+          }
+          .hiw-custom-scrollbar-track {
+            display: none;
+          }
         }
 
         .hiw-pull-handle {
@@ -2627,7 +2797,7 @@ export default function HowItWorksModal({
             width: 100%;
             max-width: 100%;
             border-radius: 24px 24px 0 0;
-            padding: 12px 16px 28px 16px;
+            padding: 0;
             max-height: 90vh;
             border-bottom: none;
             border-left: none;
